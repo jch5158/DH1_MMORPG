@@ -11,7 +11,7 @@ public:
 
 	static constexpr int32 DEFAULT_EXECUTE_JOB_COUNT = 50;
 	static constexpr int64 DEFAULT_TIME_SLICE_MS = 16;
-	static constexpr int64 DEFAULT_TICK_INTERVAL_MS = 10;
+	static constexpr int64 DEFAULT_TICK_INTERVAL_MS = 16;
 
 	ActorScheduler(const ActorScheduler&) = delete;
 	ActorScheduler& operator=(const ActorScheduler&) = delete;

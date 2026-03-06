@@ -22,7 +22,7 @@ int32 main()
 				NET_ENGINE_LOG_ERROR("ActorScheduler Error, errorCode : {}", errorCode);
 			}),
 		cpp_net_engine::MakeShared<GameSession>,
-		cpp_net_engine::MakeShared<SessionManager>(1)
+		cpp_net_engine::MakeShared<SessionManager>(5000)
 	);
 
 	if (pService->Start() == false)

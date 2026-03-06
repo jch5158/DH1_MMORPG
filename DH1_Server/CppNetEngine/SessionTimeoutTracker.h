@@ -21,6 +21,6 @@ private:
 	
 	static int64 getNowTimeMs();
 	
-	int64 mLastActivityMs;
+	std::atomic<int64> mLastActivityMs;
 };
 

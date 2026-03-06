@@ -5,18 +5,15 @@
 GameSession::GameSession()
 	:PacketSession()
 {
-	fmt::print(L"GameSession Created\n");
 }
 
 GameSession::~GameSession()
 {
-	fmt::print(L"GameSession Destroyed\n");
 }
 
 void GameSession::OnConnected()
 {
 	fmt::print(L"Client Connect\n");
-
 }
 
 void GameSession::OnEnterWaitQueue(const uint64 myTicket)
@@ -49,5 +46,5 @@ void GameSession::OnRecvPacket(byte* pBuffer, const int32 len)
 
 void GameSession::OnError(const int32 errorCode)
 {
-	return;
+	fmt::print(L"OnError - errorCode : {}", errorCode);
 }

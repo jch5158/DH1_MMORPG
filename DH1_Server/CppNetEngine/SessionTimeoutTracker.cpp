@@ -9,15 +9,15 @@ SessionTimeoutTracker::SessionTimeoutTracker()
 void SessionTimeoutTracker::UpdateActivity()
 {
 	const auto now = getNowTimeMs();
-	if (now - mLastActivityMs > ONE_SECOND_MS)
+	if (now - mLastActivityMs.load() > ONE_SECOND_MS)
 	{
-		mLastActivityMs = getNowTimeMs();
+		mLastActivityMs.store(now);
 	}
 }
 
 int64 SessionTimeoutTracker::GetLastActivityMs() const
 {
-	return mLastActivityMs;
+	return mLastActivityMs.load();
 }
 
 int64 SessionTimeoutTracker::getNowTimeMs()

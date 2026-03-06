@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "pch.h"
-
 // ReSharper disable CppClangTidyClangDiagnosticPadded
 template <typename T>
 class ISingleton
@@ -15,7 +13,7 @@ public:
 	ISingleton(ISingleton&&) = delete;
 	ISingleton& operator=(ISingleton&&) = delete;
 
-	virtual ~ISingleton() = default;
+	~ISingleton() = default;
 
 	static T& GetInstance()
 	{

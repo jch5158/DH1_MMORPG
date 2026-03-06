@@ -27,8 +27,8 @@ int main()
 				NET_ENGINE_LOG_ERROR("ActorScheduler Error, errorCode : {}", errorCode);
 			}),
 			cpp_net_engine::MakeShared<GameSession>,
-			cpp_net_engine::MakeShared<SessionManager>(1),
-			cpp_net_engine::MakeShared<SessionReaper>(10000),
+			cpp_net_engine::MakeShared<SessionManager>(5000),
+			cpp_net_engine::MakeShared<SessionReaper>(60000),
 			cpp_net_engine::MakeShared<WaitQueueManager>(0));
 
 	if (pService->Start() == false)
@@ -55,6 +55,16 @@ int main()
 				}
 			});
 	}
+
+	ThreadManager::GetInstance().Launch([pService]()->void
+		{
+			while (true)
+			{
+				fmt::print("Current SessionCount : {}\n", pService->GetCurrentSessionCount());
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+			}
+		});
 
 	ThreadManager::GetInstance().JoinWithClear();
 }

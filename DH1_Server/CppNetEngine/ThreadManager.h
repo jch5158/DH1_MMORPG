@@ -19,7 +19,7 @@ private:
 
 public:
 
-	virtual ~ThreadManager() override;
+	~ThreadManager();
 
 	void Launch(std::function<void()> callback);
 	void JoinWithClear();

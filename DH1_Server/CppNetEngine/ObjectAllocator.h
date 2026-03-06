@@ -26,7 +26,7 @@ private:
 
 public:
 
-	virtual ~ObjectAllocator() override = default;
+	~ObjectAllocator() = default;
 
 	[[nodiscard]]
 	int32 AllocCount() const

@@ -33,7 +33,7 @@ private:
 
 public:
 
-	virtual ~MemoryAllocator() override = default;
+	~MemoryAllocator() = default;
 
 	[[nodiscard]]
 	void* Alloc(const int64 size);
