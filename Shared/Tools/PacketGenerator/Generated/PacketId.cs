@@ -25,13 +25,14 @@ namespace Protocol {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cg5QYWNrZXRJZC5wcm90bxIIUHJvdG9jb2waIGdvb2dsZS9wcm90b2J1Zi9k",
-            "ZXNjcmlwdG9yLnByb3RvKlUKDGVTZXJ2aWNlVHlwZRIVChFTRVJWSUNFX1RZ",
-            "UEVfTk9ORRAAEi4KElNFUlZJQ0VfVFlQRV9MT0dJThABGhaStRgSTG9naW5Q",
-            "YWNrZXRIYW5kbGVyKogBCgllUGFja2V0SWQSCwoHSURfTk9ORRAAEhUKD0lE",
-            "X0MyU19FQ0hPX1JFURCBgAQSFQoPSURfUzJDX0VDSE9fUkVTEIKABBIWChBJ",
-            "RF9DMlNfTE9HSU5fUkVREIOABBIWChBJRF9TMkNfTE9HSU5fUkVTEISABBIQ",
-            "CgtJRF9DMlNfTU9WRRCBBDo5CgxoYW5kbGVyX25hbWUSIS5nb29nbGUucHJv",
-            "dG9idWYuRW51bVZhbHVlT3B0aW9ucxjShgMgASgJYgZwcm90bzM="));
+            "ZXNjcmlwdG9yLnByb3RvKoMBCgxlU2VydmljZVR5cGUSFQoRU0VSVklDRV9U",
+            "WVBFX05PTkUQABIsChFTRVJWSUNFX1RZUEVfRUNITxABGhWStRgRRWNob1Bh",
+            "Y2tldEhhbmRsZXISLgoSU0VSVklDRV9UWVBFX0xPR0lOEAIaFpK1GBJMb2dp",
+            "blBhY2tldEhhbmRsZXIqdgoJZVBhY2tldElkEgsKB0lEX05PTkUQABIVCg9J",
+            "RF9DMlNfRUNIT19SRVEQgYAEEhUKD0lEX1MyQ19FQ0hPX1JFUxCCgAQSFgoQ",
+            "SURfQzJTX0xPR0lOX1JFURCBgAgSFgoQSURfUzJDX0xPR0lOX1JFUxCCgAg6",
+            "OQoMaGFuZGxlcl9uYW1lEiEuZ29vZ2xlLnByb3RvYnVmLkVudW1WYWx1ZU9w",
+            "dGlvbnMY0oYDIAEoCWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Protocol.eServiceType), typeof(global::Protocol.ePacketId), }, new pb::Extension[] { PacketIdExtensions.HandlerName }, null));
@@ -48,16 +49,16 @@ namespace Protocol {
   #region Enums
   public enum eServiceType {
     [pbr::OriginalName("SERVICE_TYPE_NONE")] ServiceTypeNone = 0,
-    [pbr::OriginalName("SERVICE_TYPE_LOGIN")] ServiceTypeLogin = 1,
+    [pbr::OriginalName("SERVICE_TYPE_ECHO")] ServiceTypeEcho = 1,
+    [pbr::OriginalName("SERVICE_TYPE_LOGIN")] ServiceTypeLogin = 2,
   }
 
   public enum ePacketId {
     [pbr::OriginalName("ID_NONE")] IdNone = 0,
     [pbr::OriginalName("ID_C2S_ECHO_REQ")] IdC2SEchoReq = 65537,
     [pbr::OriginalName("ID_S2C_ECHO_RES")] IdS2CEchoRes = 65538,
-    [pbr::OriginalName("ID_C2S_LOGIN_REQ")] IdC2SLoginReq = 65539,
-    [pbr::OriginalName("ID_S2C_LOGIN_RES")] IdS2CLoginRes = 65540,
-    [pbr::OriginalName("ID_C2S_MOVE")] IdC2SMove = 513,
+    [pbr::OriginalName("ID_C2S_LOGIN_REQ")] IdC2SLoginReq = 131073,
+    [pbr::OriginalName("ID_S2C_LOGIN_RES")] IdS2CLoginRes = 131074,
   }
 
   #endregion

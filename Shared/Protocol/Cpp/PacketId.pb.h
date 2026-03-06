@@ -58,7 +58,8 @@ namespace protobuf {
 namespace Protocol {
 enum eServiceType : int {
   SERVICE_TYPE_NONE = 0,
-  SERVICE_TYPE_LOGIN = 1,
+  SERVICE_TYPE_ECHO = 1,
+  SERVICE_TYPE_LOGIN = 2,
   eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -68,8 +69,8 @@ enum eServiceType : int {
 bool eServiceType_IsValid(int value);
 extern const uint32_t eServiceType_internal_data_[];
 constexpr eServiceType eServiceType_MIN = static_cast<eServiceType>(0);
-constexpr eServiceType eServiceType_MAX = static_cast<eServiceType>(1);
-constexpr int eServiceType_ARRAYSIZE = 1 + 1;
+constexpr eServiceType eServiceType_MAX = static_cast<eServiceType>(2);
+constexpr int eServiceType_ARRAYSIZE = 2 + 1;
 const ::google::protobuf::EnumDescriptor*
 eServiceType_descriptor();
 template <typename T>
@@ -82,7 +83,7 @@ const std::string& eServiceType_Name(T value) {
 template <>
 inline const std::string& eServiceType_Name(eServiceType value) {
   return ::google::protobuf::internal::NameOfDenseEnum<eServiceType_descriptor,
-                                                 0, 1>(
+                                                 0, 2>(
       static_cast<int>(value));
 }
 inline bool eServiceType_Parse(absl::string_view name, eServiceType* value) {
@@ -93,9 +94,8 @@ enum ePacketId : int {
   ID_NONE = 0,
   ID_C2S_ECHO_REQ = 65537,
   ID_S2C_ECHO_RES = 65538,
-  ID_C2S_LOGIN_REQ = 65539,
-  ID_S2C_LOGIN_RES = 65540,
-  ID_C2S_MOVE = 513,
+  ID_C2S_LOGIN_REQ = 131073,
+  ID_S2C_LOGIN_RES = 131074,
   ePacketId_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   ePacketId_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -105,8 +105,8 @@ enum ePacketId : int {
 bool ePacketId_IsValid(int value);
 extern const uint32_t ePacketId_internal_data_[];
 constexpr ePacketId ePacketId_MIN = static_cast<ePacketId>(0);
-constexpr ePacketId ePacketId_MAX = static_cast<ePacketId>(65540);
-constexpr int ePacketId_ARRAYSIZE = 65540 + 1;
+constexpr ePacketId ePacketId_MAX = static_cast<ePacketId>(131074);
+constexpr int ePacketId_ARRAYSIZE = 131074 + 1;
 const ::google::protobuf::EnumDescriptor*
 ePacketId_descriptor();
 template <typename T>

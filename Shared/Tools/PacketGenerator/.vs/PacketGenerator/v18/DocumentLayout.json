@@ -11,12 +11,12 @@
       "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\config\\packetconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:config\\packetconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetgenerator.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
@@ -56,9 +56,10 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAgwCkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T05:29:00.864Z"
+              "WhenOpened": "2026-03-06T05:29:00.864Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -86,7 +87,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "PacketId.cs",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Generated\\PacketId.cs",
               "RelativeDocumentMoniker": "Generated\\PacketId.cs",
@@ -115,7 +116,7 @@
               "RelativeDocumentMoniker": "PacketFormatter.cs",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketFormatter.cs",
               "RelativeToolTip": "PacketFormatter.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAcwA8AAABhAAAAAAAAAA==",
+              "ViewState": "AgIAABEAAAAAAAAAAAAAwDMAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-06T04:26:01.466Z",
               "EditorCaption": ""
@@ -146,7 +147,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "PacketConfig.json",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Config\\PacketConfig.json",
               "RelativeDocumentMoniker": "Config\\PacketConfig.json",
@@ -154,7 +155,8 @@
               "RelativeToolTip": "Config\\PacketConfig.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-06T03:21:07.698Z"
+              "WhenOpened": "2026-03-06T03:21:07.698Z",
+              "EditorCaption": ""
             }
           ]
         }

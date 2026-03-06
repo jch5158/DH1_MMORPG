@@ -53,6 +53,12 @@
     <ClCompile Include="..\..\Shared\Protocol\Cpp\Struct.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="EchoPacketHandler.cpp">
+      <Filter>PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Cpp\Echo.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -79,6 +85,12 @@
     <ClInclude Include="..\..\Shared\Protocol\Cpp\Struct.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="Generated\EchoPacketHandler.h">
+      <Filter>PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Cpp\Echo.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Enum.proto">
@@ -91,6 +103,9 @@
       <Filter>Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Struct.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Echo.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
   </ItemGroup>

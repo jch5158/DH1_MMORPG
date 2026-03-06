@@ -1,23 +1,21 @@
 ﻿#include "pch.h"
-#include "GameSession.h"
 #include "Generated/PacketServiceTypeHandler.h"
+#include "GameSession.h"
 
 GameSession::GameSession()
 	:PacketSession()
 {
-	fmt::print(L"GameSession Created\n");
 }
 
 GameSession::~GameSession()
 {
-	fmt::print(L"GameSession Destroyed\n");
 }
 
 void GameSession::OnConnected()
 {
 	Protocol::C2S_ECHO_REQ packet;
 	packet.set_ehcomsg("Hello World\n");
-	const auto pSendBuffer = LoginPacketHandler::MakeSendBuffer(packet);
+	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(packet);
 	Send(pSendBuffer);
 }
 

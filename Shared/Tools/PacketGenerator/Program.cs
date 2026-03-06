@@ -15,10 +15,10 @@ if (args.Length >= 4)
 else
 {
     var baseDir = AppContext.BaseDirectory;
-    configPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\PacketGenerator\Config\PacketConfig.json"));
+    configPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\Tools\PacketGenerator\Config\PacketConfig.json"));
     outputDirPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\PacketGenerator\Generated"));
-    protoPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\Protocol"));
-    prjBasePath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\.."));
+    protoPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\Shared\Protocol"));
+    prjBasePath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\"));
 }
 
 Console.WriteLine($"[Config Path] {configPath}");

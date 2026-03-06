@@ -11,7 +11,8 @@ extend google.protobuf.EnumValueOptions
 enum eServiceType 
 {
     SERVICE_TYPE_NONE = 0x0000;
-    SERVICE_TYPE_LOGIN = 0x0001 [(handler_name) = "LoginPacketHandler"];
+    SERVICE_TYPE_ECHO = 0x0001 [(handler_name) = "EchoPacketHandler"];
+    SERVICE_TYPE_LOGIN = 0x0002 [(handler_name) = "LoginPacketHandler"];
 }
 
 enum ePacketId 
@@ -19,7 +20,6 @@ enum ePacketId
     ID_NONE = 0;
     ID_C2S_ECHO_REQ = 0x00010001;
     ID_S2C_ECHO_RES = 0x00010002;
-    ID_C2S_LOGIN_REQ = 0x00010003;
-    ID_S2C_LOGIN_RES = 0x00010004;
-    ID_C2S_MOVE = 0x0201;
+    ID_C2S_LOGIN_REQ = 0x00020001;
+    ID_S2C_LOGIN_RES = 0x00020002;
 }

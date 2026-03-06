@@ -5,7 +5,7 @@
     <version>1.0.0</version>
     <authors>PacketGenerator</authors>
     <description>Package Description</description>
-    <repository type="git" commit="34aaa6a70f949c2309115f2d1ebf2261df6906e4" />
+    <repository type="git" commit="c4dbd7795a238f8839446586339911d87ba714e8" />
     <dependencies>
       <group targetFramework="net10.0">
         <dependency id="Google.Protobuf" version="3.33.5" exclude="Build,Analyzers" />

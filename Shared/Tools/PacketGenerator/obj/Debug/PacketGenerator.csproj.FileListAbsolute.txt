@@ -55,10 +55,10 @@ E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\obj\Debug\refint\PacketGener
 E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\obj\Debug\PacketGenerator.pdb
 E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\obj\Debug\PacketGenerator.genruntimeconfig.cache
 E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\obj\Debug\ref\PacketGenerator.dll
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\PacketGenerator.exe
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\PacketGenerator.deps.json
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\PacketGenerator.runtimeconfig.json
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\PacketGenerator.dll
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\PacketGenerator.pdb
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\Google.Protobuf.dll
-E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Debug\JetBrains.Annotations.dll
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\PacketGenerator.exe
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\PacketGenerator.deps.json
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\PacketGenerator.runtimeconfig.json
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\PacketGenerator.dll
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\PacketGenerator.pdb
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\Google.Protobuf.dll
+E:\Projects\DH1_MMORPG\Shared\Tools\PacketGenerator\Binaries\JetBrains.Annotations.dll

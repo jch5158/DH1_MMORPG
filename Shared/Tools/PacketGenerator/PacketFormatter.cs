@@ -48,7 +48,8 @@ private:
 ";
 
         public static readonly string SERVICE_TYPE_INIT_FORMAT =
-            @"{0}PacketHandler::Init();
+            @"
+        {0}PacketHandler::Init();
 ";
 
         public static readonly string SERVICE_TYPE_HANDLE_INIT_FORMAT =
