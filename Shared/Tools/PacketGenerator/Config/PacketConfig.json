@@ -4,8 +4,14 @@
       "name": "DH1_Client",
       "role": "Client"
     },
+
     {
-      "name": "DH1_Server",
+      "name": "DH1_Server\\DummyClient",
+      "role": "Client"
+    },
+
+    {
+      "name": "DH1_Server\\GameServer",
       "role": "GameServer"
     }
   ]

@@ -1,12 +1,6 @@
 ﻿using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Protocol;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Text;
-using static Google.Protobuf.Reflection.FeatureSet.Types;
 
 namespace PacketGenerator
 {
@@ -188,7 +182,7 @@ namespace PacketGenerator
                     continue;
                 }
 
-                var fileName = $"{protoName.ToString()}PacketHandler.h";
+                var fileName = $"{protoName}PacketHandler.h";
                 var outputFilePath = Path.Combine(outputDirPath, fileName);
 
                 if (!GenerateInitHandleString(receiver, sender, $"{protoName}.proto", protoFilePath, out var initHandleString))
