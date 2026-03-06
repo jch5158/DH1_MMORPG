@@ -8,10 +8,11 @@
     <PublishAot>False</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<PlatformTarget>x64</PlatformTarget>
 	<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-	<BaseOutputPath>..\Binaries\PacketGenerator</BaseOutputPath>
+    <OutputPath>.\Binaries\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

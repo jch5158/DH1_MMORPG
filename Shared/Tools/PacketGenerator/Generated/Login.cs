@@ -24,14 +24,14 @@ namespace Protocol {
     static LoginReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgtMb2dpbi5wcm90bxIIUHJvdG9jb2waDlBhY2tldElkLnByb3RvIikKDEMy",
-            "U19FQ0hPX1JFURIPCgdlaGNvTXNnGAEgASgJOgiAtRgBiLUYAiIpCgxTMkNf",
-            "RUNIT19SRVMSDwoHZWhjb01zZxgBIAEoCToIgLUYAoi1GAEiTwoNQzJTX0xP",
-            "R0lOX1JFURIKCgJpZBgBIAEoBBIKCgJocBgCIAEoDRIOCgZhdHRhY2sYAyAB",
-            "KA0SDAoEdGVzdBgEIAEoDToIgLUYAYi1GAIiKQoNUzJDX0xPR0lOX1JFUxIO",
-            "CgZyZXN1bHQYASABKAg6CIC1GAKItRgBYgZwcm90bzM="));
+            "CgtMb2dpbi5wcm90bxIIUHJvdG9jb2waCkVudW0ucHJvdG8iKQoMQzJTX0VD",
+            "SE9fUkVREg8KB2VoY29Nc2cYASABKAk6CIC1GAGItRgCIikKDFMyQ19FQ0hP",
+            "X1JFUxIPCgdlaGNvTXNnGAEgASgJOgiAtRgCiLUYASJPCg1DMlNfTE9HSU5f",
+            "UkVREgoKAmlkGAEgASgEEgoKAmhwGAIgASgNEg4KBmF0dGFjaxgDIAEoDRIM",
+            "CgR0ZXN0GAQgASgNOgiAtRgBiLUYAiIpCg1TMkNfTE9HSU5fUkVTEg4KBnJl",
+            "c3VsdBgBIAEoCDoIgLUYAoi1GAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Protocol.PacketIdReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Protocol.EnumReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C2S_ECHO_REQ), global::Protocol.C2S_ECHO_REQ.Parser, new[]{ "EhcoMsg" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S2C_ECHO_RES), global::Protocol.S2C_ECHO_RES.Parser, new[]{ "EhcoMsg" }, null, null, null, null),

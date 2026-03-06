@@ -48,5 +48,3 @@ catch (Exception ex)
 Console.WriteLine(PacketHandlerGenerator.Generate(resultConfig, outputDirPath, protoPath, prjBasePath)
     ? "SUCCESS"
     : "FAILED to generate packet handler.");
-
-Thread.Sleep(10000);

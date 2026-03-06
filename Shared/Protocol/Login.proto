@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 package Protocol;
 
-import "PacketId.proto";
+import "Enum.proto";
 
 message	C2S_ECHO_REQ
 {
