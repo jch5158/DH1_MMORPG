@@ -3,22 +3,9 @@ package Protocol;
 
 import "google/protobuf/descriptor.proto";
 
-enum eRole 
-{
-    ROLE_NONE = 0;
-    CLIENT = 1;
-    GAME_SERVER = 2;
-}
-
-extend google.protobuf.MessageOptions 
-{
-    eRole sender = 50000;
-    eRole receiver = 50001;
-}
-
 extend google.protobuf.EnumValueOptions 
 {
-  string handler_name = 50002;
+    string handler_name = 50002;
 }
 
 enum eServiceType 
@@ -26,6 +13,7 @@ enum eServiceType
     SERVICE_TYPE_NONE = 0x0000;
     SERVICE_TYPE_LOGIN = 0x0001 [(handler_name) = "LoginPacketHandler"];
 }
+
 enum ePacketId 
 {
     ID_NONE = 0;

@@ -9,24 +9,49 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-/// <summary>Holder for reflection information generated from Enum.proto</summary>
-public static partial class EnumReflection {
+namespace Protocol {
 
-  #region Descriptor
-  /// <summary>File descriptor for Enum.proto</summary>
-  public static pbr::FileDescriptor Descriptor {
-    get { return descriptor; }
-  }
-  private static pbr::FileDescriptor descriptor;
+  /// <summary>Holder for reflection information generated from Enum.proto</summary>
+  public static partial class EnumReflection {
 
-  static EnumReflection() {
-    byte[] descriptorData = global::System.Convert.FromBase64String(
-        string.Concat(
-          "CgpFbnVtLnByb3Rv"));
-    descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-        new pbr::FileDescriptor[] { },
-        new pbr::GeneratedClrTypeInfo(null, null, null));
+    #region Descriptor
+    /// <summary>File descriptor for Enum.proto</summary>
+    public static pbr::FileDescriptor Descriptor {
+      get { return descriptor; }
+    }
+    private static pbr::FileDescriptor descriptor;
+
+    static EnumReflection() {
+      byte[] descriptorData = global::System.Convert.FromBase64String(
+          string.Concat(
+            "CgpFbnVtLnByb3RvEghQcm90b2NvbBogZ29vZ2xlL3Byb3RvYnVmL2Rlc2Ny",
+            "aXB0b3IucHJvdG8qMwoFZVJvbGUSDQoJUk9MRV9OT05FEAASCgoGQ0xJRU5U",
+            "EAESDwoLR0FNRV9TRVJWRVIQAjpCCgZzZW5kZXISHy5nb29nbGUucHJvdG9i",
+            "dWYuTWVzc2FnZU9wdGlvbnMY0IYDIAEoDjIPLlByb3RvY29sLmVSb2xlOkQK",
+            "CHJlY2VpdmVyEh8uZ29vZ2xlLnByb3RvYnVmLk1lc3NhZ2VPcHRpb25zGNGG",
+            "AyABKA4yDy5Qcm90b2NvbC5lUm9sZWIGcHJvdG8z"));
+      descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
+          new pbr::FileDescriptor[] { global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor, },
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Protocol.eRole), }, new pb::Extension[] { EnumExtensions.Sender, EnumExtensions.Receiver }, null));
+    }
+    #endregion
+
   }
+  /// <summary>Holder for extension identifiers generated from the top level of Enum.proto</summary>
+  public static partial class EnumExtensions {
+    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole> Sender =
+      new pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole>(50000, pb::FieldCodec.ForEnum(400000, x => (int) x, x => (global::Protocol.eRole) x, global::Protocol.eRole.RoleNone));
+    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole> Receiver =
+      new pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole>(50001, pb::FieldCodec.ForEnum(400008, x => (int) x, x => (global::Protocol.eRole) x, global::Protocol.eRole.RoleNone));
+  }
+
+  #region Enums
+  public enum eRole {
+    [pbr::OriginalName("ROLE_NONE")] RoleNone = 0,
+    [pbr::OriginalName("CLIENT")] Client = 1,
+    [pbr::OriginalName("GAME_SERVER")] GameServer = 2,
+  }
+
   #endregion
 
 }

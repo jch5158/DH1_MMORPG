@@ -124,8 +124,8 @@ namespace PacketGenerator
                 // 1. 레지스트리 생성 및 등록 (이 코드가 없으면 무조건 Unknown으로 빠집니다!)
                 var registry = new ExtensionRegistry
                 {
-                    PacketIdExtensions.Sender,
-                    PacketIdExtensions.Receiver,
+                    EnumExtensions.Sender,
+                    EnumExtensions.Receiver,
                     PacketIdExtensions.HandlerName
                 };
 
@@ -238,8 +238,8 @@ namespace PacketGenerator
                 // 1. 레지스트리 생성 및 등록 (이 코드가 없으면 무조건 Unknown으로 빠집니다!)
                 var registry = new ExtensionRegistry
                 {
-                    PacketIdExtensions.Sender,
-                    PacketIdExtensions.Receiver
+                    EnumExtensions.Sender,
+                    EnumExtensions.Receiver
                 };
 
                 using var stream = File.OpenRead(filePath);
@@ -259,7 +259,7 @@ namespace PacketGenerator
                             continue;
                         }
 
-                        if (options.GetExtension(PacketIdExtensions.Receiver) != receiver && options.GetExtension(PacketIdExtensions.Sender) != sender)
+                        if (options.GetExtension(EnumExtensions.Receiver) != receiver && options.GetExtension(EnumExtensions.Sender) != sender)
                         {
                             continue;
                         }
@@ -290,8 +290,8 @@ namespace PacketGenerator
                 // 1. 레지스트리 생성 및 등록 (이 코드가 없으면 무조건 Unknown으로 빠집니다!)
                 var registry = new ExtensionRegistry
                 {
-                    PacketIdExtensions.Sender,
-                    PacketIdExtensions.Receiver
+                    EnumExtensions.Sender,
+                    EnumExtensions.Receiver
                 };
 
                 using var stream = File.OpenRead(filePath);
@@ -307,7 +307,7 @@ namespace PacketGenerator
                     foreach (var msg in fileProto.MessageType)
                     {
                         var options = msg.Options;
-                        if (options.GetExtension(PacketIdExtensions.Receiver) != receiver && options.GetExtension(PacketIdExtensions.Sender) != sender)
+                        if (options.GetExtension(EnumExtensions.Receiver) != receiver && options.GetExtension(EnumExtensions.Sender) != sender)
                         {
                             continue;
                         }
@@ -336,8 +336,8 @@ namespace PacketGenerator
                 // 1. 레지스트리 생성 및 등록 (이 코드가 없으면 무조건 Unknown으로 빠집니다!)
                 var registry = new ExtensionRegistry
                 {
-                    PacketIdExtensions.Sender,
-                    PacketIdExtensions.Receiver
+                    EnumExtensions.Sender,
+                    EnumExtensions.Receiver
                 };
 
                 using var stream = File.OpenRead(filePath);
@@ -357,7 +357,7 @@ namespace PacketGenerator
                             continue;
                         }
 
-                        if (options.GetExtension(PacketIdExtensions.Receiver) != sender && options.GetExtension(PacketIdExtensions.Sender) != receiver)
+                        if (options.GetExtension(EnumExtensions.Receiver) != sender && options.GetExtension(EnumExtensions.Sender) != receiver)
                         {
                             continue;
                         }

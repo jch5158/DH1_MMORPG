@@ -25,42 +25,27 @@ namespace Protocol {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cg5QYWNrZXRJZC5wcm90bxIIUHJvdG9jb2waIGdvb2dsZS9wcm90b2J1Zi9k",
-            "ZXNjcmlwdG9yLnByb3RvKjMKBWVSb2xlEg0KCVJPTEVfTk9ORRAAEgoKBkNM",
-            "SUVOVBABEg8KC0dBTUVfU0VSVkVSEAIqVQoMZVNlcnZpY2VUeXBlEhUKEVNF",
-            "UlZJQ0VfVFlQRV9OT05FEAASLgoSU0VSVklDRV9UWVBFX0xPR0lOEAEaFpK1",
-            "GBJMb2dpblBhY2tldEhhbmRsZXIqiAEKCWVQYWNrZXRJZBILCgdJRF9OT05F",
-            "EAASFQoPSURfQzJTX0VDSE9fUkVREIGABBIVCg9JRF9TMkNfRUNIT19SRVMQ",
-            "goAEEhYKEElEX0MyU19MT0dJTl9SRVEQg4AEEhYKEElEX1MyQ19MT0dJTl9S",
-            "RVMQhIAEEhAKC0lEX0MyU19NT1ZFEIEEOkIKBnNlbmRlchIfLmdvb2dsZS5w",
-            "cm90b2J1Zi5NZXNzYWdlT3B0aW9ucxjQhgMgASgOMg8uUHJvdG9jb2wuZVJv",
-            "bGU6RAoIcmVjZWl2ZXISHy5nb29nbGUucHJvdG9idWYuTWVzc2FnZU9wdGlv",
-            "bnMY0YYDIAEoDjIPLlByb3RvY29sLmVSb2xlOjkKDGhhbmRsZXJfbmFtZRIh",
-            "Lmdvb2dsZS5wcm90b2J1Zi5FbnVtVmFsdWVPcHRpb25zGNKGAyABKAliBnBy",
-            "b3RvMw=="));
+            "ZXNjcmlwdG9yLnByb3RvKlUKDGVTZXJ2aWNlVHlwZRIVChFTRVJWSUNFX1RZ",
+            "UEVfTk9ORRAAEi4KElNFUlZJQ0VfVFlQRV9MT0dJThABGhaStRgSTG9naW5Q",
+            "YWNrZXRIYW5kbGVyKogBCgllUGFja2V0SWQSCwoHSURfTk9ORRAAEhUKD0lE",
+            "X0MyU19FQ0hPX1JFURCBgAQSFQoPSURfUzJDX0VDSE9fUkVTEIKABBIWChBJ",
+            "RF9DMlNfTE9HSU5fUkVREIOABBIWChBJRF9TMkNfTE9HSU5fUkVTEISABBIQ",
+            "CgtJRF9DMlNfTU9WRRCBBDo5CgxoYW5kbGVyX25hbWUSIS5nb29nbGUucHJv",
+            "dG9idWYuRW51bVZhbHVlT3B0aW9ucxjShgMgASgJYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.Reflection.DescriptorReflection.Descriptor, },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Protocol.eRole), typeof(global::Protocol.eServiceType), typeof(global::Protocol.ePacketId), }, new pb::Extension[] { PacketIdExtensions.Sender, PacketIdExtensions.Receiver, PacketIdExtensions.HandlerName }, null));
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Protocol.eServiceType), typeof(global::Protocol.ePacketId), }, new pb::Extension[] { PacketIdExtensions.HandlerName }, null));
     }
     #endregion
 
   }
   /// <summary>Holder for extension identifiers generated from the top level of PacketId.proto</summary>
   public static partial class PacketIdExtensions {
-    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole> Sender =
-      new pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole>(50000, pb::FieldCodec.ForEnum(400000, x => (int) x, x => (global::Protocol.eRole) x, global::Protocol.eRole.RoleNone));
-    public static readonly pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole> Receiver =
-      new pb::Extension<global::Google.Protobuf.Reflection.MessageOptions, global::Protocol.eRole>(50001, pb::FieldCodec.ForEnum(400008, x => (int) x, x => (global::Protocol.eRole) x, global::Protocol.eRole.RoleNone));
     public static readonly pb::Extension<global::Google.Protobuf.Reflection.EnumValueOptions, string> HandlerName =
       new pb::Extension<global::Google.Protobuf.Reflection.EnumValueOptions, string>(50002, pb::FieldCodec.ForString(400018, ""));
   }
 
   #region Enums
-  public enum eRole {
-    [pbr::OriginalName("ROLE_NONE")] RoleNone = 0,
-    [pbr::OriginalName("CLIENT")] Client = 1,
-    [pbr::OriginalName("GAME_SERVER")] GameServer = 2,
-  }
-
   public enum eServiceType {
     [pbr::OriginalName("SERVICE_TYPE_NONE")] ServiceTypeNone = 0,
     [pbr::OriginalName("SERVICE_TYPE_LOGIN")] ServiceTypeLogin = 1,
