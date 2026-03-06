@@ -1,11 +1,11 @@
-{
+﻿{
   "projects": [
     {
-      "name": "DummyClient",
+      "name": "DH1_Client",
       "role": "Client"
     },
     {
-      "name": "GameServer",
+      "name": "DH1_Server",
       "role": "GameServer"
     }
   ]

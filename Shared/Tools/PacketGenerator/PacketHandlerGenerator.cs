@@ -12,7 +12,7 @@ namespace PacketGenerator
 {
     internal class PacketHandlerGenerator
     {
-        public static bool Generate(PacketProjectsConfig config, string baseDirPath)
+        public static bool Generate(PacketProjectsConfig config, string outputDirPath, string protoPath, string prjBasePath)
         {
             foreach (var projectReceiver in config.Projects)
             {
@@ -29,8 +29,7 @@ namespace PacketGenerator
                         return false;
                     }
 
-                    var protoPath = Path.Combine(baseDirPath, @"..\..\..\..\Common\Protocol");
-                    var outputPath = Path.Combine(baseDirPath, @$"..\..\..\..\{projectReceiver.Name}\Generated");
+                    var outputPath = Path.Combine(prjBasePath, @$"{projectReceiver.Name}\Generated");
                     if (!GenerateHandlerFile(receiver, sender, protoPath, outputPath))
                     {
                         Console.WriteLine("GenerateFile is Failed");

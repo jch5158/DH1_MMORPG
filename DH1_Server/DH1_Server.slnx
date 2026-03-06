@@ -4,9 +4,6 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/Tools/">
-    <Project Path="Tools/PacketGenerator/PacketGenerator.csproj" />
-  </Folder>
   <Project Path="CppNetEngine/CppNetEngine.vcxproj" Id="486cfa2b-9bcb-4a39-a314-9b194c9db079">
     <Platform Project="x64" />
   </Project>
