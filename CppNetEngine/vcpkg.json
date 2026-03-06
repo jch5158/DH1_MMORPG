@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "crashpad",
+    "fmt",
+    "mimalloc",
+    "spdlog",
+    "protobuf"
+  ]
+}

@@ -1,0 +1,21 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/PacketGenerator/PacketGenerator.csproj" />
+  </Folder>
+  <Project Path="CppNetEngine/CppNetEngine.vcxproj" Id="486cfa2b-9bcb-4a39-a314-9b194c9db079">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="DummyClient/DummyClient.vcxproj" Id="f158fc76-3d53-4fc0-ae12-8b9b3b0d5cc0">
+    <BuildDependency Project="CppNetEngine/CppNetEngine.vcxproj" />
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="GameServer/GameServer.vcxproj" Id="1ed39a61-c49d-410b-ac7a-90f50c8d2ae0">
+    <BuildDependency Project="CppNetEngine/CppNetEngine.vcxproj" />
+    <Platform Project="x64" />
+  </Project>
+</Solution>

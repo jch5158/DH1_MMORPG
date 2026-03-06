@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{cc8d4815-8b1f-4834-9acb-2ec0eced18ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{cb954553-106b-42ad-b8a0-4a6580b192b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{3c4c591c-85df-442a-8c66-8a0ff2ac51c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{cda91dfd-1d8f-44c1-bd90-81e9cfd8c3e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{4e9ff5d9-32ba-488f-a21a-9a6661eff64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container">
+      <UniqueIdentifier>{8efa3a9e-5a7d-456e-930c-6350594e4953}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EnginePch">
+      <UniqueIdentifier>{a0925f2d-3277-4dbe-9fe8-3bbc205e03c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{f94ca58d-a0f7-429c-9d56-46cf78ae1cec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pattern">
+      <UniqueIdentifier>{e0791a0c-49cb-4011-a2e8-c3975f0a0171}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\IOCP">
+      <UniqueIdentifier>{20017d25-67d7-4212-a24f-58508c5f5828}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\IOCP\Event">
+      <UniqueIdentifier>{395bfe04-1100-42e9-a0a2-d6f5ac94fbba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Session">
+      <UniqueIdentifier>{3e98945e-61f1-4f9e-9d67-500f8b271781}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor">
+      <UniqueIdentifier>{8d774a0e-136e-4008-855e-facdab60d221}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="EnginePch.h">
+      <Filter>EnginePch</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="NetEngineInit.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="NetEngineMacro.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadManager.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectPool.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="LockFreeStack.h">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectAllocator.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="LockFreeQueue.h">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashReporter.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ISingleton.h">
+      <Filter>Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryPool.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryAllocator.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketUtils.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetAddress.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Listener.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="UniquePtrUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedPtrUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="StlTypes.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Service.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="AllocatorUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Job.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorScheduler.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="NetEngineLogger.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="WaitQueueManager.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopedActor.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpCore.h">
+      <Filter>Network\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="Connector.h">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Disconnector.h">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Receiver.h">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Sender.h">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSession.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Acceptor.h">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="NetSendBuffer.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBufferAllocator.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="NetReceiveBuffer.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionReaper.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionManager.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionTimeoutTracker.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="JobDispatcher.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorOverlapped.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpEvent.h">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="TimingWheel.h">
+      <Filter>Thread</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="NetEngineInit.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadManager.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashReporter.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketUtils.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetAddress.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Listener.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Service.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorScheduler.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="NetEngineLogger.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="WaitQueueManager.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopedActor.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="IocpCore.cpp">
+      <Filter>Network\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Connector.cpp">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Disconnector.cpp">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Receiver.cpp">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Sender.cpp">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketSession.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Acceptor.cpp">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="NetSendBuffer.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="SendBufferAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="NetReceiveBuffer.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionManager.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionReaper.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionTimeoutTracker.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="JobDispatcher.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorOverlapped.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="IocpEvent.cpp">
+      <Filter>Network\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="TimingWheel.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

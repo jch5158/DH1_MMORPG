@@ -1,0 +1,39 @@
+﻿syntax = "proto3";
+package Protocol;
+
+import "PacketId.proto";
+
+message	C2S_ECHO_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GAME_SERVER;
+
+    string ehcoMsg = 1;
+}
+
+message S2C_ECHO_RES
+{
+    option (sender) = GAME_SERVER;
+    option (receiver) = CLIENT;
+
+    string ehcoMsg = 1;
+}
+
+message C2S_LOGIN_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GAME_SERVER;
+
+	uint64 id = 1;
+	uint32 hp = 2;
+	uint32 attack = 3;
+	uint32 test = 4;
+}
+
+message S2C_LOGIN_RES
+{
+    option (sender) = GAME_SERVER;
+    option (receiver) = CLIENT;
+
+	bool result = 1;
+}
