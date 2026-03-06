@@ -26,7 +26,6 @@ public:
 		const auto [packetSize, id] = *(reinterpret_cast<PacketHeader*>(pBuffer));
 		
 		const uint16 serviceType = GET_SERVICE_TYPE(id);
-		const uint16 packetId = GET_PACKET_ID(id);
 
 		const auto iter = sPacketServiceTypeMap.find(serviceType);
 		if (iter != sPacketServiceTypeMap.end())
@@ -63,10 +62,10 @@ private:
         public static readonly string HANDLE_FILE_FORMAT =
             @"// ReSharper disable CppInconsistentNaming
 #pragma once
-#include ""PacketId.pb.h""
-#include ""Enum.pb.h""
-#include ""Struct.pb.h""
-#include ""{0}.pb.h""
+#include ""Cpp/PacketId.pb.h""
+#include ""Cpp/Enum.pb.h""
+#include ""Cpp/Struct.pb.h""
+#include ""Cpp/{0}.pb.h""
 #include ""StlTypes.h""
 #include ""PacketSession.h""
 #include <functional>

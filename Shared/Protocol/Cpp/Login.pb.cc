@@ -196,23 +196,23 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 const char descriptor_table_protodef_Login_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
-    "\n\013Login.proto\022\010Protocol\032\016PacketId.proto\""
-    ")\n\014C2S_ECHO_REQ\022\017\n\007ehcoMsg\030\001 \001(\t:\010\200\265\030\001\210\265"
-    "\030\002\")\n\014S2C_ECHO_RES\022\017\n\007ehcoMsg\030\001 \001(\t:\010\200\265\030"
-    "\002\210\265\030\001\"O\n\rC2S_LOGIN_REQ\022\n\n\002id\030\001 \001(\004\022\n\n\002hp"
-    "\030\002 \001(\r\022\016\n\006attack\030\003 \001(\r\022\014\n\004test\030\004 \001(\r:\010\200\265"
-    "\030\001\210\265\030\002\")\n\rS2C_LOGIN_RES\022\016\n\006result\030\001 \001(\010:"
-    "\010\200\265\030\002\210\265\030\001b\006proto3"
+    "\n\013Login.proto\022\010Protocol\032\nEnum.proto\")\n\014C"
+    "2S_ECHO_REQ\022\017\n\007ehcoMsg\030\001 \001(\t:\010\200\265\030\001\210\265\030\002\")"
+    "\n\014S2C_ECHO_RES\022\017\n\007ehcoMsg\030\001 \001(\t:\010\200\265\030\002\210\265\030"
+    "\001\"O\n\rC2S_LOGIN_REQ\022\n\n\002id\030\001 \001(\004\022\n\n\002hp\030\002 \001"
+    "(\r\022\016\n\006attack\030\003 \001(\r\022\014\n\004test\030\004 \001(\r:\010\200\265\030\001\210\265"
+    "\030\002\")\n\rS2C_LOGIN_RES\022\016\n\006result\030\001 \001(\010:\010\200\265\030"
+    "\002\210\265\030\001b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[1] =
     {
-        &::descriptor_table_PacketId_2eproto,
+        &::descriptor_table_Enum_2eproto,
 };
 static ::absl::once_flag descriptor_table_Login_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Login_2eproto = {
     false,
     false,
-    257,
+    253,
     descriptor_table_protodef_Login_2eproto,
     "Login.proto",
     &descriptor_table_Login_2eproto_once,

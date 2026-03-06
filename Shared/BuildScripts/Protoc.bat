@@ -10,6 +10,9 @@ set "PROTO_DIR=%BASE_DIR%..\Protocol"
 set "CS_OUT_DIR=%BASE_DIR%..\Tools\PacketGenerator\Generated"
 if not exist "%CS_OUT_DIR%" mkdir "%CS_OUT_DIR%"
 
+set "CPP_OUT_DIR=%BASE_DIR%..\Protocol\Cpp"
+if not exist "%CPP_OUT_DIR%" mkdir "%CPP_OUT_DIR%"
+
 for %%f in ("%PROTO_DIR%\*.proto") do (
-    "%PROTOC_PATH%" -I="%PROTO_DIR%" -I="%GOOGLE_INC%" --csharp_out="%CS_OUT_DIR%" --descriptor_set_out="%PROTO_DIR%\%%~nf.desc" --include_imports "%%f"
+    "%PROTOC_PATH%" -I="%PROTO_DIR%" -I="%GOOGLE_INC%" --csharp_out="%CS_OUT_DIR%" --cpp_out="%CPP_OUT_DIR%" --descriptor_set_out="%PROTO_DIR%\%%~nf.desc" --include_imports "%%f"
 )

@@ -32,18 +32,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
-    <ClCompile Include="Generated\Enum.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="Generated\Login.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="Generated\PacketId.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="Generated\Struct.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
     <ClCompile Include="GameSession.cpp">
       <Filter>Network</Filter>
     </ClCompile>
@@ -53,22 +41,22 @@
     <ClCompile Include="LoginPacketHandler.cpp">
       <Filter>PacketHandler</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Cpp\Struct.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Cpp\Enum.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Cpp\Login.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Cpp\PacketId.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>PCH</Filter>
-    </ClInclude>
-    <ClInclude Include="Generated\Enum.pb.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="Generated\Login.pb.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="Generated\PacketId.pb.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="Generated\Struct.pb.h">
-      <Filter>Protocol</Filter>
     </ClInclude>
     <ClInclude Include="GameSession.h">
       <Filter>Network</Filter>
@@ -79,18 +67,30 @@
     <ClInclude Include="Generated\PacketServiceTypeHandler.h">
       <Filter>PacketHandler</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Cpp\Struct.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Cpp\Enum.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Cpp\Login.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Cpp\PacketId.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Common\Protocol\Enum.proto">
+    <None Include="..\..\Shared\Protocol\PacketId.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\Common\Protocol\Login.proto">
+    <None Include="..\..\Shared\Protocol\Struct.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\Common\Protocol\PacketId.proto">
+    <None Include="..\..\Shared\Protocol\Enum.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\Common\Protocol\Struct.proto">
+    <None Include="..\..\Shared\Protocol\Login.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
   </ItemGroup>

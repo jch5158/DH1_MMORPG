@@ -3,12 +3,24 @@
   "WorkspaceRootPath": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetgenerator.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:packetgenerator.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetformatter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:packetformatter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\config\\packetconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:config\\packetconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetgenerator.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:packetgenerator.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetgenerator.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
@@ -19,20 +31,8 @@
       "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:packethandlergenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:generated\\packetid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\generated\\enum.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:generated\\enum.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetformatter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:packetformatter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\config\\packetconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|solutionrelative:config\\packetconfig.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{13EB77B6-F294-9C69-E4A2-2CD92CEF2045}|PacketGenerator.csproj|e:\\projects\\dh1_mmorpg\\shared\\tools\\packetgenerator\\packetconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -46,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
@@ -56,27 +56,25 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T05:29:00.864Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-06T05:29:00.864Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "PacketGenerator",
+              "DocumentIndex": 4,
+              "Title": "PacketGenerator.csproj",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketGenerator.csproj",
               "RelativeDocumentMoniker": "PacketGenerator.csproj",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketGenerator.csproj",
               "RelativeToolTip": "PacketGenerator.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAABJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAABTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-06T05:27:54.945Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-06T05:27:54.945Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "Enum.cs",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Generated\\Enum.cs",
               "RelativeDocumentMoniker": "Generated\\Enum.cs",
@@ -88,43 +86,43 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "PacketId.cs",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Generated\\PacketId.cs",
               "RelativeDocumentMoniker": "Generated\\PacketId.cs",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Generated\\PacketId.cs",
               "RelativeToolTip": "Generated\\PacketId.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAADgAAABAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-06T05:17:22.035Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "PacketGenerator",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketGenerator.csproj",
               "RelativeDocumentMoniker": "PacketGenerator.csproj",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketGenerator.csproj",
               "RelativeToolTip": "PacketGenerator.csproj",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-06T05:00:10.944Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-06T05:00:10.944Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 0,
               "Title": "PacketFormatter.cs",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketFormatter.cs",
               "RelativeDocumentMoniker": "PacketFormatter.cs",
               "ToolTip": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketFormatter.cs",
               "RelativeToolTip": "PacketFormatter.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAcwA8AAABhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T04:26:01.466Z"
+              "WhenOpened": "2026-03-06T04:26:01.466Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "PacketHandlerGenerator.cs",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\PacketHandlerGenerator.cs",
               "RelativeDocumentMoniker": "PacketHandlerGenerator.cs",
@@ -132,8 +130,7 @@
               "RelativeToolTip": "PacketHandlerGenerator.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T03:32:36.911Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-06T03:32:36.911Z"
             },
             {
               "$type": "Document",
@@ -149,7 +146,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 3,
               "Title": "PacketConfig.json",
               "DocumentMoniker": "E:\\Projects\\DH1_MMORPG\\Shared\\Tools\\PacketGenerator\\Config\\PacketConfig.json",
               "RelativeDocumentMoniker": "Config\\PacketConfig.json",
