@@ -49,7 +49,7 @@ bool CrashReporter::Init(const Wstring& appName, const Wstring& appVersion, cons
     }
 
     const fs::path currentDir = GetExeDirectory();
-    const fs::path handlerPath = currentDir / L"crashpad_handler.exe";
+    const fs::path handlerPath = currentDir / LR"(..\..\..\Shared\Tools\Crashpad\crashpad_handler.exe)";
     const fs::path dbPath = currentDir / L"crashes";
     const fs::path metricsPath = currentDir / L"metrics";
 
