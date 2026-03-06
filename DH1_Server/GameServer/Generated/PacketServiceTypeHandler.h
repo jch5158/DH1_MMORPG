@@ -28,7 +28,6 @@ public:
 		const auto [packetSize, id] = *(reinterpret_cast<PacketHeader*>(pBuffer));
 		
 		const uint16 serviceType = GET_SERVICE_TYPE(id);
-		const uint16 packetId = GET_PACKET_ID(id);
 
 		const auto iter = sPacketServiceTypeMap.find(serviceType);
 		if (iter != sPacketServiceTypeMap.end())

@@ -1,9 +1,9 @@
 // ReSharper disable CppInconsistentNaming
 #pragma once
-#include "PacketId.pb.h"
-#include "Enum.pb.h"
-#include "Struct.pb.h"
-#include "Login.pb.h"
+#include "Cpp/PacketId.pb.h"
+#include "Cpp/Enum.pb.h"
+#include "Cpp/Struct.pb.h"
+#include "Cpp/Login.pb.h"
 #include "StlTypes.h"
 #include "PacketSession.h"
 #include <functional>

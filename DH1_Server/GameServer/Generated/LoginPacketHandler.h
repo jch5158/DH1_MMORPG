@@ -1,4 +1,4 @@
-﻿// ReSharper disable CppInconsistentNaming
+// ReSharper disable CppInconsistentNaming
 #pragma once
 #include "Cpp/PacketId.pb.h"
 #include "Cpp/Enum.pb.h"
