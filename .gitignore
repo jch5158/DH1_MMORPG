@@ -813,3 +813,9 @@ vcpkg_installed/
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,jetbrains,visualstudio,csharp,dotnetcore,unrealengine,vcpkg
+
+# Shared 폴더 자체를 예외 처리
+!Shared/
+
+# Shared 폴더 하위의 모든 파일과 폴더를 예외 처리 (기존에 *.exe, *.dll 등이 무시되어 있어도 덮어씀)
+!Shared/**

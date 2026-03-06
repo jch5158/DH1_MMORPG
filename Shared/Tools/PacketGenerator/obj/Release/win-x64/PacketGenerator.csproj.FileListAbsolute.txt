@@ -1,0 +1,17 @@
+E:\Projects\CppNetEngine\Tools\PacketGenerator\Binary\Release\win-x64\PacketGenerator.deps.json
+E:\Projects\CppNetEngine\Tools\PacketGenerator\Binary\Release\win-x64\PacketGenerator.runtimeconfig.json
+E:\Projects\CppNetEngine\Tools\PacketGenerator\Binary\Release\win-x64\PacketGenerator.dll
+E:\Projects\CppNetEngine\Tools\PacketGenerator\Binary\Release\win-x64\PacketGenerator.pdb
+E:\Projects\CppNetEngine\Tools\PacketGenerator\Binary\Release\win-x64\Google.Protobuf.dll
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.csproj.AssemblyReference.cache
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.AssemblyInfoInputs.cache
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.AssemblyInfo.cs
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.csproj.CoreCompileInputs.cache
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.sourcelink.json
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGe.F1D84891.Up2Date
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.dll
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\refint\PacketGenerator.dll
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.pdb
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\PacketGenerator.genruntimeconfig.cache
+E:\Projects\CppNetEngine\Tools\PacketGenerator\obj\Release\win-x64\ref\PacketGenerator.dll
