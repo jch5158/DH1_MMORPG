@@ -15,15 +15,9 @@ bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32
 
 bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet, PacketSessionRef& pSession)
 {
-	static int32 num = 0;
-	num++;
-
 	Protocol::C2S_ECHO_REQ retPacket;
 
-	String str;
-	str = fmt::format("Hello World\n");
-
-	retPacket.set_ehcomsg(str);
+	retPacket.set_ehcomsg("Hello World\n");
 	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(retPacket);
 	
 	const PlayerRef pPlayer = PlayerManager::GetInstance().FindPlayer(pSession);

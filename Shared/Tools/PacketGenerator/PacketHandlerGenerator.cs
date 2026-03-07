@@ -96,6 +96,8 @@ namespace PacketGenerator
                     Directory.CreateDirectory(directoryPath);
                 }
 
+                serviceTypeHandlerContent = serviceTypeHandlerContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
+
                 File.WriteAllText(outputFilePath, serviceTypeHandlerContent, new System.Text.UTF8Encoding(true));
             }
             catch (Exception e)
@@ -215,6 +217,8 @@ namespace PacketGenerator
                     {
                         Directory.CreateDirectory(directoryPath);
                     }
+
+                    handleFileContent = handleFileContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
 
                     File.WriteAllText(outputFilePath, handleFileContent, new System.Text.UTF8Encoding(true));
                 }
