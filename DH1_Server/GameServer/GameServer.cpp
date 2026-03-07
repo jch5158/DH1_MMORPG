@@ -20,8 +20,6 @@ int main()
 			NET_ENGINE_LOG_ERROR("ActorScheduler Error, errorCode : {}", errorCode);
 		});
 
-
-
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(
 		NetAddress(L"127.0.0.1", 7777),
 		cpp_net_engine::MakeShared<Listener>(10,

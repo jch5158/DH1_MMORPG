@@ -111,7 +111,14 @@ void TimingWheel::Tick()
 
 	for (auto& node : executeList)
 	{
-		node.Execute();
+		try
+		{
+			node.Execute();
+		}
+		catch (const std::exception& e)
+		{
+			NET_ENGINE_LOG_FATAL("TimingWheel::Tick - node.Execute Failed {}", e.what());
+		}
 	}
 }
 
@@ -157,14 +164,36 @@ void TimingWheel::addNode(TimingNode&& node)
 	}
 }
 
+void TimingWheel::addNodeList(List<TimingNode>& bucket)
+{
+	auto it = bucket.begin();
+	while (it != bucket.end())
+	{
+		const uint64 delay = it->GetExpiredTick() - mCurrentTick;
+
+		if (delay < LEVEL0_SIZE)
+		{
+			const uint32 index = it->GetExpiredTick() & LEVEL0_MASK;
+			mWheel0[index].splice(mWheel0[index].end(), bucket, it++);
+		}
+		else if (delay < (LEVEL0_SIZE << LEVEL1_BITS))
+		{
+			const uint32 index = (it->GetExpiredTick() >> LEVEL0_BITS) & LEVEL1_MASK;
+			mWheel1[index].splice(mWheel1[index].end(), bucket, it++);
+		}
+		else
+		{
+			const uint32 index = (it->GetExpiredTick() >> (LEVEL0_BITS + LEVEL1_BITS)) & LEVEL2_MASK;
+			mWheel2[index].splice(mWheel2[index].end(), bucket, it++);
+		}
+	}
+}
+
 void TimingWheel::cascade(List<TimingNode>& bucket)
 {
 	List<TimingNode> tempBucket;
 
 	tempBucket.splice(tempBucket.end(), bucket);
 
-	for (auto& node : tempBucket)
-	{
-		addNode(std::move(node));
-	}
+	addNodeList(tempBucket);
 }

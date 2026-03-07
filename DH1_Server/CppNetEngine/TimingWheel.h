@@ -78,6 +78,7 @@ private:
 
 	void processTick(List<TimingNode>& outExecuteList);
 	void addNode(TimingNode&& node);
+	void addNodeList(List<TimingNode>& bucket);
 	void cascade(List<TimingNode>& bucket);
 
 	std::atomic<bool> mbTicking;

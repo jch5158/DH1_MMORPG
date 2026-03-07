@@ -34,8 +34,8 @@ int32 PacketSession::OnReceive(byte* pBuffer, const int32 len)
 			break;
 		}
 
-		OnActivityUpdate();
-		OnRecvPacket(&pBuffer[processLen], size);
+		updateLastActivityMs();
+		OnReceivePacket(&pBuffer[processLen], size);
 
 		processLen += size;
 	}
@@ -43,12 +43,12 @@ int32 PacketSession::OnReceive(byte* pBuffer, const int32 len)
 	return processLen;
 }
 
-void PacketSession::OnActivityUpdate()
+void PacketSession::updateLastActivityMs()
 {
-	mTimeoutTracker.UpdateActivity();
+	mTimeoutTracker.UpdateLastActivityMs();
 }
 
-int64 PacketSession::OnGetLastActivityMs()
+int64 PacketSession::getLastActivityMs() const
 {
 	return mTimeoutTracker.GetLastActivityMs();
 }

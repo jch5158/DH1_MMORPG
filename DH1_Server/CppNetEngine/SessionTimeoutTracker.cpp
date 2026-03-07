@@ -6,7 +6,7 @@ SessionTimeoutTracker::SessionTimeoutTracker()
 {
 }
 
-void SessionTimeoutTracker::UpdateActivity()
+void SessionTimeoutTracker::UpdateLastActivityMs()
 {
 	const auto now = getNowTimeMs();
 	if (now - mLastActivityMs.load() > ONE_SECOND_MS)

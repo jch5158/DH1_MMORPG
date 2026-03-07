@@ -14,7 +14,7 @@ public:
 	explicit SessionTimeoutTracker();
 	~SessionTimeoutTracker() = default;
 
-	void UpdateActivity();
+	void UpdateLastActivityMs();
 	[[nodiscard]] int64 GetLastActivityMs() const;
 	
 private:

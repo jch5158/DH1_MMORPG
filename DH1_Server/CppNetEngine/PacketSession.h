@@ -19,11 +19,13 @@ public:
 	PacketSessionRef GetPacketSessionRef();
 
 	virtual int32 OnReceive(byte* pBuffer, const int32 len) override final;
-	virtual void OnActivityUpdate() override final;
-	virtual int64 OnGetLastActivityMs() override final;
-	virtual void OnRecvPacket(byte* pBuffer, const int32 len) = 0;
+	virtual void OnReceivePacket(byte* pBuffer, const int32 len) = 0;
 
 private:
+
+	void updateLastActivityMs();
+	int64 getLastActivityMs() const;
+
 	SessionTimeoutTracker mTimeoutTracker;
 };
 
