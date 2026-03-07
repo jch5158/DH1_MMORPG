@@ -30,7 +30,7 @@ public:
 
 private:
 
-	HANDLE mJobIocpHandle;
+	HANDLE mActorIocpHandle;
 	const uint32 mTimeSliceMs;
 	const int32 mExecuteJobCount;
 	TimingWheel mTimingWheel;
