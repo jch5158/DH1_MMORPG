@@ -19,6 +19,7 @@ public:
 	bool Register();
 	void Process();
 	void Clear();
+	void ClearEvent();
 
 private:
 

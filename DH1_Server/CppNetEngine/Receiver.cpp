@@ -24,18 +24,16 @@ byte* Receiver::GetWritePtr() const
 
 void Receiver::Process(const uint32 numOfBytes)
 {
-	mReceiveEvent.ClearOverlapped();
-	mReceiveEvent.ResetOwner();
+	ClearEvent();
+
 	if (mpOwner == nullptr || mpOwner->IsDisconnected())
 	{
-		Clear();
 		return;
 	}
 
 	if (numOfBytes == 0)
 	{
 		mpOwner->Disconnect(eDisconnectReason::Closed);
-		Clear();
 		return;
 	}
 
@@ -48,7 +46,6 @@ void Receiver::Process(const uint32 numOfBytes)
 	if (processLen < 0 || processLen > useSize)
 	{
 		mpOwner->Disconnect(eDisconnectReason::Kicked);
-		Clear();
 		return;
 	}
 
@@ -61,7 +58,6 @@ void Receiver::Register()
 {
 	if (mpOwner == nullptr || mpOwner->IsDisconnected())
 	{
-		Clear();
 		return;
 	}
 
@@ -69,7 +65,6 @@ void Receiver::Register()
 	if (freeSize == 0)
 	{
 		mpOwner->Disconnect(eDisconnectReason::Kicked);
-		Clear();
 		return;
 	}
 
@@ -97,6 +92,7 @@ void Receiver::Register()
 		{
 			mpOwner->OnError(errorCode);
 			mpOwner->Disconnect(eDisconnectReason::SocketError);
+			ClearEvent();
 			Clear();
 		}
 	}
@@ -106,4 +102,10 @@ void Receiver::Clear()
 {
 	mpOwner.reset();
 	mNetReceiveBuffer.Clear();
+}
+
+void Receiver::ClearEvent()
+{
+	mReceiveEvent.ClearOverlapped();
+	mReceiveEvent.ResetOwner();
 }

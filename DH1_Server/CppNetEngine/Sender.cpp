@@ -35,19 +35,16 @@ void Sender::Send(const NetSendBufferRef& pSendBuffer)
 
 void Sender::Process(const uint32 numOfBytes)
 {
-	mSendEvent.GetSendPendingBuffer().clear();
-	mSendEvent.ResetOwner();
+	ClearEvent();
 
 	if (mpOwner == nullptr || mpOwner->IsDisconnected())
 	{
-		Clear();
 		return;
 	}
 
 	if (numOfBytes == 0)
 	{
 		mpOwner->Disconnect(eDisconnectReason::Closed);
-		Clear();
 		return;
 	}
 
@@ -67,7 +64,6 @@ void Sender::Register()
 	{
 		if (mpOwner == nullptr || mpOwner->IsDisconnected())
 		{
-			Clear();
 			return;
 		}
 
@@ -112,6 +108,7 @@ void Sender::Register()
 			{
 				mpOwner->OnError(errorCode);
 				mpOwner->Disconnect(eDisconnectReason::SocketError);
+				ClearEvent();
 				Clear();
 			}
 		}
@@ -125,4 +122,10 @@ void Sender::Clear()
 	mpOwner.reset();
 	mbSendRegistered.store(false);
 	mSendQueue.Clear();
+}
+
+void Sender::ClearEvent()
+{
+	mSendEvent.GetSendPendingBuffer().clear();
+	mSendEvent.ResetOwner();
 }

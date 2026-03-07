@@ -16,6 +16,7 @@ public:
 	
 	void SetOwner(const SessionRef& pOwner);
 	void Clear();
+	void ClearEvent();
 
 	void Register();
 	void Process();

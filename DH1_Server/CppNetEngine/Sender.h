@@ -22,6 +22,7 @@ public:
 	void Process(const uint32 numOfBytes);
 	void Register();
 	void Clear();
+	void ClearEvent();
 
 private:
 

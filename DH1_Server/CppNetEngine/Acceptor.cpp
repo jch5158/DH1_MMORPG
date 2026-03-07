@@ -48,7 +48,8 @@ void Acceptor::Register()
 		if (errorCode != WSA_IO_PENDING)
 		{
 			mpOwner->mpErrorHandle(errorCode);
-			pSession->Clear();
+			ClearEvent();
+			Clear();
 		}
 	}
 }
@@ -57,9 +58,7 @@ void Acceptor::Process()
 {
 	const SessionRef pSession = mAcceptEvent.GetClientSession();
 
-	mAcceptEvent.ClearOverlapped();
-	mAcceptEvent.ResetOwner();
-	mAcceptEvent.ResetSession();
+	ClearEvent();
 
 	do
 	{
@@ -70,13 +69,11 @@ void Acceptor::Process()
 
 		if (mpOwner == nullptr)
 		{
-			pSession->Clear();
 			break;
 		}
 
 		if (SocketUtils::SetUpdateAcceptSocket(pSession->GetSocket(), mpOwner->GetSocket()) == false)
 		{
-			pSession->Clear();
 			break;
 		}
 
@@ -84,7 +81,6 @@ void Acceptor::Process()
 		int32 sizeOfSockAddr = SIZE_OF_32(sockAddr);
 		if (SOCKET_ERROR == getpeername(pSession->GetSocket(), reinterpret_cast<SOCKADDR*>(&sockAddr), &sizeOfSockAddr))
 		{
-			pSession->Clear();
 			break;
 		}
 
@@ -100,3 +96,11 @@ void Acceptor::Clear()
 	mpOwner.reset();
 	mpService.reset();
 }
+
+void Acceptor::ClearEvent()
+{
+	mAcceptEvent.ClearOverlapped();
+	mAcceptEvent.ResetOwner();
+	mAcceptEvent.ResetSession();
+}
+

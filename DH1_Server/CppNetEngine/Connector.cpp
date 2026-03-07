@@ -53,6 +53,7 @@ bool Connector::Register()
 		{
 			mpOwner->OnError(errorCode);
 			mpOwner->Disconnect(eDisconnectReason::SocketError);
+			ClearEvent();
 			Clear();
 			return false;
 		}
@@ -63,8 +64,7 @@ bool Connector::Register()
 
 void Connector::Process()
 {
-	mConnectEvent.ClearOverlapped();
-	mConnectEvent.ResetOwner();
+	ClearEvent();
 	Clear();
 }
 
@@ -72,4 +72,10 @@ void Connector::Clear()
 {
 	mpOwner.reset();
 	mpService.reset();
+}
+
+void Connector::ClearEvent()
+{
+	mConnectEvent.ClearOverlapped();
+	mConnectEvent.ResetOwner();
 }
