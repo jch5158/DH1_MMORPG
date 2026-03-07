@@ -4,6 +4,7 @@
 
 #include "Player.h"
 #include "PlayerManager.h"
+#include "Service.h"
 
 GameSession::GameSession()
 	:PacketSession()
@@ -17,7 +18,7 @@ GameSession::~GameSession()
 void GameSession::OnConnected()
 {
 	const PacketSessionRef pSession = std::static_pointer_cast<PacketSession>(shared_from_this());
-	const PlayerRef pPlayer = cpp_net_engine::MakeShared<Player>();
+	const PlayerRef pPlayer = cpp_net_engine::MakeShared<Player>(ActorContext(GetService()->GetActorScheduler()));
 	
 	if (pPlayer->SetSession(pSession) == false)
 	{

@@ -3,8 +3,9 @@
 
 #include "Session.h"
 
-SessionReaper::SessionReaper(const int64 timeoutMs)
-	:mTimeoutMs(timeoutMs)
+SessionReaper::SessionReaper(const ActorContext& actorContext, const int64 timeoutMs)
+	: Actor(actorContext)
+	, mTimeoutMs(timeoutMs)
 {
 }
 

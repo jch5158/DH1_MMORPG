@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "JobDispatcher.h"
 
-void JobDispatcher::Post(const JobRef& pJob, const IActorRef& pActor, const ActorSchedulerRef& pScheduler)
+void JobDispatcher::Post(const JobRef& pJob, const IActorRef& pActor)
 {
 	if (pActor->PushJob(pJob) == false)
 	{
@@ -9,11 +9,18 @@ void JobDispatcher::Post(const JobRef& pJob, const IActorRef& pActor, const Acto
 		return;
 	}
 
-	pActor->Register(pScheduler);
+	pActor->Register();
 }
 
 TimerHandle JobDispatcher::PostDelay(const JobRef& pJob, const IActorRef& pActor, const ActorSchedulerRef& pScheduler, const int64 delayMs)
 {
+	if (pScheduler == nullptr)
+	{
+		TimerHandle handle;
+		handle.Cancel();
+		return handle;
+	}
+
 	TimerHandle handle = pScheduler->ScheduleDelay(pJob, pActor, delayMs);
 	return handle;
 }

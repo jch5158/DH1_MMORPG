@@ -68,7 +68,6 @@ TimerHandle TimingWheel::AddTiming(std::function<void()> pCallback, const uint64
 		return handle;
 	}
 
-
 	{
 		const uint64 safeDelayMs = std::min(delayMs, GetMaxDelayMs());
 		const uint64 delayTicks = safeDelayMs / mTickIntervalMs;

@@ -4,12 +4,12 @@ class ActorOverlapped : public OVERLAPPED
 {
 public:
 
-	ActorOverlapped(const ActorOverlapped&) = delete;
-	ActorOverlapped operator=(const ActorOverlapped&) = delete;
-	ActorOverlapped(ActorOverlapped&&) = delete;
-	ActorOverlapped operator=(ActorOverlapped&&) = delete;
+	ActorOverlapped(const ActorOverlapped&) = default;
+	ActorOverlapped& operator=(const ActorOverlapped&) = default;
+	ActorOverlapped(ActorOverlapped&&) = default;
+	ActorOverlapped& operator=(ActorOverlapped&&) = default;
 
-	ActorOverlapped();
+	explicit ActorOverlapped();
 	~ActorOverlapped();
 
 	IActorRef GetOwner();
@@ -23,4 +23,3 @@ private:
 
 	IActorRef mpOwner;
 };
-

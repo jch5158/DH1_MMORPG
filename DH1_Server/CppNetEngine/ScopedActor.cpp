@@ -3,7 +3,6 @@
 
 void ScopedActor::Execute()
 {
-
 	JobRef pJob;
 	if (mJobQueue.TryDequeue(pJob) == false)
 	{
@@ -37,11 +36,15 @@ void ScopedActor::Release()
 	mAcquireIndex = -1;
 }
 
-void ScopedActor::Register(const ActorSchedulerRef& pActorScheduler)
+void ScopedActor::Register()
 {
 	if (mJobQueue.Count() > 0)
 	{
-		pActorScheduler->Schedule(shared_from_this(), true);
+		const ActorSchedulerRef pScheduler = GetActorSchedulerRef();
+		if (pScheduler != nullptr)
+		{
+			pScheduler->Schedule(shared_from_this());
+		}
 	}
 }
 
@@ -64,16 +67,16 @@ int32 ScopedActor::GetJobCount()
 	return mJobQueue.Count();
 }
 
-void ScopedActor::Post(const ActorSchedulerRef& pScheduler, CallbackType&& callback)
+void ScopedActor::Post(CallbackType&& callback)
 {
 	const auto pJob = cpp_net_engine::MakeShared<Job>(std::move(callback));
-	JobDispatcher::Post(pJob, shared_from_this(), pScheduler);
+	JobDispatcher::Post(pJob, shared_from_this());
 }
 
-TimerHandle ScopedActor::PostDelay(const ActorSchedulerRef& pScheduler, const int64 delayMs, CallbackType&& callback)
+TimerHandle ScopedActor::PostDelay(CallbackType&& callback, const int64 delayMs)
 {
 	const auto pJob = cpp_net_engine::MakeShared<Job>(std::move(callback));
-	TimerHandle handle = JobDispatcher::PostDelay(pJob, shared_from_this(), pScheduler, delayMs);
+	TimerHandle handle = JobDispatcher::PostDelay(pJob, shared_from_this(), GetActorSchedulerRef(), delayMs);
 	return handle;
 }
 

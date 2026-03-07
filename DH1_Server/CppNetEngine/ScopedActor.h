@@ -7,8 +7,9 @@ public:
 	static constexpr int32 DEFAULT_SPIN_COUNT = 5000;
 
 	template <typename... Args>
-	explicit ScopedActor(Args&&... args)
-		: mSpinCount(DEFAULT_SPIN_COUNT)
+	explicit ScopedActor(ActorContext actorContext, Args&&... args)
+		: IActor(std::move(actorContext))
+		, mSpinCount(DEFAULT_SPIN_COUNT)
 		, mAcquireIndex(-1)
 		, mActors()
 		, mJobQueue()
@@ -32,13 +33,13 @@ public:
 	virtual void Execute() override;
 	[[nodiscard]] virtual bool TryAcquire() override;
 	virtual void Release() override;
-	virtual void Register(const ActorSchedulerRef& pActorScheduler) override;
+	virtual void Register() override;
 	virtual void Flush() override;
 	[[nodiscard]] virtual bool PushJob(const JobRef& pJob) override;
 	[[nodiscard]] virtual int32 GetJobCount() override;
 
-	void Post(const ActorSchedulerRef& pScheduler, CallbackType&& callback);
-	TimerHandle PostDelay(const ActorSchedulerRef& pScheduler, const int64 delayMs, CallbackType&& callback);
+	void Post( CallbackType&& callback);
+	TimerHandle PostDelay(CallbackType&& callback, const int64 delayMs);
 
 	void SetSpinCount(const int32 spinCount);
 	[[nodiscard]] int32 GetSpinCount() const;

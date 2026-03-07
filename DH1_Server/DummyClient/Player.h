@@ -4,7 +4,7 @@ class Player final : public Actor
 {
 public:
 
-	Player();
+	explicit Player(const ActorContext& actorContext);
 	virtual ~Player() override = default;
 
 	bool SetSession(const PacketSessionRef& pSession);

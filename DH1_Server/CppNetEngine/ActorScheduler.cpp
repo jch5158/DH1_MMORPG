@@ -51,7 +51,7 @@ TimerHandle ActorScheduler::ScheduleDelay(JobRef pJob, IActorRef pOwner, const u
 {
 	TimerHandle handle = mTimingWheel.AddTiming([pCaptureJob = std::move(pJob), pCaptureOwner = std::move(pOwner), pScheduler = shared_from_this()]() mutable -> void
 		{
-			JobDispatcher::Post(pCaptureJob, pCaptureOwner, pScheduler);
+			JobDispatcher::Post(pCaptureJob, pCaptureOwner);
 		}
 	, delayMs);
 
@@ -91,7 +91,7 @@ void ActorScheduler::Dispatch()
 
 			pActor->Release();
 
-			pActor->Register(shared_from_this());
+			pActor->Register();
 		}
 	}
 

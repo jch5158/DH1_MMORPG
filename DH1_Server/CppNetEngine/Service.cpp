@@ -111,7 +111,7 @@ void Service::RegisterSessionReap(const SessionRef& pSession) const
 
 	SessionWeak pSessionWeak = pSession;
 
-	mpSessionReaper->PostDelay(mpScheduler, mpSessionReaper->GetTimeoutMs(), &SessionReaper::ReapSession, pSessionWeak);
+	mpSessionReaper->PostDelay(mpSessionReaper->GetTimeoutMs(), &SessionReaper::ReapSession, pSessionWeak);
 }
 
 eServiceType Service::GetServiceType() const

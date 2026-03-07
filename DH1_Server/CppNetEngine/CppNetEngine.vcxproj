@@ -198,6 +198,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Acceptor.h" />
+    <ClInclude Include="ActorContext.h" />
     <ClInclude Include="ActorOverlapped.h" />
     <ClInclude Include="AllocatorUtils.h" />
     <ClInclude Include="Connector.h" />
@@ -246,6 +247,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Acceptor.cpp" />
+    <ClCompile Include="ActorContext.cpp" />
     <ClCompile Include="ActorOverlapped.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="CrashReporter.cpp" />

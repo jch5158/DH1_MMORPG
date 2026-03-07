@@ -2,23 +2,29 @@
 #include "Actor.h"
 #include "ActorScheduler.h"
 
-IActor::IActor()
-	: mActorOverlapped()
+IActor::IActor(ActorContext actorContext)
+	: mActorContext(std::move(actorContext))
 {
 }
 
 ActorOverlapped& IActor::GetActorOverlapped()
 {
-	return mActorOverlapped;
+	return mActorContext.mActorOverlapped;
 }
 
 void IActor::ClearActorOverlapped()
 {
-	mActorOverlapped.Clear();
+	mActorContext.Clear();
 }
 
-Actor::Actor()
-	: mSeed(sSeedBase.fetch_add(1))
+ActorSchedulerRef IActor::GetActorSchedulerRef() const
+{
+	return mActorContext.GetActorSchedulerRef();
+}
+
+Actor::Actor(ActorContext actorContext)
+	: IActor(std::move(actorContext))
+	, mSeed(sSeedBase.fetch_add(1))
 	, mbAcquire(false)
 	, mJobQueue()
 {
@@ -53,11 +59,15 @@ void Actor::Release()
 	mbAcquire.store(false);
 }
 
-void Actor::Register(const ActorSchedulerRef& pActorScheduler)
+void Actor::Register()
 {
 	if (mJobQueue.Count() > 0)
 	{
-		pActorScheduler->Schedule(shared_from_this());
+		const ActorSchedulerRef pScheduler = GetActorSchedulerRef();
+		if (pScheduler != nullptr)
+		{
+			pScheduler->Schedule(shared_from_this());
+		}
 	}
 }
 
