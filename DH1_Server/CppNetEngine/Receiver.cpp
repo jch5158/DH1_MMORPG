@@ -7,7 +7,7 @@
 Receiver::Receiver()
 	:mpOwner(nullptr)
 	, mReceiveEvent()
-	, mNetReceiveBuffer()
+	, mNetReceiveBuffer(90)
 {
 }
 
@@ -29,6 +29,8 @@ byte* Receiver::GetWritePtr() const
 
 void Receiver::Process(const uint32 numOfBytes)
 {
+	mReceiveEvent.ClearOverlapped();
+	mReceiveEvent.ResetOwner();
 	if (mpOwner == nullptr || mpOwner->IsDisconnected())
 	{
 		Clear();
@@ -44,9 +46,11 @@ void Receiver::Process(const uint32 numOfBytes)
 
 	mNetReceiveBuffer.MoveWritePos(static_cast<int32>(numOfBytes));
 
-	const int32 dataSize = mNetReceiveBuffer.GetUseSize();
-	const int32 processLen = mpOwner->OnReceive(mNetReceiveBuffer.GetReadPtr(), static_cast<int32>(numOfBytes));
-	if (processLen < 0 || processLen > dataSize)
+	mNetReceiveBuffer.LinearizeRead();
+
+	const int32 useSize = mNetReceiveBuffer.GetUseSize();
+	const int32 processLen = mpOwner->OnReceive(mNetReceiveBuffer.GetBufferPtr(), useSize);
+	if (processLen < 0 || processLen > useSize)
 	{
 		mpOwner->Disconnect(eDisconnectReason::Kicked);
 		Clear();
@@ -66,8 +70,6 @@ void Receiver::Register()
 		return;
 	}
 
-	WSABUF wsabufs[MAX_RECEIVE_WSABUF_SIZE]{};
-
 	const int32 freeSize = mNetReceiveBuffer.GetFreeSize();
 	if (freeSize == 0)
 	{
@@ -79,6 +81,7 @@ void Receiver::Register()
 	const int32 linearSize = mNetReceiveBuffer.GetLinearWriteSize();
 	const int32 remainSize = freeSize - linearSize;
 
+	WSABUF wsabufs[MAX_RECEIVE_WSABUF_SIZE]{};
 	wsabufs[0].buf = reinterpret_cast<char*>(mNetReceiveBuffer.GetWritePtr());
 	wsabufs[0].len = linearSize;
 
@@ -91,6 +94,7 @@ void Receiver::Register()
 	}
 
 	mReceiveEvent.ClearOverlapped();
+	mReceiveEvent.SetOwner(mpOwner);
 	if (SocketUtils::WsaReceive(mpOwner->GetSocket(), wsabufs, wsabufsLen, &mReceiveEvent) == false)
 	{
 		const int32 errorCode = WSAGetLastError();

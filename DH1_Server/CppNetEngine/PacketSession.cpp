@@ -1,11 +1,6 @@
 ﻿#include "pch.h"
 #include "PacketSession.h"
 
-PacketSession::PacketSession()
-	: mTimeoutTracker()
-{
-}
-
 PacketSessionRef PacketSession::GetPacketSessionRef()
 {
 	return static_pointer_cast<PacketSession>(shared_from_this());
@@ -41,14 +36,4 @@ int32 PacketSession::OnReceive(byte* pBuffer, const int32 len)
 	}
 
 	return processLen;
-}
-
-void PacketSession::updateLastActivityMs()
-{
-	mTimeoutTracker.UpdateLastActivityMs();
-}
-
-int64 PacketSession::getLastActivityMs() const
-{
-	return mTimeoutTracker.GetLastActivityMs();
 }

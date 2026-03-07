@@ -96,7 +96,7 @@ namespace PacketGenerator
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                File.WriteAllText(outputFilePath, serviceTypeHandlerContent);
+                File.WriteAllText(outputFilePath, serviceTypeHandlerContent, new System.Text.UTF8Encoding(true));
             }
             catch (Exception e)
             {
@@ -216,7 +216,7 @@ namespace PacketGenerator
                         Directory.CreateDirectory(directoryPath);
                     }
 
-                    File.WriteAllText(outputFilePath, handleFileContent);
+                    File.WriteAllText(outputFilePath, handleFileContent, new System.Text.UTF8Encoding(true));
                 }
                 catch (Exception e)
                 {

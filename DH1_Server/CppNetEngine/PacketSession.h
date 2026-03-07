@@ -13,19 +13,12 @@ struct PacketHeader
 class PacketSession : public Session
 {
 public:
-	explicit PacketSession();
+	explicit PacketSession() = default;
 	virtual ~PacketSession() override = default;
 
 	PacketSessionRef GetPacketSessionRef();
 
 	virtual int32 OnReceive(byte* pBuffer, const int32 len) override final;
 	virtual void OnReceivePacket(byte* pBuffer, const int32 len) = 0;
-
-private:
-
-	void updateLastActivityMs();
-	int64 getLastActivityMs() const;
-
-	SessionTimeoutTracker mTimeoutTracker;
 };
 

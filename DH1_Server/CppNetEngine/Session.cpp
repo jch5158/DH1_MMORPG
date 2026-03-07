@@ -10,6 +10,7 @@ Session::Session()
 	, mSocket(INVALID_SOCKET)
 	, mNetAddress()
 	, mSessionState(eSessionState::Disconnected)
+	, mTimeoutTracker()
 	, mConnector()
 	, mDisconnector()
 	, mReceiver()
@@ -130,6 +131,16 @@ void Session::Clear()
 	mSender.Clear();
 }
 
+void Session::updateLastActivityMs()
+{
+	mTimeoutTracker.UpdateLastActivityMs();
+}
+
+int64 Session::getLastActivityMs() const
+{
+	return mTimeoutTracker.GetLastActivityMs();
+}
+
 bool Session::registerConnect()
 {
 	return mConnector.Register();
@@ -167,6 +178,7 @@ void Session::processConnect()
 
 	if (pService->AddSession(pSession))
 	{
+		updateLastActivityMs();
 		registerReap();
 		registerReceive();
 	}

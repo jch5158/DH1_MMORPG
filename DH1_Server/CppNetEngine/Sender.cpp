@@ -43,6 +43,7 @@ void Sender::Send(const NetSendBufferRef& pSendBuffer)
 void Sender::Process(const uint32 numOfBytes)
 {
 	mSendEvent.GetSendPendingBuffer().clear();
+	mSendEvent.ResetOwner();
 
 	if (mpOwner == nullptr || mpOwner->IsDisconnected())
 	{

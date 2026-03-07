@@ -22,7 +22,7 @@ void SessionReaper::ReapSession(const SessionWeak& pSessionWeak) const
 		return;
 	}
 
-	if (isExpired(pSession->OnGetLastActivityMs()))
+	if (isExpired(pSession->getLastActivityMs()))
 	{
 		pSession->Disconnect(eDisconnectReason::Timeout);
 	}

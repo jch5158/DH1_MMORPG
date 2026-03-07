@@ -2,7 +2,7 @@
 #include "NetReceiveBuffer.h"
 
 NetReceiveBuffer::NetReceiveBuffer(const int32 maxSize)
-	: mMaxBufferSize(maxSize)
+	: mMaxBufferSize(maxSize + 1)
 	, mReadPos(0)
 	, mWritePos(0)
 	, mpBuffer(cpp_net_engine::MakeUniqueArray<byte>(maxSize + 1))
@@ -22,7 +22,7 @@ bool NetReceiveBuffer::IsEmpty() const
 
 int32 NetReceiveBuffer::GetMaxSize() const
 {
-	return mMaxBufferSize;
+	return mMaxBufferSize - 1;
 }
 
 int32 NetReceiveBuffer::GetFreeSize() const
@@ -130,7 +130,7 @@ int32 NetReceiveBuffer::Write(const byte* pData, const int32 size)
 		return writeSize;
 	}
 
-	if (writeSize + mWritePos < mMaxBufferSize)
+	if (writeSize + mWritePos <= mMaxBufferSize)
 	{
 		std::copy_n(pData, writeSize, &mpBuffer[mWritePos]);
 	}
@@ -196,4 +196,40 @@ int32 NetReceiveBuffer::Peek(byte* pBuffer, const int32 size) const
 	}
 
 	return readSize;
+}
+
+void NetReceiveBuffer::LinearizeRead()
+{
+	if (mReadPos == 0)
+	{
+		return;
+	}
+	
+	const int32 dataSize = GetUseSize();
+	if (dataSize == 0)
+	{
+		mReadPos = 0;
+		mWritePos = 0;
+		return;
+	}
+
+	const int32 linearSize = GetLinearReadSize();
+	const int32 remainSize = dataSize - linearSize;
+
+	if (remainSize > 0)
+	{
+		Vector<byte> tempBuffer(remainSize);
+		std::memcpy(tempBuffer.data(), GetBufferPtr(), remainSize);
+
+		std::memmove(GetBufferPtr(), GetReadPtr(), linearSize);
+
+		std::memcpy(GetBufferPtr() + linearSize, tempBuffer.data(), remainSize);
+	}
+	else
+	{
+		std::memmove(GetBufferPtr(), GetReadPtr(), linearSize);
+	}
+
+	mReadPos = 0;
+	mWritePos = dataSize;
 }

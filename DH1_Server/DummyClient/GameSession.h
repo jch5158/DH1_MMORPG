@@ -13,7 +13,7 @@ public:
 	virtual void OnDisconnecting(const eDisconnectReason reason) override;
 	virtual void OnDisconnected() override;
 	virtual void OnSend(const int32 len) override;
-	virtual void OnRecvPacket(byte* pBuffer, const int32 len) override;
+	virtual void OnReceivePacket(byte* pBuffer, const int32 len) override;
 	virtual void OnError(const int32 errorCode) override;
 
 private:

@@ -29,6 +29,7 @@ public:
 	int32 Write(const byte* pData, const int32 size);
 	int32 Read(byte* pBuffer, const int32 size);
 	int32 Peek(byte* pBuffer, const int32 size) const;
+	void LinearizeRead();
 
 private:
 	const int32 mMaxBufferSize;

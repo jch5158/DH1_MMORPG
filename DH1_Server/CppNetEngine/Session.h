@@ -8,6 +8,7 @@
 #include "NetReceiveBuffer.h"
 #include "Receiver.h"
 #include "Sender.h"
+#include "SessionTimeoutTracker.h"
 #include "SharedPtrUtils.h"
 
 enum class eSessionState : uint8
@@ -82,6 +83,11 @@ public:
 	void Send(const NetSendBufferRef& pSendBuffer);
 	void Clear();
 
+protected:
+
+	void updateLastActivityMs();
+	int64 getLastActivityMs() const;
+
 private:
 
 	bool registerConnect();
@@ -108,6 +114,7 @@ private:
 	SOCKET mSocket;
 	NetAddress mNetAddress;
 	std::atomic<eSessionState> mSessionState;
+	SessionTimeoutTracker mTimeoutTracker;
 	Connector mConnector;
 	Disconnector mDisconnector;
 	Receiver mReceiver;
