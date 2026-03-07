@@ -11,11 +11,6 @@ Connector::Connector()
 {
 }
 
-Connector::~Connector()
-{
-	Clear();
-}
-
 void Connector::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
@@ -31,29 +26,26 @@ bool Connector::Register()
 {
 	if (mpOwner == nullptr || !mpOwner->IsDisconnected())
 	{
-		Clear();
 		return false;
 	}
 
 	if (mpService == nullptr || mpService->GetServiceType() != eServiceType::Client)
 	{
-		Clear();
 		return false;
 	}
 
 	if (SocketUtils::SetReuseAddress(mpOwner->GetSocket(), true) == false)
 	{
-		Clear();
 		return false;
 	}
 
 	if (SocketUtils::BindAnyAddress(mpOwner->GetSocket(), 0) == false)
 	{
-		Clear();
 		return false;
 	}
 
 	mConnectEvent.ClearOverlapped();
+	mConnectEvent.SetOwner(mpOwner);
 	if (false == SocketUtils::ConnectEx(mpOwner->GetSocket(), mpService->GetNetAddress().GetSockAddr(), &mConnectEvent))
 	{
 		const int32 errorCode = WSAGetLastError();
@@ -71,6 +63,8 @@ bool Connector::Register()
 
 void Connector::Process()
 {
+	mConnectEvent.ClearOverlapped();
+	mConnectEvent.ResetOwner();
 	Clear();
 }
 
@@ -78,6 +72,4 @@ void Connector::Clear()
 {
 	mpOwner.reset();
 	mpService.reset();
-	mConnectEvent.ClearOverlapped();
-	mConnectEvent.ResetOwner();
 }

@@ -10,11 +10,6 @@ Sender::Sender()
 {
 }
 
-Sender::~Sender()
-{
-	Clear();
-}
-
 void Sender::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
@@ -25,14 +20,12 @@ void Sender::Send(const NetSendBufferRef& pSendBuffer)
 {
 	if (mpOwner == nullptr || mpOwner->IsDisconnected())
 	{
-		Clear();
 		return;
 	}
 
 	if (mSendQueue.TryEnqueue(pSendBuffer) == false)
 	{
 		NET_ENGINE_LOG_FATAL("Sender::Send - TryEnqueue is Failed, mSendQueue.Count() : {}", mSendQueue.Count());
-		Clear();
 		mpOwner->Disconnect(eDisconnectReason::ServiceError);
 		return;
 	}
@@ -53,7 +46,7 @@ void Sender::Process(const uint32 numOfBytes)
 
 	if (numOfBytes == 0)
 	{
-		mpOwner->Disconnect(eDisconnectReason::Kicked);
+		mpOwner->Disconnect(eDisconnectReason::Closed);
 		Clear();
 		return;
 	}
@@ -70,64 +63,66 @@ void Sender::Process(const uint32 numOfBytes)
 
 void Sender::Register()
 {
-	if (mpOwner == nullptr || mpOwner->IsDisconnected())
+	while (true)
 	{
-		Clear();
-		return;
-	}
-
-	if (mbSendRegistered.exchange(true) == true)
-	{
-		return;
-	}
-
-	WSABUF wsabufs[MAX_SEND_WSABUF_SIZE]{};
-	int32 sendCount;
-	for (sendCount = 0; sendCount < MAX_SEND_WSABUF_SIZE; ++sendCount)
-	{
-		NetSendBufferRef pSendBuffer;
-		if (mSendQueue.TryDequeue(pSendBuffer) == false)
+		if (mpOwner == nullptr || mpOwner->IsDisconnected())
 		{
-			break;
-		}
-
-		mSendEvent.GetSendPendingBuffer().emplace_back(pSendBuffer);
-		wsabufs[sendCount].buf = reinterpret_cast<char*>(pSendBuffer->GetReadPtr());
-		wsabufs[sendCount].len = pSendBuffer->GetUseSize();
-	}
-
-	if (sendCount == 0)
-	{
-		mbSendRegistered.store(false); // 플래그를 내림
-
-		if (mSendQueue.IsEmpty() == false)
-		{
-			Register(); // 다시 시도
-		}
-
-		return;
-	}
-
-	mSendEvent.ClearOverlapped();
-	mSendEvent.SetOwner(mpOwner);
-	if (SocketUtils::WsaSend(mpOwner->GetSocket(), wsabufs, sendCount, &mSendEvent) == false)
-	{
-		const int32 errorCode = WSAGetLastError();
-		if (errorCode != WSA_IO_PENDING)
-		{
-			mpOwner->OnError(errorCode);
-			mpOwner->Disconnect(eDisconnectReason::SocketError);
 			Clear();
+			return;
 		}
+
+		if (mbSendRegistered.exchange(true) == true)
+		{
+			return;
+		}
+
+		WSABUF wsabufs[MAX_SEND_WSABUF_SIZE]{};
+		int32 sendCount;
+		for (sendCount = 0; sendCount < MAX_SEND_WSABUF_SIZE; ++sendCount)
+		{
+			NetSendBufferRef pSendBuffer;
+			if (mSendQueue.TryDequeue(pSendBuffer) == false)
+			{
+				break;
+			}
+
+			mSendEvent.GetSendPendingBuffer().emplace_back(pSendBuffer);
+			wsabufs[sendCount].buf = reinterpret_cast<char*>(pSendBuffer->GetReadPtr());
+			wsabufs[sendCount].len = pSendBuffer->GetUseSize();
+		}
+
+		if (sendCount == 0)
+		{
+			mbSendRegistered.store(false); // 플래그를 내림
+
+			if (mSendQueue.IsEmpty() == false)
+			{
+				continue;
+			}
+
+			return;
+		}
+
+		mSendEvent.ClearOverlapped();
+		mSendEvent.SetOwner(mpOwner);
+		if (SocketUtils::WsaSend(mpOwner->GetSocket(), wsabufs, sendCount, &mSendEvent) == false)
+		{
+			const int32 errorCode = WSAGetLastError();
+			if (errorCode != WSA_IO_PENDING)
+			{
+				mpOwner->OnError(errorCode);
+				mpOwner->Disconnect(eDisconnectReason::SocketError);
+				Clear();
+			}
+		}
+
+		return;
 	}
 }
 
 void Sender::Clear()
 {
 	mpOwner.reset();
-	mSendEvent.ClearOverlapped();
-	mSendEvent.ResetOwner();
-	mSendEvent.GetSendPendingBuffer().clear();
 	mbSendRegistered.store(false);
 	mSendQueue.Clear();
 }

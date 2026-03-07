@@ -11,7 +11,7 @@ public:
 	Acceptor operator=(Acceptor&&) = delete;
 
 	explicit Acceptor(const int32 acceptorIndex);
-	~Acceptor();
+	~Acceptor() = default;
 
 	void SetOwner(const ListenerRef& pOwner);
 	void SetService(const ServiceRef& pService);

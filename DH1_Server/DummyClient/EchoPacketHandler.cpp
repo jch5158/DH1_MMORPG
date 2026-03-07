@@ -8,6 +8,8 @@
 bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer,
                                                  PacketSessionRef& pSession)
 {
+	NET_ENGINE_LOG_ERROR("EchoPacketHandler::HANDLE_PACKET_ID_INVALID\n");
+
 	return false;
 }
 

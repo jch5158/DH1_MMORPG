@@ -132,15 +132,15 @@ int32 NetReceiveBuffer::Write(const byte* pData, const int32 size)
 
 	if (writeSize + mWritePos <= mMaxBufferSize)
 	{
-		std::copy_n(pData, writeSize, &mpBuffer[mWritePos]);
+		std::memcpy(&mpBuffer[mWritePos], pData, writeSize);
 	}
 	else
 	{
 		const int32 linearSize = GetLinearWriteSize();
-		std::copy_n(pData, linearSize, &mpBuffer[mWritePos]);
+		std::memcpy(&mpBuffer[mWritePos], pData, linearSize);
 
 		const int32 remainSize = writeSize - linearSize;
-		std::copy_n(&pData[linearSize], remainSize, &mpBuffer[0]);
+		std::memcpy(&mpBuffer[0], &pData[linearSize], remainSize);
 	}
 
 	MoveWritePos(writeSize);
@@ -156,17 +156,17 @@ int32 NetReceiveBuffer::Read(byte* pBuffer, const int32 size)
 		return readSize;
 	}
 
-	if (readSize + mReadPos > mMaxBufferSize)
+	if (readSize + mReadPos <= mMaxBufferSize)
 	{
-		const int32 linearSize = GetLinearReadSize();
-		std::copy_n(&mpBuffer[mReadPos], linearSize, pBuffer);
-
-		const int32 remainSize = readSize - linearSize;
-		std::copy_n(&mpBuffer[0], remainSize, &pBuffer[linearSize]);
+		std::memcpy(pBuffer, &mpBuffer[mReadPos], readSize);
 	}
 	else
 	{
-		std::copy_n(&mpBuffer[mReadPos], readSize, pBuffer);
+		const int32 linearSize = GetLinearReadSize();
+		std::memcpy(pBuffer, &mpBuffer[mReadPos], linearSize);
+
+		const int32 remainSize = readSize - linearSize;
+		std::memcpy(&pBuffer[linearSize], &mpBuffer[0], remainSize);
 	}
 
 	MoveReadPos(readSize);
@@ -182,17 +182,17 @@ int32 NetReceiveBuffer::Peek(byte* pBuffer, const int32 size) const
 		return readSize;
 	}
 
-	if (readSize + mReadPos > mMaxBufferSize)
+	if (readSize + mReadPos <= mMaxBufferSize)
 	{
-		const int32 linearSize = GetLinearReadSize();
-		std::copy_n(&mpBuffer[mReadPos], linearSize, pBuffer);
-
-		const int32 remainSize = readSize - linearSize;
-		std::copy_n(&mpBuffer[0], remainSize, &pBuffer[linearSize]);
+		std::memcpy(pBuffer, &mpBuffer[mReadPos], readSize);
 	}
 	else
 	{
-		std::copy_n(&mpBuffer[mReadPos], readSize, pBuffer);
+		const int32 linearSize = GetLinearReadSize();
+		std::memcpy(pBuffer, &mpBuffer[mReadPos], linearSize);
+
+		const int32 remainSize = readSize - linearSize;
+		std::memcpy(&pBuffer[linearSize], &mpBuffer[0], remainSize);
 	}
 
 	return readSize;
@@ -208,8 +208,7 @@ void NetReceiveBuffer::LinearizeRead()
 	const int32 dataSize = GetUseSize();
 	if (dataSize == 0)
 	{
-		mReadPos = 0;
-		mWritePos = 0;
+		Clear();
 		return;
 	}
 

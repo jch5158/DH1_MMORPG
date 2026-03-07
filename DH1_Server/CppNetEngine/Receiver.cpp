@@ -11,11 +11,6 @@ Receiver::Receiver()
 {
 }
 
-Receiver::~Receiver()
-{
-	Clear();
-}
-
 void Receiver::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
@@ -39,7 +34,7 @@ void Receiver::Process(const uint32 numOfBytes)
 
 	if (numOfBytes == 0)
 	{
-		mpOwner->Disconnect(eDisconnectReason::Kicked);
+		mpOwner->Disconnect(eDisconnectReason::Closed);
 		Clear();
 		return;
 	}
@@ -110,7 +105,5 @@ void Receiver::Register()
 void Receiver::Clear()
 {
 	mpOwner.reset();
-	mReceiveEvent.ClearOverlapped();
-	mReceiveEvent.ResetOwner();
 	mNetReceiveBuffer.Clear();
 }

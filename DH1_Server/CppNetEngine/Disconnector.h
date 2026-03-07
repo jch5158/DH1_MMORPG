@@ -12,7 +12,7 @@ public:
 	Disconnector operator=(Disconnector&&) = delete;
 
 	explicit Disconnector();
-	~Disconnector();
+	~Disconnector() = default;
 	
 	void SetOwner(const SessionRef& pOwner);
 	void Clear();

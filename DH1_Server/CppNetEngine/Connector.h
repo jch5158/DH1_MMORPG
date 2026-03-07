@@ -11,7 +11,7 @@ public:
 	Connector operator=(Connector&&) = delete;
 
 	explicit Connector();
-	~Connector();
+	~Connector() = default;
 
 	void SetOwner(const SessionRef& pOwner);
 	void SetService(const ServiceRef& pService);

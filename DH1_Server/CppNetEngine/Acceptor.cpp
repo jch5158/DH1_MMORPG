@@ -11,15 +11,9 @@ Acceptor::Acceptor(const int32 acceptorIndex)
 {
 }
 
-Acceptor::~Acceptor()
-{
-	Clear();
-}
-
 void Acceptor::SetOwner(const ListenerRef& pOwner)
 {
 	mpOwner = pOwner;
-	mAcceptEvent.SetOwner(pOwner);
 }
 
 void Acceptor::SetService(const ServiceRef& pService)
@@ -29,17 +23,25 @@ void Acceptor::SetService(const ServiceRef& pService)
 
 void Acceptor::Register()
 {
-	const SessionRef pSession = mpService->CreateSession();
-	if (pSession == nullptr)
+	if (mpOwner == nullptr)
 	{
-		NET_ENGINE_LOG_FATAL("Acceptor::Register() - mpServerService->CreateSession() is failed");
-		Clear();
 		return;
 	}
 
-	mAcceptEvent.SetSession(pSession);
+	if (mpService == nullptr)
+	{
+		return;
+	}
+
+	const SessionRef pSession = mpService->CreateSession();
+	if (pSession == nullptr)
+	{
+		return;
+	}
 
 	mAcceptEvent.ClearOverlapped();
+	mAcceptEvent.SetOwner(mpOwner);
+	mAcceptEvent.SetSession(pSession);
 	if (false == SocketUtils::AcceptEx(mpOwner->GetSocket(), pSession->GetSocket(), pSession->GetReceiveBufferPtr(), &mAcceptEvent))
 	{
 		const int32 errorCode = WSAGetLastError();
@@ -47,7 +49,6 @@ void Acceptor::Register()
 		{
 			mpOwner->mpErrorHandle(errorCode);
 			pSession->Clear();
-			Clear();
 		}
 	}
 }
@@ -55,24 +56,42 @@ void Acceptor::Register()
 void Acceptor::Process()
 {
 	const SessionRef pSession = mAcceptEvent.GetClientSession();
+
+	mAcceptEvent.ClearOverlapped();
+	mAcceptEvent.ResetOwner();
 	mAcceptEvent.ResetSession();
 
-	if (SocketUtils::SetUpdateAcceptSocket(pSession->GetSocket(), mpOwner->GetSocket()) == false)
+	do
 	{
-		Clear();
-		return;
-	}
+		if (pSession == nullptr)
+		{
+			break;
+		}
 
-	SOCKADDR_IN sockAddr{};
-	int32 sizeOfSockAddr = SIZE_OF_32(sockAddr);
-	if (SOCKET_ERROR == getpeername(pSession->GetSocket(), reinterpret_cast<SOCKADDR*>(&sockAddr), &sizeOfSockAddr))
-	{
-		Clear();
-		return;
-	}
+		if (mpOwner == nullptr)
+		{
+			pSession->Clear();
+			break;
+		}
 
-	pSession->setNetAddress(NetAddress(sockAddr));
-	pSession->processConnect();
+		if (SocketUtils::SetUpdateAcceptSocket(pSession->GetSocket(), mpOwner->GetSocket()) == false)
+		{
+			pSession->Clear();
+			break;
+		}
+
+		SOCKADDR_IN sockAddr{};
+		int32 sizeOfSockAddr = SIZE_OF_32(sockAddr);
+		if (SOCKET_ERROR == getpeername(pSession->GetSocket(), reinterpret_cast<SOCKADDR*>(&sockAddr), &sizeOfSockAddr))
+		{
+			pSession->Clear();
+			break;
+		}
+
+		pSession->setNetAddress(NetAddress(sockAddr));
+		pSession->processConnect();
+	} while (false);
+
 	Register();
 }
 
@@ -80,6 +99,4 @@ void Acceptor::Clear()
 {
 	mpOwner.reset();
 	mpService.reset();
-	mAcceptEvent.ClearOverlapped();
-	mAcceptEvent.ResetOwner();
 }

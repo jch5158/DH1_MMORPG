@@ -14,7 +14,7 @@ public:
 	Receiver operator=(Receiver&&) = delete;
 
 	explicit Receiver();
-	~Receiver();
+	~Receiver() = default;
 
 	void SetOwner(const SessionRef& pOwner);
 	[[nodiscard]] byte* GetWritePtr() const;

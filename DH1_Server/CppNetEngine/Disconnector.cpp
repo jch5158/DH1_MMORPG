@@ -10,11 +10,6 @@ Disconnector::Disconnector()
 {
 }
 
-Disconnector::~Disconnector()
-{
-	Clear();
-}
-
 void Disconnector::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
@@ -24,8 +19,6 @@ void Disconnector::SetOwner(const SessionRef& pOwner)
 void Disconnector::Clear()
 {
 	mpOwner.reset();
-	mDisconnectEvent.ClearOverlapped();
-	mDisconnectEvent.ResetOwner();
 }
 
 void Disconnector::Register()
@@ -37,6 +30,7 @@ void Disconnector::Register()
 	}
 
 	mDisconnectEvent.ClearOverlapped();
+	mDisconnectEvent.SetOwner(mpOwner);
 	if (SocketUtils::DisconnectEx(mpOwner->GetSocket(), &mDisconnectEvent) == false)
 	{
 		const int32 errorCode = WSAGetLastError();
@@ -50,5 +44,7 @@ void Disconnector::Register()
 
 void Disconnector::Process()
 {
+	mDisconnectEvent.ClearOverlapped();
+	mDisconnectEvent.ResetOwner();
 	Clear();
 }

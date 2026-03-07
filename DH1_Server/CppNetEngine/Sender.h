@@ -15,7 +15,7 @@ public:
 	Sender operator=(Sender&&) = delete;
 
 	explicit Sender();
-	~Sender();
+	~Sender() = default;
 
 	void SetOwner(const SessionRef& pOwner);
 	void Send(const NetSendBufferRef& pSendBuffer);

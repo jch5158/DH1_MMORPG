@@ -23,20 +23,20 @@ public:
 
 	static bool HandlePacketServiceType(const uint16 len, byte* pBuffer, PacketSessionRef& pSession)
 	{{
-		const auto [packetSize, id] = *(reinterpret_cast<PacketHeader*>(pBuffer));
+		const auto [packetSize, packetId] = *(reinterpret_cast<PacketHeader*>(pBuffer));
 		
-		const uint16 serviceType = GET_SERVICE_TYPE(id);
+		const uint16 serviceType = GET_SERVICE_TYPE(packetId);
 
 		const auto iter = sPacketServiceTypeMap.find(serviceType);
 		if (iter != sPacketServiceTypeMap.end())
 		{{
-			return iter->second(packetSize, id, pBuffer, pSession);
+			return iter->second(packetSize, packetId, pBuffer, pSession);
 		}}
 
-		return HANDLE_SERVICE_TYPE_INVALID(packetSize, id, pBuffer, pSession);
+		return HANDLE_SERVICE_TYPE_INVALID(packetSize, packetId, pBuffer, pSession);
 	}}
 
-	static bool HANDLE_SERVICE_TYPE_INVALID(const uint16 size, const uint16 packetId, byte* pBuffer, PacketSessionRef& pSession);
+	static bool HANDLE_SERVICE_TYPE_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession);
 
 private:
 

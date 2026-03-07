@@ -92,7 +92,7 @@ public:
 
 		std::atomic_ref<Node16> atomicHead(mHead);
 
-		do
+		while (true)
 		{
 			if (mHead.pNode == mTail.pNode)
 			{
@@ -114,10 +114,14 @@ public:
 			{
 				continue;
 			}
-			
+
 			outData = desired.pNode->data;
 
-		} while (atomicHead.compare_exchange_weak(expected, desired) == false);
+			if (atomicHead.compare_exchange_weak(expected, desired) == true)
+			{
+				break;
+			}
+		}
 
 		cpp_net_engine::DeleteObject(expected.pNode);
 
