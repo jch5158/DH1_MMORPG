@@ -17,14 +17,14 @@ public:
 	IActor(IActor&&) = delete;
 	IActor& operator=(IActor&&) = delete;
 
-	explicit IActor(const ActorSchedulerRef& pScheduler);
+	explicit IActor(ActorSchedulerRef pScheduler);
 	virtual ~IActor() = default;
 
 	virtual void Dispatch(ActorEvent& actorEvent) = 0;
 	[[nodiscard]] virtual bool TryAcquire() = 0;
 	virtual void Release() = 0;
 	
-	void InitSchedule();
+	void Activate();
 	void Register();
 	void Flush();
 	[[nodiscard]] bool PushJob(const JobRef& pJob);

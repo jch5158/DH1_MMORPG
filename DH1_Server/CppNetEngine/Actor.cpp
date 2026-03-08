@@ -3,17 +3,15 @@
 #include "ActorScheduler.h"
 #include "ActorEvent.h"
 
-IActor::IActor(const ActorSchedulerRef& pScheduler)
-	: mpScheduler(pScheduler)
+IActor::IActor(ActorSchedulerRef pScheduler)
+	: mpScheduler(std::move(pScheduler))
 	, mJobQueue()
 {
 }
 
-void IActor::InitSchedule()
+void IActor::Activate()
 {
-	mJobQueue.InitEvent(shared_from_this());
-	mJobQueue.SetOwner(shared_from_this());
-	mJobQueue.SetScheduler(mpScheduler);
+	mJobQueue.Initialize(shared_from_this(), mpScheduler);
 }
 
 void IActor::Register()

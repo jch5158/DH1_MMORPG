@@ -8,34 +8,20 @@ ActorJobQueue::ActorJobQueue()
 {
 }
 
-void ActorJobQueue::SetOwner(const IActorRef& pOwner)
+void ActorJobQueue::Initialize(const IActorRef& pOwner, ActorSchedulerRef pScheduler)
 {
-	if (pOwner == nullptr)
+	if (pOwner == nullptr || pScheduler == nullptr)
 	{
 		return;
 	}
 
 	mJobActorEvent.SetOwner(pOwner);
+	mpScheduler = std::move(pScheduler);
 }
 
-void ActorJobQueue::SetScheduler(const ActorSchedulerRef& pScheduler)
+bool ActorJobQueue::PushJob(JobRef pJob)
 {
-	if (pScheduler == nullptr)
-	{
-		return;
-	}
-
-	mpScheduler = pScheduler;
-}
-
-void ActorJobQueue::InitEvent(const IActorRef& pOwner)
-{
-	mJobActorEvent.SetOwner(pOwner);
-}
-
-bool ActorJobQueue::PushJob(const JobRef& pJob)
-{
-	return mJobQueue.TryEnqueue(pJob);
+	return mJobQueue.TryEnqueue(std::move(pJob));
 }
 
 int32 ActorJobQueue::GetJobCount() const

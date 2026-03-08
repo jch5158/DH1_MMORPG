@@ -18,7 +18,7 @@ public:
 private:
 
 	ObjectAllocator()
-		:mTlsObjectPool()
+		:mTlsObjectPool(true)
 	{
 		static_assert(std::is_class_v<T>, "T is not class type.");
 		static_assert(CHUNK_SIZE > 0, "CHUNK_SIZE must be non-negative");

@@ -13,11 +13,9 @@ public:
 	explicit ActorJobQueue();
 	~ActorJobQueue() = default;
 
-	void SetOwner(const IActorRef& pOwner);
-	void SetScheduler(const ActorSchedulerRef& pScheduler);
+	void Initialize(const IActorRef& pOwner, ActorSchedulerRef pScheduler);
 
-	void InitEvent(const IActorRef& pOwner);
-	bool PushJob(const JobRef& pJob);
+	bool PushJob(JobRef pJob);
 	[[nodiscard]] int32 GetJobCount() const;
 	void Process();
 	void Register();

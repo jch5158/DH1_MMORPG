@@ -34,7 +34,7 @@ int main()
 		[pScheduler]()->SessionReaperRef
 		{
 			SessionReaperRef pSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(pScheduler, 60000);
-			pSessionReaper->InitSchedule();
+			pSessionReaper->Activate();
 
 			return pSessionReaper;
 		}(),

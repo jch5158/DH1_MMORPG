@@ -103,7 +103,7 @@ public:
 
 		if (mbPlacementNew)
 		{
-			new(&expected.pNode->data)T(std::forward<Args>(args)...);
+			new(&expected.pNode->data) T(std::forward<Args>(args)...);
 		}
 
 		return &expected.pNode->data;
@@ -145,8 +145,7 @@ public:
 		mPoolingCount.fetch_add(1);
 	}
 
-	[[nodiscard]]
-	int32 PoolingCount() const
+	[[nodiscard]] int32 PoolingCount() const
 	{
 		return mPoolingCount.load();
 	}
@@ -190,7 +189,7 @@ private:
 
 		struct ChunkData
 		{
-			T data{};
+			alignas(T) byte data[sizeof(T)];
 			uint64 checksum = 0;
 			Chunk* pChunk = nullptr;
 		};
@@ -224,7 +223,7 @@ private:
 				return nullptr;
 			}
 
-			return &mChunkDataArray[mAllocCount++].data;
+			return reinterpret_cast<T*>(&mChunkDataArray[mAllocCount++].data);
 		}
 
 		bool IsDataEmpty() const
@@ -269,8 +268,9 @@ public:
 	TlsObjectPool(TlsObjectPool&&) = delete;
 	TlsObjectPool& operator=(TlsObjectPool&&) = delete;
 
-	explicit TlsObjectPool()
-		: mAllocCount(0)
+	explicit TlsObjectPool(const bool bPlacementNew)
+		: mbPlacementNew(bPlacementNew)
+		, mAllocCount(0)
 		, mObjectPool(false, 0)
 	{
 		static_assert(std::is_class_v<T>, "T is not class type.");
@@ -286,31 +286,40 @@ public:
 
 		if (spTlsChunk == nullptr)
 		{
-			spTlsChunk = mObjectPool.Alloc(std::forward<Args>(args)...);
-		}
-
-		T* pData = spTlsChunk->GetData();
-		if (pData != nullptr && spTlsChunk->IsDataEmpty())
-		{
 			spTlsChunk = mObjectPool.Alloc();
 		}
 
-		return pData;
+		T* pRawMemory = spTlsChunk->GetData();
+		if (pRawMemory != nullptr && spTlsChunk->IsDataEmpty())
+		{
+			spTlsChunk = mObjectPool.Alloc();
+			pRawMemory = spTlsChunk->GetData();
+		}
+
+		// 4. 가져온 빈 메모리 위에 객체 생성 (Placement New)
+		new(pRawMemory) T(std::forward<Args>(args)...);
+
+		return pRawMemory;
 	}
 
-	void Free(T* pData)
+	void Free(T* pObject)
 	{
-		if (pData == nullptr)
+		if (pObject == nullptr)
 		{
 			NET_ASSERT(false, "TlsObjectPool::Free - pData is nullptr.");
 			return;
 		}
 
-		ChunkBlock* pChunkBlock = reinterpret_cast<ChunkBlock*>(pData);
+		ChunkBlock* pChunkBlock = reinterpret_cast<ChunkBlock*>(pObject);
 		if (!Chunk::IsValidChecksum(*pChunkBlock))
 		{
 			NET_ENGINE_LOG_ERROR("TlsObjectPool::Free - Invalid object detected. Possible memory corruption. checksum : {}", pChunkBlock->checksum);
 			return;
+		}
+
+		if constexpr (std::is_class_v<T>)
+		{
+			pObject->~T();
 		}
 
 		Chunk* pChunk = pChunkBlock->pChunk;
@@ -330,8 +339,7 @@ public:
 		spTlsChunk = nullptr;
 	}
 
-	[[nodiscard]]
-	int32 AllocCount() const
+	[[nodiscard]] int32 AllocCount() const
 	{
 		return mAllocCount.load();
 	}
@@ -339,6 +347,8 @@ public:
 private:
 
 	inline static thread_local Chunk* spTlsChunk = nullptr;
+
+	const bool mbPlacementNew;
 	std::atomic<int32> mAllocCount;
 	ObjectPool<Chunk> mObjectPool;
 };

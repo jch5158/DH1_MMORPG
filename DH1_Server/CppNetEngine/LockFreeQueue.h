@@ -11,16 +11,35 @@ public:
 
 	struct Node
 	{
-		T data{};
-		Node* pNextNode = nullptr;
+		explicit Node()
+			: mData()
+			, mpNextNode(nullptr)
+		{
+		}
+
+		template <typename U>
+		explicit Node(U&& data) requires (std::is_constructible_v<T, U>)
+			: mData(std::forward<U>(data))
+			, mpNextNode(nullptr)
+		{
+		}
+
+		T mData;
+		Node* mpNextNode;
 	};
 
 private:
 
 	struct Node16
 	{
-		Node* pNode = nullptr;
-		int64 count = 0;
+		explicit Node16()
+			:mpNode(nullptr)
+			, mCount(0)
+		{
+		}
+
+		Node* mpNode = nullptr;
+		int64 mCount = 0;
 	};
 
 public:
@@ -37,9 +56,9 @@ public:
 		, mTail{}
 	{
 		Node* pDummyNode = cpp_net_engine::NewObject<Node>();
-		pDummyNode->pNextNode = nullptr;
-		mHead.pNode = pDummyNode;
-		mTail.pNode = pDummyNode;
+		pDummyNode->mpNextNode = nullptr;
+		mHead.mpNode = pDummyNode;
+		mTail.mpNode = pDummyNode;
 	}
 
 	~LockFreeQueue()
@@ -47,22 +66,20 @@ public:
 		Clear();
 	}
 
-	[[nodiscard]]
-	bool TryEnqueue(const T& data)
+	template <typename U>
+	[[nodiscard]] bool TryEnqueue(U&& data)
 	{
 		if (mMaxCount <= mCount.load())
 		{
 			return false;
 		}
 
-		Node* pDesired = cpp_net_engine::NewObject<Node>();
-		pDesired->data = data;
-		pDesired->pNextNode = nullptr;
+		Node* pDesired = cpp_net_engine::NewObject<Node>(std::forward<U>(data));
 
 		while (true)
 		{
-			Node* pExpected = mTail.pNode->pNextNode;
-			std::atomic_ref<Node*> atomicTailNextNodePtr(mTail.pNode->pNextNode);
+			Node* pExpected = mTail.mpNode->mpNextNode;
+			std::atomic_ref<Node*> atomicTailNextNodePtr(mTail.mpNode->mpNextNode);
 			if (pExpected == nullptr && (atomicTailNextNodePtr.compare_exchange_weak(pExpected, pDesired) == true))
 			{
 				moveTail();
@@ -77,8 +94,7 @@ public:
 		return true;
 	}
 
-	[[nodiscard]]
-	bool TryDequeue(T& outData)
+	[[nodiscard]] bool TryDequeue(T& outData)
 	{
 		if (mCount.fetch_sub(1) <= 0)
 		{
@@ -86,35 +102,35 @@ public:
 			return false;
 		}
 
-		Node16 expected{};
-		Node16 desired{};
+		Node16 expected;
+		Node16 desired;
 
 		std::atomic_ref<Node16> atomicHead(mHead);
 
 		while (true)
 		{
-			if (mHead.pNode == mTail.pNode)
+			if (mHead.mpNode == mTail.mpNode)
 			{
 				moveTail();
 				continue;
 			}
 
-			expected.count = mHead.count;
+			expected.mCount = mHead.mCount;
 			std::atomic_thread_fence(std::memory_order_seq_cst);
-			expected.pNode = mHead.pNode;
-			if (expected.pNode == nullptr)
+			expected.mpNode = mHead.mpNode;
+			if (expected.mpNode == nullptr)
 			{
 				continue;
 			}
 
-			desired.count = expected.count + 1;
-			desired.pNode = expected.pNode->pNextNode;
-			if (desired.pNode == nullptr)
+			desired.mCount = expected.mCount + 1;
+			desired.mpNode = expected.mpNode->mpNextNode;
+			if (desired.mpNode == nullptr)
 			{
 				continue;
 			}
 
-			outData = desired.pNode->data;
+			outData = desired.mpNode->mData;
 
 			if (atomicHead.compare_exchange_weak(expected, desired) == true)
 			{
@@ -122,18 +138,18 @@ public:
 			}
 		}
 
-		cpp_net_engine::DeleteObject(expected.pNode);
+		cpp_net_engine::DeleteObject(expected.mpNode);
 
 		return true;
 	}
 
 	void Clear()
 	{
-		Node* pNode = mHead.pNode;
+		Node* pNode = mHead.mpNode;
 
 		while (pNode != nullptr)
 		{
-			Node* pNextNode = pNode->pNextNode;
+			Node* pNextNode = pNode->mpNextNode;
 			cpp_net_engine::DeleteObject(pNode);
 			pNode = pNextNode;
 		}
@@ -158,16 +174,16 @@ private:
 
 	void moveTail()
 	{
-		Node16 expected{};
-		Node16 desired{};
+		Node16 expected;
+		Node16 desired;
 
-		expected.count = mTail.count;
+		expected.mCount = mTail.mCount;
 		std::atomic_thread_fence(std::memory_order_seq_cst);
-		expected.pNode = mTail.pNode;
+		expected.mpNode = mTail.mpNode;
 
-		desired.count = expected.count + 1;
-		desired.pNode = expected.pNode->pNextNode;
-		if (desired.pNode == nullptr)
+		desired.mCount = expected.mCount + 1;
+		desired.mpNode = expected.mpNode->mpNextNode;
+		if (desired.mpNode == nullptr)
 		{
 			return;
 		}
