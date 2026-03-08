@@ -71,25 +71,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(SolutionDir)Libraries\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(IncludePath)</IncludePath>

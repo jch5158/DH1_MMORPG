@@ -72,25 +72,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)Libraries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\</OutDir>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)Libraries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\</OutDir>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)Libraries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\</OutDir>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)Libraries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\</OutDir>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
