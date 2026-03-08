@@ -74,12 +74,6 @@ using HashMap = std::unordered_map<Key, Type, Hasher, KeyEq, StlAllocator<std::p
 template<typename Key, typename Hasher = std::hash<Key>, typename KeyEq = std::equal_to<Key>>
 using HashSet = std::unordered_set<Key, Hasher, KeyEq, StlAllocator<Key>>;
 
-template<typename Key, typename Type, typename Hasher = std::hash<Key>, typename KeyEq = std::equal_to<Key>>
-using ConcurrentHashMap = concurrency::concurrent_unordered_map<Key, Type, Hasher, KeyEq, StlAllocator<std::pair<const Key, Type>>>;
-
-template<typename Key, typename Hasher = std::hash<Key>, typename KeyEq = std::equal_to<Key>>
-using ConcurrentHashSet = concurrency::concurrent_unordered_set<Key, Hasher, KeyEq, StlAllocator<Key>>;
-
 using String = std::basic_string<char, std::char_traits<char>, StlAllocator<char>>;
 
 using Wstring = std::basic_string<wchar_t, std::char_traits<wchar_t>, StlAllocator<wchar_t>>;
