@@ -18,13 +18,10 @@ public:
 
 	void Register();
 	void Process();
-	void Clear();
-	void ClearEvent();
 
 private:
 
-	ListenerRef mpOwner;
-	ServiceRef mpService;
 	IocpAcceptEvent mAcceptEvent;
+	ServiceRef mpService;
 };
 

@@ -4,20 +4,25 @@
 #include "SocketUtils.h"
 
 Sender::Sender()
-	: mpOwner(nullptr)
-	, mbSendRegistered(false)
+	: mbSendRegistered(false)
 	, mSendQueue()
 {
 }
 
 void Sender::SetOwner(const SessionRef& pOwner)
 {
-	mpOwner = pOwner;
+	if (pOwner == nullptr)
+	{
+		return;
+	}
+
+	mSendEvent.SetOwner(pOwner);
 }
 
 void Sender::Send(const NetSendBufferRef& pSendBuffer)
 {
-	if (mpOwner == nullptr || mpOwner->IsDisconnected())
+	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
+	if (pOwner == nullptr || pOwner->IsDisconnected())
 	{
 		return;
 	}
@@ -25,7 +30,7 @@ void Sender::Send(const NetSendBufferRef& pSendBuffer)
 	if (mSendQueue.TryEnqueue(pSendBuffer) == false)
 	{
 		NET_ENGINE_LOG_FATAL("Sender::Send - TryEnqueue is Failed, mSendQueue.Count() : {}", mSendQueue.Count());
-		mpOwner->Disconnect(eDisconnectReason::ServiceError);
+		pOwner->Disconnect(eDisconnectReason::ServiceError);
 		return;
 	}
 
@@ -34,20 +39,19 @@ void Sender::Send(const NetSendBufferRef& pSendBuffer)
 
 void Sender::Process(const uint32 numOfBytes)
 {
-	ClearEvent();
-
-	if (mpOwner == nullptr || mpOwner->IsDisconnected())
+	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
+	if (pOwner == nullptr || pOwner->IsDisconnected())
 	{
 		return;
 	}
 
 	if (numOfBytes == 0)
 	{
-		mpOwner->Disconnect(eDisconnectReason::Closed);
+		pOwner->Disconnect(eDisconnectReason::Closed);
 		return;
 	}
 
-	mpOwner->OnSend(static_cast<int32>(numOfBytes));
+	pOwner->OnSend(static_cast<int32>(numOfBytes));
 
 	mbSendRegistered.store(false);
 
@@ -61,7 +65,8 @@ void Sender::Register()
 {
 	while (true)
 	{
-		if (mpOwner == nullptr || mpOwner->IsDisconnected())
+		const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
+		if (pOwner == nullptr || pOwner->IsDisconnected())
 		{
 			return;
 		}
@@ -99,33 +104,16 @@ void Sender::Register()
 		}
 
 		mSendEvent.ClearOverlapped();
-		mSendEvent.SetOwner(mpOwner);
-		if (SocketUtils::WsaSend(mpOwner->GetSocket(), wsabufs, sendCount, &mSendEvent) == false)
+		if (SocketUtils::WsaSend(pOwner->GetSocket(), wsabufs, sendCount, &mSendEvent) == false)
 		{
 			const int32 errorCode = WSAGetLastError();
 			if (errorCode != WSA_IO_PENDING)
 			{
-				mpOwner->OnError(errorCode);
-				mpOwner->Disconnect(eDisconnectReason::SocketError);
-				ClearEvent();
-				Clear();
+				pOwner->OnError(errorCode);
+				pOwner->Disconnect(eDisconnectReason::SocketError);
 			}
 		}
 
 		return;
 	}
-}
-
-// TODO : 외부에서 호출할 수 없도록
-void Sender::Clear()
-{
-	mpOwner.reset();
-	mbSendRegistered.store(false);
-	mSendQueue.Clear();
-}
-
-void Sender::ClearEvent()
-{
-	mSendEvent.GetSendPendingBuffer().clear();
-	mSendEvent.ResetOwner();
 }

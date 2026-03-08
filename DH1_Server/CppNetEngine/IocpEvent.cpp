@@ -22,9 +22,11 @@ eIocpEventType IocpEvent::GetEventType() const
 	return mEventType;
 }
 
-IocpObjectRef IocpEvent::GetOwner()
+IocpObjectRef IocpEvent::GetOwner() const
 {
-	return mpOwner;
+	IocpObjectRef pIocpRef = mpOwner.lock();
+
+	return pIocpRef;
 }
 
 void IocpEvent::SetOwner(const IocpObjectRef& pOwner)
@@ -34,13 +36,13 @@ void IocpEvent::SetOwner(const IocpObjectRef& pOwner)
 
 void IocpEvent::ResetOwner()
 {
-	mpOwner = nullptr;
+	mpOwner.reset();
 }
 
 IocpAcceptEvent::IocpAcceptEvent(const int32 acceptorIndex)
 	: IocpEvent(eIocpEventType::Accept)
 	, mAcceptorIndex(acceptorIndex)
-	, mpClientSession(nullptr)
+	, mpClientSession()
 {
 }
 
@@ -56,6 +58,11 @@ void IocpAcceptEvent::ResetSession()
 
 void IocpAcceptEvent::SetSession(const SessionRef& pSession)
 {
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
 	mpClientSession = pSession;
 }
 

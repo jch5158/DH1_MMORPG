@@ -5,15 +5,13 @@
 #include "SocketUtils.h"
 
 Connector::Connector()
-	: mpOwner(nullptr)
-	, mpService(nullptr)
-	, mConnectEvent()
+	: mConnectEvent()
+    , mpService(nullptr)
 {
 }
 
 void Connector::SetOwner(const SessionRef& pOwner)
 {
-	mpOwner = pOwner;
 	mConnectEvent.SetOwner(pOwner);
 }
 
@@ -24,7 +22,8 @@ void Connector::SetService(const ServiceRef& pService)
 
 bool Connector::Register()
 {
-	if (mpOwner == nullptr || !mpOwner->IsDisconnected())
+	const SessionRef pSession = std::static_pointer_cast<Session>(mConnectEvent.GetOwner());
+	if (pSession == nullptr || !pSession->IsDisconnected())
 	{
 		return false;
 	}
@@ -34,27 +33,24 @@ bool Connector::Register()
 		return false;
 	}
 
-	if (SocketUtils::SetReuseAddress(mpOwner->GetSocket(), true) == false)
+	if (SocketUtils::SetReuseAddress(pSession->GetSocket(), true) == false)
 	{
 		return false;
 	}
 
-	if (SocketUtils::BindAnyAddress(mpOwner->GetSocket(), 0) == false)
+	if (SocketUtils::BindAnyAddress(pSession->GetSocket(), 0) == false)
 	{
 		return false;
 	}
 
 	mConnectEvent.ClearOverlapped();
-	mConnectEvent.SetOwner(mpOwner);
-	if (false == SocketUtils::ConnectEx(mpOwner->GetSocket(), mpService->GetNetAddress().GetSockAddr(), &mConnectEvent))
+	if (false == SocketUtils::ConnectEx(pSession->GetSocket(), mpService->GetNetAddress().GetSockAddr(), &mConnectEvent))
 	{
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			mpOwner->OnError(errorCode);
-			mpOwner->Disconnect(eDisconnectReason::SocketError);
-			ClearEvent();
-			Clear();
+			pSession->OnError(errorCode);
+			pSession->Disconnect(eDisconnectReason::SocketError);
 			return false;
 		}
 	}
@@ -62,20 +58,27 @@ bool Connector::Register()
 	return true;
 }
 
-void Connector::Process()
+void Connector::Process() const
 {
-	ClearEvent();
-	Clear();
-}
+	const SessionRef pSession = std::static_pointer_cast<Session>(mConnectEvent.GetOwner());
+	if (pSession == nullptr)
+	{
+		return;
+	}
 
-void Connector::Clear()
-{
-	mpOwner.reset();
-	mpService.reset();
-}
+	if (mpService == nullptr)
+	{
+		return;
+	}
 
-void Connector::ClearEvent()
-{
-	mConnectEvent.ClearOverlapped();
-	mConnectEvent.ResetOwner();
+	if (mpService->AddSession(pSession))
+	{
+		pSession->updateLastActivityMs();
+		pSession->registerReap();
+		pSession->registerReceive();
+	}
+	else
+	{
+		pSession->Disconnect(eDisconnectReason::ServerFull);
+	}
 }

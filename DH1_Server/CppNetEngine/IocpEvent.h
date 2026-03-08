@@ -27,14 +27,14 @@ public:
 
 	void ClearOverlapped();
 	[[nodiscard]] eIocpEventType GetEventType() const;
-	[[nodiscard]] IocpObjectRef GetOwner();
+	[[nodiscard]] IocpObjectRef GetOwner() const;
 	void SetOwner(const IocpObjectRef& pOwner);
 	void ResetOwner();
 
 private:
 
 	const eIocpEventType mEventType;
-	IocpObjectRef mpOwner;
+	IocpObjectWeak mpOwner;
 };
 
 class IocpAcceptEvent final : public IocpEvent

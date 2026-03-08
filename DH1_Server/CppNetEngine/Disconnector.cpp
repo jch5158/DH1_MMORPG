@@ -5,50 +5,64 @@
 #include "SocketUtils.h"
 
 Disconnector::Disconnector()
-	: mpOwner(nullptr)
-	, mDisconnectEvent()
+	: mDisconnectEvent()
+	, mpService()
 {
 }
 
 void Disconnector::SetOwner(const SessionRef& pOwner)
 {
-	mpOwner = pOwner;
+	if (pOwner == nullptr)
+	{
+		return;
+	}
+
+	mDisconnectEvent.SetOwner(pOwner);
 }
 
-void Disconnector::Clear()
+void Disconnector::SetService(const ServiceRef& pService)
 {
-	mpOwner.reset();
-}
+	if (pService == nullptr)
+	{
+		return;
+	}
 
-void Disconnector::ClearEvent()
-{
-	mDisconnectEvent.ClearOverlapped();
-	mDisconnectEvent.ResetOwner();
+	mpService = pService;
 }
 
 void Disconnector::Register()
 {
-	if (mpOwner == nullptr)
+	const SessionRef pSession = std::static_pointer_cast<Session>(mDisconnectEvent.GetOwner());
+	if (pSession == nullptr)
 	{
 		return;
 	}
 
 	mDisconnectEvent.ClearOverlapped();
-	mDisconnectEvent.SetOwner(mpOwner);
-	if (SocketUtils::DisconnectEx(mpOwner->GetSocket(), &mDisconnectEvent) == false)
+	if (SocketUtils::DisconnectEx(pSession->GetSocket(), &mDisconnectEvent) == false)
 	{
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			mpOwner->OnError(errorCode);
-			ClearEvent();
-			Clear();
+			pSession->OnError(errorCode);
 		}
 	}
 }
 
-void Disconnector::Process()
+void Disconnector::Process() const
 {
-	ClearEvent();
-	Clear();
+	const SessionRef pSession = std::static_pointer_cast<Session>(mDisconnectEvent.GetOwner());
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	pSession->OnDisconnected();
+
+	if (mpService != nullptr)
+	{
+		mpService->RemoveSession(pSession);
+	}
+
+	pSession->Clear();
 }

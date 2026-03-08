@@ -15,15 +15,14 @@ public:
 	~Disconnector() = default;
 	
 	void SetOwner(const SessionRef& pOwner);
-	void Clear();
-	void ClearEvent();
+	void SetService(const ServiceRef& pService);
 
 	void Register();
-	void Process();
+	void Process() const;
 
 private:
 
-	SessionRef mpOwner;
 	IocpDisconnectEvent mDisconnectEvent;
+	ServiceRef mpService;
 };
 

@@ -49,12 +49,6 @@ void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 	}
 }
 
-bool Session::SetSessionInGame()
-{
-	auto expected = eSessionState::Connected;
-	return mSessionState.compare_exchange_weak(expected, eSessionState::InGame);
-}
-
 ServiceRef Session::GetService() const
 {
 	return mpService;
@@ -100,6 +94,12 @@ bool Session::IsDisconnected() const
 	return mSessionState.load() == eSessionState::Disconnected;
 }
 
+bool Session::SetSessionInGame()
+{
+	auto expected = eSessionState::Connected;
+	return mSessionState.compare_exchange_weak(expected, eSessionState::InGame);
+}
+
 bool Session::Connect()
 {
 	return registerConnect();
@@ -125,10 +125,6 @@ void Session::Clear()
 {
 	mpService.reset();
 	mSocket = INVALID_SOCKET;
-	mConnector.Clear();
-	mDisconnector.Clear();
-	mReceiver.Clear();
-	mSender.Clear();
 }
 
 void Session::updateLastActivityMs()
@@ -166,37 +162,14 @@ void Session::registerReap()
 	GetService()->RegisterSessionReap(GetSessionRef());
 }
 
-void Session::processConnect()
+void Session::processConnect() const
 {
 	mConnector.Process();
-
-	const SessionRef pSession = GetSessionRef();
-	const ServiceRef pService = GetService();
-
-	mReceiver.SetOwner(pSession);
-	mSender.SetOwner(pSession);
-
-	if (pService->AddSession(pSession))
-	{
-		updateLastActivityMs();
-		registerReap();
-		registerReceive();
-	}
-	else
-	{
-		Disconnect(eDisconnectReason::ServerFull);
-	}
 }
 
-void Session::processDisconnect()
+void Session::processDisconnect() const
 {
 	mDisconnector.Process();
-
-	OnDisconnected();
-
-	GetService()->RemoveSession(GetSessionRef());
-
-	Clear();
 }
 
 void Session::processSend(const uint32 numOfBytes)
@@ -217,6 +190,7 @@ void Session::setService(const ServiceRef& pService)
 void Session::setSessionEvent(const ServiceRef& pService)
 {
 	mConnector.SetService(pService);
+	mDisconnector.SetService(pService);
 
 	const SessionRef pSession = GetSessionRef();
 	mConnector.SetOwner(pSession);

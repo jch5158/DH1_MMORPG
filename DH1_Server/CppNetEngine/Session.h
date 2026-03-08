@@ -66,8 +66,6 @@ public:
 	virtual int32 OnReceive(byte* pBuffer, const int32 len) = 0;
 	virtual void OnError(const int32 errorCode) = 0;
 
-	[[nodiscard]] bool SetSessionInGame();
-
 	[[nodiscard]] ServiceRef GetService() const;
 	[[nodiscard]] SOCKET GetSocket() const;
 	[[nodiscard]] NetAddress& GetAddress();
@@ -78,6 +76,7 @@ public:
 	[[nodiscard]] bool IsConnected() const;
 	[[nodiscard]] bool IsWaiting() const;
 	[[nodiscard]] bool IsDisconnected() const;
+	[[nodiscard]] bool SetSessionInGame();
 	[[nodiscard]] bool Connect();
 	void Disconnect(const eDisconnectReason reason);
 	void Send(const NetSendBufferRef& pSendBuffer);
@@ -96,8 +95,8 @@ private:
 	void registerReceive();
 	void registerReap();
 
-	void processConnect();
-	void processDisconnect();
+	void processConnect() const;
+	void processDisconnect() const;
 	void processSend(const uint32 numOfBytes);
 	void processReceive(const uint32 numOfBytes);
 

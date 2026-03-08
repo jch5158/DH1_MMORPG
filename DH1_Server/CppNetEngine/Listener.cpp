@@ -114,8 +114,5 @@ bool Listener::StartAccept(const ServerServiceRef& pServerService)
 void Listener::CloseAccept()
 {
 	SocketUtils::Close(mSocket);
-	for (const auto& pAcceptor : mAcceptors)
-	{
-		pAcceptor->Clear();
-	}
+	mAcceptors.clear();
 }

@@ -21,12 +21,9 @@ public:
 	void Send(const NetSendBufferRef& pSendBuffer);
 	void Process(const uint32 numOfBytes);
 	void Register();
-	void Clear();
-	void ClearEvent();
 
 private:
 
-	SessionRef mpOwner;
 	IocpSendEvent mSendEvent;
 	std::atomic<bool> mbSendRegistered;
 	LockFreeQueue<NetSendBufferRef> mSendQueue;

@@ -17,14 +17,11 @@ public:
 	void SetService(const ServiceRef& pService);
 
 	bool Register();
-	void Process();
-	void Clear();
-	void ClearEvent();
+	void Process() const;
 
 private:
 
-	SessionRef mpOwner;
-	ServiceRef mpService;
 	IocpConnectEvent mConnectEvent;
+	ServiceRef mpService;
 };
 

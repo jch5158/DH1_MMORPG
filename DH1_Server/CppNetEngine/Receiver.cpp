@@ -5,15 +5,19 @@
 #include "SocketUtils.h"
 
 Receiver::Receiver()
-	:mpOwner(nullptr)
-	, mReceiveEvent()
+	: mReceiveEvent()
 	, mNetReceiveBuffer(90)
 {
 }
 
 void Receiver::SetOwner(const SessionRef& pOwner)
 {
-	mpOwner = pOwner;
+	if (pOwner == nullptr)
+	{
+		return;
+	}
+
+	mReceiveEvent.SetOwner(pOwner);
 }
 
 byte* Receiver::GetWritePtr() const
@@ -23,16 +27,15 @@ byte* Receiver::GetWritePtr() const
 
 void Receiver::Process(const uint32 numOfBytes)
 {
-	ClearEvent();
-
-	if (mpOwner == nullptr || mpOwner->IsDisconnected())
+	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
+	if (pOwner == nullptr || pOwner->IsDisconnected())
 	{
 		return;
 	}
 
 	if (numOfBytes == 0)
 	{
-		mpOwner->Disconnect(eDisconnectReason::Closed);
+		pOwner->Disconnect(eDisconnectReason::Closed);
 		return;
 	}
 
@@ -41,10 +44,10 @@ void Receiver::Process(const uint32 numOfBytes)
 	mNetReceiveBuffer.LinearizeRead();
 
 	const int32 useSize = mNetReceiveBuffer.GetUseSize();
-	const int32 processLen = mpOwner->OnReceive(mNetReceiveBuffer.GetBufferPtr(), useSize);
+	const int32 processLen = pOwner->OnReceive(mNetReceiveBuffer.GetBufferPtr(), useSize);
 	if (processLen < 0 || processLen > useSize)
 	{
-		mpOwner->Disconnect(eDisconnectReason::Kicked);
+		pOwner->Disconnect(eDisconnectReason::Kicked);
 		return;
 	}
 
@@ -55,7 +58,8 @@ void Receiver::Process(const uint32 numOfBytes)
 
 void Receiver::Register()
 {
-	if (mpOwner == nullptr || mpOwner->IsDisconnected())
+	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
+	if (pOwner == nullptr || pOwner->IsDisconnected())
 	{
 		return;
 	}
@@ -63,7 +67,7 @@ void Receiver::Register()
 	const int32 freeSize = mNetReceiveBuffer.GetFreeSize();
 	if (freeSize == 0)
 	{
-		mpOwner->Disconnect(eDisconnectReason::Kicked);
+		pOwner->Disconnect(eDisconnectReason::Kicked);
 		return;
 	}
 
@@ -83,28 +87,13 @@ void Receiver::Register()
 	}
 
 	mReceiveEvent.ClearOverlapped();
-	mReceiveEvent.SetOwner(mpOwner);
-	if (SocketUtils::WsaReceive(mpOwner->GetSocket(), wsabufs, wsabufsLen, &mReceiveEvent) == false)
+	if (SocketUtils::WsaReceive(pOwner->GetSocket(), wsabufs, wsabufsLen, &mReceiveEvent) == false)
 	{
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			mpOwner->OnError(errorCode);
-			mpOwner->Disconnect(eDisconnectReason::SocketError);
-			ClearEvent();
-			Clear();
+			pOwner->OnError(errorCode);
+			pOwner->Disconnect(eDisconnectReason::SocketError);
 		}
 	}
-}
-
-void Receiver::Clear()
-{
-	mpOwner.reset();
-	mNetReceiveBuffer.Clear();
-}
-
-void Receiver::ClearEvent()
-{
-	mReceiveEvent.ClearOverlapped();
-	mReceiveEvent.ResetOwner();
 }

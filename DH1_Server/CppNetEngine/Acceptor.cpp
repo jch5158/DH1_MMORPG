@@ -6,24 +6,35 @@
 #include "SocketUtils.h"
 
 Acceptor::Acceptor(const int32 acceptorIndex)
-	: mpOwner(nullptr)
-	, mAcceptEvent(acceptorIndex)
+	: mAcceptEvent(acceptorIndex)
+	, mpService()
 {
 }
 
 void Acceptor::SetOwner(const ListenerRef& pOwner)
 {
-	mpOwner = pOwner;
+	if (pOwner == nullptr)
+	{
+		return;
+	}
+
+	mAcceptEvent.SetOwner(pOwner);
 }
 
 void Acceptor::SetService(const ServiceRef& pService)
 {
+	if (pService == nullptr)
+	{
+		return;
+	}
+
 	mpService = pService;
 }
 
 void Acceptor::Register()
 {
-	if (mpOwner == nullptr)
+	const ListenerRef pOwner = static_pointer_cast<Listener>(mAcceptEvent.GetOwner());
+	if (pOwner == nullptr)
 	{
 		return;
 	}
@@ -40,39 +51,36 @@ void Acceptor::Register()
 	}
 
 	mAcceptEvent.ClearOverlapped();
-	mAcceptEvent.SetOwner(mpOwner);
 	mAcceptEvent.SetSession(pSession);
-	if (false == SocketUtils::AcceptEx(mpOwner->GetSocket(), pSession->GetSocket(), pSession->GetReceiveBufferPtr(), &mAcceptEvent))
+	if (false == SocketUtils::AcceptEx(pOwner->GetSocket(), pSession->GetSocket(), pSession->GetReceiveBufferPtr(), &mAcceptEvent))
 	{
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			mpOwner->mpErrorHandle(errorCode);
-			ClearEvent();
-			Clear();
+			pOwner->mpErrorHandle(errorCode);
 		}
 	}
 }
 
 void Acceptor::Process()
 {
+	const ListenerRef pOwner = static_pointer_cast<Listener>(mAcceptEvent.GetOwner());
 	const SessionRef pSession = mAcceptEvent.GetClientSession();
-
-	ClearEvent();
+	mAcceptEvent.ResetSession();
 
 	do
 	{
+		if (pOwner == nullptr)
+		{
+			break;
+		}
+
 		if (pSession == nullptr)
 		{
 			break;
 		}
 
-		if (mpOwner == nullptr)
-		{
-			break;
-		}
-
-		if (SocketUtils::SetUpdateAcceptSocket(pSession->GetSocket(), mpOwner->GetSocket()) == false)
+		if (SocketUtils::SetUpdateAcceptSocket(pSession->GetSocket(), pOwner->GetSocket()) == false)
 		{
 			break;
 		}
@@ -86,21 +94,8 @@ void Acceptor::Process()
 
 		pSession->setNetAddress(NetAddress(sockAddr));
 		pSession->processConnect();
+
 	} while (false);
 
 	Register();
 }
-
-void Acceptor::Clear()
-{
-	mpOwner.reset();
-	mpService.reset();
-}
-
-void Acceptor::ClearEvent()
-{
-	mAcceptEvent.ClearOverlapped();
-	mAcceptEvent.ResetOwner();
-	mAcceptEvent.ResetSession();
-}
-
