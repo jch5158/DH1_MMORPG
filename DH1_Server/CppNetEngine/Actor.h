@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "ActorContext.h"
-#include "ActorOverlapped.h"
+#include "ActorEvent.h"
+#include "ActorJobQueue.h"
 #include "LockFreeQueue.h"
 #include "Job.h"
 #include "JobDispatcher.h"
@@ -17,32 +17,31 @@ public:
 	IActor(IActor&&) = delete;
 	IActor& operator=(IActor&&) = delete;
 
-	explicit IActor(ActorContext actorContext);
+	explicit IActor(const ActorSchedulerRef& pScheduler);
 	virtual ~IActor() = default;
 
-	virtual void Execute() = 0;
+	virtual void Dispatch(ActorEvent& actorEvent) = 0;
 	[[nodiscard]] virtual bool TryAcquire() = 0;
 	virtual void Release() = 0;
-	virtual void Register() = 0;
-	virtual void Flush() = 0;
-	[[nodiscard]] virtual bool PushJob(const JobRef& pJob) = 0;
-	[[nodiscard]] virtual int32 GetJobCount() = 0;
+	
+	void InitSchedule();
+	void Register();
+	void Flush();
+	[[nodiscard]] bool PushJob(const JobRef& pJob);
+	[[nodiscard]] int32 GetJobCount() const;
+	[[nodiscard]] ActorSchedulerRef GetActorSchedulerRef() const;
 
-	ActorOverlapped& GetActorOverlapped();
-	void ClearActorOverlapped();
+protected:
 
-	ActorSchedulerRef GetActorSchedulerRef() const;
-
-private:
-
-	ActorContext mActorContext;
+	ActorSchedulerRef mpScheduler;
+	ActorJobQueue mJobQueue;
 };
 
 class Actor : public IActor
 {
 public:
 
-	explicit Actor(ActorContext actorContext);
+	explicit Actor(const ActorSchedulerRef& pScheduler);
 	virtual ~Actor() override = default;
 
 	void Post(CallbackType&& callback)
@@ -92,17 +91,10 @@ public:
 		return handle;
 	}
 
-	virtual void Execute() override;
+	virtual void Dispatch(ActorEvent& actorEvent) override;
 	[[nodiscard]] virtual bool TryAcquire() override;
 	virtual void Release() override;
-	virtual void Register() override;
-	virtual void Flush() override;
-	[[nodiscard]] virtual bool PushJob(const JobRef& pJob) override;
-	[[nodiscard]] virtual int32 GetJobCount() override;
 
-
-	void Clear();
-	[[nodiscard]] int32 Count() const;
 	[[nodiscard]] int64 GetSeed() const;
 
 private:
@@ -110,5 +102,4 @@ private:
 
 	const int64 mSeed;
 	std::atomic<bool> mbAcquire;
-	LockFreeQueue<JobRef> mJobQueue;
 };

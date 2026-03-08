@@ -13,7 +13,6 @@ Disconnector::Disconnector()
 void Disconnector::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
-	mDisconnectEvent.SetOwner(pOwner);
 }
 
 void Disconnector::Clear()

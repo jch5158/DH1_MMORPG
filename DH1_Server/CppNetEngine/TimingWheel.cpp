@@ -152,15 +152,15 @@ void TimingWheel::addNode(TimingNode&& node)
 
 	if (delay < LEVEL0_SIZE)
 	{
-		mWheel0[node.GetExpiredTick() & LEVEL0_MASK].push_back(std::move(node));
+		mWheel0[node.GetExpiredTick() & LEVEL0_MASK].emplace_back(std::move(node));
 	}
 	else if (delay < (LEVEL0_SIZE << LEVEL1_BITS))
 	{
-		mWheel1[(node.GetExpiredTick() >> LEVEL0_BITS) & LEVEL1_MASK].push_back(std::move(node));
+		mWheel1[(node.GetExpiredTick() >> LEVEL0_BITS) & LEVEL1_MASK].emplace_back(std::move(node));
 	}
 	else
 	{
-		mWheel2[(node.GetExpiredTick() >> (LEVEL0_BITS + LEVEL1_BITS)) & LEVEL2_MASK].push_back(std::move(node));
+		mWheel2[(node.GetExpiredTick() >> (LEVEL0_BITS + LEVEL1_BITS)) & LEVEL2_MASK].emplace_back(std::move(node));
 	}
 }
 

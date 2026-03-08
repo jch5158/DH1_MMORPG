@@ -4,11 +4,11 @@
 
 ActorScheduler::ActorScheduler(std::function<void(const uint32)> pOnHandleError,
 	const uint32 timeSliceMs,
-	const int32 executeJobCount,
+	const int32 maxExecuteJobCount,
 	const int64 tickIntervalMs)
 	: mActorIocpHandle(nullptr)
 	, mTimeSliceMs(timeSliceMs)
-	, mExecuteJobCount(executeJobCount)
+	, mMaxExecuteJobCount(maxExecuteJobCount)
 	, mTimingWheel(TimingWheel(tickIntervalMs))
 	, mpOnHandleError(std::move(pOnHandleError))
 {
@@ -27,33 +27,24 @@ ActorScheduler::~ActorScheduler()
 	}
 }
 
-void ActorScheduler::Schedule(const IActorRef& pActor, const bool bBypassAcquire) const
+int32 ActorScheduler::GetMaxExecuteJobCount() const
 {
-	if (bBypassAcquire || pActor->TryAcquire())
+	return mMaxExecuteJobCount;
+}
+
+void ActorScheduler::Schedule(ActorEvent& actorEvent) const
+{
+	if (PostQueuedCompletionStatus(mActorIocpHandle, 0, 0, &actorEvent) == false)
 	{
-		auto& overlapped = pActor->GetActorOverlapped();
-		overlapped.ClearOverlapped();
-		overlapped.SetOwner(pActor);
-
-		if (PostQueuedCompletionStatus(mActorIocpHandle, 0, 0, &overlapped) == false)
-		{
-			overlapped.ClearOverlapped();
-			overlapped.ResetOwner();
-			NET_ENGINE_LOG_ERROR("ActorScheduler::Push - PostQueuedCompletionStatus is Failed, errorCode : {}", GetLastError());
-		}
-
-		if (!bBypassAcquire)
-		{
-			pActor->Release();
-		}
+		NET_ENGINE_LOG_ERROR("ActorScheduler::Schedule - PostQueuedCompletionStatus is Failed, errorCode : {}", GetLastError());
 	}
 }
 
-TimerHandle ActorScheduler::ScheduleDelay(JobRef pJob, IActorRef pOwner, const uint64 delayMs)
+TimerHandle ActorScheduler::ScheduleDelay(const JobRef& pJob, const IActorRef& pOwner, const uint64 delayMs)
 {
-	TimerHandle handle = mTimingWheel.AddTiming([pCaptureJob = std::move(pJob), pCaptureOwner = std::move(pOwner), pScheduler = shared_from_this()]() mutable -> void
+	TimerHandle handle = mTimingWheel.AddTiming([pJob, pOwner]() -> void
 		{
-			JobDispatcher::Post(pCaptureJob, pCaptureOwner);
+			JobDispatcher::Post(pJob, pOwner);
 		}
 	, delayMs);
 
@@ -64,9 +55,9 @@ void ActorScheduler::Dispatch()
 {
 	DWORD bytesTransferred = 0;
 	ULONG_PTR pCompletionKey = 0;
-	ActorOverlapped* pActorOverlapped = nullptr;
+	ActorEvent* pActorEvent = nullptr;
 
-	const int32 gqcsRet = GetQueuedCompletionStatus(mActorIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorOverlapped), mTimeSliceMs);
+	const int32 gqcsRet = GetQueuedCompletionStatus(mActorIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorEvent), mTimeSliceMs);
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
@@ -76,26 +67,12 @@ void ActorScheduler::Dispatch()
 		}
 	}
 
-	if (pActorOverlapped != nullptr)
+	if (pActorEvent != nullptr)
 	{
-		const IActorRef pActor = pActorOverlapped->GetOwner();
+		const IActorRef pActor = pActorEvent->GetOwner();
 		if (pActor != nullptr && pActor->TryAcquire())
 		{
-			pActorOverlapped->Clear();
-
-			const int32 currentJobCount = pActor->GetJobCount();
-			const int32 executeJobCount = mExecuteJobCount < currentJobCount ? mExecuteJobCount : currentJobCount;
-
-			for (int32 i = 0; i < executeJobCount; ++i)
-			{
-				pActor->Execute();
-			}
-
-			pActor->ClearActorOverlapped();
-
-			pActor->Release();
-
-			pActor->Register();
+			pActor->Dispatch(*pActorEvent);
 		}
 	}
 

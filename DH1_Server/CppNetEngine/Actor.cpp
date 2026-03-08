@@ -1,46 +1,63 @@
 ﻿#include "pch.h"
 #include "Actor.h"
 #include "ActorScheduler.h"
+#include "ActorEvent.h"
 
-IActor::IActor(ActorContext actorContext)
-	: mActorContext(std::move(actorContext))
-{
-}
-
-ActorOverlapped& IActor::GetActorOverlapped()
-{
-	return mActorContext.mActorOverlapped;
-}
-
-void IActor::ClearActorOverlapped()
-{
-	mActorContext.Clear();
-}
-
-ActorSchedulerRef IActor::GetActorSchedulerRef() const
-{
-	return mActorContext.GetActorSchedulerRef();
-}
-
-Actor::Actor(ActorContext actorContext)
-	: IActor(std::move(actorContext))
-	, mSeed(sSeedBase.fetch_add(1))
-	, mbAcquire(false)
+IActor::IActor(const ActorSchedulerRef& pScheduler)
+	: mpScheduler(pScheduler)
 	, mJobQueue()
 {
 }
 
-void Actor::Execute()
+void IActor::InitSchedule()
 {
-	JobRef pJob;
-	if (mJobQueue.TryDequeue(pJob) == false)
-	{
-		return;
-	}
+	mJobQueue.InitEvent(shared_from_this());
+	mJobQueue.SetOwner(shared_from_this());
+	mJobQueue.SetScheduler(mpScheduler);
+}
 
-	if (pJob != nullptr)
+void IActor::Register()
+{
+	mJobQueue.Register();
+}
+
+void IActor::Flush()
+{
+	mJobQueue.Flush();
+}
+
+bool IActor::PushJob(const JobRef& pJob)
+{
+	return mJobQueue.PushJob(pJob);
+}
+
+int32 IActor::GetJobCount() const
+{
+	return mJobQueue.GetJobCount();
+}
+
+ActorSchedulerRef IActor::GetActorSchedulerRef() const
+{
+	return mpScheduler;
+}
+
+Actor::Actor(const ActorSchedulerRef& pScheduler)
+	: IActor(pScheduler)
+	, mSeed(sSeedBase.fetch_add(1))
+	, mbAcquire(false)
+{
+}
+
+void Actor::Dispatch(ActorEvent& actorEvent)
+{
+	switch (actorEvent.GetEventType())
 	{
-		pJob->Execute();
+	case eActorEventType::Job:
+		mJobQueue.Process();
+		break;
+	default:  // NOLINT(clang-diagnostic-covered-switch-default)
+		NET_ENGINE_LOG_ERROR("Actor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
+		break;
 	}
 }
 
@@ -57,47 +74,6 @@ bool Actor::TryAcquire()
 void Actor::Release()
 {
 	mbAcquire.store(false);
-}
-
-void Actor::Register()
-{
-	if (mJobQueue.Count() > 0)
-	{
-		const ActorSchedulerRef pScheduler = GetActorSchedulerRef();
-		if (pScheduler != nullptr)
-		{
-			pScheduler->Schedule(shared_from_this());
-		}
-	}
-}
-
-void Actor::Flush()
-{
-	JobRef pJob;
-	while (mJobQueue.TryDequeue(pJob))
-	{
-		pJob->Execute();
-	}
-}
-
-bool Actor::PushJob(const JobRef& pJob)
-{
-	return mJobQueue.TryEnqueue(pJob);
-}
-
-int32 Actor::GetJobCount()
-{
-	return mJobQueue.Count();
-}
-
-void Actor::Clear()
-{
-	mJobQueue.Clear();
-}
-
-int32 Actor::Count() const
-{
-	return mJobQueue.Count();
 }
 
 int64 Actor::GetSeed() const

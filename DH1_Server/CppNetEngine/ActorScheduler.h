@@ -20,19 +20,21 @@ public:
 
 	explicit ActorScheduler(std::function<void(const uint32)> pOnHandleError,
 		const uint32 timeSliceMs = DEFAULT_TIME_SLICE_MS,
-		const int32 executeJobCount = DEFAULT_EXECUTE_JOB_COUNT,
+		const int32 maxExecuteJobCount = DEFAULT_EXECUTE_JOB_COUNT,
 		const int64 tickIntervalMs = DEFAULT_TICK_INTERVAL_MS);
 	~ActorScheduler();
 
-	void Schedule(const IActorRef& pActor, const bool bBypassAcquire = false) const;
-	TimerHandle ScheduleDelay(JobRef pJob, IActorRef pOwner, const uint64 delayMs);
+	[[nodiscard]] int32 GetMaxExecuteJobCount() const;
+
+	void Schedule(ActorEvent& actorEvent) const;
+	TimerHandle ScheduleDelay(const JobRef& pJob, const IActorRef& pOwner, const uint64 delayMs);
 	void Dispatch();
 
 private:
 
 	HANDLE mActorIocpHandle;
 	const uint32 mTimeSliceMs;
-	const int32 mExecuteJobCount;
+	const int32 mMaxExecuteJobCount;
 	TimingWheel mTimingWheel;
 	std::function<void(const uint32)> mpOnHandleError;
 };

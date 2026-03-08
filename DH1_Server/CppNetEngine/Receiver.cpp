@@ -14,7 +14,6 @@ Receiver::Receiver()
 void Receiver::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
-	mReceiveEvent.SetOwner(pOwner);
 }
 
 byte* Receiver::GetWritePtr() const

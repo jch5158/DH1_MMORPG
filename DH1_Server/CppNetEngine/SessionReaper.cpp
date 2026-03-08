@@ -3,8 +3,8 @@
 
 #include "Session.h"
 
-SessionReaper::SessionReaper(const ActorContext& actorContext, const int64 timeoutMs)
-	: Actor(actorContext)
+SessionReaper::SessionReaper(const ActorSchedulerRef& pScheduler, const int64 timeoutMs)
+	: Actor(pScheduler)
 	, mTimeoutMs(timeoutMs)
 {
 }
@@ -17,7 +17,7 @@ int64 SessionReaper::GetTimeoutMs() const
 void SessionReaper::ReapSession(const SessionWeak& pSessionWeak) const
 {
 	const SessionRef pSession = pSessionWeak.lock();
-	if (pSession == nullptr)
+	if (pSession == nullptr || pSession->IsDisconnected())
 	{
 		return;
 	}

@@ -198,8 +198,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Acceptor.h" />
-    <ClInclude Include="ActorContext.h" />
-    <ClInclude Include="ActorOverlapped.h" />
+    <ClInclude Include="ActorEvent.h" />
     <ClInclude Include="AllocatorUtils.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="CrashReporter.h" />
@@ -212,6 +211,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="JobDispatcher.h" />
     <ClInclude Include="ActorScheduler.h" />
+    <ClInclude Include="ActorJobQueue.h" />
     <ClInclude Include="TimingWheel.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="LockFreeQueue.h" />
@@ -247,8 +247,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Acceptor.cpp" />
-    <ClCompile Include="ActorContext.cpp" />
-    <ClCompile Include="ActorOverlapped.cpp" />
+    <ClCompile Include="ActorEvent.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="CrashReporter.cpp" />
     <ClCompile Include="Disconnector.cpp" />
@@ -257,6 +256,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="JobDispatcher.cpp" />
     <ClCompile Include="ActorScheduler.cpp" />
+    <ClCompile Include="ActorJobQueue.cpp" />
     <ClCompile Include="TimingWheel.cpp" />
     <ClCompile Include="Listener.cpp" />
     <ClCompile Include="MemoryAllocator.cpp" />

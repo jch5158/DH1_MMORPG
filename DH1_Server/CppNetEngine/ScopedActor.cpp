@@ -1,17 +1,16 @@
 ﻿#include "pch.h"
 #include "ScopedActor.h"
 
-void ScopedActor::Execute()
+void ScopedActor::Dispatch(ActorEvent& actorEvent)
 {
-	JobRef pJob;
-	if (mJobQueue.TryDequeue(pJob) == false)
+	switch (actorEvent.GetEventType())
 	{
-		return;
-	}
-
-	if (pJob != nullptr)
-	{
-		pJob->Execute();
+	case eActorEventType::Job:
+		mJobQueue.Process();
+		break;
+	default:  // NOLINT(clang-diagnostic-covered-switch-default)
+		NET_ENGINE_LOG_ERROR("ScopedActor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
+		break;
 	}
 }
 
@@ -34,37 +33,6 @@ void ScopedActor::Release()
 	}
 
 	mAcquireIndex = -1;
-}
-
-void ScopedActor::Register()
-{
-	if (mJobQueue.Count() > 0)
-	{
-		const ActorSchedulerRef pScheduler = GetActorSchedulerRef();
-		if (pScheduler != nullptr)
-		{
-			pScheduler->Schedule(shared_from_this());
-		}
-	}
-}
-
-void ScopedActor::Flush()
-{
-	JobRef pJob;
-	while (mJobQueue.TryDequeue(pJob))
-	{
-		pJob->Execute();
-	}
-}
-
-bool ScopedActor::PushJob(const JobRef& pJob)
-{
-	return mJobQueue.TryEnqueue(pJob);
-}
-
-int32 ScopedActor::GetJobCount()
-{
-	return mJobQueue.Count();
 }
 
 void ScopedActor::Post(CallbackType&& callback)

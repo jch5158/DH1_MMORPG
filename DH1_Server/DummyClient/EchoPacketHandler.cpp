@@ -25,7 +25,7 @@ bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet
 	{
 		return false;
 	}
-	
+
 	pPlayer->PostDelay(3000, [pSession, pSendBuffer]()->void
 		{
 			pSession->Send(pSendBuffer);

@@ -31,7 +31,13 @@ int main()
 		pScheduler,
 		cpp_net_engine::MakeShared<GameSession>,
 		cpp_net_engine::MakeShared<SessionManager>(5000),
-		cpp_net_engine::MakeShared<SessionReaper>(ActorContext(pScheduler), 60000),
+		[pScheduler]()->SessionReaperRef
+		{
+			SessionReaperRef pSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(pScheduler, 60000);
+			pSessionReaper->InitSchedule();
+
+			return pSessionReaper;
+		}(),
 		cpp_net_engine::MakeShared<WaitQueueManager>(0));
 
 	if (pService->Start() == false)

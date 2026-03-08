@@ -1,0 +1,32 @@
+﻿#pragma once
+#include "LockFreeQueue.h"
+
+class ActorJobQueue
+{
+public:
+
+	ActorJobQueue(const ActorJobQueue&) = delete;
+	ActorJobQueue& operator=(const ActorJobQueue&) = delete;
+	ActorJobQueue(ActorJobQueue&&) = delete;
+	ActorJobQueue& operator=(ActorJobQueue&&) = delete;
+
+	explicit ActorJobQueue();
+	~ActorJobQueue() = default;
+
+	void SetOwner(const IActorRef& pOwner);
+	void SetScheduler(const ActorSchedulerRef& pScheduler);
+
+	void InitEvent(const IActorRef& pOwner);
+	bool PushJob(const JobRef& pJob);
+	[[nodiscard]] int32 GetJobCount() const;
+	void Process();
+	void Register();
+	void Flush();
+
+private:
+
+	JobActorEvent mJobActorEvent;
+	ActorSchedulerRef mpScheduler;
+	LockFreeQueue<JobRef> mJobQueue;
+};
+

@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
 #include "Player.h"
 
-Player::Player(const ActorContext& actorContext)
-	: Actor(actorContext)
+Player::Player(const ActorSchedulerRef& pScheduler)
+	: Actor(pScheduler)
 	, mpSession(nullptr)
 {
 }

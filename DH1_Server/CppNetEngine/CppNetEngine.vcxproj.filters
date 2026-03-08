@@ -40,6 +40,12 @@
     <Filter Include="Actor">
       <UniqueIdentifier>{8d774a0e-136e-4008-855e-facdab60d221}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Actor\IOCP">
+      <UniqueIdentifier>{344e51d1-bf54-4a76-be85-dbcd5d85539f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\IOCP\Event">
+      <UniqueIdentifier>{e9b8b922-0767-45b3-a3fb-1021e577407a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -114,9 +120,6 @@
     <ClInclude Include="Actor.h">
       <Filter>Actor</Filter>
     </ClInclude>
-    <ClInclude Include="ActorScheduler.h">
-      <Filter>Actor</Filter>
-    </ClInclude>
     <ClInclude Include="NetEngineLogger.h">
       <Filter>Main</Filter>
     </ClInclude>
@@ -171,17 +174,20 @@
     <ClInclude Include="JobDispatcher.h">
       <Filter>Actor</Filter>
     </ClInclude>
-    <ClInclude Include="ActorOverlapped.h">
-      <Filter>Actor</Filter>
-    </ClInclude>
     <ClInclude Include="IocpEvent.h">
       <Filter>Network\IOCP\Event</Filter>
     </ClInclude>
     <ClInclude Include="TimingWheel.h">
       <Filter>Thread</Filter>
     </ClInclude>
-    <ClInclude Include="ActorContext.h">
-      <Filter>Actor</Filter>
+    <ClInclude Include="ActorScheduler.h">
+      <Filter>Actor\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorEvent.h">
+      <Filter>Actor\IOCP\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorJobQueue.h">
+      <Filter>Actor\IOCP\Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -213,9 +219,6 @@
       <Filter>Network</Filter>
     </ClCompile>
     <ClCompile Include="Actor.cpp">
-      <Filter>Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="ActorScheduler.cpp">
       <Filter>Actor</Filter>
     </ClCompile>
     <ClCompile Include="NetEngineLogger.cpp">
@@ -272,17 +275,20 @@
     <ClCompile Include="JobDispatcher.cpp">
       <Filter>Actor</Filter>
     </ClCompile>
-    <ClCompile Include="ActorOverlapped.cpp">
-      <Filter>Actor</Filter>
-    </ClCompile>
     <ClCompile Include="IocpEvent.cpp">
       <Filter>Network\IOCP\Event</Filter>
     </ClCompile>
     <ClCompile Include="TimingWheel.cpp">
       <Filter>Thread</Filter>
     </ClCompile>
-    <ClCompile Include="ActorContext.cpp">
-      <Filter>Actor</Filter>
+    <ClCompile Include="ActorScheduler.cpp">
+      <Filter>Actor\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorEvent.cpp">
+      <Filter>Actor\IOCP\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorJobQueue.cpp">
+      <Filter>Actor\IOCP\Event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

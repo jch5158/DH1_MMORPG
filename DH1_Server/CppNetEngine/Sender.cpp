@@ -13,7 +13,6 @@ Sender::Sender()
 void Sender::SetOwner(const SessionRef& pOwner)
 {
 	mpOwner = pOwner;
-	mSendEvent.SetOwner(pOwner);
 }
 
 void Sender::Send(const NetSendBufferRef& pSendBuffer)
@@ -117,6 +116,7 @@ void Sender::Register()
 	}
 }
 
+// TODO : 외부에서 호출할 수 없도록
 void Sender::Clear()
 {
 	mpOwner.reset();
