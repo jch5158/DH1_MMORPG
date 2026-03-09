@@ -19,7 +19,7 @@ bool ScopedActor::TryAcquire()
 	bool bSuccess = false;
 	const int32 retryLimit = GetRetryLimit();
 
-	for (int32 i = 0; i < retryLimit; ++i)
+	for (int32 retry = 0; retry < retryLimit; ++retry)
 	{
 		if (tryAcquireAll())
 		{
@@ -29,11 +29,11 @@ bool ScopedActor::TryAcquire()
 
 		Release();
 
-		if (i < 10)
+		if (retry < 10)
 		{
 			_mm_pause();
 		}
-		else if (i < 50)
+		else if (retry < 50)
 		{
 			std::this_thread::yield();
 		}
