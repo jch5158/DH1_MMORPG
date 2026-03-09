@@ -20,7 +20,7 @@ public:
 	explicit IActor(ActorSchedulerRef pScheduler);
 	virtual ~IActor() = default;
 
-	virtual void Dispatch(ActorEvent& actorEvent) = 0;
+	virtual void Dispatch(ActorEvent& actorEvent);
 	[[nodiscard]] virtual bool TryAcquire() = 0;
 	virtual void Release() = 0;
 	
@@ -91,7 +91,6 @@ public:
 		return handle;
 	}
 
-	virtual void Dispatch(ActorEvent& actorEvent) override;
 	[[nodiscard]] virtual bool TryAcquire() override;
 	virtual void Release() override;
 

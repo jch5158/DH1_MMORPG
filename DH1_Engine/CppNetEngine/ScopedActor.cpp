@@ -1,19 +1,6 @@
 ﻿#include "pch.h"
 #include "ScopedActor.h"
 
-void ScopedActor::Dispatch(ActorEvent& actorEvent)
-{
-	switch (actorEvent.GetEventType())
-	{
-	case eActorEventType::Job:
-		mJobQueue.Process();
-		break;
-	default:  // NOLINT(clang-diagnostic-covered-switch-default)
-		NET_ENGINE_LOG_ERROR("ScopedActor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
-		break;
-	}
-}
-
 bool ScopedActor::TryAcquire()
 {
 	bool bSuccess = false;

@@ -46,7 +46,7 @@ Actor::Actor(ActorSchedulerRef pScheduler)
 {
 }
 
-void Actor::Dispatch(ActorEvent& actorEvent)
+void IActor::Dispatch(ActorEvent& actorEvent)
 {
 	switch (actorEvent.GetEventType())
 	{
@@ -54,7 +54,7 @@ void Actor::Dispatch(ActorEvent& actorEvent)
 		mJobQueue.Process();
 		break;
 	default:  // NOLINT(clang-diagnostic-covered-switch-default)
-		NET_ENGINE_LOG_ERROR("Actor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
+		NET_ENGINE_LOG_ERROR("IActor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
 		break;
 	}
 }

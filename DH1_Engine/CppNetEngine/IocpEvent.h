@@ -48,7 +48,6 @@ public:
 	void SetSession(SessionRef pSession);
 	[[nodiscard]] SessionRef GetClientSession() const;
 
-
 private:
 	const int32 mAcceptorIndex;
 	SessionRef mpClientSession;
