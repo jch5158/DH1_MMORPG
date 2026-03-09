@@ -150,21 +150,20 @@ private:
 	static HashMap<uint32, PacketHandle> sPacketHandleMap;
 }};";
 
-        public static readonly string HANDLE_INIT_FORMAT =
-@"
-		sPacketHandleMap[Protocol::ePacketId::{0}] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
+        public static readonly string HANDLE_INIT_FORMAT = 
+            @"sPacketHandleMap[Protocol::ePacketId::{0}] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
 			{{
 				return HandlePacket<Protocol::{1}>(size, pBuffer, pSession, HANDLE_{1});
 			}};
-		";
+";
 
 
 		public static readonly string HANDLE_DECLARE_FORMAT =
             @"static bool HANDLE_{0}(const Protocol::{0}& packet, PacketSessionRef& pSession);
-    ";
+";
 
         public static readonly string MAKE_SEND_BUFFER_FORMAT =
             @"static NetSendBufferRef MakeSendBuffer(Protocol::{0}& packet) {{ return MakeSendBuffer(packet, static_cast<uint32>(Protocol::{1})); }}
-    ";
+";
     }
 }

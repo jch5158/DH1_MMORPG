@@ -1,28 +1,24 @@
 ﻿using PacketGenerator;
 
 string configPath;
-string outputDirPath;
 string protoPath;
 string prjBasePath;
 
-if (args.Length >= 4)
+if (args.Length >= 3)
 {
     configPath = args[0];
-    outputDirPath = args[1];
-    protoPath = args[2];
-    prjBasePath = args[3];
+    protoPath = args[1];
+    prjBasePath = args[2];
 }
 else
 {
     var baseDir = AppContext.BaseDirectory;
     configPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\Tools\PacketGenerator\Config\PacketConfig.json"));
-    outputDirPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\PacketGenerator\Generated"));
     protoPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\Shared\Protocol"));
     prjBasePath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\"));
 }
 
 Console.WriteLine($"[Config Path] {configPath}");
-Console.WriteLine($"[Output Path] {outputDirPath}");
 Console.WriteLine($"[Proto Path] {protoPath}");
 Console.WriteLine($"[prjBasePath] {prjBasePath}");
 
@@ -45,6 +41,6 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 
-Console.WriteLine(PacketHandlerGenerator.Generate(resultConfig, outputDirPath, protoPath, prjBasePath)
+Console.WriteLine(PacketHandlerGenerator.Generate(resultConfig, protoPath, prjBasePath)
     ? "SUCCESS"
     : "FAILED to generate packet handler.");

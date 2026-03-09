@@ -10,11 +10,11 @@
     },
     {
       "name": "DH1_Engine\\GameServer",
-      "role": "GameServer"
+      "role": "Game_Server"
     },
     {
       "name": "DH1_Server\\GameServer",
-      "role": "GameServer"
+      "role": "Game_Server"
     }
   ]
 }
