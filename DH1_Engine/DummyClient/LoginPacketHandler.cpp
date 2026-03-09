@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "Generated/LoginPacketHandler.h"
+#include "PacketHandler/LoginPacketHandler.h"
 
 bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession)
 {

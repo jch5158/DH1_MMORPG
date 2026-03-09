@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "GameSession.h"
-#include "Generated/PacketServiceTypeHandler.h"
+#include "PacketHandler/PacketServiceTypeHandler.h"
 
 GameSession::GameSession()
 	:PacketSession()

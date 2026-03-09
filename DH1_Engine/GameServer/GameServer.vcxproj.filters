@@ -67,12 +67,6 @@
     <ClInclude Include="GameSession.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="Generated\PacketServiceTypeHandler.h">
-      <Filter>PacketHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="Generated\LoginPacketHandler.h">
-      <Filter>PacketHandler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Cpp\Enum.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
@@ -85,11 +79,17 @@
     <ClInclude Include="..\..\Shared\Protocol\Cpp\Struct.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="Generated\EchoPacketHandler.h">
-      <Filter>PacketHandler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Cpp\Echo.pb.h">
       <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\EchoPacketHandler.h">
+      <Filter>PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\LoginPacketHandler.h">
+      <Filter>PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h">
+      <Filter>PacketHandler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

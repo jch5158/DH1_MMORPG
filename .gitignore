@@ -819,3 +819,18 @@ vcpkg_installed/
 
 # Shared 폴더 하위의 모든 파일과 폴더를 예외 처리 (기존에 *.exe, *.dll 등이 무시되어 있어도 덮어씀)
 !Shared/**
+
+# --- PacketGenerator 내부 잡다한 찌꺼기 파일 무시 ---
+Shared/Tools/PacketGenerator/bin/
+Shared/Tools/PacketGenerator/obj/
+Shared/Tools/PacketGenerator/.vs/
+Shared/Tools/PacketGenerator/Generated/
+Shared/Tools/PacketGenerator/*.user
+Shared/Tools/PacketGenerator/Binaries
+
+DH1_Client/Binaries/
+DH1_Client/Intermediate/
+DH1_Client/Saved/
+DH1_Client/DerivedDataCache/
+DH1_Client/.idea/
+DH1_Client/.vs/

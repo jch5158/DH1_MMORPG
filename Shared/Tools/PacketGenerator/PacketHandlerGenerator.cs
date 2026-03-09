@@ -12,18 +12,18 @@ namespace PacketGenerator
             {
                 foreach (var projectSender in config.Projects)
                 {
-                    if (projectReceiver.Name == projectSender.Name)
-                    {
-                        continue;
-                    }
-
                     if (!Enum.TryParse<eRole>(projectReceiver.Role, true, out var receiver) || !Enum.TryParse<eRole>(projectSender.Role, true, out var sender))
                     {
                         Console.WriteLine($"[Error] 프로젝트 '{projectReceiver.Name}'의 역할 '{projectReceiver.Role}'이(가) 유효하지 않습니다.");
                         return false;
                     }
 
-                    var outputPath = Path.Combine(prjBasePath, @$"{projectReceiver.Name}\Generated");
+                    if (sender == receiver)
+                    {
+                        continue;
+                    }
+
+                    var outputPath = Path.Combine(prjBasePath, @$"{projectReceiver.Name}\PacketHandler");
                     if (!GenerateHandlerFile(receiver, sender, protoPath, outputPath))
                     {
                         Console.WriteLine("GenerateFile is Failed");
@@ -263,14 +263,12 @@ namespace PacketGenerator
                             continue;
                         }
 
-                        if (options.GetExtension(EnumExtensions.Receiver) != receiver && options.GetExtension(EnumExtensions.Sender) != sender)
+                        if (options.GetExtension(EnumExtensions.Receiver) == receiver && options.GetExtension(EnumExtensions.Sender) == sender)
                         {
-                            continue;
+                            var packetName = msg.Name;
+                            initHandleString += string.Format(PacketFormatter.HANDLE_INIT_FORMAT, "ID_" + packetName,
+                                packetName);
                         }
-
-                        var packetName = msg.Name;
-                        initHandleString += string.Format(PacketFormatter.HANDLE_INIT_FORMAT, "ID_" + packetName,
-                            packetName);
                     }
                 }
             }
@@ -300,7 +298,6 @@ namespace PacketGenerator
 
                 using var stream = File.OpenRead(filePath);
                 var descriptorSet = FileDescriptorSet.Parser.WithExtensionRegistry(registry).ParseFrom(stream);
-
                 foreach (var fileProto in descriptorSet.File)
                 {
                     if (!fileProto.Name.EndsWith(protoName))
@@ -311,13 +308,16 @@ namespace PacketGenerator
                     foreach (var msg in fileProto.MessageType)
                     {
                         var options = msg.Options;
-                        if (options.GetExtension(EnumExtensions.Receiver) != receiver && options.GetExtension(EnumExtensions.Sender) != sender)
+                        if (options == null)
                         {
                             continue;
                         }
 
-                        var packetName = msg.Name;
-                        handleFunctionDeclareString += string.Format(PacketFormatter.HANDLE_DECLARE_FORMAT, packetName);
+                        if (options.GetExtension(EnumExtensions.Receiver) == receiver && options.GetExtension(EnumExtensions.Sender) == sender)
+                        {
+                            var packetName = msg.Name;
+                            handleFunctionDeclareString += string.Format(PacketFormatter.HANDLE_DECLARE_FORMAT, packetName);
+                        }
                     }
                 }
             }
@@ -361,14 +361,12 @@ namespace PacketGenerator
                             continue;
                         }
 
-                        if (options.GetExtension(EnumExtensions.Receiver) != sender && options.GetExtension(EnumExtensions.Sender) != receiver)
+                        if (options.GetExtension(EnumExtensions.Receiver) == sender && options.GetExtension(EnumExtensions.Sender) == receiver)
                         {
-                            continue;
+                            var packetName = msg.Name;
+                            makeSendBufferFunctionString += string.Format(PacketFormatter.MAKE_SEND_BUFFER_FORMAT,
+                                packetName, $"ID_{packetName}");
                         }
-
-                        var packetName = msg.Name;
-                        makeSendBufferFunctionString += string.Format(PacketFormatter.MAKE_SEND_BUFFER_FORMAT,
-                            packetName, $"ID_{packetName}");
                     }
                 }
             }

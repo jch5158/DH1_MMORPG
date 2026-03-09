@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "Generated/EchoPacketHandler.h"
+#include "PacketHandler/EchoPacketHandler.h"
 #include "GameSession.h"
 
 bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession)

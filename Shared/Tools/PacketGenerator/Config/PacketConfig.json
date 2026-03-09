@@ -1,7 +1,7 @@
 ﻿{
   "projects": [
     {
-      "name": "DH1_Client",
+      "name": "DH1_Client\\Source\\DH1_Client\\Network",
       "role": "Client"
     },
     {

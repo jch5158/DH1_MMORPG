@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "Generated/EchoPacketHandler.h"
+#include "PacketHandler/EchoPacketHandler.h"
 
 #include "Player.h"
 #include "PlayerManager.h"

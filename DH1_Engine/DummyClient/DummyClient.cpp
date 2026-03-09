@@ -4,7 +4,7 @@
 #include "Service.h"
 #include "ThreadManager.h"
 
-#include "Generated/PacketServiceTypeHandler.h"
+#include "PacketHandler/PacketServiceTypeHandler.h"
 
 int32 main()
 {

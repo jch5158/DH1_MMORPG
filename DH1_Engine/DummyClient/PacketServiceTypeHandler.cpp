@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "Generated/PacketServiceTypeHandler.h"
+#include "PacketHandler/PacketServiceTypeHandler.h"
 
 bool PacketServiceTypeHandler::HANDLE_SERVICE_TYPE_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer,
 	PacketSessionRef& pSession)
