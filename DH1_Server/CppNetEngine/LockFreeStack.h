@@ -3,23 +3,34 @@
 #include "pch.h"
 #include "ObjectAllocator.h"
 
-template <typename T, int32 CHUNK_SIZE = 500>
+template <typename T>
 class LockFreeStack final
 {
 public:
 
 	struct Node
 	{
-		T data{};
-		Node* pNextNode = nullptr;
+		Node() = default;
+
+		template <typename U>
+		explicit Node(U&& data) requires (std::is_constructible_v<T, U>)
+			: mData(std::forward<U>(data))
+			, mpNextNode(nullptr)
+		{
+		}
+
+		T mData;
+		Node* mpNextNode = nullptr;
 	};
 
 private:
 
 	struct Node16
 	{
-		Node* pNode = nullptr;
-		int64 count = 0;
+		Node16() = default;
+
+		Node* mpNode = nullptr;
+		int64 mCount = 0;
 	};
 
 public:
@@ -32,17 +43,17 @@ public:
 	explicit LockFreeStack(const int32 maxCount)
 		: mMaxCount(maxCount)
 		, mCount(0)
-		, mTopAlineNode16{}
+		, mTopAlineNode16()
 	{
 	}
 
 	~LockFreeStack()
 	{
-		Node* pNode = mTopAlineNode16.pNode;
+		Node* pNode = mTopAlineNode16.mpNode;
 
 		while (pNode != nullptr)
 		{
-			Node* pNextNode = pNode->pNextNode;
+			Node* pNextNode = pNode->mpNextNode;
 			
 			cpp_net_engine::DeleteObject(pNode);
 
@@ -50,24 +61,23 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	bool TryPush(const T& data)
+	template <typename U>
+	[[nodiscard]] bool TryPush(U&& data)
 	{
 		if (mMaxCount <= mCount.load())
 		{
 			return false;
 		}
 
-		Node* pExpected{};
-		Node* pDesired = cpp_net_engine::NewObject<Node>();
-		pDesired->data = data;
+		Node* pExpected;
+		Node* pDesired = cpp_net_engine::NewObject<Node>(std::forward<U>(data));
 
-		std::atomic_ref<Node*> topNodePtr(mTopAlineNode16.pNode);
+		std::atomic_ref<Node*> topNodePtr(mTopAlineNode16.mpNode);
 
 		do
 		{
-			pExpected = mTopAlineNode16.pNode;
-			pDesired->pNextNode = pExpected;
+			pExpected = mTopAlineNode16.mpNode;
+			pDesired->mpNextNode = pExpected;
 
 		} while (topNodePtr.compare_exchange_weak(pExpected, pDesired) == false);
 
@@ -85,25 +95,24 @@ public:
 			return false;
 		}
 		
-		Node16 expected{};
-		Node16 desired{};
+		Node16 expected;
+		Node16 desired;
 
 		std::atomic_ref<Node16> topAlign16Node(mTopAlineNode16);
 
 		do
 		{
-			expected.count = mTopAlineNode16.count;
+			expected.mCount = mTopAlineNode16.mCount;
 			std::atomic_thread_fence(std::memory_order_seq_cst);
-			expected.pNode = mTopAlineNode16.pNode;
+			expected.mpNode = mTopAlineNode16.mpNode;
 
-			desired.count = expected.count + 1;
-			desired.pNode = expected.pNode->pNextNode;
+			desired.mCount = expected.mCount + 1;
+			desired.mpNode = expected.mpNode->mpNextNode;
 
 		} while (topAlign16Node.compare_exchange_weak(expected, desired) == false);
 
-		outData = expected.pNode->data;
-
-		cpp_net_engine::DeleteObject(expected.pNode);
+		outData = std::move(expected.mpNode->mData);
+		cpp_net_engine::DeleteObject(expected.mpNode);
 
 		return true;
 	}

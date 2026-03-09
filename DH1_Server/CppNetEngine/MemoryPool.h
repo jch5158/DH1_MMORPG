@@ -3,7 +3,7 @@
 
 #include "ObjectPool.h"
 
-template <uint32 ALLOC_SIZE, int32 CHUNK_SIZE = 500>
+template <uint32 ALLOC_SIZE, uint32 ALIGN_SIZE = 16, int32 CHUNK_SIZE = 500>
 class MemoryPool final
 {
 private:
@@ -16,9 +16,11 @@ private:
 
 		struct ChunkData
 		{
-			alignas(16) byte data[ALLOC_SIZE]{};
-			uint64 checksum = 0;
-			Chunk* pChunk = nullptr;
+			ChunkData() = default;
+
+			alignas(ALIGN_SIZE) byte data[ALLOC_SIZE];
+			uint64 mChecksum = 0;
+			Chunk* mpChunk = nullptr;
 		};
 
 		Chunk(const Chunk&) = delete;
@@ -27,14 +29,13 @@ private:
 		Chunk& operator=(Chunk&&) = delete;
 
 		explicit Chunk()
-			:mAllocCount(0)
+			: mAllocCount(0)
 			, mFreeCount(0)
-			, mChunkDataArray{}
 		{
 			for (int32 i = 0; i < CHUNK_SIZE; ++i)
 			{
-				mChunkDataArray[i].checksum = CHECKSUM_CODE;
-				mChunkDataArray[i].pChunk = this;
+				mChunkDataArray[i].mChecksum = CHECKSUM_CODE;
+				mChunkDataArray[i].mpChunk = this;
 			}
 		}
 
@@ -47,7 +48,7 @@ private:
 				return nullptr;
 			}
 
-			return &mChunkDataArray[mAllocCount++].data;
+			return mChunkDataArray[mAllocCount++].data;
 		}
 
 		bool IsDataEmpty() const
@@ -73,7 +74,7 @@ private:
 
 		static bool IsValidChecksum(const ChunkData& chunkData)
 		{
-			return chunkData.checksum == CHECKSUM_CODE;
+			return chunkData.mChecksum == CHECKSUM_CODE;
 		}
 
 	public:
@@ -93,10 +94,12 @@ public:
 	MemoryPool& operator=(MemoryPool&&) = delete;
 
 	explicit MemoryPool()
-		:mObjectPool(false, 0)
+		:mObjectPool(0)
 	{
 		static_assert(ALLOC_SIZE > 0, "ALLOC_SIZE must be non-negative");
 		static_assert(CHUNK_SIZE > 0, "CHUNK_SIZE must be non-negative");
+		static_assert(std::is_standard_layout_v<ChunkBlock>, "ChunkBlock must be standard layout.");
+		static_assert(offsetof(ChunkBlock, data) == 0, "data MUST be the first member for safe casting!");
 	}
 
 	~MemoryPool() = default;
@@ -109,13 +112,14 @@ public:
 			spTlsChunk = mObjectPool.Alloc();
 		}
 
-		void* pData = spTlsChunk->GetData();
-		if (pData != nullptr && spTlsChunk->IsDataEmpty())
+		void* pRawMemory = spTlsChunk->GetData();
+		if (pRawMemory == nullptr)
 		{
 			spTlsChunk = mObjectPool.Alloc();
+			pRawMemory = spTlsChunk->GetData();
 		}
 
-		return pData;
+		return pRawMemory;
 	}
 
 	void Free(void* pData)
@@ -129,11 +133,11 @@ public:
 		ChunkBlock* pChunkBlock = static_cast<ChunkBlock*>(pData);
 		if (!Chunk::IsValidChecksum(*pChunkBlock))
 		{
-			NET_ASSERT(false, "MemoryPool::Free - Invalid checksum detected. Possible memory corruption.");
+			NET_ENGINE_LOG_ERROR("MemoryPool::Free - Invalid object detected. Possible memory corruption. checksum : {}", pChunkBlock->mChecksum);
 			return;
 		}
 
-		Chunk* pChunk = pChunkBlock->pChunk;
+		Chunk* pChunk = pChunkBlock->mpChunk;
 		if (pChunk->FreeWithIsAllFreed())
 		{
 			pChunk->ChunkReset();
@@ -151,6 +155,16 @@ public:
 	int32 PoolingCount() const
 	{
 		return mObjectPool.PoolingCount();
+	}
+
+	void AllFree()
+	{
+		if (spTlsChunk != nullptr)
+		{
+			spTlsChunk->ChunkReset();
+			mObjectPool.Free(spTlsChunk);
+			spTlsChunk = nullptr;
+		}
 	}
 
 private:

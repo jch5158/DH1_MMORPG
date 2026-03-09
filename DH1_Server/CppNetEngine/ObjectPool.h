@@ -9,15 +9,19 @@ private:
 
 	struct Node
 	{
-		T data{};
-		uint64 checksum = 0;
-		Node* pNextNode = nullptr;
+		Node() = default;
+
+		alignas(T) byte mData[sizeof(T)];
+		uint64 mChecksum = 0;
+		Node* mpNextNode = nullptr;
 	};
 
 	struct Node16
 	{
-		Node* pNode = nullptr;
-		int64 count = 0;
+		Node16() = default;
+
+		Node* mpNode;
+		int64 mCount = 0;
 	};
 
 public:
@@ -27,38 +31,31 @@ public:
 	ObjectPool(ObjectPool&&) = delete;
 	ObjectPool& operator=(ObjectPool&&) = delete;
 
-	explicit ObjectPool(const bool bPlacementNew, const int32 poolingCount)
-		: mbPlacementNew(bPlacementNew)
-		, mTopNode16{}
+	explicit ObjectPool(const int32 poolingCount)
+		: mTopNode16()
 		, mPoolingCount(poolingCount)
 	{
 		static_assert(std::is_class_v<T>, "T is not class type.");
+		static_assert(std::is_standard_layout_v<Node>, "Node must be standard layout.");
+		static_assert(offsetof(Node, mData) == 0, "mData MUST be the first member for safe reinterpret_cast!");
 
 		for (int32 i = 0; i < mPoolingCount.load(); ++i)
 		{
-			Node* pNode = allocNode(!mbPlacementNew);
+			Node* pNode = allocNode(false);
 
-			pNode->checksum = CHECKSUM_CODE;
-			pNode->pNextNode = mTopNode16.pNode;
-			mTopNode16.pNode = pNode;
+			pNode->mChecksum = CHECKSUM_CODE;
+			pNode->mpNextNode = mTopNode16.mpNode;
+			mTopNode16.mpNode = pNode;
 		}
 	}
 
 	~ObjectPool()
 	{
-		Node* pNode = mTopNode16.pNode;
+		Node* pNode = mTopNode16.mpNode;
 
 		while (pNode != nullptr)
 		{
-			Node* pNextNode = pNode->pNextNode;
-
-			if (!mbPlacementNew)
-			{
-				if constexpr (std::is_class_v<T>)
-				{
-					pNode->data.~T();
-				}
-			}
+			Node* pNextNode = pNode->mpNextNode;
 
 			mi_free(pNode);
 
@@ -79,66 +76,60 @@ public:
 			mPoolingCount.fetch_add(1);
 
 			Node* pNode = allocNode(true, std::forward<Args>(args)...);
-			pNode->checksum = CHECKSUM_CODE;
-			pNode->pNextNode = nullptr;
+			pNode->mChecksum = CHECKSUM_CODE;
+			pNode->mpNextNode = nullptr;
 
-			return &pNode->data;
+			return reinterpret_cast<T*>(&pNode->mData);
 		}
 
-		Node16 expected{};
-		Node16 desired{};
+		Node16 expected;
+		Node16 desired;
 
 		std::atomic_ref<Node16> topNode16(mTopNode16);
 
 		do
 		{
-			expected.count = mTopNode16.count;
+			expected.mCount = mTopNode16.mCount;
 			std::atomic_thread_fence(std::memory_order_seq_cst);
-			expected.pNode = mTopNode16.pNode;
+			expected.mpNode = mTopNode16.mpNode;
 			
-			desired.count = expected.count + 1;
-			desired.pNode = expected.pNode->pNextNode;
+			desired.mCount = expected.mCount + 1;
+			desired.mpNode = expected.mpNode->mpNextNode;
 
 		} while (topNode16.compare_exchange_weak(expected, desired) == false);
 
-		if (mbPlacementNew)
-		{
-			new(&expected.pNode->data) T(std::forward<Args>(args)...);
-		}
+		new(&expected.mpNode->mData) T(std::forward<Args>(args)...);
 
-		return &expected.pNode->data;
+		return reinterpret_cast<T*>(&expected.mpNode->mData);
 	}
 
 	void Free(T* pData)
 	{
 		if (pData == nullptr)
 		{
-			NET_ASSERT(false, " ObjectPool::Free - pData is nullptr.");
+			NET_ENGINE_LOG_ERROR("ObjectPool::Free - pData is nullptr");
 			return;
 		}
 		
 		Node* pExpected;
 		Node* pDesired = reinterpret_cast<Node*>(pData);
-		if (pDesired->checksum != CHECKSUM_CODE)
+		if (pDesired->mChecksum != CHECKSUM_CODE)
 		{
-			NET_ASSERT(false, "ObjectPool::Free - Invalid object detected. Possible memory corruption.");
+			NET_ENGINE_LOG_FATAL("ObjectPool::Free - Invalid object detected. Possible memory corruption.");
 			return;
 		}
-
-		if (mbPlacementNew)
+		
+		if constexpr (!std::is_trivially_destructible_v<T>)
 		{
-			if constexpr (std::is_class_v<T>)
-			{
-				pDesired->data.~T();
-			}
+			pData->~T();
 		}
 
-		std::atomic_ref<Node*> topNodePtr(mTopNode16.pNode);
+		std::atomic_ref<Node*> topNodePtr(mTopNode16.mpNode);
 
 		do
 		{
-			pExpected = mTopNode16.pNode;
-			pDesired->pNextNode = pExpected;
+			pExpected = mTopNode16.mpNode;
+			pDesired->mpNextNode = pExpected;
 
 		} while (topNodePtr.compare_exchange_weak(pExpected, pDesired) == false);
 
@@ -164,13 +155,12 @@ private:
 		
 		if (bPlacementNew)
 		{
-			new(&pNode->data)T(std::forward<Args>(args)...);
+			new(&pNode->mData)T(std::forward<Args>(args)...);
 		}
 
 		return pNode;
 	}
 
-	const bool mbPlacementNew;
 	alignas(std::hardware_constructive_interference_size) Node16 mTopNode16;
 	alignas(std::hardware_constructive_interference_size) std::atomic<int32> mPoolingCount;
 };
@@ -189,9 +179,11 @@ private:
 
 		struct ChunkData
 		{
-			alignas(T) byte data[sizeof(T)];
-			uint64 checksum = 0;
-			Chunk* pChunk = nullptr;
+			ChunkData() = default;
+
+			alignas(T) byte mData[sizeof(T)];
+			uint64 mChecksum = 0;
+			Chunk* mpChunk = nullptr;
 		};
 
 		Chunk(const Chunk&) = delete;
@@ -202,12 +194,12 @@ private:
 		explicit Chunk()
 			:mAllocCount(0)
 			, mFreeCount(0)
-			, mChunkDataArray{}
+			, mChunkDataArray()
 		{
 			for (int32 i = 0; i < CHUNK_SIZE; ++i)
 			{
-				mChunkDataArray[i].checksum = CHECKSUM_CODE;
-				mChunkDataArray[i].pChunk = this;
+				mChunkDataArray[i].mChecksum = CHECKSUM_CODE;
+				mChunkDataArray[i].mpChunk = this;
 			}
 		}
 
@@ -223,7 +215,7 @@ private:
 				return nullptr;
 			}
 
-			return reinterpret_cast<T*>(&mChunkDataArray[mAllocCount++].data);
+			return reinterpret_cast<T*>(&mChunkDataArray[mAllocCount++].mData);
 		}
 
 		bool IsDataEmpty() const
@@ -249,7 +241,7 @@ private:
 
 		static bool IsValidChecksum(const ChunkData& chunkData)
 		{
-			return chunkData.checksum == CHECKSUM_CODE;
+			return chunkData.mChecksum == CHECKSUM_CODE;
 		}
 
 	public:
@@ -268,13 +260,14 @@ public:
 	TlsObjectPool(TlsObjectPool&&) = delete;
 	TlsObjectPool& operator=(TlsObjectPool&&) = delete;
 
-	explicit TlsObjectPool(const bool bPlacementNew)
-		: mbPlacementNew(bPlacementNew)
-		, mAllocCount(0)
-		, mObjectPool(false, 0)
+	explicit TlsObjectPool()
+		: mAllocCount(0)
+		, mObjectPool(0)
 	{
 		static_assert(std::is_class_v<T>, "T is not class type.");
 		static_assert(CHUNK_SIZE > 0, "CHUNK_SIZE must be non-negative");
+		static_assert(std::is_standard_layout_v<ChunkBlock>, "ChunkBlock must be standard layout.");
+		static_assert(offsetof(ChunkBlock, mData) == 0, "mData MUST be the first member for safe reinterpret_cast!");
 	}
 
 	~TlsObjectPool() = default;
@@ -290,15 +283,13 @@ public:
 		}
 
 		T* pRawMemory = spTlsChunk->GetData();
-		if (pRawMemory != nullptr && spTlsChunk->IsDataEmpty())
+		if (pRawMemory == nullptr)
 		{
 			spTlsChunk = mObjectPool.Alloc();
 			pRawMemory = spTlsChunk->GetData();
 		}
 
-		// 4. 가져온 빈 메모리 위에 객체 생성 (Placement New)
 		new(pRawMemory) T(std::forward<Args>(args)...);
-
 		return pRawMemory;
 	}
 
@@ -313,16 +304,16 @@ public:
 		ChunkBlock* pChunkBlock = reinterpret_cast<ChunkBlock*>(pObject);
 		if (!Chunk::IsValidChecksum(*pChunkBlock))
 		{
-			NET_ENGINE_LOG_ERROR("TlsObjectPool::Free - Invalid object detected. Possible memory corruption. checksum : {}", pChunkBlock->checksum);
+			NET_ENGINE_LOG_ERROR("TlsObjectPool::Free - Invalid object detected. Possible memory corruption. checksum : {}", pChunkBlock->mChecksum);
 			return;
 		}
 
-		if constexpr (std::is_class_v<T>)
+		if constexpr (!std::is_trivially_destructible_v<T>)
 		{
 			pObject->~T();
 		}
 
-		Chunk* pChunk = pChunkBlock->pChunk;
+		Chunk* pChunk = pChunkBlock->mpChunk;
 		if (pChunk->FreeWithIsAllFreed())
 		{
 			pChunk->ChunkReset();
@@ -334,9 +325,12 @@ public:
 
 	void AllFree()
 	{
-		spTlsChunk->ChunkReset();
-		mObjectPool.Free(spTlsChunk);
-		spTlsChunk = nullptr;
+		if (spTlsChunk != nullptr)
+		{
+			spTlsChunk->ChunkReset();
+			mObjectPool.Free(spTlsChunk);
+			spTlsChunk = nullptr;
+		}
 	}
 
 	[[nodiscard]] int32 AllocCount() const
@@ -348,7 +342,6 @@ private:
 
 	inline static thread_local Chunk* spTlsChunk = nullptr;
 
-	const bool mbPlacementNew;
 	std::atomic<int32> mAllocCount;
 	ObjectPool<Chunk> mObjectPool;
 };

@@ -8,7 +8,7 @@ class ObjectAllocator final : public ISingleton<ObjectAllocator<T, CHUNK_SIZE>>
 {
 public:
 
-	friend class ISingleton<ObjectAllocator>;
+	friend class ISingleton<ObjectAllocator<T, CHUNK_SIZE>>;
 
 	ObjectAllocator(const ObjectAllocator&) = delete;
 	ObjectAllocator& operator=(const ObjectAllocator&) = delete;
@@ -18,7 +18,7 @@ public:
 private:
 
 	ObjectAllocator()
-		:mTlsObjectPool(true)
+		:mTlsObjectPool()
 	{
 		static_assert(std::is_class_v<T>, "T is not class type.");
 		static_assert(CHUNK_SIZE > 0, "CHUNK_SIZE must be non-negative");
@@ -28,15 +28,13 @@ public:
 
 	~ObjectAllocator() = default;
 
-	[[nodiscard]]
-	int32 AllocCount() const
+	[[nodiscard]] int32 AllocCount() const
 	{
 		return mTlsObjectPool.AllocCount();
 	}
 
 	template <typename... Args>
-	[[nodiscard]]
-	T* Alloc(Args&&... args)
+	[[nodiscard]] T* Alloc(Args&&... args)
 	{
 		T* pData = mTlsObjectPool.Alloc(std::forward<Args>(args)...);
 
@@ -46,6 +44,12 @@ public:
 	void Free(T* pData)
 	{
 		mTlsObjectPool.Free(pData);
+	}
+
+	// 스레드 종료 시 호출
+	void AllFree()
+	{
+		mTlsObjectPool.AllFree();
 	}
 
 private:

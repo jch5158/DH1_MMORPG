@@ -2,7 +2,7 @@
 
 #include "ObjectAllocator.h"
 
-template <typename T, int32 CHUNK_SIZE = 500>
+template <typename T>
 class LockFreeQueue final
 {
 public:
@@ -11,11 +11,7 @@ public:
 
 	struct Node
 	{
-		explicit Node()
-			: mData()
-			, mpNextNode(nullptr)
-		{
-		}
+		Node() = default;
 
 		template <typename U>
 		explicit Node(U&& data) requires (std::is_constructible_v<T, U>)
@@ -25,18 +21,14 @@ public:
 		}
 
 		T mData;
-		Node* mpNextNode;
+		Node* mpNextNode = nullptr;
 	};
 
 private:
 
 	struct Node16
 	{
-		explicit Node16()
-			:mpNode(nullptr)
-			, mCount(0)
-		{
-		}
+		Node16() = default;
 
 		Node* mpNode = nullptr;
 		int64 mCount = 0;
@@ -52,8 +44,8 @@ public:
 	explicit LockFreeQueue(const int32 maxCount = DEFAULT_MAX_COUNT)
 		: mMaxCount(maxCount)
 		, mCount(0)
-		, mHead{}
-		, mTail{}
+		, mHead()
+		, mTail()
 	{
 		Node* pDummyNode = cpp_net_engine::NewObject<Node>();
 		pDummyNode->mpNextNode = nullptr;
@@ -134,11 +126,10 @@ public:
 
 			if (atomicHead.compare_exchange_weak(expected, desired) == true)
 			{
+				cpp_net_engine::DeleteObject(expected.mpNode);
 				break;
 			}
 		}
-
-		cpp_net_engine::DeleteObject(expected.mpNode);
 
 		return true;
 	}
