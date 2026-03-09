@@ -100,7 +100,7 @@ private:
 	void processSend(const uint32 numOfBytes);
 	void processReceive(const uint32 numOfBytes);
 
-	void setService(const ServiceRef& pService);
+	void setService(ServiceRef pService);
 	void setSessionEvent(const ServiceRef& pService);
 	void setNetAddress(const NetAddress& address);
 

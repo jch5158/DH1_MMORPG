@@ -15,9 +15,9 @@ void Connector::SetOwner(const SessionRef& pOwner)
 	mConnectEvent.SetOwner(pOwner);
 }
 
-void Connector::SetService(const ServiceRef& pService)
+void Connector::SetService(ServiceRef pService)
 {
-	mpService = pService;
+	mpService = std::move(pService);
 }
 
 bool Connector::Register()

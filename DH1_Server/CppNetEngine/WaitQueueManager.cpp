@@ -20,7 +20,7 @@ bool WaitQueueManager::EnterWaitQueue(const SessionRef& pSession, uint64& outTic
 		return false;
 	}
 	
-	mEnterWaitQueue.push(pSession);
+	mEnterWaitQueue.emplace(pSession);
 	outTicket = mWaitTicket++;
 	return true;
 }

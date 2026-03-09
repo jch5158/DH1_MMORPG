@@ -8,7 +8,7 @@ public:
 	JobDispatcher() = delete;
 	~JobDispatcher() = delete;
 
-	static void Post(const JobRef& pJob, const IActorRef& pActor);
-	static TimerHandle PostDelay(const JobRef& pJob, const IActorRef& pActor, const ActorSchedulerRef& pScheduler, const int64 delayMs);
+	static void Post(JobRef pJob, const IActorRef& pActor);
+	static TimerHandle PostDelay(JobRef pJob, IActorRef pActor, const ActorSchedulerRef& pScheduler, const int64 delayMs);
 };
 

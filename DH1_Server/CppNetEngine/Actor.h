@@ -27,7 +27,7 @@ public:
 	void Activate();
 	void Register();
 	void Flush();
-	[[nodiscard]] bool PushJob(const JobRef& pJob);
+	[[nodiscard]] bool PushJob(JobRef pJob);
 	[[nodiscard]] int32 GetJobCount() const;
 	[[nodiscard]] ActorSchedulerRef GetActorSchedulerRef() const;
 
@@ -41,7 +41,7 @@ class Actor : public IActor
 {
 public:
 
-	explicit Actor(const ActorSchedulerRef& pScheduler);
+	explicit Actor(ActorSchedulerRef pScheduler);
 	virtual ~Actor() override = default;
 
 	void Post(CallbackType&& callback)

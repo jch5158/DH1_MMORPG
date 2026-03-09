@@ -40,11 +40,11 @@ void ActorScheduler::Schedule(ActorEvent& actorEvent) const
 	}
 }
 
-TimerHandle ActorScheduler::ScheduleDelay(const JobRef& pJob, const IActorRef& pOwner, const uint64 delayMs)
+TimerHandle ActorScheduler::ScheduleDelay(JobRef pJob, IActorRef pOwner, const uint64 delayMs)
 {
-	TimerHandle handle = mTimingWheel.AddTiming([pJob, pOwner]() -> void
+	TimerHandle handle = mTimingWheel.AddTiming([pCapJob = std::move(pJob), pCapOwner = std::move(pOwner)]() -> void
 		{
-			JobDispatcher::Post(pJob, pOwner);
+			JobDispatcher::Post(pCapJob, pCapOwner);
 		}
 	, delayMs);
 

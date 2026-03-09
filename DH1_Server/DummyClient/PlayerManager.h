@@ -10,7 +10,7 @@ public:
 
 	~PlayerManager() = default;
 
-	[[nodiscard]] bool AddPlayer(const PacketSessionRef& pSession, const PlayerRef& pPlayer);
+	[[nodiscard]] bool AddPlayer(PacketSessionRef pSession, PlayerRef pPlayer);
 	[[nodiscard]] PlayerRef FindPlayer(const PacketSessionRef& pSession);
 	void RemovePlayer(const PacketSessionRef& pSession);
 

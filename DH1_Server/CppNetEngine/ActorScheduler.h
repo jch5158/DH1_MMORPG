@@ -27,7 +27,7 @@ public:
 	[[nodiscard]] int32 GetMaxExecuteJobCount() const;
 
 	void Schedule(ActorEvent& actorEvent) const;
-	TimerHandle ScheduleDelay(const JobRef& pJob, const IActorRef& pOwner, const uint64 delayMs);
+	TimerHandle ScheduleDelay(JobRef pJob, IActorRef pOwner, const uint64 delayMs);
 	void Dispatch();
 
 private:

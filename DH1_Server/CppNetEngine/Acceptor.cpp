@@ -11,24 +11,24 @@ Acceptor::Acceptor(const int32 acceptorIndex)
 {
 }
 
-void Acceptor::SetOwner(const ListenerRef& pOwner)
+void Acceptor::SetOwner(ListenerRef pOwner)
 {
 	if (pOwner == nullptr)
 	{
 		return;
 	}
 
-	mAcceptEvent.SetOwner(pOwner);
+	mAcceptEvent.SetOwner(std::move(pOwner));
 }
 
-void Acceptor::SetService(const ServiceRef& pService)
+void Acceptor::SetService(ServiceRef pService)
 {
 	if (pService == nullptr)
 	{
 		return;
 	}
 
-	mpService = pService;
+	mpService = std::move(pService);
 }
 
 void Acceptor::Register()

@@ -9,18 +9,16 @@ SessionManager::SessionManager(const int32 maxSessionCount)
 {
 }
 
-bool SessionManager::AddSession(const SessionRef& pSession)
+bool SessionManager::AddSession(SessionRef pSession)
 {
 	UniqueLock lock(mLock);
 
-	// 1. 최대 인원(예약석 포함) 검사 복구
 	if (mCurrentSessionCount >= mMaxSessionCount)
 	{
 		return false;
 	}
 
-	// 2. 맵에 실제로 삽입이 성공했을 때만 카운트를 증가시킴 (누수 방지)
-	if (mSessions.emplace(pSession).second)
+	if (mSessions.emplace(std::move(pSession)).second)
 	{
 		++mCurrentSessionCount;
 		return true;
@@ -29,10 +27,10 @@ bool SessionManager::AddSession(const SessionRef& pSession)
 	return false;
 }
 
-bool SessionManager::AddWaitingSession(const SessionRef& pSession)
+bool SessionManager::AddWaitingSession(SessionRef pSession)
 {
 	UniqueLock lock(mLock);
-	return mSessions.emplace(pSession).second;
+	return mSessions.emplace(std::move(pSession)).second;
 }
 
 void SessionManager::RemoveSession(const SessionRef& pSession, const bool bKeepWaitingSession)

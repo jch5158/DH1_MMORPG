@@ -18,7 +18,7 @@ public:
 	~Sender() = default;
 
 	void SetOwner(const SessionRef& pOwner);
-	void Send(const NetSendBufferRef& pSendBuffer);
+	void Send(NetSendBufferRef pSendBuffer);
 	void Process(const uint32 numOfBytes);
 	void Register();
 

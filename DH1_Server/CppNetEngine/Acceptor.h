@@ -13,8 +13,8 @@ public:
 	explicit Acceptor(const int32 acceptorIndex);
 	~Acceptor() = default;
 
-	void SetOwner(const ListenerRef& pOwner);
-	void SetService(const ServiceRef& pService);
+	void SetOwner(ListenerRef pOwner);
+	void SetService(ServiceRef pService);
 
 	void Register();
 	void Process();

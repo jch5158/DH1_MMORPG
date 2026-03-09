@@ -45,7 +45,7 @@ public:
 	[[nodiscard]] int32 GetAcceptorIndex() const;
 
 	void ResetSession();
-	void SetSession(const SessionRef& pSession);
+	void SetSession(SessionRef pSession);
 	[[nodiscard]] SessionRef GetClientSession() const;
 
 

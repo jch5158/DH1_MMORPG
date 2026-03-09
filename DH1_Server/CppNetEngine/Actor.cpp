@@ -24,9 +24,9 @@ void IActor::Flush()
 	mJobQueue.Flush();
 }
 
-bool IActor::PushJob(const JobRef& pJob)
+bool IActor::PushJob(JobRef pJob)
 {
-	return mJobQueue.PushJob(pJob);
+	return mJobQueue.PushJob(std::move(pJob));
 }
 
 int32 IActor::GetJobCount() const
@@ -39,8 +39,8 @@ ActorSchedulerRef IActor::GetActorSchedulerRef() const
 	return mpScheduler;
 }
 
-Actor::Actor(const ActorSchedulerRef& pScheduler)
-	: IActor(pScheduler)
+Actor::Actor(ActorSchedulerRef pScheduler)
+	: IActor(std::move(pScheduler))
 	, mSeed(sSeedBase.fetch_add(1))
 	, mbAcquire(false)
 {

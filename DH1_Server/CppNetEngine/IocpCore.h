@@ -31,12 +31,8 @@ public:
 	explicit IocpCore(std::function<void(const uint32)> pOnHandleError);
 	~IocpCore();
 
-	[[nodiscard]]
-	HANDLE GetHandle() const;
-
-	[[nodiscard]]
-	bool Register(const IocpObjectRef& iocpObject) const;
-
+	[[nodiscard]] HANDLE GetHandle() const;
+	[[nodiscard]] bool Register(const IocpObjectRef& iocpObject) const;
 	void Dispatch(const uint32 timeout = INFINITE) const;
 
 private:

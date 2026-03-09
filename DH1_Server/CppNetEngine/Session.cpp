@@ -182,9 +182,9 @@ void Session::processReceive(const uint32 numOfBytes)
 	mReceiver.Process(numOfBytes);
 }
 
-void Session::setService(const ServiceRef& pService)
+void Session::setService(ServiceRef pService)
 {
-	mpService = pService;
+	mpService = std::move(pService);
 }
 
 void Session::setSessionEvent(const ServiceRef& pService)

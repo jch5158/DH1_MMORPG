@@ -14,7 +14,7 @@ public:
 	~Connector() = default;
 
 	void SetOwner(const SessionRef& pOwner);
-	void SetService(const ServiceRef& pService);
+	void SetService(ServiceRef pService);
 
 	bool Register();
 	void Process() const;

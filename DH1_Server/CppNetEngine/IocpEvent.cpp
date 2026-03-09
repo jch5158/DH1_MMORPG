@@ -56,14 +56,14 @@ void IocpAcceptEvent::ResetSession()
 	mpClientSession.reset();
 }
 
-void IocpAcceptEvent::SetSession(const SessionRef& pSession)
+void IocpAcceptEvent::SetSession(SessionRef pSession)
 {
 	if (pSession == nullptr)
 	{
 		return;
 	}
 
-	mpClientSession = pSession;
+	mpClientSession = std::move(pSession);
 }
 
 SessionRef IocpAcceptEvent::GetClientSession() const

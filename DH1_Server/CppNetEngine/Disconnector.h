@@ -15,7 +15,7 @@ public:
 	~Disconnector() = default;
 	
 	void SetOwner(const SessionRef& pOwner);
-	void SetService(const ServiceRef& pService);
+	void SetService(ServiceRef pService);
 
 	void Register();
 	void Process() const;

@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "PlayerManager.h"
 
-bool PlayerManager::AddPlayer(const PacketSessionRef& pSession, const PlayerRef& pPlayer)
+bool PlayerManager::AddPlayer(PacketSessionRef pSession, PlayerRef pPlayer)
 {
 	if (pSession == nullptr || pPlayer == nullptr)
 	{
@@ -9,7 +9,7 @@ bool PlayerManager::AddPlayer(const PacketSessionRef& pSession, const PlayerRef&
 	}
 
 	UniqueLock lock(mLock);
-	return mPlayers.insert(std::pair(pSession, pPlayer)).second;
+	return mPlayers.emplace(std::move(pSession), std::move(pPlayer)).second;
 }
 
 PlayerRef PlayerManager::FindPlayer(const PacketSessionRef& pSession)

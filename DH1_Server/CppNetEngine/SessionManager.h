@@ -13,8 +13,8 @@ public:
 	explicit SessionManager(const int32 maxSessionCount);
 	~SessionManager() = default;
 
-	[[nodiscard]] bool AddSession(const SessionRef& pSession);
-	[[nodiscard]] bool AddWaitingSession(const SessionRef& pSession);
+	[[nodiscard]] bool AddSession(SessionRef pSession);
+	[[nodiscard]] bool AddWaitingSession(SessionRef pSession);
 	void RemoveSession(const SessionRef& pSession, const bool bKeepWaitingSession = false);
 	void ReleaseKeepTicket();
 

@@ -6,7 +6,7 @@ public:
 
 	static constexpr int64 DEFAULT_TIME_OUT = 60000;
 
-	explicit SessionReaper(const ActorSchedulerRef& pScheduler, const int64 timeoutMs);
+	explicit SessionReaper(ActorSchedulerRef pScheduler, const int64 timeoutMs);
 	virtual ~SessionReaper() override = default;
 
 	[[nodiscard]] int64 GetTimeoutMs() const;

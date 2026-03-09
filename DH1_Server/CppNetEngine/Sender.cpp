@@ -19,7 +19,7 @@ void Sender::SetOwner(const SessionRef& pOwner)
 	mSendEvent.SetOwner(pOwner);
 }
 
-void Sender::Send(const NetSendBufferRef& pSendBuffer)
+void Sender::Send(NetSendBufferRef pSendBuffer)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
 	if (pOwner == nullptr || pOwner->IsDisconnected())
@@ -27,7 +27,7 @@ void Sender::Send(const NetSendBufferRef& pSendBuffer)
 		return;
 	}
 
-	if (mSendQueue.TryEnqueue(pSendBuffer) == false)
+	if (mSendQueue.TryEnqueue(std::move(pSendBuffer)) == false)
 	{
 		NET_ENGINE_LOG_FATAL("Sender::Send - TryEnqueue is Failed, mSendQueue.Count() : {}", mSendQueue.Count());
 		pOwner->Disconnect(eDisconnectReason::ServiceError);

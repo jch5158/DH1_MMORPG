@@ -7,12 +7,11 @@ public:
 	static constexpr int32 DEFAULT_SPIN_COUNT = 5000;
 
 	template <typename... Args>
-	explicit ScopedActor(const ActorSchedulerRef& pScheduler, Args&&... args)
-		: IActor(pScheduler)
+	explicit ScopedActor(ActorSchedulerRef pScheduler, Args&&... args)
+		: IActor(std::move(pScheduler))
 		, mSpinCount(DEFAULT_SPIN_COUNT)
 		, mAcquireIndex(-1)
 		, mActors()
-		, mJobQueue()
 	{
 		mActors.reserve(sizeof...(Args));
 		(mActors.emplace_back(std::forward<Args>(args)), ...);
@@ -47,6 +46,5 @@ private:
 	int32 mSpinCount;
 	int32 mAcquireIndex;
 	Vector<ActorRef> mActors;
-	ActorJobQueue mJobQueue;
 };
 
