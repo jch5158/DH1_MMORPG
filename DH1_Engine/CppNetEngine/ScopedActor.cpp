@@ -65,18 +65,23 @@ bool ScopedActor::tryAcquireAll()
 
 	for (int32 i = 0; i < actorSize; ++i)
 	{
-		for (int32 curSpin = 0; curSpin < spinCount; ++curSpin)
+		bool bAcquired = false;
+
+		const int32 spinLimit = (i == 0) ? spinCount : 1;
+
+		for (int32 curSpin = 0; curSpin < spinLimit; ++curSpin)
 		{
 			if (mActors[i]->TryAcquire())
 			{
 				mAcquireIndex = i;
+				bAcquired = true;
 				break;
 			}
 
-			_mm_pause();
+			_mm_pause(); // 하이퍼스레딩 최적화
 		}
 
-		if (mAcquireIndex != i)
+		if (!bAcquired)
 		{
 			return false;
 		}

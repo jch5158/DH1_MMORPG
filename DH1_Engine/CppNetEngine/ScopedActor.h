@@ -16,15 +16,15 @@ public:
 		mActors.reserve(sizeof...(Args));
 		(mActors.emplace_back(std::forward<Args>(args)), ...);
 
-		mActors.erase(std::unique(mActors.begin(), mActors.end(), [](const ActorRef& pLeft, const ActorRef& pRight) -> bool
-			{
-				return pLeft->GetSeed() == pRight->GetSeed();
-			}), mActors.end());
-
 		std::sort(mActors.begin(), mActors.end(), [](const ActorRef& pLeft, const ActorRef& pRight)->bool
 			{
 				return pLeft->GetSeed() < pRight->GetSeed();
 			});
+
+		mActors.erase(std::unique(mActors.begin(), mActors.end(), [](const ActorRef& pLeft, const ActorRef& pRight) -> bool
+			{
+				return pLeft->GetSeed() == pRight->GetSeed();
+			}), mActors.end());
 	}
 
 	virtual ~ScopedActor() override = default;
