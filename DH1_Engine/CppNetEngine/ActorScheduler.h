@@ -1,9 +1,8 @@
 ﻿#pragma once
-#include <functional>
-
 #include "Job.h"
 #include "TimingWheel.h"
-#include "LockFreeQueue.h"
+
+class ActorEvent;
 
 class ActorScheduler final : public std::enable_shared_from_this<ActorScheduler>
 {

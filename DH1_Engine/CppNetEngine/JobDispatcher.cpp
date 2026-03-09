@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "JobDispatcher.h"
+#include "Actor.h"
 
 void JobDispatcher::Post(JobRef pJob, const IActorRef& pActor)
 {

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <functional>
-
 #include "Listener.h"
 #include "NetAddress.h"
 #include "LockFreeStack.h"

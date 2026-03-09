@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Actor.h"
 
 class SessionReaper final : public Actor
 {

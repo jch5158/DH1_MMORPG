@@ -1,4 +1,8 @@
 ﻿#pragma once
+#include "Actor.h"
+#include "TimingWheel.h"
+
+class ActorEvent;
 
 class ScopedActor final : public IActor
 {
@@ -31,7 +35,6 @@ public:
 
 	virtual ~ScopedActor() override = default;
 
-	virtual void Dispatch(ActorEvent& actorEvent) override;
 	[[nodiscard]] virtual bool TryAcquire() override;
 	virtual void Release() override;
 

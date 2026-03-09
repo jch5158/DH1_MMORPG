@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "ActorJobQueue.h"
+#include "Actor.h"
 
 ActorJobQueue::ActorJobQueue()
 	: mJobActorEvent()

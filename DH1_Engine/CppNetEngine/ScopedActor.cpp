@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "ScopedActor.h"
+#include "JobDispatcher.h"
 
 bool ScopedActor::TryAcquire()
 {

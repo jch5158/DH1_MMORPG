@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "ActorEvent.h"
 #include "LockFreeQueue.h"
 
 class ActorJobQueue
