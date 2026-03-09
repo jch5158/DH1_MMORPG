@@ -1,9 +1,9 @@
 @echo off
 set "BASE_DIR=%~dp0"
 
-set "PROTOC_DIR=%BASE_DIR%..\Tools\Protoc"
+set "PROTOC_DIR=%BASE_DIR%..\vcpkg_installed\x64-windows-static-md\tools\protobuf"
 set "PROTOC_PATH=%PROTOC_DIR%\protoc.exe"
-set "GOOGLE_INC=%PROTOC_DIR%\include"
+set "GOOGLE_INC=%BASE_DIR%..\vcpkg_installed\x64-windows-static-md\include"
 set "PROTO_DIR=%BASE_DIR%..\Protocol"
 
 set "CPP_OUT_DIR=%BASE_DIR%..\Protocol\Cpp"
