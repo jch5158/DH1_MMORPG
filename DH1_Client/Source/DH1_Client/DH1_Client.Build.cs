@@ -1,5 +1,6 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class DH1_Client : ModuleRules
@@ -35,12 +36,24 @@ public class DH1_Client : ModuleRules
 			"DH1_Client/Variant_TwinStick/UI"
 		});
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        // Uncomment if you are using Slate UI
+        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        // Uncomment if you are using online features
+        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+
+
+        string SharedPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../Shared"));
+        string VcpkgPath = Path.Combine(SharedPath, "vcpkg_installed/x64-windows-static-md");
+
+        PublicIncludePaths.Add(Path.Combine(VcpkgPath, "include"));
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Network/Protocol"));
+
+        PublicAdditionalLibraries.Add(Path.Combine(VcpkgPath, "lib/libprotobuf.lib"));
+
+        bEnableExceptions = true;
+        bEnableUndefinedIdentifierWarnings = false;
+    }
 }

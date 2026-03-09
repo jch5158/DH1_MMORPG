@@ -71,25 +71,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)Shared\Protocol\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)Shared\Protocol\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)Shared\Protocol\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)Shared\Protocol\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
     <ExternalIncludePath>$(SolutionDir)vcpkg_installed\x64-windows\x64-windows\include</ExternalIncludePath>
@@ -230,35 +230,35 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Shared\Protocol\Cpp\Echo.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\Shared\Protocol\Echo.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Cpp\Enum.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\Shared\Protocol\Enum.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Cpp\Login.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\Shared\Protocol\Login.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Cpp\PacketId.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\Shared\Protocol\PacketId.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Cpp\Struct.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="..\Shared\Protocol\Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EchoPacketHandler.cpp" />
     <ClCompile Include="GameServer.cpp" />
@@ -273,11 +273,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Shared\Protocol\Cpp\Echo.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\Cpp\Enum.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\Cpp\Login.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\Cpp\PacketId.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\Cpp\Struct.pb.h" />
+    <ClInclude Include="..\Shared\Protocol\Echo.pb.h" />
+    <ClInclude Include="..\Shared\Protocol\Enum.pb.h" />
+    <ClInclude Include="..\Shared\Protocol\Login.pb.h" />
+    <ClInclude Include="..\Shared\Protocol\PacketId.pb.h" />
+    <ClInclude Include="..\Shared\Protocol\Struct.pb.h" />
     <ClInclude Include="GameSession.h" />
     <ClInclude Include="PacketHandler\EchoPacketHandler.h" />
     <ClInclude Include="PacketHandler\LoginPacketHandler.h" />
