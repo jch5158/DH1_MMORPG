@@ -6,12 +6,12 @@
     },
 
     {
-      "name": "DH1_Server\\DummyClient",
+      "name": "DH1_Engine\\DummyClient",
       "role": "Client"
     },
 
     {
-      "name": "DH1_Server\\GameServer",
+      "name": "DH1_Engine\\GameServer",
       "role": "GameServer"
     }
   ]
