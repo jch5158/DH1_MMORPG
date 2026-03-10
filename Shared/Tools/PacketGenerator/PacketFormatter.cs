@@ -40,7 +40,7 @@ public:
 
 private:
 
-	static HashMap<uint32, PacketServiceTypeHandle> sPacketServiceTypeMap;
+	inline static HashMap<uint32, PacketServiceTypeHandle> sPacketServiceTypeMap;
 }};";
 
         public static readonly string SERVICE_TYPE_INCLUDE_FORMAT =
@@ -156,7 +156,7 @@ private:
         return sendBuffer;
 	}}
 
-	static HashMap<uint32, PacketHandle> sPacketHandleMap;
+	inline static HashMap<uint32, PacketHandle> sPacketHandleMap;
 }};";
 
         public static readonly string HANDLE_INIT_FORMAT = 

@@ -99,5 +99,5 @@ private:
         return sendBuffer;
 	}
 
-	static HashMap<uint32, PacketHandle> sPacketHandleMap;
+	inline static HashMap<uint32, PacketHandle> sPacketHandleMap;
 };

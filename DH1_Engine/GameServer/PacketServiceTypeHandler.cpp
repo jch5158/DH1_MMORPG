@@ -6,5 +6,3 @@ bool PacketServiceTypeHandler::HANDLE_SERVICE_TYPE_INVALID(const uint16 size, co
 	NET_ENGINE_LOG_ERROR("PacketServiceTypeHandler::HANDLE_SERVICE_TYPE_INVALID\n");
 	return false;
 }
-
-HashMap<uint32, PacketServiceTypeHandler::PacketServiceTypeHandle> PacketServiceTypeHandler::sPacketServiceTypeMap;

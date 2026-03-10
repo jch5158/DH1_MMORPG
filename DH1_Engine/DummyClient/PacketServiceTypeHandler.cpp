@@ -8,5 +8,3 @@ bool PacketServiceTypeHandler::HANDLE_SERVICE_TYPE_INVALID(const uint16 size, co
 
 	return false;
 }
-
-HashMap<uint32, PacketServiceTypeHandler::PacketServiceTypeHandle> PacketServiceTypeHandler::sPacketServiceTypeMap;

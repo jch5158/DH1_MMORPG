@@ -19,5 +19,3 @@ bool EchoPacketHandler::HANDLE_C2S_ECHO_REQ(const Protocol::C2S_ECHO_REQ& packet
 
 	return true;
 }
-
-HashMap<uint32, EchoPacketHandler::PacketHandle> EchoPacketHandler::sPacketHandleMap;

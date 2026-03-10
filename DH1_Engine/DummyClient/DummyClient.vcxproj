@@ -294,15 +294,10 @@
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Shared\Protocol\Proto\Echo.desc" />
     <None Include="..\..\Shared\Protocol\Proto\Echo.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\Enum.desc" />
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\Login.desc" />
     <None Include="..\..\Shared\Protocol\Proto\Login.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\PacketId.desc" />
     <None Include="..\..\Shared\Protocol\Proto\PacketId.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\Struct.desc" />
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

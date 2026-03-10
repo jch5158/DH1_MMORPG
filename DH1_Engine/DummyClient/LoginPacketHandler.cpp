@@ -10,5 +10,3 @@ bool LoginPacketHandler::HANDLE_S2C_LOGIN_RES(const Protocol::S2C_LOGIN_RES& pac
 {
 	return true;
 }
-
-HashMap<uint32, LoginPacketHandler::PacketHandle> LoginPacketHandler::sPacketHandleMap;

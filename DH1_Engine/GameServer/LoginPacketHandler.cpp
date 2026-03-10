@@ -12,5 +12,3 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 {
 	return false;
 }
-
-HashMap<uint32, LoginPacketHandler::PacketHandle> LoginPacketHandler::sPacketHandleMap;

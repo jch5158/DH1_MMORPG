@@ -114,31 +114,16 @@
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\..\Shared\Protocol\Proto\Echo.desc">
-      <Filter>Protocol\Proto</Filter>
-    </None>
     <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
-    <None Include="..\..\Shared\Protocol\Proto\Enum.desc">
       <Filter>Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\..\Shared\Protocol\Proto\Login.desc">
-      <Filter>Protocol\Proto</Filter>
-    </None>
     <None Include="..\..\Shared\Protocol\Proto\Login.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\..\Shared\Protocol\Proto\PacketId.desc">
-      <Filter>Protocol\Proto</Filter>
-    </None>
     <None Include="..\..\Shared\Protocol\Proto\PacketId.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
-    <None Include="..\..\Shared\Protocol\Proto\Struct.desc">
       <Filter>Protocol\Proto</Filter>
     </None>
   </ItemGroup>

@@ -51,5 +51,5 @@ public:
 
 private:
 
-	static HashMap<uint32, PacketServiceTypeHandle> sPacketServiceTypeMap;
+	inline static HashMap<uint32, PacketServiceTypeHandle> sPacketServiceTypeMap;
 };
