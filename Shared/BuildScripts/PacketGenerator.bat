@@ -13,7 +13,7 @@ if %errorlevel% neq 0 (
 set "GENERATOR_EXE=%BASE_DIR%..\Tools\PacketGenerator\Binaries\PacketGenerator.exe"
 
 set "ARG_CONFIG=%BASE_DIR%..\Tools\PacketGenerator\Config\PacketConfig.json"
-set "ARG_PROTO=%BASE_DIR%..\Protocol"
+set "ARG_PROTO=%BASE_DIR%..\Protocol\Proto"
 set "ARG_BASE_PRJ=%BASE_DIR%..\.."
 
 if not exist "%GENERATOR_EXE%" (

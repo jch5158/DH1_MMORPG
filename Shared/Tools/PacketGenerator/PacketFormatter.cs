@@ -63,12 +63,22 @@ private:
         public static readonly string HANDLE_FILE_FORMAT =
             @"// ReSharper disable CppInconsistentNaming
 #pragma once
+
+#ifdef _UNREAL_
+
+#include ""Network/CppNetEngine/NetEngineWrapper.h""
+#include ""Network/ProtocolHeader/ProtocolWrapper.h""
+
+#else
+
 #include ""PacketId.pb.h""
 #include ""Enum.pb.h""
 #include ""Struct.pb.h""
 #include ""{0}.pb.h""
 #include ""StlTypes.h""
 #include ""PacketSession.h""
+
+#endif
 
 class {0}PacketHandler
 {{

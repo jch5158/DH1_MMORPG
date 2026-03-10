@@ -14,7 +14,7 @@ else
 {
     var baseDir = AppContext.BaseDirectory;
     configPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\Tools\PacketGenerator\Config\PacketConfig.json"));
-    protoPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\Shared\Protocol"));
+    protoPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\Shared\Protocol\Proto"));
     prjBasePath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\"));
 }
 
