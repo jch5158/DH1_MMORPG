@@ -6,7 +6,7 @@
 #include "Types.h"
 
 #ifdef _DEBUG
-#pragma comment(lib, "Debug\\CppNetEngine")
+#pragma comment(lib, "CppNetEngine")
 #else
-#pragma comment(lib, "Release\\CppNetEngine")
+#pragma comment(lib, "CppNetEngine")
 #endif

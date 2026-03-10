@@ -838,8 +838,4 @@ DH1_Client/*.sln
 
 
 # vcpkg Build Artifacts
-Shared/vcpkg_installed/
-
-# vcpkg Local Cache (선택 사항이지만 권장)
-.vcpkg/
-vcpkg-configuration.json
+Shared/vcpkg/vcpkg_installed/

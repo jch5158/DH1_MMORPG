@@ -1,5 +1,6 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
 using System.IO;
 using UnrealBuildTool;
 
@@ -46,28 +47,30 @@ public class DH1_Client : ModuleRules
 
 
         string SharedPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../Shared"));
-        string VcpkgPath = Path.Combine(SharedPath, "vcpkg_installed/x64-windows-static-md");
+        string VcpkgPath = Path.Combine(SharedPath, "vcpkg/vcpkg_installed/x64-windows-static-md");
 
         PublicIncludePaths.Add(Path.Combine(VcpkgPath, "include"));
-        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "../../../DH1_Engine/CppNetEngine"));
         PublicIncludePaths.Add(Path.Combine(VcpkgPath, "include/google/protobuf"));
         PublicIncludePaths.Add(Path.Combine(SharedPath, "Protocol"));
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "../../../DH1_Engine/CppNetEngine"));
 
-        PublicAdditionalLibraries.Add(Path.Combine(VcpkgPath, "lib/libprotobuf.lib"));
-
-        // 1. Shared/Libraries 내의 CppNetEngine 최상단 경로 계산
-        string CppNetEngineLibPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../Shared/Libraries/CppNetEngine"));
-
-        // 3. 현재 언리얼 빌드 타겟에 따른 Debug / Release 폴더명 동적 결정
-        string ConfigFolder = "Release"; // Development, Shipping 등은 기본적으로 Release를 사용
+        string ProtobufLibPath = string.Empty;
+        string CppNetEngineLibPath = string.Empty;
         if (Target.Configuration == UnrealTargetConfiguration.Debug || Target.Configuration == UnrealTargetConfiguration.DebugGame)
         {
-	        ConfigFolder = "Debug";
+	        ProtobufLibPath = Path.Combine(VcpkgPath, "debug", "lib", "libprotobufd.lib");
+	        CppNetEngineLibPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../Shared/Libraries/CppNetEngine/Debug/CppNetEngine.lib"));
+        }
+        else
+        {
+	        ProtobufLibPath = Path.Combine(VcpkgPath, "lib", "libprotobuf.lib");
+	        CppNetEngineLibPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../Shared/Libraries/CppNetEngine/Release/CppNetEngine.lib"));
         }
 
-        // 4. 결정된 폴더명(ConfigFolder)을 조합하여 최종 .lib 파일 링킹
-        PublicAdditionalLibraries.Add(Path.Combine(CppNetEngineLibPath, ConfigFolder, "CppNetEngine.lib"));
-
+        PublicAdditionalLibraries.Add(Path.Combine(VcpkgPath, "lib", "mimalloc.lib"));
+        PublicAdditionalLibraries.Add(Path.Combine(VcpkgPath, "lib", "fmt.lib"));
+        PublicAdditionalLibraries.Add(ProtobufLibPath);
+        PublicAdditionalLibraries.Add(CppNetEngineLibPath);
 
         bEnableExceptions = true;
         CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off; // (최신 5.6+ 문법 적용)
