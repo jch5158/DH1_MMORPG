@@ -13,14 +13,11 @@ public:
 	explicit NetAddress(const NetAddress& netAddress) = default;
 	NetAddress& operator=(const NetAddress&) = default;
 
-	[[nodiscard]]
-	SOCKADDR_IN& GetSockAddr();
+	[[nodiscard]] SOCKADDR_IN& GetSockAddr();
 	
-	[[nodiscard]]
-	Wstring	GetIpAddress() const;
+	[[nodiscard]] Wstring GetIpAddress() const;
 
-	[[nodiscard]]
-	uint16 GetPort() const;
+	[[nodiscard]] uint16 GetPort() const;
 
 	void SetSocketAddr(const SOCKADDR_IN& sockAddr);
 

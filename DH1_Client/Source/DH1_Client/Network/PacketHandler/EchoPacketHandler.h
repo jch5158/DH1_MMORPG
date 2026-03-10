@@ -1,11 +1,8 @@
 ﻿// ReSharper disable CppInconsistentNaming
 #pragma once
-#include "PacketId.pb.h"
-#include "Enum.pb.h"
-#include "Struct.pb.h"
-#include "Echo.pb.h"
-#include "StlTypes.h"
-#include "PacketSession.h"
+
+#include "Network/CppNetEngine/NetEngineWrapper.h"
+#include "Network/ProtocolHeader/ProtocolWrapper.h"
 
 class EchoPacketHandler
 {

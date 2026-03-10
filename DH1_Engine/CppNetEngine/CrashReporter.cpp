@@ -1,11 +1,8 @@
 ﻿#include "pch.h"
 
-#include <filesystem>
-
 #include "client/crashpad_client.h"
 #include "client/crash_report_database.h"
 #include "client/settings.h"
-
 #include "CrashReporter.h"
 
 namespace fs = std::filesystem;

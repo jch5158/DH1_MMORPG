@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+package Protocol;
+
+import "google/protobuf/descriptor.proto";
+
+enum eRole 
+{
+    ROLE_NONE = 0;
+    CLIENT = 1;
+    GAME_SERVER = 2;
+}
+
+extend google.protobuf.MessageOptions 
+{
+    eRole sender = 50000;
+    eRole receiver = 50001;
+}

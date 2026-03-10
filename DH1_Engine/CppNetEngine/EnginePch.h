@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include <vector>
 #include <functional>
+#include <filesystem>
 
 #ifdef _WIN32
 #include <WinSock2.h>

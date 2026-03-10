@@ -44,19 +44,19 @@
     <ClCompile Include="EchoPacketHandler.cpp">
       <Filter>PacketHandler</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Struct.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Echo.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Echo.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Enum.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Login.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\PacketId.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\PacketId.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,36 +76,51 @@
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h">
       <Filter>PacketHandler</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Struct.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Echo.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Enum.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Login.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\PacketId.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\PacketId.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Shared\Protocol\Enum.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Echo.desc">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Enum.desc">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\PacketId.desc">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\PacketId.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Struct.desc">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Login.desc">
       <Filter>Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Login.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
-    <None Include="..\..\Shared\Protocol\PacketId.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
-    <None Include="..\..\Shared\Protocol\Struct.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
-    <None Include="..\..\Shared\Protocol\Echo.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
   </ItemGroup>
