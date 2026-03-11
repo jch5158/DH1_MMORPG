@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/c++,jetbrains,visualstudio,csharp,dotnetcore,unrealengine,vcpkg
-# Edit at https://www.toptal.com/developers/gitignore?templates=c++,jetbrains,visualstudio,csharp,dotnetcore,unrealengine,vcpkg
+# Created by https://www.toptal.com/developers/gitignore/api/c++,csharp,visualstudio,unrealengine,vcpkg,jetbrains
+# Edit at https://www.toptal.com/developers/gitignore?templates=c++,csharp,visualstudio,unrealengine,vcpkg,jetbrains
 
 ### C++ ###
 # Prerequisites
@@ -431,15 +431,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-### DotnetCore ###
-# .NET Core build folders
-bin/
-obj/
-
-# Common node modules locations
-/node_modules
-/wwwroot/node_modules
-
 ### JetBrains ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -812,21 +803,7 @@ vcpkg_installed/
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
-# End of https://www.toptal.com/developers/gitignore/api/c++,jetbrains,visualstudio,csharp,dotnetcore,unrealengine,vcpkg
-
-# Shared 폴더 자체를 예외 처리
-!Shared/
-
-# Shared 폴더 하위의 모든 파일과 폴더를 예외 처리 (기존에 *.exe, *.dll 등이 무시되어 있어도 덮어씀)
-!Shared/**
-
-# --- PacketGenerator 내부 잡다한 찌꺼기 파일 무시 ---
-Shared/Tools/PacketGenerator/bin/
-Shared/Tools/PacketGenerator/obj/
-Shared/Tools/PacketGenerator/.vs/
-Shared/Tools/PacketGenerator/Generated/
-Shared/Tools/PacketGenerator/*.user
-Shared/Tools/PacketGenerator/Binaries
+# End of https://www.toptal.com/developers/gitignore/api/c++,csharp,visualstudio,unrealengine,vcpkg,jetbrains
 
 DH1_Client/Binaries/
 DH1_Client/Intermediate/
@@ -836,6 +813,4 @@ DH1_Client/.idea/
 DH1_Client/.vs/
 DH1_Client/*.sln
 
-
-# vcpkg Build Artifacts
 Shared/vcpkg/vcpkg_installed/

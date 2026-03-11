@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{04243bc5-9a55-492e-a11b-b191ebd4a02c}</ProjectGuid>
+    <ProjectGuid>{49e65f39-679a-4f45-b0cf-c6a124bb046a}</ProjectGuid>
     <RootNamespace>GatewayServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
