@@ -3,6 +3,24 @@ POST https://localhost:7213/api/account/register
 Content-Type: application/json
 
 {
-  "email": "testuser01@test.com",
-  "password": "mypassword123!"
+  "email": "healee9465@gmail.com",
+  "password": "gg26479465*"
+}
+
+### 인증번호 전송 테스트
+POST https://localhost:7213/api/account/auth-code
+Content-Type: application/json
+
+{
+  "email": "healee9465@gmail.com"
+}
+
+
+### 인증번호 검사
+POST https://localhost:7213/api/account/verify-auth-code
+Content-Type: application/json
+
+{
+  "email": "healee9465@gmail.com",
+  "authcode":"410928"
 }
