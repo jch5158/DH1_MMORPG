@@ -21,11 +21,11 @@ namespace LoginServer.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            Debug.Assert(DbContext.Accounts != null, "DbContext.Accounts != null");
+            Debug.Assert(DbContext.Accounts != null);
             var emailExists = await DbContext.Accounts.AnyAsync(a => a.Email == request.Email);
             if (emailExists)
             {
-                return Conflict(new { message = "이미 사용 중인 이메일입니다." });
+                return Conflict(new { message = "이미 사용중인 이메일입니다." });
             }
 
             var newAccount = new Account
@@ -43,7 +43,7 @@ namespace LoginServer.Controllers
         [HttpPost("auth-code")]
         public async Task<IActionResult> AuthCode([FromBody] AuthCodeRequest request)
         {
-            Debug.Assert(DbContext.Accounts != null, "DbContext.Accounts != null");
+            Debug.Assert(DbContext.Accounts != null);
             var emailExists = await DbContext.Accounts.AnyAsync(a => a.Email == request.Email && a.IsEmailVerified == false);
             if (!emailExists)
             {
@@ -89,7 +89,7 @@ namespace LoginServer.Controllers
                 return BadRequest(new { message = "인증번호가 일치하지 않습니다." });
             }
 
-            Debug.Assert(DbContext.Accounts != null, "DbContext.Accounts != null");
+            Debug.Assert(DbContext.Accounts != null);
             var account = await DbContext.Accounts.SingleOrDefaultAsync(a => a.Email == request.Email && a.IsEmailVerified == false);
             if (account != null)
             {
