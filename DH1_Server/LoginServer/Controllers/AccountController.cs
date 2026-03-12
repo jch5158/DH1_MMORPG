@@ -1,11 +1,11 @@
 ﻿using LoginServer.Data;
-using LoginServer.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using System.Diagnostics;
 using MailKit.Net.Smtp;
 using MimeKit;
+using LoginServer.DTOs.Account;
 
 namespace LoginServer.Controllers
 {

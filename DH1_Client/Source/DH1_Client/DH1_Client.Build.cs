@@ -10,7 +10,8 @@ public class DH1_Client : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] {
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
 			"Core",
 			"CoreUObject",
 			"Engine",
@@ -22,8 +23,11 @@ public class DH1_Client : ModuleRules
 			"GameplayStateTreeModule",
 			"Niagara",
 			"UMG",
-			"Slate"
-		});
+			"Slate",
+			"HTTP",
+			"Json",
+			"JsonUtilities"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 

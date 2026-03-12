@@ -106,20 +106,24 @@
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <VcpkgUseStatic>false</VcpkgUseStatic>
-    <VcpkgTriplet>x64-windows-static-md</VcpkgTriplet>
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgTriplet>$(VcpkgTriplet)</VcpkgTriplet>
+    <VcpkgUseMD>true</VcpkgUseMD>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgUseStatic>false</VcpkgUseStatic>
-    <VcpkgTriplet>x64-windows-static-md</VcpkgTriplet>
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgTriplet>$(VcpkgTriplet)</VcpkgTriplet>
+    <VcpkgUseMD>true</VcpkgUseMD>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgUseStatic>false</VcpkgUseStatic>
-    <VcpkgTriplet>x64-windows-static-md</VcpkgTriplet>
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgTriplet>$(VcpkgTriplet)</VcpkgTriplet>
+    <VcpkgUseMD>true</VcpkgUseMD>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgUseStatic>false</VcpkgUseStatic>
-    <VcpkgTriplet>x64-windows-static-md</VcpkgTriplet>
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgTriplet>$(VcpkgTriplet)</VcpkgTriplet>
+    <VcpkgUseMD>true</VcpkgUseMD>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
