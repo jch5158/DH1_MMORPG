@@ -218,7 +218,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Acceptor.h" />
-    <ClInclude Include="ActorEvent.h" />
+    <ClInclude Include="ActorDispatcher.h" />
+    <ClInclude Include="ActorMailBox.h" />
+    <ClInclude Include="ActorManager.h" />
+    <ClInclude Include="ActorService.h" />
     <ClInclude Include="AllocatorUtils.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="CrashReporter.h" />
@@ -227,11 +230,11 @@
     <ClInclude Include="IocpCore.h" />
     <ClInclude Include="IocpEvent.h" />
     <ClInclude Include="ISingleton.h" />
-    <ClInclude Include="Job.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="Actor.h" />
-    <ClInclude Include="JobDispatcher.h" />
     <ClInclude Include="ActorScheduler.h" />
-    <ClInclude Include="ActorJobQueue.h" />
+    <ClInclude Include="NetworkScheduler.h" />
+    <ClInclude Include="SocketIocpObject.h" />
     <ClInclude Include="TimingWheel.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="LockFreeQueue.h" />
@@ -267,16 +270,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Acceptor.cpp" />
-    <ClCompile Include="ActorEvent.cpp" />
+    <ClCompile Include="ActorDispatcher.cpp" />
+    <ClCompile Include="ActorMailBox.cpp" />
+    <ClCompile Include="ActorManager.cpp" />
+    <ClCompile Include="ActorService.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="CrashReporter.cpp" />
     <ClCompile Include="Disconnector.cpp" />
     <ClCompile Include="IocpCore.cpp" />
     <ClCompile Include="IocpEvent.cpp" />
     <ClCompile Include="Actor.cpp" />
-    <ClCompile Include="JobDispatcher.cpp" />
     <ClCompile Include="ActorScheduler.cpp" />
-    <ClCompile Include="ActorJobQueue.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="NetworkScheduler.cpp" />
+    <ClCompile Include="SocketIocpObject.cpp" />
     <ClCompile Include="TimingWheel.cpp" />
     <ClCompile Include="Listener.cpp" />
     <ClCompile Include="MemoryAllocator.cpp" />

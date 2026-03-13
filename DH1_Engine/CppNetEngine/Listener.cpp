@@ -9,7 +9,7 @@
 #include "Session.h"
 
 Listener::Listener(const int32 acceptCount, std::function<void(const uint32)> pErrorHandle)
-	: mSocket(INVALID_SOCKET)
+	: SocketIocpObject()
 	, mAcceptCount(acceptCount)
 	, mpErrorHandle(std::move(pErrorHandle))
 	, mAcceptors()
@@ -19,11 +19,6 @@ Listener::Listener(const int32 acceptCount, std::function<void(const uint32)> pE
 Listener::~Listener()
 {
 	SocketUtils::Close(mSocket);
-}
-
-HANDLE Listener::GetHandle() const
-{
-	return reinterpret_cast<HANDLE>(mSocket);  // NOLINT(performance-no-int-to-ptr)
 }
 
 void Listener::Dispatch(class IocpEvent& iocpEvent, uint32 numOfBytes)
@@ -36,11 +31,6 @@ void Listener::Dispatch(class IocpEvent& iocpEvent, uint32 numOfBytes)
 
 	const auto* pAcceptEvent = static_cast<IocpAcceptEvent*>(&iocpEvent);
 	mAcceptors[pAcceptEvent->GetAcceptorIndex()]->Process();
-}
-
-SOCKET Listener::GetSocket() const
-{
-	return mSocket;
 }
 
 ListenerRef Listener::GetListenerRef()

@@ -4,7 +4,7 @@ class NetReceiveBuffer
 {
 public:
 
-	static constexpr int32 DEFAULT_BUFFER_SIZE = 65535;
+	static constexpr int32 DEFAULT_BUFFER_SIZE = 8192;
 
 	NetReceiveBuffer(const NetReceiveBuffer&) = delete;
 	NetReceiveBuffer& operator=(const NetReceiveBuffer&) = delete;

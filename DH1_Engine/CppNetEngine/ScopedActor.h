@@ -12,8 +12,8 @@ public:
 	static constexpr int32 DEFAULT_SPIN_LIMIT = 5000;
 
 	template <typename... Args>
-	explicit ScopedActor(ActorSchedulerRef pScheduler, Args&&... args)
-		: IActor(std::move(pScheduler))
+	explicit ScopedActor(Args&&... args)
+		: IActor()
 		, mRetryLimit(DEFAULT_RETRY_LIMIT)
 		, mSpinLimit(DEFAULT_SPIN_LIMIT)
 		, mAcquireIndex(-1)
@@ -24,22 +24,28 @@ public:
 
 		std::sort(mActors.begin(), mActors.end(), [](const ActorRef& pLeft, const ActorRef& pRight)->bool
 			{
-				return pLeft->GetSeed() < pRight->GetSeed();
+				return pLeft->GetId() < pRight->GetId();
 			});
 
 		mActors.erase(std::unique(mActors.begin(), mActors.end(), [](const ActorRef& pLeft, const ActorRef& pRight) -> bool
 			{
-				return pLeft->GetSeed() == pRight->GetSeed();
+				return pLeft->GetId() == pRight->GetId();
 			}), mActors.end());
 	}
 
 	virtual ~ScopedActor() override = default;
 
-	[[nodiscard]] virtual bool TryAcquire() override;
+	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32) override;
+
+	virtual bool TryAcquire() override;
 	virtual void Release() override;
 
-	void Post( CallbackType&& callback);
-	TimerHandle PostDelay(CallbackType&& callback, const int64 delayMs);
+	virtual void Activate() override;
+	virtual void Register() override;
+	virtual void Flush() override;
+	virtual IocpEvent& GetIocpEvent() override;
+	virtual int32 GetMessageCount() override;
+	virtual void Post(MessageRef pMessage) override;
 
 	void SetRetryLimit(const int32 retryLimit);
 	[[nodiscard]] int32 GetRetryLimit() const;
@@ -55,5 +61,6 @@ private:
 	int32 mSpinLimit;
 	int32 mAcquireIndex;
 	Vector<ActorRef> mActors;
+	ActorMailBox mMailbox;
 };
 

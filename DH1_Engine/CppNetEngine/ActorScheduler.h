@@ -1,14 +1,15 @@
 ﻿#pragma once
-#include "Job.h"
+#include "IocpCore.h"
+#include "Message.h"
 #include "TimingWheel.h"
 
 class ActorEvent;
 
-class ActorScheduler final : public std::enable_shared_from_this<ActorScheduler>
+class ActorScheduler final : public IocpCore
 {
 public:
 
-	static constexpr int32 DEFAULT_EXECUTE_JOB_COUNT = 50;
+	static constexpr int32 DEFAULT_EXECUTE_Message_COUNT = 50;
 	static constexpr int64 DEFAULT_TIME_SLICE_MS = 16;
 	static constexpr int64 DEFAULT_TICK_INTERVAL_MS = 16;
 
@@ -17,23 +18,23 @@ public:
 	ActorScheduler(ActorScheduler&&) = delete;
 	ActorScheduler& operator=(ActorScheduler&&) = delete;
 
-	explicit ActorScheduler(std::function<void(const uint32)> pOnHandleError,
+	explicit ActorScheduler(std::function<void(const uint32)> onHandleError,
 		const uint32 timeSliceMs = DEFAULT_TIME_SLICE_MS,
-		const int32 maxExecuteJobCount = DEFAULT_EXECUTE_JOB_COUNT,
+		const int32 maxExecuteMessageCount = DEFAULT_EXECUTE_Message_COUNT,
 		const int64 tickIntervalMs = DEFAULT_TICK_INTERVAL_MS);
-	~ActorScheduler();
+	virtual ~ActorScheduler() override;
 
-	[[nodiscard]] int32 GetMaxExecuteJobCount() const;
+	[[nodiscard]] int32 GetMaxExecuteMessageCount() const;
 
-	void Schedule(ActorEvent& actorEvent) const;
-	TimerHandle ScheduleDelay(JobRef pJob, IActorRef pOwner, const uint64 delayMs);
-	void Dispatch();
+	virtual bool Register(const IocpObjectRef& pIocpObject) override;
+	virtual TimerHandle RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs) override;
+	virtual void Dispatch() override;
 
 private:
 
 	HANDLE mActorIocpHandle;
 	const uint32 mTimeSliceMs;
-	const int32 mMaxExecuteJobCount;
+	const int32 mMaxExecuteMessageCount;
 	TimingWheel mTimingWheel;
-	std::function<void(const uint32)> mpOnHandleError;
+	std::function<void(const uint32)> mOnHandleError;
 };

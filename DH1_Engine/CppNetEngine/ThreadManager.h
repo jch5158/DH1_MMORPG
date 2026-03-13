@@ -35,6 +35,6 @@ private:
 	Vector<std::thread> mThreads;
 
 	static thread_local uint32 sTlsThreadId;
-	static thread_local std::chrono::time_point<std::chrono::steady_clock> sTlsJobWorkEndTime;
+	static thread_local std::chrono::time_point<std::chrono::steady_clock> sTlsMessageWorkEndTime;
 };
 

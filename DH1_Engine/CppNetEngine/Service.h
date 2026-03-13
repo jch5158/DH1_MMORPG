@@ -3,6 +3,7 @@
 #include "Listener.h"
 #include "NetAddress.h"
 #include "LockFreeStack.h"
+#include "NetworkScheduler.h"
 #include "SessionManager.h"
 #include "WaitQueueManager.h"
 
@@ -23,7 +24,14 @@ public:
 	Service(Service&&) = delete;
 	Service& operator=(Service&&) = delete;
 
-	explicit Service(const eServiceType serviceType, const NetAddress& netAddress, IocpCoreRef pIocpCore, ActorSchedulerRef pScheduler, SessionFactory pSessionFactory, SessionManagerRef pSessionManager, SessionReaperRef pSessionReaper, WaitQueueManagerRef pWaitQueueManager);
+	explicit Service(
+		const eServiceType serviceType,
+		const NetAddress& netAddress,
+		IocpCoreRef pIocpCore,
+		SessionFactory pSessionFactory,
+		SessionManagerRef pSessionManager,
+		SessionReaperRef pSessionReaper,
+		WaitQueueManagerRef pWaitQueueManager);
 	virtual ~Service() = default;
 
 	virtual bool Start() = 0;
@@ -34,12 +42,11 @@ public:
 	void RemoveSession(const SessionRef& pSession) const;
 	bool EnterWaitQueue(const SessionRef& pSession, uint64& outTicket) const;
 	SessionRef DequeueWaitQueue() const;
-	void RegisterSessionReap(const SessionRef& pSession) const;
+	void RegisterSessionReap(const SessionRef& pSession);
 
 	eServiceType GetServiceType() const;
 	NetAddress& GetNetAddress();
 	IocpCoreRef GetIocpCore() const;
-	ActorSchedulerRef GetActorScheduler() const;
 	int32 GetCurrentSessionCount() const;
 	int32 GetMaxSessionCount() const;
 	bool GetWaitCount(const uint64 myTicket, uint64& outWaitCount) const;
@@ -52,7 +59,6 @@ private:
 	const int32	mMaxSessionCount;
 	NetAddress mNetAddress;
 	IocpCoreRef mpIocpCore;
-	ActorSchedulerRef mpScheduler;
 	SessionFactory mpSessionFactory;
 	SessionManagerRef mpSessionManager;
 	SessionReaperRef mpSessionReaper;
@@ -62,7 +68,11 @@ private:
 class ClientService : public Service
 {
 public:
-	explicit ClientService(const NetAddress& targetAddress, IocpCoreRef pIocpCore, ActorSchedulerRef pScheduler, SessionFactory pSessionFactory, SessionManagerRef pSessionManager);
+	explicit ClientService(
+		const NetAddress& targetAddress, 
+		IocpCoreRef pIocpCore, 
+		SessionFactory pSessionFactory, 
+		SessionManagerRef pSessionManager);
 	virtual ~ClientService() override = default;
 
 	virtual bool Start() override;
@@ -72,7 +82,14 @@ public:
 class ServerService : public Service
 {
 public:
-	explicit ServerService(const NetAddress& targetAddress, ListenerRef pListener, IocpCoreRef pIocpCore, ActorSchedulerRef pScheduler, SessionFactory pSessionFactory, SessionManagerRef pSessionManager, SessionReaperRef pSessionReaper, WaitQueueManagerRef pWaitQueueManager);
+	explicit ServerService(
+		const NetAddress& targetAddress, 
+		ListenerRef pListener, 
+		IocpCoreRef pIocpCore, 
+		SessionFactory pSessionFactory, 
+		SessionManagerRef pSessionManager,
+		SessionReaperRef pSessionReaper, 
+		WaitQueueManagerRef pWaitQueueManager);
 	virtual ~ServerService() override = default;
 
 	virtual bool Start() override;

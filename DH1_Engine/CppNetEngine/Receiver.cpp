@@ -1,12 +1,16 @@
 ﻿#include "pch.h"
 #include "Receiver.h"
-
 #include "Session.h"
 #include "SocketUtils.h"
 
+IocpReceiveEvent::IocpReceiveEvent()
+	:IocpEvent(eIocpEventType::Receive)
+{
+}
+
 Receiver::Receiver()
 	: mReceiveEvent()
-	, mNetReceiveBuffer(90)
+	, mNetReceiveBuffer(NetReceiveBuffer::DEFAULT_BUFFER_SIZE)
 {
 }
 

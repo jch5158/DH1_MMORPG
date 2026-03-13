@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "IocpCore.h"
 #include "SharedPtrUtils.h"
+#include "SocketIocpObject.h"
 
 class IocpAcceptEvent;
 
-class Listener final : public IocpObject
+class Listener final : public SocketIocpObject
 {
 public:
 
@@ -20,11 +21,8 @@ public:
 	explicit Listener(const int32 acceptCount, ErrorHandle pErrorHandle);
 	virtual ~Listener() override;
 
-	[[nodiscard]]
-	virtual HANDLE GetHandle() const override;
 	virtual void Dispatch(IocpEvent& iocpEvent, uint32 numOfBytes) override;
 
-	SOCKET GetSocket() const;
 	ListenerRef GetListenerRef();
 
 	bool StartAccept(const ServerServiceRef& pServerService);
@@ -32,7 +30,6 @@ public:
 
 private:
 
-	SOCKET mSocket;
 	const int32 mAcceptCount;
 	const ErrorHandle mpErrorHandle;
 	Vector<AcceptorRef> mAcceptors;

@@ -4,6 +4,11 @@
 #include "Session.h"
 #include "SocketUtils.h"
 
+IocpConnectEvent::IocpConnectEvent()
+	:IocpEvent(eIocpEventType::Connect)
+{
+}
+
 Connector::Connector()
 	: mConnectEvent()
     , mpService(nullptr)

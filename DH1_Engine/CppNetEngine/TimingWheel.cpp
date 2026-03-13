@@ -99,12 +99,13 @@ void TimingWheel::Tick()
 	mLastTickTime += std::chrono::milliseconds(tickCount * mTickIntervalMs);
 
 	List<TimingNode> executeList;
-
-	for (uint32 i = 0; i < tickCount; ++i)
 	{
 		UniqueLock lock(mLock);
-		processTick(executeList);
-		++mCurrentTick;
+		for (uint32 i = 0; i < tickCount; ++i)
+		{
+			processTick(executeList);
+			++mCurrentTick;
+		}
 	}
 
 	mbTicking.store(false);

@@ -1,7 +1,17 @@
 ﻿#pragma once
-
 #include "IocpEvent.h"
 #include "NetSendBuffer.h"
+
+class IocpSendEvent final : public IocpEvent
+{
+public:
+	IocpSendEvent();
+
+	[[nodiscard]] Vector<NetSendBufferRef>& GetSendPendingBuffer();
+
+private:
+	Vector<NetSendBufferRef> mSendPendingBuffer; // 전송중인 버퍼
+};
 
 class Sender
 {

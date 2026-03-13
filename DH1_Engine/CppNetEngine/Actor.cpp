@@ -1,62 +1,41 @@
 ﻿#include "pch.h"
 #include "Actor.h"
 #include "ActorScheduler.h"
-#include "ActorEvent.h"
+#include "IocpEvent.h"
 
-IActor::IActor(ActorSchedulerRef pScheduler)
-	: mpScheduler(std::move(pScheduler))
-	, mJobQueue()
+//void IActor::Dispatch(class IocpEvent& iocpEvent, const uint32)
+//{
+//	switch (iocpEvent)
+//	{
+//	case eIocpEventType::ActorMessage:
+//		mMessageQueue.Process();
+//		break;
+//	default:
+//		NET_ENGINE_LOG_ERROR("IActor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
+//		break;
+//	}
+//}
+
+IActor::IActor()
+	:mId(sSeedBase.fetch_add(1))
 {
 }
 
-void IActor::Activate()
+uint64 IActor::GetId() const
 {
-	mJobQueue.Initialize(shared_from_this(), mpScheduler);
+	return mId;
 }
 
-void IActor::Register()
-{
-	mJobQueue.Register();
-}
+std::atomic<uint64> IActor::sSeedBase = 0;
 
-void IActor::Flush()
-{
-	mJobQueue.Flush();
-}
-
-bool IActor::PushJob(JobRef pJob)
-{
-	return mJobQueue.PushJob(std::move(pJob));
-}
-
-int32 IActor::GetJobCount() const
-{
-	return mJobQueue.GetJobCount();
-}
-
-ActorSchedulerRef IActor::GetActorSchedulerRef() const
-{
-	return mpScheduler;
-}
-
-Actor::Actor(ActorSchedulerRef pScheduler)
-	: IActor(std::move(pScheduler))
-	, mSeed(sSeedBase.fetch_add(1))
-	, mbAcquire(false)
+Actor::Actor()
+	: mbAcquire(false)
+	, mMailbox()
 {
 }
 
-void IActor::Dispatch(ActorEvent& actorEvent)
+void Actor::Dispatch(class IocpEvent& iocpEvent, const uint32)
 {
-	switch (actorEvent.GetEventType())
-	{
-	case eActorEventType::Job:
-		mJobQueue.Process();
-		break;
-	default:  // NOLINT(clang-diagnostic-covered-switch-default)
-		NET_ENGINE_LOG_ERROR("IActor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
-		break;
-	}
 }
 
 bool Actor::TryAcquire()
@@ -74,9 +53,42 @@ void Actor::Release()
 	mbAcquire.store(false);
 }
 
-int64 Actor::GetSeed() const
+void Actor::Activate()
 {
-	return mSeed;
+	mMailbox.SetOwner(shared_from_this());
 }
 
-std::atomic<int64> Actor::sSeedBase = 0;
+void Actor::Register()
+{
+	if (TryAcquire())
+	{
+		mMailbox.Register();
+		
+		Release();
+	}
+}
+
+void Actor::Flush()
+{
+	if (TryAcquire())
+	{
+		mMailbox.Flush();
+
+		Release();
+	}
+}
+
+IocpEvent& Actor::GetIocpEvent()
+{
+	return mMailbox.GetActorMessageEvent();
+}
+
+int32 Actor::GetMessageCount()
+{
+	return mMailbox.GetMessageCount();
+}
+
+void Actor::Post(MessageRef pMessage)
+{
+	mMailbox.Post(std::move(pMessage));
+}

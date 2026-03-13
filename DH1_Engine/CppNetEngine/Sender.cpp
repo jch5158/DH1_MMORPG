@@ -3,6 +3,18 @@
 #include "Session.h"
 #include "SocketUtils.h"
 
+IocpSendEvent::IocpSendEvent()
+	:IocpEvent(eIocpEventType::Send)
+	, mSendPendingBuffer()
+{
+	mSendPendingBuffer.reserve(Sender::MAX_SEND_WSABUF_SIZE);
+}
+
+Vector<NetSendBufferRef>& IocpSendEvent::GetSendPendingBuffer()
+{
+	return mSendPendingBuffer;
+}
+
 Sender::Sender()
 	: mbSendRegistered(false)
 	, mSendQueue()

@@ -78,22 +78,27 @@ using SharedPtr = std::shared_ptr<T>;
 	using TypeName##Weak = WeakPtr<TypeName>; \
 	using TypeName##ConstWeak = WeakPtr<const TypeName>;
 
-DECLARE_SMART_PTR(Listener);
-DECLARE_SMART_PTR(PacketSession);
-DECLARE_SMART_PTR(GameSession);
-DECLARE_SMART_PTR(NetSendBuffer);
+
 DECLARE_SMART_PTR(IocpCore);
-DECLARE_SMART_PTR(ActorScheduler);
+DECLARE_SMART_PTR(IocpObject);
+DECLARE_SMART_PTR(SocketIocpObject)
+DECLARE_SMART_PTR(Listener);
+DECLARE_SMART_PTR(Acceptor);
+DECLARE_SMART_PTR(Session);
+DECLARE_SMART_PTR(GameSession);
+DECLARE_SMART_PTR(PacketSession);
+DECLARE_SMART_PTR(NetSendBuffer);
+
+DECLARE_SMART_PTR(Service);
+DECLARE_SMART_PTR(ClientService);
+DECLARE_SMART_PTR(ServerService);
 DECLARE_SMART_PTR(SessionManager);
 DECLARE_SMART_PTR(SessionReaper);
 DECLARE_SMART_PTR(WaitQueueManager);
-DECLARE_SMART_PTR(IocpObject);
-DECLARE_SMART_PTR(ServerService);
-DECLARE_SMART_PTR(ClientService);
-DECLARE_SMART_PTR(Job);
-DECLARE_SMART_PTR(ScopedActor);
-DECLARE_SMART_PTR(Session);
-DECLARE_SMART_PTR(Service);
+
 DECLARE_SMART_PTR(IActor);
 DECLARE_SMART_PTR(Actor);
-DECLARE_SMART_PTR(Acceptor);
+DECLARE_SMART_PTR(ScopedActor);
+DECLARE_SMART_PTR(Message);
+DECLARE_SMART_PTR(ActorScheduler);
+DECLARE_SMART_PTR(ActorManager);

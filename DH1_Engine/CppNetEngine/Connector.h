@@ -1,6 +1,12 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
+class IocpConnectEvent final : public IocpEvent
+{
+public:
+	IocpConnectEvent();
+};
+
 class Connector
 {
 public:

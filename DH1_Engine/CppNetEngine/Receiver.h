@@ -2,6 +2,12 @@
 #include "IocpEvent.h"
 #include "NetReceiveBuffer.h"
 
+class IocpReceiveEvent final : public IocpEvent
+{
+public:
+	IocpReceiveEvent();
+};
+
 class Receiver
 {
 public:

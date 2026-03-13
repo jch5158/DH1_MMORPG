@@ -4,6 +4,11 @@
 #include "Session.h"
 #include "SocketUtils.h"
 
+IocpDisconnectEvent::IocpDisconnectEvent()
+	:IocpEvent(eIocpEventType::Disconnect)
+{
+}
+
 Disconnector::Disconnector()
 	: mDisconnectEvent()
 	, mpService()

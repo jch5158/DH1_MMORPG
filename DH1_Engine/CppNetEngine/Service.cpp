@@ -5,13 +5,18 @@
 #include "SessionReaper.h"
 #include <utility>
 
-Service::Service(const eServiceType serviceType, const NetAddress& netAddress, IocpCoreRef pIocpCore,
-	ActorSchedulerRef pScheduler, SessionFactory pSessionFactory, SessionManagerRef pSessionManager, SessionReaperRef pSessionReaper, WaitQueueManagerRef pWaitQueueManager)
+Service::Service(
+	const eServiceType serviceType,
+	const NetAddress& netAddress,
+	IocpCoreRef pIocpCore,
+	SessionFactory pSessionFactory,
+	SessionManagerRef pSessionManager,
+	SessionReaperRef pSessionReaper,
+	WaitQueueManagerRef pWaitQueueManager)
 	: mServiceType(serviceType)
 	, mMaxSessionCount(pSessionManager->GetMaxSessionCount())
 	, mNetAddress(netAddress)
 	, mpIocpCore(std::move(pIocpCore))
-	, mpScheduler(std::move(pScheduler))
 	, mpSessionFactory(std::move(pSessionFactory))
 	, mpSessionManager(std::move(pSessionManager))
 	, mpSessionReaper(std::move(pSessionReaper))
@@ -102,7 +107,7 @@ SessionRef Service::DequeueWaitQueue() const
 	return mpWaitQueueManager->DequeueWaitQueue();
 }
 
-void Service::RegisterSessionReap(const SessionRef& pSession) const
+void Service::RegisterSessionReap(const SessionRef& pSession)
 {
 	if (mpSessionReaper == nullptr)
 	{
@@ -110,8 +115,10 @@ void Service::RegisterSessionReap(const SessionRef& pSession) const
 	}
 
 	SessionWeak pSessionWeak = pSession;
-
-	mpSessionReaper->PostDelay(mpSessionReaper->GetTimeoutMs(), &SessionReaper::ReapSession, pSessionWeak);
+	mpIocpCore->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak]()->void
+		{
+			pSessionReaper->ReapSession(pSessionWeak);
+		}, mpSessionReaper->GetTimeoutMs());
 }
 
 eServiceType Service::GetServiceType() const
@@ -127,11 +134,6 @@ NetAddress& Service::GetNetAddress()
 IocpCoreRef Service::GetIocpCore() const
 {
 	return mpIocpCore;
-}
-
-ActorSchedulerRef Service::GetActorScheduler() const
-{
-	return mpScheduler;
 }
 
 int32 Service::GetCurrentSessionCount() const
@@ -184,8 +186,12 @@ void Service::admitWaitingSession() const
 	}
 }
 
-ClientService::ClientService(const NetAddress& targetAddress, IocpCoreRef pIocpCore, ActorSchedulerRef pScheduler, SessionFactory pSessionFactory, SessionManagerRef pSessionManager)
-	: Service(eServiceType::Client, targetAddress, std::move(pIocpCore), std::move(pScheduler), std::move(pSessionFactory), std::move(pSessionManager), nullptr, nullptr)
+ClientService::ClientService(
+	const NetAddress& targetAddress, 
+	IocpCoreRef pIocpCore, 
+	SessionFactory pSessionFactory, 
+	SessionManagerRef pSessionManager)
+	: Service(eServiceType::Client, targetAddress, std::move(pIocpCore), std::move(pSessionFactory), std::move(pSessionManager), nullptr, nullptr)
 {
 }
 
@@ -208,8 +214,15 @@ void ClientService::CloseService()
 {
 }
 
-ServerService::ServerService(const NetAddress& targetAddress, ListenerRef pListener, IocpCoreRef pIocpCore, ActorSchedulerRef pScheduler, SessionFactory pSessionFactory, SessionManagerRef pSessionManager, SessionReaperRef pSessionReaper, WaitQueueManagerRef pWaitQueueManager)
-	: Service(eServiceType::Server, targetAddress, std::move(pIocpCore), std::move(pScheduler), std::move(pSessionFactory), std::move(pSessionManager), std::move(pSessionReaper), std::move(pWaitQueueManager))
+ServerService::ServerService(
+	const NetAddress& targetAddress, 
+	ListenerRef pListener, 
+	IocpCoreRef pIocpCore, 
+	SessionFactory pSessionFactory, 
+	SessionManagerRef pSessionManager, 
+	SessionReaperRef pSessionReaper, 
+	WaitQueueManagerRef pWaitQueueManager)
+	: Service(eServiceType::Server, targetAddress, std::move(pIocpCore), std::move(pSessionFactory), std::move(pSessionManager), std::move(pSessionReaper), std::move(pWaitQueueManager))
 	, mpListener(std::move(pListener))
 {
 }

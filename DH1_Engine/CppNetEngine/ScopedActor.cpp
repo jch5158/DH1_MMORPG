@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 #include "ScopedActor.h"
-#include "JobDispatcher.h"
+
+void ScopedActor::Dispatch(class IocpEvent& iocpEvent, const uint32)
+{
+}
 
 bool ScopedActor::TryAcquire()
 {
@@ -49,17 +52,44 @@ void ScopedActor::Release()
 	mAcquireIndex = -1;
 }
 
-void ScopedActor::Post(CallbackType&& callback)
+void ScopedActor::Activate()
 {
-	const auto pJob = cpp_net_engine::MakeShared<Job>(std::move(callback));
-	JobDispatcher::Post(pJob, shared_from_this());
+	mMailbox.SetOwner(shared_from_this());
 }
 
-TimerHandle ScopedActor::PostDelay(CallbackType&& callback, const int64 delayMs)
+void ScopedActor::Register()
 {
-	const auto pJob = cpp_net_engine::MakeShared<Job>(std::move(callback));
-	TimerHandle handle = JobDispatcher::PostDelay(pJob, shared_from_this(), GetActorSchedulerRef(), delayMs);
-	return handle;
+	if (TryAcquire())
+	{
+		mMailbox.Register();
+
+		Release();
+	}
+}
+
+void ScopedActor::Flush()
+{
+	if (TryAcquire())
+	{
+		mMailbox.Flush();
+
+		Release();
+	}
+}
+
+IocpEvent& ScopedActor::GetIocpEvent()
+{
+	return mMailbox.GetActorMessageEvent();
+}
+
+int32 ScopedActor::GetMessageCount()
+{
+	return mMailbox.GetMessageCount();
+}
+
+void ScopedActor::Post(MessageRef pMessage)
+{
+	mMailbox.Post(std::move(pMessage));
 }
 
 void ScopedActor::SetRetryLimit(const int32 retryLimit)

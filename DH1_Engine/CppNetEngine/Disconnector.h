@@ -1,6 +1,11 @@
 ﻿#pragma once
-
 #include "IocpEvent.h"
+
+class IocpDisconnectEvent final : public IocpEvent
+{
+public:
+	IocpDisconnectEvent();
+};
 
 class Disconnector
 {

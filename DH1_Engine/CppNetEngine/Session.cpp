@@ -6,8 +6,8 @@
 #include "NetSendBuffer.h"
 
 Session::Session()
-	: mpService()
-	, mSocket(INVALID_SOCKET)
+	: SocketIocpObject()
+	, mpService()
 	, mNetAddress()
 	, mSessionState(eSessionState::Disconnected)
 	, mTimeoutTracker()
@@ -20,11 +20,6 @@ Session::Session()
 	{
 		CrashReporter::Crash();
 	}
-}
-
-HANDLE Session::GetHandle() const
-{
-	return reinterpret_cast<HANDLE>(mSocket);  // NOLINT(performance-no-int-to-ptr)
 }
 
 void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
@@ -52,11 +47,6 @@ void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 ServiceRef Session::GetService() const
 {
 	return mpService;
-}
-
-SOCKET Session::GetSocket() const
-{
-	return mSocket;
 }
 
 NetAddress& Session::GetAddress()

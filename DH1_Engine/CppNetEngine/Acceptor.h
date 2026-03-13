@@ -1,6 +1,22 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
+class IocpAcceptEvent final : public IocpEvent
+{
+public:
+	explicit IocpAcceptEvent(const int32 acceptorIndex);
+
+	[[nodiscard]] int32 GetAcceptorIndex() const;
+
+	void ResetSession();
+	void SetSession(SessionRef pSession);
+	[[nodiscard]] SessionRef GetClientSession() const;
+
+private:
+	const int32 mAcceptorIndex;
+	SessionRef mpClientSession;
+};
+
 class Acceptor
 {
 public:

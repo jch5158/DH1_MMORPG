@@ -10,6 +10,7 @@
 #include "Sender.h"
 #include "SessionTimeoutTracker.h"
 #include "SharedPtrUtils.h"
+#include "SocketIocpObject.h"
 
 enum class eSessionState : uint8
 {
@@ -32,7 +33,7 @@ enum class eDisconnectReason : uint16  // NOLINT(performance-enum-size)
 	ServiceError,
 };
 
-class Session : public IocpObject
+class Session : public SocketIocpObject
 {
 public:
 
@@ -55,7 +56,6 @@ public:
 	explicit Session();
 	virtual ~Session() override = default;
 
-	[[nodiscard]] virtual HANDLE GetHandle() const override;
 	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32 numOfBytes) override;
 
 	virtual void OnConnected() = 0;
@@ -67,7 +67,6 @@ public:
 	virtual void OnError(const int32 errorCode) = 0;
 
 	[[nodiscard]] ServiceRef GetService() const;
-	[[nodiscard]] SOCKET GetSocket() const;
 	[[nodiscard]] NetAddress& GetAddress();
 	[[nodiscard]] byte* GetReceiveBufferPtr() const;
 	[[nodiscard]] SessionRef GetSessionRef();
@@ -110,7 +109,6 @@ private:
 	bool setSessionDisconnected();
 
 	ServiceRef mpService;
-	SOCKET mSocket;
 	NetAddress mNetAddress;
 	std::atomic<eSessionState> mSessionState;
 	SessionTimeoutTracker mTimeoutTracker;

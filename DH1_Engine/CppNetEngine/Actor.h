@@ -1,104 +1,58 @@
 ﻿#pragma once
-#include "ActorEvent.h"
-#include "ActorJobQueue.h"
+#include "ActorMailBox.h"
 #include "LockFreeQueue.h"
-#include "Job.h"
-#include "JobDispatcher.h"
+#include "Message.h"
 #include "ActorScheduler.h"
+#include "IocpCore.h"
 
-class IActor : public std::enable_shared_from_this<IActor>
+class IActor : public IocpObject
 {
 public:
-
-	using CallbackType = std::function<void()>;
-
 	IActor(const IActor&) = delete;
 	IActor& operator=(const IActor&) = delete;
 	IActor(IActor&&) = delete;
 	IActor& operator=(IActor&&) = delete;
 
-	explicit IActor(ActorSchedulerRef pScheduler);
-	virtual ~IActor() = default;
+	explicit IActor();
+	virtual ~IActor() override = default;
 
-	virtual void Dispatch(ActorEvent& actorEvent);
-	[[nodiscard]] virtual bool TryAcquire() = 0;
+	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32) override = 0;
+
+	virtual bool TryAcquire() = 0;
 	virtual void Release() = 0;
-	
-	void Activate();
-	void Register();
-	void Flush();
-	[[nodiscard]] bool PushJob(JobRef pJob);
-	[[nodiscard]] int32 GetJobCount() const;
-	[[nodiscard]] ActorSchedulerRef GetActorSchedulerRef() const;
 
-protected:
+	virtual void Activate() = 0;
+	virtual void Register() = 0;
+	virtual void Flush() = 0;
+	virtual IocpEvent& GetIocpEvent() = 0;
+	virtual int32 GetMessageCount()  = 0;
+	virtual void Post(MessageRef pMessage) = 0;
+	[[nodiscard]] uint64 GetId() const;
 
-	ActorSchedulerRef mpScheduler;
-	ActorJobQueue mJobQueue;
+private:
+	static std::atomic<uint64> sSeedBase;
+	const uint64 mId;
 };
 
 class Actor : public IActor
 {
 public:
 
-	explicit Actor(ActorSchedulerRef pScheduler);
+	explicit Actor();
 	virtual ~Actor() override = default;
 
-	void Post(CallbackType&& callback)
-	{
-		const auto pJob = cpp_net_engine::MakeShared<Job>(std::move(callback));
-		JobDispatcher::Post(pJob, shared_from_this());
-	}
-
-	template<typename T, typename Ret, typename... FuncArgs, typename... CallArgs>
-	void Post(Ret(T::* pMemFunc)(FuncArgs...), CallArgs&&... args)
-	{
-		const auto pOwner = std::static_pointer_cast<T>(shared_from_this());
-		const auto pJob = cpp_net_engine::MakeShared<Job>(pOwner, pMemFunc, std::forward<CallArgs>(args)...);
-		JobDispatcher::Post(pJob, pOwner);
-	}
-
-	template<typename T, typename Ret, typename... FuncArgs, typename... CallArgs>
-	void Post(Ret(T::* pMemFunc)(FuncArgs...) const, CallArgs&&... args)
-	{
-		const auto pOwner = std::static_pointer_cast<T>(shared_from_this());
-		const auto pJob = cpp_net_engine::MakeShared<Job>(pOwner, pMemFunc, std::forward<CallArgs>(args)...);
-		JobDispatcher::Post(pJob, pOwner);
-	}
-
-	TimerHandle PostDelay(const int64 delayMs, CallbackType&& callback)
-	{
-		const auto pJob = cpp_net_engine::MakeShared<Job>(std::move(callback));
-		TimerHandle handle = JobDispatcher::PostDelay(pJob, shared_from_this(), GetActorSchedulerRef(), delayMs);
-		return handle;
-	}
-
-	template<typename T, typename Ret, typename... FuncArgs, typename... CallArgs>
-	TimerHandle PostDelay(const int64 delayMs, Ret(T::* pMemFunc)(FuncArgs...), CallArgs&&... args)
-	{
-		const auto pOwner = std::static_pointer_cast<T>(shared_from_this());
-		const auto pJob = cpp_net_engine::MakeShared<Job>(pOwner, pMemFunc, std::forward<CallArgs>(args)...);
-		TimerHandle handle = JobDispatcher::PostDelay(pJob, pOwner, GetActorSchedulerRef(), delayMs);
-		return handle;
-	}
-
-	template<typename T, typename Ret, typename... FuncArgs, typename... CallArgs>
-	TimerHandle PostDelay(const int64 delayMs, Ret(T::* pMemFunc)(FuncArgs...) const, CallArgs&&... args)
-	{
-		const auto pOwner = std::static_pointer_cast<T>(shared_from_this());
-		const auto pJob = cpp_net_engine::MakeShared<Job>(pOwner, pMemFunc, std::forward<CallArgs>(args)...);
-		TimerHandle handle = JobDispatcher::PostDelay(pJob, pOwner, GetActorSchedulerRef(), delayMs);
-		return handle;
-	}
-
-	[[nodiscard]] virtual bool TryAcquire() override;
+	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32) override;
+	virtual bool TryAcquire() override;
 	virtual void Release() override;
 
-	[[nodiscard]] int64 GetSeed() const;
+	virtual void Activate() override;
+	virtual void Register() override;
+	virtual void Flush() override;
+	virtual IocpEvent& GetIocpEvent() override;
+	virtual int32 GetMessageCount() override;
+	virtual void Post(MessageRef pMessage) override;
 
 private:
-	static std::atomic<int64> sSeedBase;
-
-	const int64 mSeed;
 	std::atomic<bool> mbAcquire;
+	ActorMailBox mMailbox;
 };

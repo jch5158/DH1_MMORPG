@@ -2,15 +2,15 @@
 #include "ActorScheduler.h"
 #include "Actor.h"
 
-ActorScheduler::ActorScheduler(std::function<void(const uint32)> pOnHandleError,
+ActorScheduler::ActorScheduler(std::function<void(const uint32)> onHandleError,
 	const uint32 timeSliceMs,
-	const int32 maxExecuteJobCount,
+	const int32 maxExecuteMessageCount,
 	const int64 tickIntervalMs)
 	: mActorIocpHandle(nullptr)
 	, mTimeSliceMs(timeSliceMs)
-	, mMaxExecuteJobCount(maxExecuteJobCount)
+	, mMaxExecuteMessageCount(maxExecuteMessageCount)
 	, mTimingWheel(TimingWheel(tickIntervalMs))
-	, mpOnHandleError(std::move(pOnHandleError))
+	, mOnHandleError(std::move(onHandleError))
 {
 	mActorIocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 	if (mActorIocpHandle == nullptr)
@@ -27,26 +27,34 @@ ActorScheduler::~ActorScheduler()
 	}
 }
 
-int32 ActorScheduler::GetMaxExecuteJobCount() const
+int32 ActorScheduler::GetMaxExecuteMessageCount() const
 {
-	return mMaxExecuteJobCount;
+	return mMaxExecuteMessageCount;
 }
 
-void ActorScheduler::Schedule(ActorEvent& actorEvent) const
+bool ActorScheduler::Register(const IocpObjectRef& pIocpObject)
 {
-	if (PostQueuedCompletionStatus(mActorIocpHandle, 0, 0, &actorEvent) == false)
+	const IActorRef pActor = std::static_pointer_cast<IActor>(pIocpObject);
+	if (pActor == nullptr)
 	{
-		NET_ENGINE_LOG_ERROR("ActorScheduler::Schedule - PostQueuedCompletionStatus is Failed, errorCode : {}", GetLastError());
+		return false;
 	}
+
+	if (PostQueuedCompletionStatus(mActorIocpHandle, 0, 0, &pActor->GetIocpEvent()) == false)
+	{
+		NET_ENGINE_LOG_ERROR("ActorScheduler::Register - PostQueuedCompletionStatus is Failed, errorCode : {}", GetLastError());
+		return false;
+	}
+
+	return true;
 }
 
-TimerHandle ActorScheduler::ScheduleDelay(JobRef pJob, IActorRef pOwner, const uint64 delayMs)
+TimerHandle ActorScheduler::RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs)
 {
-	TimerHandle handle = mTimingWheel.AddTiming([pCapJob = std::move(pJob), pCapOwner = std::move(pOwner)]() -> void
+	TimerHandle handle = mTimingWheel.AddTiming([capFunction = std::move(delayFunction)]()->void
 		{
-			JobDispatcher::Post(pCapJob, pCapOwner);
-		}
-	, delayMs);
+			capFunction();
+		}, delayMs);
 
 	return handle;
 }
@@ -55,24 +63,24 @@ void ActorScheduler::Dispatch()
 {
 	DWORD bytesTransferred = 0;
 	ULONG_PTR pCompletionKey = 0;
-	ActorEvent* pActorEvent = nullptr;
+	ActorMessageEvent* pActorMessageEvent = nullptr;
 
-	const int32 gqcsRet = GetQueuedCompletionStatus(mActorIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorEvent), mTimeSliceMs);
+	const int32 gqcsRet = GetQueuedCompletionStatus(mActorIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorMessageEvent), mTimeSliceMs);
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
 		if (errorCode != WAIT_TIMEOUT)
 		{
-			mpOnHandleError(errorCode);
+			mOnHandleError(errorCode);
 		}
 	}
 
-	if (pActorEvent != nullptr)
+	if (pActorMessageEvent != nullptr)
 	{
-		const IActorRef pActor = pActorEvent->GetOwner();
+		const IActorRef pActor = std::static_pointer_cast<IActor>(pActorMessageEvent->GetOwner());
 		if (pActor != nullptr && pActor->TryAcquire())
 		{
-			pActor->Dispatch(*pActorEvent);
+			pActor->Dispatch(*pActorMessageEvent, 0);
 		}
 	}
 

@@ -4,8 +4,7 @@
 #include "Session.h"
 
 SessionReaper::SessionReaper(ActorSchedulerRef pScheduler, const int64 timeoutMs)
-	: Actor(std::move(pScheduler))
-	, mTimeoutMs(timeoutMs)
+	: mTimeoutMs(timeoutMs)
 {
 }
 

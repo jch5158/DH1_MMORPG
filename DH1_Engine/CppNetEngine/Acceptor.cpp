@@ -1,9 +1,40 @@
 ﻿#include "pch.h"
 #include "Acceptor.h"
-
 #include "Service.h"
 #include "Session.h"
 #include "SocketUtils.h"
+
+IocpAcceptEvent::IocpAcceptEvent(const int32 acceptorIndex)
+	: IocpEvent(eIocpEventType::Accept)
+	, mAcceptorIndex(acceptorIndex)
+	, mpClientSession()
+{
+}
+
+int32 IocpAcceptEvent::GetAcceptorIndex() const
+{
+	return mAcceptorIndex;
+}
+
+void IocpAcceptEvent::ResetSession()
+{
+	mpClientSession.reset();
+}
+
+void IocpAcceptEvent::SetSession(SessionRef pSession)
+{
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	mpClientSession = std::move(pSession);
+}
+
+SessionRef IocpAcceptEvent::GetClientSession() const
+{
+	return mpClientSession;
+}
 
 Acceptor::Acceptor(const int32 acceptorIndex)
 	: mAcceptEvent(acceptorIndex)
