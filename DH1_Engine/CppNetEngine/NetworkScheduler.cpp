@@ -17,11 +17,11 @@ void NetworkScheduler::Dispatch()
 	uint32 numOfBytes = 0;
 	ULONG_PTR key = 0;
 	IocpEvent* pIocpEvent = nullptr;
-	const int32 gqcsRet = GetQueuedCompletionStatus(GetHandle(), reinterpret_cast<LPDWORD>(&numOfBytes), &key, reinterpret_cast<LPOVERLAPPED*>(&pIocpEvent), mWaitTimeoutMs);
+	const int32 gqcsRet = GetQueuedCompletionStatus(mIocpHandle, reinterpret_cast<LPDWORD>(&numOfBytes), &key, reinterpret_cast<LPOVERLAPPED*>(&pIocpEvent), mWaitTimeoutMs);
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
-		if (errorCode != WAIT_TIMEOUT)
+		if (!IsIgnorableError(errorCode))
 		{
 			mOnHandleError(errorCode);
 		}
@@ -42,7 +42,7 @@ void NetworkScheduler::Dispatch()
 bool NetworkScheduler::Register(const IocpObjectRef& pIocpObject)
 {
 	const auto pSocketIocpObj = std::static_pointer_cast<SocketIocpObject>(pIocpObject);
-	if (nullptr == CreateIoCompletionPort(pSocketIocpObj->GetSocketHandle(), GetHandle(), 0, 0))
+	if (nullptr == CreateIoCompletionPort(pSocketIocpObj->GetSocketHandle(), mIocpHandle, 0, 0))
 	{
 		return false;
 	}

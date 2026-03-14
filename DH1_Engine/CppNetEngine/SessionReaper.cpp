@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "SessionReaper.h"
-
 #include "Session.h"
 
 SessionReaper::SessionReaper(const int64 timeoutMs)

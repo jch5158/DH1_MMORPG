@@ -54,7 +54,7 @@ void ActorScheduler::Dispatch()
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
-		if (errorCode != WAIT_TIMEOUT)
+		if (!IsIgnorableError(errorCode))
 		{
 			mOnHandleError(errorCode);
 		}

@@ -32,6 +32,7 @@ public:
 	[[nodiscard]] virtual bool Register(const IocpObjectRef& pIocpObject) = 0;
 	[[nodiscard]] virtual bool Register(IocpEvent& iocpEvent);
 	virtual TimerHandle RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs) = 0;
+	[[nodiscard]] static bool IsIgnorableError(const uint32 errorCode);
 
 protected:
 

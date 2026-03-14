@@ -20,13 +20,11 @@ int main()
 		cpp_net_engine::MakeShared<Listener>(10,
 			[](const uint32 errorCode)->void
 			{
-				NET_ENGINE_LOG_ERROR("Listener Error Handle, errorCode : {}", errorCode);
 			}),
 		cpp_net_engine::MakeShared<NetworkScheduler>(16, [](const uint32 errorCode)->void
 			{
-				NET_ENGINE_LOG_ERROR("NetworkScheduler - errorCode : {}", errorCode);
 			}),
-		cpp_net_engine::MakeShared<SessionReaper>(60000),
+		cpp_net_engine::MakeShared<SessionReaper>(15000),
 		cpp_net_engine::MakeShared<SessionManager>(5000),
 		cpp_net_engine::MakeShared<WaitQueueManager>(0));
 

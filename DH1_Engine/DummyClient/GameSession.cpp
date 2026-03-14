@@ -17,10 +17,10 @@ GameSession::~GameSession()
 
 void GameSession::OnConnected()
 {
-	Protocol::C2S_ECHO_REQ packet;
-	packet.set_ehcomsg("Hello World\n");
-	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(packet);
-	Send(pSendBuffer);
+	//Protocol::C2S_ECHO_REQ packet;
+	//packet.set_ehcomsg("Hello World\n");
+	//const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(packet);
+	//Send(pSendBuffer);
 }
 
 void GameSession::OnEnterWaitQueue(const uint64 myTicket)
