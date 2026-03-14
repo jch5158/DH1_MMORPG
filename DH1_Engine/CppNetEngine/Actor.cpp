@@ -3,19 +3,6 @@
 #include "ActorScheduler.h"
 #include "IocpEvent.h"
 
-//void IActor::Dispatch(class IocpEvent& iocpEvent, const uint32)
-//{
-//	switch (iocpEvent)
-//	{
-//	case eIocpEventType::ActorMessage:
-//		mMessageQueue.Process();
-//		break;
-//	default:
-//		NET_ENGINE_LOG_ERROR("IActor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(actorEvent.GetEventType()));
-//		break;
-//	}
-//}
-
 IActor::IActor()
 	:mId(sSeedBase.fetch_add(1))
 {
@@ -36,6 +23,15 @@ Actor::Actor()
 
 void Actor::Dispatch(class IocpEvent& iocpEvent, const uint32)
 {
+	switch (iocpEvent.GetEventType())  // NOLINT(clang-diagnostic-switch-enum)
+	{
+	case eIocpEventType::ActorMessage:
+		processActorMessage();
+		break;
+	default:
+		NET_ENGINE_LOG_ERROR("Actor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(iocpEvent.GetEventType()));
+		break;
+	}
 }
 
 bool Actor::TryAcquire()
@@ -53,29 +49,20 @@ void Actor::Release()
 	mbAcquire.store(false);
 }
 
-void Actor::Activate()
+bool Actor::Activate(ActorScheduler& scheduler)
 {
-	mMailbox.SetOwner(shared_from_this());
-}
-
-void Actor::Register()
-{
-	if (TryAcquire())
+	if (mMailbox.Initialize(shared_from_this(), scheduler) == false)
 	{
-		mMailbox.Register();
-		
-		Release();
+		return false;
 	}
+
+	return true;
 }
 
 void Actor::Flush()
 {
-	if (TryAcquire())
-	{
-		mMailbox.Flush();
-
-		Release();
-	}
+	mMailbox.Flush();
+	Release();
 }
 
 IocpEvent& Actor::GetIocpEvent()
@@ -91,4 +78,14 @@ int32 Actor::GetMessageCount()
 void Actor::Post(MessageRef pMessage)
 {
 	mMailbox.Post(std::move(pMessage));
+}
+
+void Actor::processActorMessage()
+{
+	if (TryAcquire())
+	{
+		mMailbox.Process();
+
+		Release(); 
+	}
 }

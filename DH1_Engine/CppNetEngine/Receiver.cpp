@@ -14,14 +14,16 @@ Receiver::Receiver()
 {
 }
 
-void Receiver::SetOwner(const SessionRef& pOwner)
+bool Receiver::Initialize(const SessionRef& pOwner)
 {
 	if (pOwner == nullptr)
 	{
-		return;
+		return false;
 	}
 
 	mReceiveEvent.SetOwner(pOwner);
+
+	return true;
 }
 
 byte* Receiver::GetWritePtr() const

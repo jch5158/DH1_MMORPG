@@ -172,21 +172,32 @@ void Session::processReceive(const uint32 numOfBytes)
 	mReceiver.Process(numOfBytes);
 }
 
-void Session::setService(ServiceRef pService)
+bool Session::Initialize(const ServiceRef& pService)
 {
-	mpService = std::move(pService);
-}
-
-void Session::setSessionEvent(const ServiceRef& pService)
-{
-	mConnector.SetService(pService);
-	mDisconnector.SetService(pService);
-
+	mpService = pService;
 	const SessionRef pSession = GetSessionRef();
-	mConnector.SetOwner(pSession);
-	mDisconnector.SetOwner(pSession);
-	mReceiver.SetOwner(pSession);
-	mSender.SetOwner(pSession);
+
+	if (mConnector.Initialize(pSession, pService) == false)
+	{
+		return false;
+	}
+	
+	if (mDisconnector.Initialize(pSession, pService) == false)
+	{
+		return false;
+	}
+	
+	if (mReceiver.Initialize(pSession) == false)
+	{
+		return false;
+	}
+
+	if (mSender.Initialize(pSession) == false)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void Session::setNetAddress(const NetAddress& address)

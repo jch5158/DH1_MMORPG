@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
+class Service;
+
 class IocpConnectEvent final : public IocpEvent
 {
 public:
@@ -19,9 +21,7 @@ public:
 	explicit Connector();
 	~Connector() = default;
 
-	void SetOwner(const SessionRef& pOwner);
-	void SetService(ServiceRef pService);
-
+	[[nodiscard]] bool Initialize(const SessionRef& pOwner, ServiceRef pService);
 	bool Register();
 	void Process() const;
 

@@ -3,6 +3,15 @@
 
 void ScopedActor::Dispatch(class IocpEvent& iocpEvent, const uint32)
 {
+	switch (iocpEvent.GetEventType())  // NOLINT(clang-diagnostic-switch-enum)
+	{
+	case eIocpEventType::ActorMessage:
+		processActorMessage();
+		break;
+	default:
+		NET_ENGINE_LOG_ERROR("Actor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(iocpEvent.GetEventType()));
+		break;
+	}
 }
 
 bool ScopedActor::TryAcquire()
@@ -52,19 +61,14 @@ void ScopedActor::Release()
 	mAcquireIndex = -1;
 }
 
-void ScopedActor::Activate()
+bool ScopedActor::Activate(ActorScheduler &scheduler)
 {
-	mMailbox.SetOwner(shared_from_this());
-}
-
-void ScopedActor::Register()
-{
-	if (TryAcquire())
+	if (mMailbox.Initialize(shared_from_this(), scheduler) == false)
 	{
-		mMailbox.Register();
-
-		Release();
+		return false;
 	}
+
+	return true;
 }
 
 void ScopedActor::Flush()
@@ -114,7 +118,7 @@ int32 ScopedActor::GetSpinLimit() const
 
 bool ScopedActor::tryAcquireAll()
 {
-	bool bAllAcquired = true; // 최종 결과를 담을 변수
+	bool bAllAcquired = true;
 	const int32 spinCount = GetSpinLimit();
 	const int32 actorSize = static_cast<int32>(mActors.size());
 
@@ -132,7 +136,7 @@ bool ScopedActor::tryAcquireAll()
 				break;
 			}
 
-			_mm_pause(); // 하이퍼스레딩 최적화
+			_mm_pause();
 		}
 
 		if (!bAcquired)
@@ -143,4 +147,14 @@ bool ScopedActor::tryAcquireAll()
 	}
 
 	return bAllAcquired;
+}
+
+void ScopedActor::processActorMessage()
+{
+	if (TryAcquire())
+	{
+		mMailbox.Process();
+
+		Release();
+	}
 }

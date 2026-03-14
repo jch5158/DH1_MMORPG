@@ -92,8 +92,12 @@ bool Listener::StartAccept(const ServerServiceRef& pServerService)
 	for (int32 i = 0; i < mAcceptCount; ++i)
 	{
 		const AcceptorRef pAcceptor = cpp_net_engine::MakeShared<Acceptor>(i);
-		pAcceptor->SetOwner(GetListenerRef());
-		pAcceptor->SetService(pServerService);
+		if (pAcceptor->Initialize(GetListenerRef(), pServerService) == false)
+		{
+			NET_ENGINE_LOG_ERROR("Listener::StartAccept - pAcceptor->Initialize is failed");
+			continue;
+		}
+
 		mAcceptors.emplace_back(pAcceptor);
 		pAcceptor->Register();
 	}

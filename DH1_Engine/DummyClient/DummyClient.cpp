@@ -16,14 +16,13 @@ int32 main()
 
 	ClientServiceRef pService = cpp_net_engine::MakeShared<ClientService>(
 		NetAddress(L"127.0.0.1", 7777),
-		cpp_net_engine::MakeShared<IocpCore>(),
-		cpp_net_engine::MakeShared<ActorScheduler>([](const uint32 errorCode)->void
-			{
-				NET_ENGINE_LOG_ERROR("ActorScheduler Error, errorCode : {}", errorCode);
-			}),
 		cpp_net_engine::MakeShared<GameSession>,
-		cpp_net_engine::MakeShared<SessionManager>(5000)
-	);
+		cpp_net_engine::MakeShared<NetworkScheduler>(16, [](const uint32 errorCode)->void
+			{
+				NET_ENGINE_LOG_ERROR("NetworkScheduler - errorCode : {}", errorCode);
+			}),
+			cpp_net_engine::MakeShared<SessionManager>(5000)
+			);
 
 	if (pService->Start() == false)
 	{
@@ -38,14 +37,6 @@ int32 main()
 				while (true)
 				{
 					pService->GetIocpCore()->Dispatch();
-				}
-			});
-
-		ThreadManager::GetInstance().Launch([pService]()->void
-			{
-				while (true)
-				{
-					pService->GetActorScheduler()->Dispatch();
 				}
 			});
 	}

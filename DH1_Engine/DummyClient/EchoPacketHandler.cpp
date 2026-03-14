@@ -19,17 +19,8 @@ bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet
 
 	retPacket.set_ehcomsg("Hello World\n");
 	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(retPacket);
-	
-	const PlayerRef pPlayer = PlayerManager::GetInstance().FindPlayer(pSession);
-	if (pPlayer == nullptr)
-	{
-		return false;
-	}
 
-	pPlayer->PostDelay(3000, [pSession, pSendBuffer]()->void
-		{
-			pSession->Send(pSendBuffer);
-		});
+	pSession->Send(pSendBuffer);
 
 	return true;
 }

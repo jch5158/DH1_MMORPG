@@ -15,24 +15,16 @@ Disconnector::Disconnector()
 {
 }
 
-void Disconnector::SetOwner(const SessionRef& pOwner)
+bool Disconnector::Initialize(const SessionRef& pOwner, ServiceRef pService)
 {
-	if (pOwner == nullptr)
+	if (pOwner == nullptr || pService == nullptr)
 	{
-		return;
+		return false;
 	}
 
 	mDisconnectEvent.SetOwner(pOwner);
-}
-
-void Disconnector::SetService(ServiceRef pService)
-{
-	if (pService == nullptr)
-	{
-		return;
-	}
-
 	mpService = std::move(pService);
+	return true;
 }
 
 void Disconnector::Register()

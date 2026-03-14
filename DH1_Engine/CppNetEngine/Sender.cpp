@@ -21,14 +21,15 @@ Sender::Sender()
 {
 }
 
-void Sender::SetOwner(const SessionRef& pOwner)
+bool Sender::Initialize(const SessionRef& pOwner)
 {
 	if (pOwner == nullptr)
 	{
-		return;
+		return false;
 	}
 
 	mSendEvent.SetOwner(pOwner);
+	return true;
 }
 
 void Sender::Send(NetSendBufferRef pSendBuffer)

@@ -38,28 +38,21 @@ SessionRef IocpAcceptEvent::GetClientSession() const
 
 Acceptor::Acceptor(const int32 acceptorIndex)
 	: mAcceptEvent(acceptorIndex)
-	, mpService()
+	, mpServerService()
 {
 }
 
-void Acceptor::SetOwner(ListenerRef pOwner)
+bool Acceptor::Initialize(const ListenerRef& pOwner, ServerServiceRef pService)
 {
-	if (pOwner == nullptr)
+	if (pOwner == nullptr || pService == nullptr)
 	{
-		return;
+		return false;
 	}
 
-	mAcceptEvent.SetOwner(std::move(pOwner));
-}
+	mAcceptEvent.SetOwner(pOwner);
+	mpServerService = std::move(pService);
 
-void Acceptor::SetService(ServiceRef pService)
-{
-	if (pService == nullptr)
-	{
-		return;
-	}
-
-	mpService = std::move(pService);
+	return true;
 }
 
 void Acceptor::Register()
@@ -70,12 +63,12 @@ void Acceptor::Register()
 		return;
 	}
 
-	if (mpService == nullptr)
+	if (mpServerService == nullptr)
 	{
 		return;
 	}
 
-	const SessionRef pSession = mpService->CreateSession();
+	const SessionRef pSession = mpServerService->CreateSession();
 	if (pSession == nullptr)
 	{
 		return;

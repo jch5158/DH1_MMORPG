@@ -147,7 +147,7 @@
     <ClInclude Include="ActorScheduler.h">
       <Filter>Actor\IOCP</Filter>
     </ClInclude>
-    <ClInclude Include="ActorMailBox.h">
+    <ClInclude Include="ActorMailbox.h">
       <Filter>Actor\IOCP\Event</Filter>
     </ClInclude>
     <ClInclude Include="NetReceiveBuffer.h">
@@ -257,7 +257,7 @@
     <ClCompile Include="ActorScheduler.cpp">
       <Filter>Actor\IOCP</Filter>
     </ClCompile>
-    <ClCompile Include="ActorMailBox.cpp">
+    <ClCompile Include="ActorMailbox.cpp">
       <Filter>Actor\IOCP\Event</Filter>
     </ClCompile>
     <ClCompile Include="NetReceiveBuffer.cpp">

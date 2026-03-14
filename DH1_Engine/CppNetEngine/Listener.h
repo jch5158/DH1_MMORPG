@@ -3,6 +3,7 @@
 #include "SharedPtrUtils.h"
 #include "SocketIocpObject.h"
 
+class ServerService;
 class IocpAcceptEvent;
 
 class Listener final : public SocketIocpObject

@@ -9,6 +9,8 @@ class ActorScheduler final : public IocpCore
 {
 public:
 
+	using IocpCore::Register;
+
 	static constexpr int32 DEFAULT_EXECUTE_Message_COUNT = 50;
 	static constexpr int64 DEFAULT_TIME_SLICE_MS = 16;
 	static constexpr int64 DEFAULT_TICK_INTERVAL_MS = 16;
@@ -22,7 +24,7 @@ public:
 		const uint32 timeSliceMs = DEFAULT_TIME_SLICE_MS,
 		const int32 maxExecuteMessageCount = DEFAULT_EXECUTE_Message_COUNT,
 		const int64 tickIntervalMs = DEFAULT_TICK_INTERVAL_MS);
-	virtual ~ActorScheduler() override;
+	virtual ~ActorScheduler() override = default;
 
 	[[nodiscard]] int32 GetMaxExecuteMessageCount() const;
 
@@ -32,7 +34,6 @@ public:
 
 private:
 
-	HANDLE mActorIocpHandle;
 	const uint32 mTimeSliceMs;
 	const int32 mMaxExecuteMessageCount;
 	TimingWheel mTimingWheel;

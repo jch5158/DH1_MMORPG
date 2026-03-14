@@ -1,23 +1,29 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
+class ActorScheduler;
+
 class ActorMessageEvent final : public IocpEvent
 {
 public:
 	explicit ActorMessageEvent();
 };
 
-class ActorMailBox final
+class ActorMailbox final
 {
 public:
 
-	static constexpr int32 DEFAULT_EXECUTE_MSG_COUNT = 50;
+	static constexpr int32 MIN_EXECUTE_MSG_COUNT = 16;
+	static constexpr int32 DEFAULT_EXECUTE_MSG_COUNT = 64;
+	static constexpr int32 MAX_EXECUTE_MSG_COUNT = 256;
 
-	explicit ActorMailBox(const int32 executeMsgCount = DEFAULT_EXECUTE_MSG_COUNT);
-	~ActorMailBox() = default;
+	explicit ActorMailbox();
+	~ActorMailbox() = default;
 
-	void SetOwner(const IocpObjectRef& pOwner);
+	bool Initialize(const IocpObjectRef& pOwner, ActorScheduler& scheduler);
+
 	ActorMessageEvent& GetActorMessageEvent();
+	void SetExecuteMsgCount(const int32 executeMsgCount);
 
 	void Post(MessageRef&& pMessage);
 
@@ -28,6 +34,7 @@ public:
 
 private:
 	ActorMessageEvent mActorMessageEvent;
-	const int32 mMaxExecuteMsgCount;
+	int32 mMaxExecuteMsgCount;
+	ActorScheduler* mpScheduler;
 	LockFreeQueue<MessageRef> mMailbox;
 };

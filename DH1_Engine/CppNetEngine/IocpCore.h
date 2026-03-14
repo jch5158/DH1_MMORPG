@@ -15,7 +15,7 @@ public:
 	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32 numOfBytes) = 0;
 };
 
-class IocpCore
+class IocpCore : public std::enable_shared_from_this<IocpCore>
 {
 public:
 	IocpCore(const IocpCore&) = delete;
@@ -30,9 +30,10 @@ public:
 
 	virtual void Dispatch() = 0;
 	[[nodiscard]] virtual bool Register(const IocpObjectRef& pIocpObject) = 0;
+	[[nodiscard]] virtual bool Register(IocpEvent& iocpEvent);
 	virtual TimerHandle RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs) = 0;
 
-private:
+protected:
 
 	HANDLE mIocpHandle;
 };

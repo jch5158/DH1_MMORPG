@@ -14,30 +14,20 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	IocpCoreRef pIocp = cpp_net_engine::MakeShared<IocpCore>();
-	ActorSchedulerRef pScheduler = cpp_net_engine::MakeShared<ActorScheduler>([](const uint32 errorCode)->void
-		{
-			NET_ENGINE_LOG_ERROR("ActorScheduler Error, errorCode : {}", errorCode);
-		});
-
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(
 		NetAddress(L"127.0.0.1", 7777),
+		cpp_net_engine::MakeShared<GameSession>,
 		cpp_net_engine::MakeShared<Listener>(10,
 			[](const uint32 errorCode)->void
 			{
 				NET_ENGINE_LOG_ERROR("Listener Error Handle, errorCode : {}", errorCode);
 			}),
-		pIocp,
-		pScheduler,
-		cpp_net_engine::MakeShared<GameSession>,
+		cpp_net_engine::MakeShared<NetworkScheduler>(16, [](const uint32 errorCode)->void
+			{
+				NET_ENGINE_LOG_ERROR("NetworkScheduler - errorCode : {}", errorCode);
+			}),
+		cpp_net_engine::MakeShared<SessionReaper>(60000),
 		cpp_net_engine::MakeShared<SessionManager>(5000),
-		[pScheduler]()->SessionReaperRef
-		{
-			SessionReaperRef pSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(pScheduler, 60000);
-			pSessionReaper->Activate();
-
-			return pSessionReaper;
-		}(),
 		cpp_net_engine::MakeShared<WaitQueueManager>(0));
 
 	if (pService->Start() == false)
@@ -53,14 +43,6 @@ int main()
 				while (true)
 				{
 					pService->GetIocpCore()->Dispatch();
-				}
-			});
-
-		ThreadManager::GetInstance().Launch([pService]()->void
-			{
-				while (true)
-				{
-					pService->GetActorScheduler()->Dispatch();
 				}
 			});
 	}

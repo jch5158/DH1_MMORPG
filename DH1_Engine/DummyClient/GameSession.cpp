@@ -17,21 +17,6 @@ GameSession::~GameSession()
 
 void GameSession::OnConnected()
 {
-	const PacketSessionRef pSession = std::static_pointer_cast<PacketSession>(shared_from_this());
-	const PlayerRef pPlayer = cpp_net_engine::MakeShared<Player>(GetService()->GetActorScheduler());
-	pPlayer->Activate();
-	
-	if (pPlayer->SetSession(pSession) == false)
-	{
-		return;
-	}
-
-	if (PlayerManager::GetInstance().AddPlayer(pSession, pPlayer) == false)
-	{
-		pPlayer->ResetSession();
-		return;
-	}
-
 	Protocol::C2S_ECHO_REQ packet;
 	packet.set_ehcomsg("Hello World\n");
 	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(packet);

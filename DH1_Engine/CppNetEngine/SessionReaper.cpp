@@ -3,7 +3,7 @@
 
 #include "Session.h"
 
-SessionReaper::SessionReaper(ActorSchedulerRef pScheduler, const int64 timeoutMs)
+SessionReaper::SessionReaper(const int64 timeoutMs)
 	: mTimeoutMs(timeoutMs)
 {
 }

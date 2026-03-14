@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
+class ServerService;
+
 class IocpAcceptEvent final : public IocpEvent
 {
 public:
@@ -29,15 +31,13 @@ public:
 	explicit Acceptor(const int32 acceptorIndex);
 	~Acceptor() = default;
 
-	void SetOwner(ListenerRef pOwner);
-	void SetService(ServiceRef pService);
-
+	[[nodiscard]] bool Initialize(const ListenerRef& pOwner, ServerServiceRef pService);
 	void Register();
 	void Process();
 
 private:
 
 	IocpAcceptEvent mAcceptEvent;
-	ServiceRef mpService;
+	ServerServiceRef mpServerService;
 };
 

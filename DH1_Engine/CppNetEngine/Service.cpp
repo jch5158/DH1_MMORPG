@@ -8,25 +8,20 @@
 Service::Service(
 	const eServiceType serviceType,
 	const NetAddress& netAddress,
+	SessionFactory sessionFactory,
 	IocpCoreRef pIocpCore,
-	SessionFactory pSessionFactory,
-	SessionManagerRef pSessionManager,
 	SessionReaperRef pSessionReaper,
+	SessionManagerRef pSessionManager,
 	WaitQueueManagerRef pWaitQueueManager)
 	: mServiceType(serviceType)
 	, mMaxSessionCount(pSessionManager->GetMaxSessionCount())
 	, mNetAddress(netAddress)
+	, mSessionFactory(std::move(sessionFactory))
 	, mpIocpCore(std::move(pIocpCore))
-	, mpSessionFactory(std::move(pSessionFactory))
-	, mpSessionManager(std::move(pSessionManager))
 	, mpSessionReaper(std::move(pSessionReaper))
+	, mpSessionManager(std::move(pSessionManager))
 	, mpWaitQueueManager(std::move(pWaitQueueManager))
 {
-	if (mpSessionFactory == nullptr)
-	{
-		NET_ENGINE_LOG_FATAL("Service::Service - mSessionFactory is nullptr");
-		CrashReporter::Crash();
-	}
 }
 
 void Service::CloseService()
@@ -36,9 +31,8 @@ void Service::CloseService()
 
 SessionRef Service::CreateSession()
 {
-	SessionRef pSession = mpSessionFactory();
-	pSession->setService(shared_from_this());
-	pSession->setSessionEvent(shared_from_this());
+	SessionRef pSession = mSessionFactory();
+	pSession->Initialize(shared_from_this());
 
 	if (mpIocpCore->Register(pSession) == false)
 	{
@@ -62,7 +56,7 @@ bool Service::AddSession(const SessionRef& pSession) const
 		RemoveSession(pSession);
 		pSession->Disconnect(eDisconnectReason::StateError);
 	}
-	else if (mpWaitQueueManager != nullptr)
+	else
 	{
 		uint64 myTicket;
 		if (mpWaitQueueManager->EnterWaitQueue(pSession, myTicket))
@@ -83,41 +77,26 @@ bool Service::AddSession(const SessionRef& pSession) const
 void Service::RemoveSession(const SessionRef& pSession) const
 {
 	mpSessionManager->RemoveSession(pSession, true);
-
 	admitWaitingSession();
 }
 
 bool Service::EnterWaitQueue(const SessionRef& pSession, uint64& outTicket) const
 {
-	if (mpWaitQueueManager == nullptr)
-	{
-		return false;
-	}
-
 	return mpWaitQueueManager->EnterWaitQueue(pSession, outTicket);
 }
 
 SessionRef Service::DequeueWaitQueue() const
 {
-	if (mpWaitQueueManager == nullptr)
-	{
-		return nullptr;
-	}
-
 	return mpWaitQueueManager->DequeueWaitQueue();
 }
 
-void Service::RegisterSessionReap(const SessionRef& pSession)
+void Service::RegisterSessionReap(const SessionRef& pSession) const
 {
-	if (mpSessionReaper == nullptr)
-	{
-		return;
-	}
-
 	SessionWeak pSessionWeak = pSession;
 	mpIocpCore->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak]()->void
 		{
 			pSessionReaper->ReapSession(pSessionWeak);
+		
 		}, mpSessionReaper->GetTimeoutMs());
 }
 
@@ -187,11 +166,18 @@ void Service::admitWaitingSession() const
 }
 
 ClientService::ClientService(
-	const NetAddress& targetAddress, 
-	IocpCoreRef pIocpCore, 
-	SessionFactory pSessionFactory, 
+	const NetAddress& targetAddress,
+	SessionFactory pSessionFactory,
+	NetworkSchedulerRef pNetworkScheduler,
 	SessionManagerRef pSessionManager)
-	: Service(eServiceType::Client, targetAddress, std::move(pIocpCore), std::move(pSessionFactory), std::move(pSessionManager), nullptr, nullptr)
+	: Service(
+		eServiceType::Client, 
+		targetAddress, 
+		std::move(pSessionFactory), 
+		std::move(pNetworkScheduler), 
+		nullptr, 
+		std::move(pSessionManager), 
+		nullptr)
 {
 }
 
@@ -215,14 +201,21 @@ void ClientService::CloseService()
 }
 
 ServerService::ServerService(
-	const NetAddress& targetAddress, 
+	const NetAddress& targetAddress,
+	SessionFactory pSessionFactory,
 	ListenerRef pListener, 
-	IocpCoreRef pIocpCore, 
-	SessionFactory pSessionFactory, 
+	NetworkSchedulerRef pNetworkScheduler,
+	SessionReaperRef pSessionReaper,
 	SessionManagerRef pSessionManager, 
-	SessionReaperRef pSessionReaper, 
 	WaitQueueManagerRef pWaitQueueManager)
-	: Service(eServiceType::Server, targetAddress, std::move(pIocpCore), std::move(pSessionFactory), std::move(pSessionManager), std::move(pSessionReaper), std::move(pWaitQueueManager))
+	: Service(
+		eServiceType::Server, 
+		targetAddress, 
+		std::move(pSessionFactory), 
+		std::move(pNetworkScheduler), 
+		std::move(pSessionReaper), 
+		std::move(pSessionManager), 
+		std::move(pWaitQueueManager))
 	, mpListener(std::move(pListener))
 {
 }
@@ -234,7 +227,7 @@ bool ServerService::Start()
 		return false;
 	}
 
-	const ServerServiceRef pServerService = static_pointer_cast<ServerService>(shared_from_this());
+	const ServerServiceRef pServerService = std::static_pointer_cast<ServerService>(shared_from_this());
 	if (mpListener->StartAccept(pServerService) == false)
 	{
 		return false;

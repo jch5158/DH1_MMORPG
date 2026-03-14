@@ -11,18 +11,21 @@ IocpConnectEvent::IocpConnectEvent()
 
 Connector::Connector()
 	: mConnectEvent()
-    , mpService(nullptr)
+    , mpService()
 {
 }
 
-void Connector::SetOwner(const SessionRef& pOwner)
+bool Connector::Initialize(const SessionRef& pOwner, ServiceRef pService)
 {
+	if (pOwner == nullptr || pService == nullptr)
+	{
+		return false;
+	}
+
 	mConnectEvent.SetOwner(pOwner);
-}
-
-void Connector::SetService(ServiceRef pService)
-{
 	mpService = std::move(pService);
+
+	return true;
 }
 
 bool Connector::Register()

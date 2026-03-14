@@ -40,8 +40,7 @@ public:
 	virtual bool TryAcquire() override;
 	virtual void Release() override;
 
-	virtual void Activate() override;
-	virtual void Register() override;
+	virtual bool Activate(ActorScheduler& scheduler) override;
 	virtual void Flush() override;
 	virtual IocpEvent& GetIocpEvent() override;
 	virtual int32 GetMessageCount() override;
@@ -57,10 +56,12 @@ private:
 
 	bool tryAcquireAll();
 
+	void processActorMessage();
+
 	int32 mRetryLimit;
 	int32 mSpinLimit;
 	int32 mAcquireIndex;
 	Vector<ActorRef> mActors;
-	ActorMailBox mMailbox;
+	ActorMailbox mMailbox;
 };
 

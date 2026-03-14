@@ -22,9 +22,8 @@ public:
 	explicit Receiver();
 	~Receiver() = default;
 
-	void SetOwner(const SessionRef& pOwner);
+	[[nodiscard]] bool Initialize(const SessionRef& pOwner);
 	[[nodiscard]] byte* GetWritePtr() const;
-
 	void Process(const uint32 numOfBytes);
 	void Register();
 	

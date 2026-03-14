@@ -6,6 +6,8 @@ class NetworkScheduler final : public IocpCore
 {
 public:
 
+	using IocpCore::Register;
+
 	explicit NetworkScheduler(const uint32 waitTimeoutMs, std::function<void(const uint32)> onHandleError);
 	virtual ~NetworkScheduler() override = default;
 

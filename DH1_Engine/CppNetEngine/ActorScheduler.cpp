@@ -6,25 +6,11 @@ ActorScheduler::ActorScheduler(std::function<void(const uint32)> onHandleError,
 	const uint32 timeSliceMs,
 	const int32 maxExecuteMessageCount,
 	const int64 tickIntervalMs)
-	: mActorIocpHandle(nullptr)
-	, mTimeSliceMs(timeSliceMs)
+	: mTimeSliceMs(timeSliceMs)
 	, mMaxExecuteMessageCount(maxExecuteMessageCount)
 	, mTimingWheel(TimingWheel(tickIntervalMs))
 	, mOnHandleError(std::move(onHandleError))
 {
-	mActorIocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
-	if (mActorIocpHandle == nullptr)
-	{
-		CrashReporter::Crash();
-	}
-}
-
-ActorScheduler::~ActorScheduler()
-{
-	if (mActorIocpHandle != nullptr)
-	{
-		CloseHandle(mActorIocpHandle);
-	}
 }
 
 int32 ActorScheduler::GetMaxExecuteMessageCount() const
@@ -40,9 +26,8 @@ bool ActorScheduler::Register(const IocpObjectRef& pIocpObject)
 		return false;
 	}
 
-	if (PostQueuedCompletionStatus(mActorIocpHandle, 0, 0, &pActor->GetIocpEvent()) == false)
+	if (PostQueuedCompletionStatus(mIocpHandle, 0, 0, &pActor->GetIocpEvent()) == false)
 	{
-		NET_ENGINE_LOG_ERROR("ActorScheduler::Register - PostQueuedCompletionStatus is Failed, errorCode : {}", GetLastError());
 		return false;
 	}
 
@@ -65,7 +50,7 @@ void ActorScheduler::Dispatch()
 	ULONG_PTR pCompletionKey = 0;
 	ActorMessageEvent* pActorMessageEvent = nullptr;
 
-	const int32 gqcsRet = GetQueuedCompletionStatus(mActorIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorMessageEvent), mTimeSliceMs);
+	const int32 gqcsRet = GetQueuedCompletionStatus(mIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorMessageEvent), mTimeSliceMs);
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
@@ -78,7 +63,7 @@ void ActorScheduler::Dispatch()
 	if (pActorMessageEvent != nullptr)
 	{
 		const IActorRef pActor = std::static_pointer_cast<IActor>(pActorMessageEvent->GetOwner());
-		if (pActor != nullptr && pActor->TryAcquire())
+		if (pActor != nullptr)
 		{
 			pActor->Dispatch(*pActorMessageEvent, 0);
 		}

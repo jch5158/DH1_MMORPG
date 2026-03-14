@@ -27,7 +27,7 @@ public:
 	explicit Sender();
 	~Sender() = default;
 
-	void SetOwner(const SessionRef& pOwner);
+	[[nodiscard]] bool Initialize(const SessionRef& pOwner);
 	void Send(NetSendBufferRef pSendBuffer);
 	void Process(const uint32 numOfBytes);
 	void Register();

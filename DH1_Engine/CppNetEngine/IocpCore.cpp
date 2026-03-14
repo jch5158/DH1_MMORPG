@@ -25,3 +25,13 @@ HANDLE IocpCore::GetHandle() const
 {
 	return mIocpHandle;
 }
+
+bool IocpCore::Register(IocpEvent& iocpEvent)
+{
+	if (PostQueuedCompletionStatus(mIocpHandle, 0, 0, static_cast<LPOVERLAPPED>(&iocpEvent)) == false)
+	{
+		return false;
+	}
+
+	return true;
+}

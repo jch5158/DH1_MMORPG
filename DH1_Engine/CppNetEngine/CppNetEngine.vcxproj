@@ -219,7 +219,7 @@
   <ItemGroup>
     <ClInclude Include="Acceptor.h" />
     <ClInclude Include="ActorDispatcher.h" />
-    <ClInclude Include="ActorMailBox.h" />
+    <ClInclude Include="ActorMailbox.h" />
     <ClInclude Include="ActorManager.h" />
     <ClInclude Include="ActorService.h" />
     <ClInclude Include="AllocatorUtils.h" />
@@ -271,7 +271,7 @@
   <ItemGroup>
     <ClCompile Include="Acceptor.cpp" />
     <ClCompile Include="ActorDispatcher.cpp" />
-    <ClCompile Include="ActorMailBox.cpp" />
+    <ClCompile Include="ActorMailbox.cpp" />
     <ClCompile Include="ActorManager.cpp" />
     <ClCompile Include="ActorService.cpp" />
     <ClCompile Include="Connector.cpp" />
