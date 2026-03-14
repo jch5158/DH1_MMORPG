@@ -145,8 +145,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /D "$(SolutionDir)..\Shared\vcpkg\vcpkg_installed\$(VcpkgTriplet)\tools\crashpad\crashpad_handler.exe" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -175,8 +174,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /D "$(SolutionDir)..\Shared\vcpkg\vcpkg_installed\$(VcpkgTriplet)\tools\crashpad\crashpad_handler.exe" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -203,8 +201,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /D "$(SolutionDir)..\Shared\vcpkg\vcpkg_installed\$(VcpkgTriplet)\tools\crashpad\crashpad_handler.exe" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -233,8 +230,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /D "$(SolutionDir)..\Shared\vcpkg\vcpkg_installed\$(VcpkgTriplet)\tools\crashpad\crashpad_handler.exe" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
