@@ -37,7 +37,7 @@ fs::path CrashReporter::GetExeDirectory()
     return fs::current_path();
 }
 
-bool CrashReporter::Init(const Wstring& appName, const Wstring& appVersion, const Wstring& url)
+bool CrashReporter::Initialize(const Wstring& appName, const Wstring& appVersion, const Wstring& url)
 {
     static bool sbInitialized = false;
     if (sbInitialized)

@@ -26,7 +26,8 @@ public class DH1_Client : ModuleRules
 			"Slate",
 			"HTTP",
 			"Json",
-			"JsonUtilities"
+			"JsonUtilities",
+			"ImageDownload"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

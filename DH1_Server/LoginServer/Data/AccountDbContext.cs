@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LoginServer.Data.Table;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoginServer.Data
 {
     public class AccountDbContext(DbContextOptions<AccountDbContext> options) : DbContext(options)
     {
-        public DbSet<Account>? Accounts { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<AccountSanction> AccountSanctions { get; set; }
+        public DbSet<AccountUnregistered> AccountUnregistereds { get; set; }
 
         // DB 구조 및 제약조건을 상세하게 세팅하는 메서드
         protected override void OnModelCreating(ModelBuilder modelBuilder)

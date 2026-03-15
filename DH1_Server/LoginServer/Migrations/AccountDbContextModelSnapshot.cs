@@ -22,14 +22,18 @@ namespace LoginServer.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("LoginServer.Data.Account", b =>
+            modelBuilder.Entity("LoginServer.Data.Table.Account", b =>
                 {
-                    b.Property<int>("AccountId")
+                    b.Property<long>("AccountId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("bigint")
                         .HasColumnName("account_id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AccountId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("AccountId"));
+
+                    b.Property<byte>("AccountState")
+                        .HasColumnType("tinyint unsigned")
+                        .HasColumnName("account_state");
 
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -43,14 +47,6 @@ namespace LoginServer.Migrations
                         .HasColumnType("varchar(254)")
                         .HasColumnName("email");
 
-                    b.Property<bool>("IsBanned")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_banned");
-
-                    b.Property<bool>("IsEmailVerified")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_email_verified");
-
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("last_login");
@@ -61,8 +57,8 @@ namespace LoginServer.Migrations
                         .HasColumnType("varchar(128)")
                         .HasColumnName("password_hash");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int")
+                    b.Property<byte>("Role")
+                        .HasColumnType("tinyint unsigned")
                         .HasColumnName("account_role");
 
                     b.HasKey("AccountId");
@@ -71,6 +67,76 @@ namespace LoginServer.Migrations
                         .IsUnique();
 
                     b.ToTable("account");
+                });
+
+            modelBuilder.Entity("LoginServer.Data.Table.AccountSanction", b =>
+                {
+                    b.Property<long>("SanctionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("sanction_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("SanctionId"));
+
+                    b.Property<long>("AccountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("account_id");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("end_date");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("reason");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("start_date");
+
+                    b.HasKey("SanctionId");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("account_sanction");
+                });
+
+            modelBuilder.Entity("LoginServer.Data.Table.AccountUnregistered", b =>
+                {
+                    b.Property<long>("AccountId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)")
+                        .HasColumnName("email");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("requested_at");
+
+                    b.Property<DateTime>("ScheduledDeleteAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("scheduled_delete_at");
+
+                    b.HasKey("AccountId");
+
+                    b.ToTable("account_unregistered");
+                });
+
+            modelBuilder.Entity("LoginServer.Data.Table.AccountSanction", b =>
+                {
+                    b.HasOne("LoginServer.Data.Table.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }
