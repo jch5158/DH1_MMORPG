@@ -32,10 +32,10 @@ namespace LoginServer.Controllers
                 return BadRequest(new { message = "30초 후에 다시 시도해주세요." });
             }
 
-            var authCode = Random.Shared.Next(100000, 1000000).ToString();
+            var verifyCode = Random.Shared.Next(100000, 1000000).ToString();
             var redisKey = $"VerifyCode_{email}";
 
-            await redisDb.StringSetAsync(redisKey, authCode, TimeSpan.FromMinutes(3));
+            await redisDb.StringSetAsync(redisKey, verifyCode, TimeSpan.FromMinutes(3));
             await redisDb.StringSetAsync(cooldownKey, "1", TimeSpan.FromSeconds(30));
 
             var message = new MimeMessage();
@@ -44,7 +44,7 @@ namespace LoginServer.Controllers
             message.Subject = "[DH1_MMORPG] 회원가입 인증번호 안내";
             message.Body = new TextPart("plain")
             {
-                Text = $"안녕하세요.\n회원가입 인증번호는 [{authCode}] 입니다.\n3분 이내에 입력해주세요."
+                Text = $"안녕하세요.\n회원가입 인증번호는 [{verifyCode}] 입니다.\n3분 이내에 입력해주세요."
             };
 
             using var client = new SmtpClient();
@@ -56,6 +56,38 @@ namespace LoginServer.Controllers
             return null; // 성공 시 null 반환
         }
 
+        private async Task<IActionResult?> SendResetPasswordAsync(string email)
+        {
+            var redisDb = RedisConnection.GetDatabase();
+            var cooldownKey = $"ResetCooldown_{email}";
+            if (await redisDb.KeyExistsAsync(cooldownKey))
+            {
+                return BadRequest(new { message = "30초 후에 다시 시도해주세요." });
+            }
+
+            var resetCode = Random.Shared.Next(100000, 1000000).ToString();
+            var redisKey = $"ResetCode_{email}";
+
+            await redisDb.StringSetAsync(redisKey, resetCode, TimeSpan.FromMinutes(5));
+            await redisDb.StringSetAsync(cooldownKey, "1", TimeSpan.FromSeconds(30));
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(SmtpConfig["SmtpSettings:SenderName"], SmtpConfig["SmtpSettings:SenderEmail"] ?? string.Empty));
+            message.To.Add(new MailboxAddress("", email));
+            message.Subject = "[DH1_MMORPG] 비밀번호 재설정 안내";
+            message.Body = new TextPart("plain")
+            {
+                Text = $"안녕하세요.\n비밀번호 재설정 인증번호는 [{resetCode}] 입니다.\n5분 이내에 입력해주세요."
+            };
+
+            using var client = new SmtpClient();
+            await client.ConnectAsync(SmtpConfig["SmtpSettings:Host"], int.Parse(SmtpConfig["SmtpSettings:Port"]!), MailKit.Security.SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(SmtpConfig["SmtpSettings:SenderEmail"], SmtpConfig["SmtpSettings:AppPassword"]);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+
+            return null;
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -182,6 +214,56 @@ namespace LoginServer.Controllers
             await redisDb.KeyDeleteAsync($"Cooldown_{request.Email}");
 
             return Ok(new { message = "이메일 인증이 완료되었습니다." });
+        }
+
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            var account = await DbContext.Accounts.AsNoTracking()
+                .SingleOrDefaultAsync(a => a.Email == request.Email);
+
+            if (account == null)
+            {
+                return Ok(new { message = "계정이 존재한다면 비밀번호 재설정 메일이 발송되었습니다." });
+            }
+
+            if (account.AccountState == EAccountState.EmailUnverified)
+            {
+                return BadRequest(new { message = "이메일 인증이 완료되지 않은 계정입니다." });
+            }
+
+            var resetResult = await SendResetPasswordAsync(request.Email);
+            return resetResult ?? Ok(new { message = "비밀번호 재설정 메일이 발송되었습니다." });
+        }
+
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var redisDb = RedisConnection.GetDatabase();
+            var redisKey = $"ResetCode_{request.Email}";
+
+            var savedCode = await redisDb.StringGetAsync(redisKey);
+            if (!savedCode.HasValue || savedCode.ToString() != request.ResetCode)
+            {
+                return BadRequest(new { message = "인증번호가 일치하지 않거나 만료되었습니다." });
+            }
+
+            var account = await DbContext.Accounts
+                .SingleOrDefaultAsync(a => a.Email == request.Email);
+            if (account == null)
+            {
+                return NotFound(new { message = "계정을 찾을 수 없습니다." });
+            }
+
+            account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await DbContext.SaveChangesAsync();
+
+            await redisDb.KeyDeleteAsync(redisKey);
+            await redisDb.KeyDeleteAsync($"ResetCooldown_{request.Email}");
+
+            return Ok(new { message = "비밀번호가 성공적으로 변경되었습니다. 새로운 비밀번호로 로그인해주세요." });
         }
     }
 }
