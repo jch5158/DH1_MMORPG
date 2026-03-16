@@ -269,7 +269,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EchoPacketHandler.cpp" />
-    <ClCompile Include="GameServer.cpp" />
+    <ClCompile Include="EchoServer.cpp" />
     <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="LoginPacketHandler.cpp" />
     <ClCompile Include="PacketServiceTypeHandler.cpp" />
