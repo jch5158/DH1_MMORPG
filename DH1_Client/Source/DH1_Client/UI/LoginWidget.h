@@ -9,9 +9,9 @@ class UEditableTextBox;
 class UButton;
 class UTextBlock;
 
-// 마스터 위젯으로 화면 전환 및 성공 이벤트를 전달할 델리게이트 선언
 DECLARE_MULTICAST_DELEGATE(FOnGoToSignUpDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnLoginSuccessDelegate); // 필요 시 매개변수로 JWT 토큰(FString) 등을 넘길 수 있습니다.
+DECLARE_MULTICAST_DELEGATE(FOnLoginSuccessDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnGoToForgotPasswordDelegate);
 
 UCLASS()
 class DH1_CLIENT_API ULoginWidget : public UUserWidget
@@ -21,6 +21,7 @@ class DH1_CLIENT_API ULoginWidget : public UUserWidget
 public:
     FOnGoToSignUpDelegate OnGoToSignUp;
     FOnLoginSuccessDelegate OnLoginSuccess;
+    FOnGoToForgotPasswordDelegate OnGoToForgotPassword;
 
     void SetEmail(const FString& EmailToSet);
 
@@ -45,11 +46,17 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UButton* SignUpButton;
 
+    UPROPERTY(meta = (BindWidget))
+    UButton* ForgotPasswordButton;
+
     UFUNCTION()
     void OnLoginButtonClicked();
 
     UFUNCTION()
     void OnSignUpButtonClicked();
+
+    UFUNCTION()
+    void OnForgotPasswordButtonClicked();
 
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful);
 };

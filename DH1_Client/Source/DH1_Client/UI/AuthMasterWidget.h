@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "AuthMasterWidget.generated.h"
 
+class UResetPasswordWidget;
 class UWidgetSwitcher;
 class ULoginWidget;
 class USignUpWidget;
@@ -30,6 +31,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UEmailVerificationWidget* EmailVerificationWidget;
 
+	UPROPERTY(meta = (BindWidget))
+	UResetPasswordWidget* ResetPasswordWidget;
+
 private:
 	// 자식 위젯들에서 Broadcast된 이벤트를 수신할 콜백 함수들
 	void HandleGoToSignUp();
@@ -37,4 +41,6 @@ private:
 	void HandleSignUpSuccess(const FString& RegisteredEmail);
 	void HandleVerificationSuccess(const FString& LoginEmail);
 	void HandleLoginSuccess();
+	void HandleGoToForgotPassword();
+	void HandleResetPasswordSuccess(const FString& LoginEmail);
 };

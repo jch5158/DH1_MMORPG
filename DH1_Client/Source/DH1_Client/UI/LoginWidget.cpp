@@ -28,6 +28,11 @@ void ULoginWidget::NativeConstruct()
     {
         SignUpButton->OnClicked.AddDynamic(this, &ULoginWidget::OnSignUpButtonClicked);
     }
+
+    if (ForgotPasswordButton)
+    {
+        ForgotPasswordButton->OnClicked.AddDynamic(this, &ULoginWidget::OnForgotPasswordButtonClicked);
+    }
 }
 
 void ULoginWidget::OnSignUpButtonClicked()
@@ -36,6 +41,14 @@ void ULoginWidget::OnSignUpButtonClicked()
     if (OnGoToSignUp.IsBound())
     {
         OnGoToSignUp.Broadcast();
+    }
+}
+
+void ULoginWidget::OnForgotPasswordButtonClicked()
+{
+    if (OnGoToForgotPassword.IsBound())
+    {
+        OnGoToForgotPassword.Broadcast();
     }
 }
 

@@ -234,7 +234,7 @@ namespace LoginServer.Controllers
             }
 
             var resetResult = await SendResetPasswordAsync(request.Email);
-            return resetResult ?? Ok(new { message = "비밀번호 재설정 메일이 발송되었습니다." });
+            return resetResult ?? Ok(new { message = "이메일 인증번호가 발송되었습니다. 비밀번호 변경 시 인증번호가 필요합니다." });
         }
 
 
@@ -245,7 +245,7 @@ namespace LoginServer.Controllers
             var redisKey = $"ResetCode_{request.Email}";
 
             var savedCode = await redisDb.StringGetAsync(redisKey);
-            if (!savedCode.HasValue || savedCode.ToString() != request.ResetCode)
+            if (!savedCode.HasValue || savedCode.ToString() != request.VerifyCode)
             {
                 return BadRequest(new { message = "인증번호가 일치하지 않거나 만료되었습니다." });
             }
@@ -257,7 +257,7 @@ namespace LoginServer.Controllers
                 return NotFound(new { message = "계정을 찾을 수 없습니다." });
             }
 
-            account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.ResetPassword);
             await DbContext.SaveChangesAsync();
 
             await redisDb.KeyDeleteAsync(redisKey);
