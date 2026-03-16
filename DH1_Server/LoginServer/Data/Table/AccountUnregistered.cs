@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoginServer.Data.Table
 {
     [Table("account_unregistered")]
+    [Index(nameof(Email), IsUnique = true)]
     public class AccountUnregistered
     {
         [Key]
@@ -15,7 +17,6 @@ namespace LoginServer.Data.Table
         [Column("email")]
         public required string Email { get; set; } // 복구를 위해 이메일 해시나 암호화된 형태로 보관 권장
 
-        // 탈퇴 신청일
         [Column("requested_at")]
         public required DateTime RequestedAt { get; set; }
 

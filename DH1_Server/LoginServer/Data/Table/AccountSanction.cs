@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LoginServer.Data.Table
 {
     [Table("account_sanction")]
+    [Index(nameof(AccountId), nameof(StartDate), nameof(EndDate))]
     public class AccountSanction
     {
         [Key]

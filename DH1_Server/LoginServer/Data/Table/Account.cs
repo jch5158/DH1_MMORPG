@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LoginServer.Data.Table
@@ -21,6 +22,7 @@ namespace LoginServer.Data.Table
     }
 
     [Table("account")]
+    [Index(nameof(Email), IsUnique = true)]
     public class Account
     {
         [Key]

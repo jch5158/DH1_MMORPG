@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LoginServer.Migrations
 {
     [DbContext(typeof(AccountDbContext))]
-    [Migration("20260314073758_AddAccountTables2")]
-    partial class AddAccountTables2
+    [Migration("20260316051125_AccountTables")]
+    partial class AccountTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,7 +101,7 @@ namespace LoginServer.Migrations
 
                     b.HasKey("SanctionId");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId", "StartDate", "EndDate");
 
                     b.ToTable("account_sanction");
                 });
@@ -127,6 +127,9 @@ namespace LoginServer.Migrations
                         .HasColumnName("scheduled_delete_at");
 
                     b.HasKey("AccountId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("account_unregistered");
                 });

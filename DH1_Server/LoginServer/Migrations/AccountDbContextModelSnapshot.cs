@@ -98,7 +98,7 @@ namespace LoginServer.Migrations
 
                     b.HasKey("SanctionId");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId", "StartDate", "EndDate");
 
                     b.ToTable("account_sanction");
                 });
@@ -124,6 +124,9 @@ namespace LoginServer.Migrations
                         .HasColumnName("scheduled_delete_at");
 
                     b.HasKey("AccountId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("account_unregistered");
                 });
