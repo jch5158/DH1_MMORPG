@@ -1,6 +1,7 @@
 ﻿using LoginServer.Data;
 using LoginServer.Data.Table;
 using LoginServer.DTOs.Auth;
+using LoginServer.Services;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,14 @@ namespace LoginServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(AccountDbContext dbContext, IConnectionMultiplexer redisConnection, IConfiguration smtpConfig) : ControllerBase
+    public class AuthController(AccountDbContext dbContext, IConnectionMultiplexer redisConnection, IConfiguration smtpConfig, IEmailQueue emailQueue) : ControllerBase
     {
         private AccountDbContext DbContext { get; } = dbContext;
         private IConnectionMultiplexer RedisConnection { get; } = redisConnection;
 
         private IConfiguration SmtpConfig { get; } = smtpConfig;
+
+        private IEmailQueue EmailQueue { get; } = emailQueue;
 
         private async Task<IActionResult?> SendVerifyCodeAsync(string email)
         {
@@ -38,20 +41,9 @@ namespace LoginServer.Controllers
             await redisDb.StringSetAsync(redisKey, verifyCode, TimeSpan.FromMinutes(3));
             await redisDb.StringSetAsync(cooldownKey, "1", TimeSpan.FromSeconds(30));
 
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(SmtpConfig["SmtpSettings:SenderName"], SmtpConfig["SmtpSettings:SenderEmail"] ?? string.Empty));
-            message.To.Add(new MailboxAddress("", email));
-            message.Subject = "[DH1_MMORPG] 회원가입 인증번호 안내";
-            message.Body = new TextPart("plain")
-            {
-                Text = $"안녕하세요.\n회원가입 인증번호는 [{verifyCode}] 입니다.\n3분 이내에 입력해주세요."
-            };
-
-            using var client = new SmtpClient();
-            await client.ConnectAsync(SmtpConfig["SmtpSettings:Host"], int.Parse(SmtpConfig["SmtpSettings:Port"]!), MailKit.Security.SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync(SmtpConfig["SmtpSettings:SenderEmail"], SmtpConfig["SmtpSettings:AppPassword"]);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            const string emailSubject = "[DH1_MMORPG] 회원가입 인증번호 안내";
+            var emailBody = $"안녕하세요.\n회원가입 인증번호는 [{verifyCode}] 입니다.\n3분 이내에 입력해주세요.";
+            await EmailQueue.QueueEmailAsync(new EmailJob(email, emailSubject, emailBody));
 
             return null; // 성공 시 null 반환
         }
@@ -68,23 +60,12 @@ namespace LoginServer.Controllers
             var resetCode = Random.Shared.Next(100000, 1000000).ToString();
             var redisKey = $"ResetCode_{email}";
 
-            await redisDb.StringSetAsync(redisKey, resetCode, TimeSpan.FromMinutes(5));
+            await redisDb.StringSetAsync(redisKey, resetCode, TimeSpan.FromMinutes(3));
             await redisDb.StringSetAsync(cooldownKey, "1", TimeSpan.FromSeconds(30));
-
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(SmtpConfig["SmtpSettings:SenderName"], SmtpConfig["SmtpSettings:SenderEmail"] ?? string.Empty));
-            message.To.Add(new MailboxAddress("", email));
-            message.Subject = "[DH1_MMORPG] 비밀번호 재설정 안내";
-            message.Body = new TextPart("plain")
-            {
-                Text = $"안녕하세요.\n비밀번호 재설정 인증번호는 [{resetCode}] 입니다.\n5분 이내에 입력해주세요."
-            };
-
-            using var client = new SmtpClient();
-            await client.ConnectAsync(SmtpConfig["SmtpSettings:Host"], int.Parse(SmtpConfig["SmtpSettings:Port"]!), MailKit.Security.SecureSocketOptions.StartTls);
-            await client.AuthenticateAsync(SmtpConfig["SmtpSettings:SenderEmail"], SmtpConfig["SmtpSettings:AppPassword"]);
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
+            
+            const string emailSubject = "[DH1_MMORPG] 비밀번호 재설정 안내";
+            var emailBody = $"안녕하세요.\n비밀번호 재설정 인증번호는 [{resetCode}] 입니다.\n5분 이내에 입력해주세요.";
+            await EmailQueue.QueueEmailAsync(new EmailJob(email, emailSubject, emailBody));
 
             return null;
         }
