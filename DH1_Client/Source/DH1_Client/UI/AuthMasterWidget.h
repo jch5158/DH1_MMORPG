@@ -10,6 +10,14 @@ class ULoginWidget;
 class USignUpWidget;
 class UEmailVerificationWidget; // 이메일 인증 위젯 포워드 선언
 
+enum class EAuthWidgetType : uint8
+{
+	Login,
+	SignUp,
+	EmailVerification,
+	ResetPassword
+};
+
 UCLASS()
 class DH1_CLIENT_API UAuthMasterWidget : public UUserWidget
 {
@@ -35,12 +43,12 @@ protected:
 	UResetPasswordWidget* ResetPasswordWidget;
 
 private:
-	// 자식 위젯들에서 Broadcast된 이벤트를 수신할 콜백 함수들
-	void HandleGoToSignUp();
-	void HandleGoToLogin();
-	void HandleSignUpSuccess(const FString& RegisteredEmail);
-	void HandleVerificationSuccess(const FString& LoginEmail);
-	void HandleLoginSuccess();
-	void HandleGoToForgotPassword();
-	void HandleResetPasswordSuccess(const FString& LoginEmail);
+	void HandleGoToSignUp() const;
+	void HandleLoginSuccess() const;
+	void HandleGoToResetPassword() const;
+
+	void HandleGoToLogin(const FString& StatusText, const FString& Email) const;
+	void HandleGoToEmailVerification(const FString& StatusText, const FString& Email) const;
+
+	void SwitchWidget(const EAuthWidgetType WidgetType, const FString& StatusText, const FString& Email) const;
 };

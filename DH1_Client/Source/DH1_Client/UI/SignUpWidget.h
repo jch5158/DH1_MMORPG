@@ -9,9 +9,8 @@ class UTextBlock;
 class UButton;
 class UEditableTextBox;
 
-// 이메일 데이터를 전달하기 위한 델리게이트 선언
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSignUpSuccessDelegate, const FString& /*RegisteredEmail*/);
-DECLARE_MULTICAST_DELEGATE(FOnGoToLoginDelegate); // 취소/뒤로가기 버튼용
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGoToLoginDelegate, const FString&, const FString&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGoToEmailVerificationDelegate, const FString&, const FString&);
 
 UCLASS()
 class DH1_CLIENT_API USignUpWidget : public UUserWidget
@@ -20,23 +19,18 @@ class DH1_CLIENT_API USignUpWidget : public UUserWidget
 
 public:
 
-	FOnSignUpSuccessDelegate OnSignUpSuccess;
 	FOnGoToLoginDelegate OnGoToLogin;
+	FOnGoToEmailVerificationDelegate OnGoToEmailVerification;
+
+	void ResetSignUpWidget() const;
+	void SetStatusTextMessage(const FString& StatusText) const;
 
 protected:
-
 	virtual void NativeConstruct() override;
-
-	// 블루프린트에서 할당할 WBP_Login 클래스
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSubclassOf<class UUserWidget> LoginWidgetClass;
-
-	UPROPERTY(meta = (BindWidget))
-	UButton* BackLoginButton;
 
 	// 에러 메시지 출력용 텍스트 블록 (UMG에서 추가해야 함)
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* ErrorTextMessage;
+	UTextBlock* StatusTextMessage;
 
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* EmailInput;
@@ -49,7 +43,10 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* SignUpButton;
-	
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* BackLoginButton;
+
 	UFUNCTION()
 	void OnSignUpButtonClicked();
 

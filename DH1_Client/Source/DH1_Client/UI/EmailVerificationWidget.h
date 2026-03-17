@@ -9,8 +9,7 @@ class UEditableTextBox;
 class UTextBlock;
 class UButton;
 
-// 화면 전환을 위한 델리게이트 선언
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnVerificationSuccessDelegate, const FString&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGoToLoginDelegate, const FString&, const FString&);
 
 UCLASS()
 class DH1_CLIENT_API UEmailVerificationWidget : public UUserWidget
@@ -18,26 +17,26 @@ class DH1_CLIENT_API UEmailVerificationWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    // 델리게이트 변수 선언
-    FOnVerificationSuccessDelegate OnVerificationSuccess;
 
-    // 이전 화면(SignUpWidget)에서 호출하여 이메일을 세팅해 줄 함수
-    void SetVerificationEmail(const FString& Email);
+    FOnGoToLoginDelegate OnGoToLogin;
+
+    void ResetVerificationWidget(const FString& StatusText, const FString& Email) const;
+    void SetStatusTextMessage(const FString& StatusText) const;
 
 protected:
     virtual void NativeConstruct() override;
 
-    // 현재 인증을 진행 중인 이메일을 보여줄 텍스트
-    UPROPERTY(meta = (BindWidget))
-    UTextBlock* TargetEmailText;
-
     // 에러 메시지 출력용
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* ErrorTextMessage;
+    UTextBlock* StatusTextMessage;
+
+    // 현재 인증을 진행 중인 이메일을 보여줄 텍스트
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* EmailText;
 
     // 인증번호 입력 칸
     UPROPERTY(meta = (BindWidget))
-    UEditableTextBox* VerificationCodeInput;
+    UEditableTextBox* VerifyCodeInput;
 
     // 인증 확인 버튼
     UPROPERTY(meta = (BindWidget))
@@ -47,9 +46,8 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UButton* ResendButton;
 
-    // (옵션) 뒤로가기/취소 버튼이 있다면 추가
-    // UPROPERTY(meta = (BindWidget))
-    // UButton* CancelButton;
+    UPROPERTY(meta = (BindWidget))
+	UButton* BackToLoginButton;
 
     // --- 이벤트 함수 ---
     UFUNCTION()
@@ -58,11 +56,10 @@ protected:
     UFUNCTION()
     void OnResendButtonClicked();
 
+    UFUNCTION()
+    void OnBackToLoginButtonClicked();
+
     // --- HTTP 콜백 ---
     void OnVerifyResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
     void OnResendResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-
-private:
-    // 현재 인증 중인 이메일을 보관할 변수
-    FString CurrentEmail;
 };

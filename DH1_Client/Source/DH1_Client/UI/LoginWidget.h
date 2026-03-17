@@ -11,7 +11,8 @@ class UTextBlock;
 
 DECLARE_MULTICAST_DELEGATE(FOnGoToSignUpDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnLoginSuccessDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnGoToForgotPasswordDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnGoToResetPasswordDelegate);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGoToEmailVerificationDelegate, const FString&, const FString&);
 
 UCLASS()
 class DH1_CLIENT_API ULoginWidget : public UUserWidget
@@ -21,18 +22,18 @@ class DH1_CLIENT_API ULoginWidget : public UUserWidget
 public:
     FOnGoToSignUpDelegate OnGoToSignUp;
     FOnLoginSuccessDelegate OnLoginSuccess;
-    FOnGoToForgotPasswordDelegate OnGoToForgotPassword;
+    FOnGoToResetPasswordDelegate OnGoToResetPassword;
+    FOnGoToEmailVerificationDelegate OnGoToEmailVerification;
 
-    void SetEmail(const FString& EmailToSet);
+    void ResetLoginWidget(const FString& StatusText, const FString& Email) const;
+    void SetStatusTextMessage(const FString& StatusText) const;
 
 protected:
     virtual void NativeConstruct() override;
 
-    // [팩트 체크] 마스터 위젯이 화면 전환을 담당하므로 SignUpWidgetClass는 삭제되었습니다.
-
     // 에러 메시지 출력용 텍스트 블록
     UPROPERTY(meta = (BindWidget))
-    UTextBlock* ErrorTextMessage;
+    UTextBlock* StatusTextMessage;
 
     UPROPERTY(meta = (BindWidget))
     UEditableTextBox* EmailInput;
@@ -47,7 +48,7 @@ protected:
     UButton* SignUpButton;
 
     UPROPERTY(meta = (BindWidget))
-    UButton* ForgotPasswordButton;
+    UButton* ResetPasswordButton;
 
     UFUNCTION()
     void OnLoginButtonClicked();
@@ -56,7 +57,7 @@ protected:
     void OnSignUpButtonClicked();
 
     UFUNCTION()
-    void OnForgotPasswordButtonClicked();
+    void OnResetPasswordButtonClicked();
 
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful);
 };

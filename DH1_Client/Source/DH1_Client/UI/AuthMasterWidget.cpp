@@ -3,79 +3,109 @@
 #include "LoginWidget.h"
 #include "SignUpWidget.h"
 #include "EmailVerificationWidget.h"
+#include "ResetPasswordWidget.h"
 
 void UAuthMasterWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// 1. 로그인 위젯 이벤트 바인딩
 	if (LoginWidget)
 	{
 		LoginWidget->OnGoToSignUp.AddUObject(this, &UAuthMasterWidget::HandleGoToSignUp);
 		LoginWidget->OnLoginSuccess.AddUObject(this, &UAuthMasterWidget::HandleLoginSuccess);
+		LoginWidget->OnGoToResetPassword.AddUObject(this, &UAuthMasterWidget::HandleGoToResetPassword);
 	}
 
-	// 2. 회원가입 위젯 이벤트 바인딩
 	if (SignUpWidget)
 	{
 		SignUpWidget->OnGoToLogin.AddUObject(this, &UAuthMasterWidget::HandleGoToLogin);
-		SignUpWidget->OnSignUpSuccess.AddUObject(this, &UAuthMasterWidget::HandleSignUpSuccess);
+		SignUpWidget->OnGoToEmailVerification.AddUObject(this, &UAuthMasterWidget::HandleGoToEmailVerification);
 	}
 
 	if (EmailVerificationWidget)
 	{
-		EmailVerificationWidget->OnVerificationSuccess.AddUObject(this, &UAuthMasterWidget::HandleVerificationSuccess);
+		EmailVerificationWidget->OnGoToLogin.AddUObject(this, &UAuthMasterWidget::HandleGoToLogin);
 	}
-}
 
-void UAuthMasterWidget::HandleGoToLogin()
-{
-	if (MainSwitcher)
+	if (ResetPasswordWidget)
 	{
-		// 인덱스 0: 로그인 화면
-		MainSwitcher->SetActiveWidgetIndex(0);
+		ResetPasswordWidget->OnGoToLogin.AddUObject(this, &UAuthMasterWidget::HandleGoToLogin);
 	}
 }
 
-void UAuthMasterWidget::HandleGoToSignUp()
+void UAuthMasterWidget::HandleGoToLogin(const FString& StatusText, const FString& Email) const
 {
-	if (MainSwitcher)
-	{
-		// 인덱스 1: 회원가입 화면
-		MainSwitcher->SetActiveWidgetIndex(1);
-	}
+	SwitchWidget(EAuthWidgetType::Login, StatusText, Email);
 }
 
-void UAuthMasterWidget::HandleSignUpSuccess(const FString& RegisteredEmail)
+void UAuthMasterWidget::HandleGoToEmailVerification(const FString& StatusText, const FString& Email) const
 {
-	if (MainSwitcher && EmailVerificationWidget)
-	{
-		// 대상 이메일 세팅 후 화면 전환
-		EmailVerificationWidget->SetVerificationEmail(RegisteredEmail);
-
-		// 인덱스 2: 이메일 인증 화면
-		MainSwitcher->SetActiveWidgetIndex(2);
-	}
+	SwitchWidget(EAuthWidgetType::EmailVerification, StatusText, Email);
 }
 
-void UAuthMasterWidget::HandleVerificationSuccess(const FString& LoginEmail)
+void UAuthMasterWidget::HandleGoToSignUp() const
 {
-	if (MainSwitcher)
-	{
-		// 대상 이메일 세팅 후 화면 전환
-		LoginWidget->SetEmail(LoginEmail);
-
-		// 인덱스 2: 이메일 인증 화면
-		MainSwitcher->SetActiveWidgetIndex(0);
-	}
+	SwitchWidget(EAuthWidgetType::SignUp, "", "");
 }
 
-void UAuthMasterWidget::HandleLoginSuccess()
+void UAuthMasterWidget::HandleLoginSuccess() const
 {
-	// 로그인 성공 시 처리 로직
-	// 예: 마스터 위젯을 화면에서 제거하고(RemoveFromParent), 
-	// 로비 맵으로 Level을 이동하거나 메인 메뉴 위젯을 띄우는 로직을 구현합니다.
-
+	// TODO : 로비로 이동 처리
 	UE_LOG(LogTemp, Log, TEXT("로그인 완료! 로비로 이동합니다."));
-	// this->RemoveFromParent();
+}
+
+void UAuthMasterWidget::HandleGoToResetPassword() const
+{
+	SwitchWidget(EAuthWidgetType::ResetPassword, "", "");
+}
+
+void UAuthMasterWidget::SwitchWidget(const EAuthWidgetType WidgetType, const FString& StatusText, const FString& Email) const
+{
+	if (!MainSwitcher)
+	{
+		return;
+	}
+
+	switch (WidgetType) 
+	{
+	case EAuthWidgetType::Login:
+
+		if (LoginWidget)
+		{
+			LoginWidget->ResetLoginWidget(StatusText, Email);
+			MainSwitcher->SetActiveWidgetIndex(0);
+		}
+
+		break;
+	case EAuthWidgetType::SignUp:
+
+		if (SignUpWidget)
+		{
+			SignUpWidget->ResetSignUpWidget();
+			MainSwitcher->SetActiveWidgetIndex(1);
+		}
+
+		break;
+	case EAuthWidgetType::EmailVerification:
+
+		if (EmailVerificationWidget)
+		{
+			EmailVerificationWidget->ResetVerificationWidget(StatusText, Email);
+			MainSwitcher->SetActiveWidgetIndex(2);
+		}
+
+		break;
+	case EAuthWidgetType::ResetPassword:
+
+		if (ResetPasswordWidget)
+		{
+			ResetPasswordWidget->ResetResetPasswordWidget(StatusText, Email);
+			MainSwitcher->SetActiveWidgetIndex(3);
+		}
+
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("UAuthMasterWidget::SwitchWidget - 처리되지 않은 ELoginWidgetType 값입니다."));
+		break;
+	}
 }

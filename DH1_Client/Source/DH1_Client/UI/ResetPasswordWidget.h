@@ -9,9 +9,7 @@ class UEditableTextBox;
 class UButton;
 class UTextBlock;
 
-// 로그인 화면으로 돌아가기 위한 델리게이트
-DECLARE_MULTICAST_DELEGATE(FOnGoToLoginDelegate);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnResetPasswordSuccessDelegate, const FString&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGoToLoginDelegate, const FString&, const FString&);
 
 UCLASS()
 class DH1_CLIENT_API UResetPasswordWidget : public UUserWidget
@@ -20,7 +18,9 @@ class DH1_CLIENT_API UResetPasswordWidget : public UUserWidget
 
 public:
     FOnGoToLoginDelegate OnGoToLogin;
-    FOnResetPasswordSuccessDelegate OnResetPasswordSuccess;
+
+    void ResetResetPasswordWidget(const FString& StatusText, const FString& Email) const;
+    void SetStatusTextMessage(const FString& StatusText) const;
 
 protected:
     virtual void NativeConstruct() override;

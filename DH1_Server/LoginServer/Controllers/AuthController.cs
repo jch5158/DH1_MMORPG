@@ -101,15 +101,40 @@ namespace LoginServer.Controllers
                 return BadRequest(new { message = "회원 정보가 일치하지 않습니다." });
             }
 
-            // 보안 결함 1 수정: 이메일 미인증 유저 로그인 차단
-            if (account.AccountState == EAccountState.EmailUnverified)
+            switch (account.AccountState)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = "EMAIL_UNVERIFIED",
-                    email = account.Email,
-                    message = "이메일 인증이 완료되지 않은 계정입니다. 인증 페이지로 이동합니다."
-                });
+                case EAccountState.Suspended:
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        code = "ACCOUNT_SUSPENDED",
+                        email = account.Email,
+                        message = "일시 정지된 계정입니다."
+                    });
+                case EAccountState.Banned:
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        code = "ACCOUNT_BANNED",
+                        email = account.Email,
+                        message = "영구 정지된 계정입니다."
+                    });
+                case EAccountState.EmailUnverified:
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        code = "EMAIL_UNVERIFIED",
+                        email = account.Email,
+                        message = "이메일 인증이 완료되지 않은 계정입니다. 인증 페이지로 이동합니다."
+                    });
+
+                case EAccountState.PendingUnregister:
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        code = "ACCOUNT_PENDING_UNREGISTER",
+                        email = account.Email,
+                        message = "탈퇴한 회원입니다."
+                    });
+                case EAccountState.Active:
+                default:
+                    break;
             }
 
             var tokenBytes = RandomNumberGenerator.GetBytes(32);
@@ -151,7 +176,12 @@ namespace LoginServer.Controllers
                     });
                 }
 
-                return BadRequest(new { message = "이미 사용중인 이메일입니다." });
+                return BadRequest(new
+                {
+                    code = "REGISTERED_EMAIL",
+                    email = existingAccount.Email,
+                    message = "이미 사용중인 이메일입니다."
+                });
             }
 
             var newAccount = new Account
@@ -164,7 +194,11 @@ namespace LoginServer.Controllers
             await DbContext.SaveChangesAsync();
 
             var sendResult = await SendVerifyCodeAsync(request.Email);
-            return sendResult ?? Ok(new { message = "회원가입이 완료되었습니다. 이메일 인증 부탁드립니다." });
+            return sendResult ?? Ok(new
+            {
+                email = request.Email,
+                message = "회원가입이 완료되었습니다. 이메일 인증 부탁드립니다."
+            });
         }
 
         [HttpPost("send-verify-code")]
@@ -213,7 +247,11 @@ namespace LoginServer.Controllers
             await redisDb.KeyDeleteAsync(redisKey);
             await redisDb.KeyDeleteAsync($"Cooldown_{request.Email}");
 
-            return Ok(new { message = "이메일 인증이 완료되었습니다." });
+            return Ok(new
+            {
+                email = request.Email,
+                message = "이메일 인증이 완료되었습니다."
+            });
         }
 
 
@@ -263,7 +301,11 @@ namespace LoginServer.Controllers
             await redisDb.KeyDeleteAsync(redisKey);
             await redisDb.KeyDeleteAsync($"ResetCooldown_{request.Email}");
 
-            return Ok(new { message = "비밀번호가 성공적으로 변경되었습니다. 새로운 비밀번호로 로그인해주세요." });
+            return Ok(new
+            {
+                email = request.Email,
+                message = "비밀번호가 성공적으로 변경되었습니다. 새로운 비밀번호로 로그인해주세요."
+            });
         }
     }
 }

@@ -6,6 +6,42 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Serialization/JsonSerializer.h"
 
+void UResetPasswordWidget::ResetResetPasswordWidget(const FString& StatusText, const FString& Email) const
+{
+    if (StatusTextMessage)
+    {
+        StatusTextMessage->SetText(FText::FromString(StatusText));
+    }
+
+    if (EmailInputText)
+    {
+        EmailInputText->SetText(FText::FromString(Email));
+    }
+
+    if (VerifyCodeInput)
+    {
+        VerifyCodeInput->SetText(FText::GetEmpty());
+    }
+
+    if (PasswordInput)
+    {
+        PasswordInput->SetText(FText::GetEmpty());
+    }
+
+    if (PasswordConfirmInput)
+    {
+        PasswordConfirmInput->SetText(FText::GetEmpty());
+    }
+}
+
+void UResetPasswordWidget::SetStatusTextMessage(const FString& StatusText) const
+{
+    if (StatusTextMessage)
+    {
+        StatusTextMessage->SetText(FText::FromString(StatusText));
+    }
+}
+
 void UResetPasswordWidget::NativeConstruct()
 {
     Super::NativeConstruct();
@@ -36,13 +72,10 @@ void UResetPasswordWidget::OnSendVerifyCodeButtonClicked()
     const FString Email = EmailInputText->GetText().ToString();
     if (Email.IsEmpty())
     {
-        StatusTextMessage->SetText(FText::FromString(TEXT("이메일 주소에 문제가 발생되었습니다.")));
+        SetStatusTextMessage(TEXT("이메일 주소에 문제가 발생되었습니다."));
         return;
     }
 
-    StatusTextMessage->SetText(FText::FromString(TEXT("인증번호 발송 중...")));
-
-    // JSON 페이로드 생성
     const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
     JsonObject->SetStringField("Email", Email);
 
@@ -50,7 +83,6 @@ void UResetPasswordWidget::OnSendVerifyCodeButtonClicked()
     const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-    // HTTP 요청 세팅
     const FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
     Request->OnProcessRequestComplete().BindUObject(this, &UResetPasswordWidget::OnSendCodeResponseReceived);
     Request->SetURL("https://localhost:5001/api/auth/forgot-password"); // 서버 주소에 맞게 변경
@@ -65,10 +97,17 @@ void UResetPasswordWidget::OnPasswordConfirmButtonClicked()
     const FString Email = EmailInputText->GetText().ToString();
     const FString VerifyCode = VerifyCodeInput->GetText().ToString();
     const FString ResetPassword = PasswordInput->GetText().ToString();
+    const FString ResetPasswordConfirm = PasswordConfirmInput->GetText().ToString();
 
-    if (Email.IsEmpty() || VerifyCode.IsEmpty() || ResetPassword.IsEmpty())
+    if (Email.IsEmpty() || VerifyCode.IsEmpty() || ResetPassword.IsEmpty() || ResetPasswordConfirm.IsEmpty())
     {
-        StatusTextMessage->SetText(FText::FromString(TEXT("모든 항목을 입력해주세요.")));
+        SetStatusTextMessage(TEXT("모든 항목을 입력해주세요."));
+        return;
+    }
+
+    if (ResetPassword != ResetPasswordConfirm)
+    {
+        SetStatusTextMessage(TEXT("새로운 비밀번호가 일치하지 않습니다."));
         return;
     }
 
@@ -81,8 +120,7 @@ void UResetPasswordWidget::OnPasswordConfirmButtonClicked()
     const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-    // HTTP 요청 세팅
-    FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
+    const FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
     Request->OnProcessRequestComplete().BindUObject(this, &UResetPasswordWidget::OnResetPasswordResponseReceived);
     Request->SetURL("https://localhost:5001/api/auth/reset-password"); // 서버 주소에 맞게 변경
     Request->SetVerb("POST");
@@ -95,7 +133,7 @@ void UResetPasswordWidget::OnBackToLoginButtonClicked()
 {
     if (OnGoToLogin.IsBound())
     {
-        OnGoToLogin.Broadcast();
+        OnGoToLogin.Broadcast("", "");
     }
 }
 
@@ -103,46 +141,57 @@ void UResetPasswordWidget::OnSendCodeResponseReceived(FHttpRequestPtr Request, F
 {
     if (!bWasSuccessful || !Response.IsValid())
     {
-        StatusTextMessage->SetText(FText::FromString(TEXT("서버와의 연결에 실패했습니다.")));
+        SetStatusTextMessage(TEXT("서버와 연결에 실패했습니다."));
+
         return;
     }
 
-    TSharedPtr<FJsonObject> JsonObject;
-    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+    FString ServerMessage = TEXT("서버 처리 중 오류가 발생했습니다.");
 
-    FString ServerMessage = TEXT("응답을 처리할 수 없습니다.");
+    const FString JsonString = Response->GetContentAsString();
+    TSharedPtr<FJsonObject> JsonObject;
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
     if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
     {
         JsonObject->TryGetStringField(TEXT("message"), ServerMessage);
     }
 
-    StatusTextMessage->SetText(FText::FromString(ServerMessage));
+    SetStatusTextMessage(ServerMessage);
 }
 
 void UResetPasswordWidget::OnResetPasswordResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful)
 {
     if (!bWasSuccessful || !Response.IsValid())
     {
-        StatusTextMessage->SetText(FText::FromString(TEXT("서버와의 연결에 실패했습니다.")));
+        SetStatusTextMessage(TEXT("서버와의 연결에 실패했습니다."));
+
         return;
     }
 
-    TSharedPtr<FJsonObject> JsonObject;
-    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+    FString ResEmail = TEXT("");
+    FString ResMessage = TEXT("서버 처리 중 오류가 발생했습니다.");
 
-    FString ServerMessage = TEXT("응답을 처리할 수 없습니다.");
+    const FString JsonString = Response->GetContentAsString();
+    TSharedPtr<FJsonObject> JsonObject;
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
     if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
     {
-        JsonObject->TryGetStringField(TEXT("message"), ServerMessage);
+        JsonObject->TryGetStringField(TEXT("email"), ResEmail);
+        JsonObject->TryGetStringField(TEXT("message"), ResMessage);
     }
 
-    StatusTextMessage->SetText(FText::FromString(ServerMessage));
-
-    if (Response->GetResponseCode() == 200)
+    const int32 ResponseCode = Response->GetResponseCode();
+    if (ResponseCode == 200)
     {
-        if (OnResetPasswordSuccess.IsBound())
+        if (OnGoToLogin.IsBound())
         {
-            OnResetPasswordSuccess.Broadcast(EmailInputText->GetText().ToString());
+            OnGoToLogin.Broadcast(ResMessage, ResEmail);
         }
+    }
+    else
+    {
+        SetStatusTextMessage(ResMessage);
     }
 }
