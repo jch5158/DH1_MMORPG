@@ -10,7 +10,7 @@ namespace PacketGenerator
         public string MessageName { get; set; } = string.Empty;
         public uint PacketId { get; set; }
         public string Sender { get; set; } = string.Empty;
-        public string Receiver { get; set; } = string.Empty;
+        public List<string> Receivers { get; set; } = []; // List로 변경
     }
 
     public class HandlerInfo
@@ -128,10 +128,24 @@ namespace PacketGenerator
                                     string.Empty;
                                 break;
                             case 50005:
-                                var receiverValue = inputStream.ReadInt32();
-                                packetInfo.Receiver =
-                                    roleDescriptor?.Value.FirstOrDefault(v => v.Number == receiverValue)?.Name ??
-                                    string.Empty;
+                                if (WireFormat.GetTagWireType(tag) == WireFormat.WireType.LengthDelimited)
+                                {
+                                    var length = inputStream.ReadLength();
+                                    var limit = inputStream.Position + length;
+
+                                    while (inputStream.Position < limit)
+                                    {
+                                        var receiverValue = inputStream.ReadInt32();
+                                        var receiverName = roleDescriptor?.Value.FirstOrDefault(v => v.Number == receiverValue)?.Name;
+                                        if (!string.IsNullOrEmpty(receiverName)) packetInfo.Receivers.Add(receiverName);
+                                    }
+                                }
+                                else
+                                {
+                                    var receiverValue = inputStream.ReadInt32();
+                                    var receiverName = roleDescriptor?.Value.FirstOrDefault(v => v.Number == receiverValue)?.Name;
+                                    if (!string.IsNullOrEmpty(receiverName)) packetInfo.Receivers.Add(receiverName);
+                                }
                                 break;
                             default:
                                 inputStream.SkipLastField();
@@ -139,8 +153,7 @@ namespace PacketGenerator
                         }
                     }
 
-                    if (packetInfo.PacketId > 0 && !string.IsNullOrEmpty(packetInfo.Sender) &&
-                        !string.IsNullOrEmpty(packetInfo.Receiver))
+                    if (packetInfo.PacketId > 0 && !string.IsNullOrEmpty(packetInfo.Sender) && packetInfo.Receivers.Count > 0)
                     {
                         handlerInfo.Packets.Add(packetInfo);
                     }
@@ -240,7 +253,7 @@ namespace PacketGenerator
 
                 foreach (var packet in handler.Packets)
                 {
-                    if (packet.Receiver.Equals(targetRole, StringComparison.OrdinalIgnoreCase))
+                    if (packet.Receivers.Any(r => r.Equals(targetRole, StringComparison.OrdinalIgnoreCase)))
                     {
                         handleInitBuilder.AppendFormat(PacketFormatter.RECEIVE_HANDLE_INIT_FORMAT,
                             handler.ProtoFileName, // {0}

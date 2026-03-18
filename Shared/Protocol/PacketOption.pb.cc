@@ -44,7 +44,7 @@ const char descriptor_table_protodef_PacketOption_2eproto[] ABSL_ATTRIBUTE_SECTI
     "MessageOptions\030\323\206\003 \001(\005:B\n\006sender\022\037.googl"
     "e.protobuf.MessageOptions\030\324\206\003 \001(\0162\017.Prot"
     "ocol.eRole:D\n\010receiver\022\037.google.protobuf"
-    ".MessageOptions\030\325\206\003 \001(\0162\017.Protocol.eRole"
+    ".MessageOptions\030\325\206\003 \003(\0162\017.Protocol.eRole"
     "b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_PacketOption_2eproto_deps[2] =
@@ -93,8 +93,8 @@ PROTOBUF_CONSTINIT
             sender(kSenderFieldNumber, static_cast< ::Protocol::eRole >(0));
 PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 ::_pbi::
-        ExtensionIdentifier<::google::protobuf::MessageOptions, ::_pbi::EnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>,
-                            14, false>
+        ExtensionIdentifier<::google::protobuf::MessageOptions, ::_pbi::RepeatedEnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>,
+                            14, true>
             receiver(kReceiverFieldNumber, static_cast< ::Protocol::eRole >(0));
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
@@ -120,6 +120,6 @@ PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::std::false_type
             false, false, ::Protocol::eRole_IsValid),
         ::_pbi::ExtensionSet::RegisterEnumExtension(
             &::google::protobuf::MessageOptions::default_instance(), 50005, 14,
-            false, false, ::Protocol::eRole_IsValid),
+            true, true, ::Protocol::eRole_IsValid),
          ::std::false_type{});
 #include "google/protobuf/port_undef.inc"

@@ -87,8 +87,8 @@ extern ::google::protobuf::internal::ExtensionIdentifier<
     sender;
 static const int kReceiverFieldNumber = 50005;
 extern ::google::protobuf::internal::ExtensionIdentifier<
-    ::google::protobuf::MessageOptions, ::google::protobuf::internal::EnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>, 14,
-    false>
+    ::google::protobuf::MessageOptions, ::google::protobuf::internal::RepeatedEnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>, 14,
+    true>
     receiver;
 
 // ===================================================================

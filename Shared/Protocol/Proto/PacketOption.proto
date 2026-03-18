@@ -14,5 +14,5 @@ extend google.protobuf.MessageOptions
 {
     int32 packet_id = 50003;
     eRole sender = 50004;
-    eRole receiver = 50005;
+    repeated eRole receiver = 50005;
 }
