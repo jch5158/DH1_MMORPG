@@ -8,7 +8,7 @@
 
 int32 main()
 {
-	CrashReporter::Initialize(L"DummyClient", L"1.0.0", L"");
+	CrashReporter::Initialize("DummyClient", "1.0.0", "");
 
 	NetEngineInit netEngineInit;
 

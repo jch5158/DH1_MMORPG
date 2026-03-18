@@ -8,7 +8,7 @@
 
 int main()
 {
-	CrashReporter::Initialize(L"GameServer", L"1.0.0", L"");
+	CrashReporter::Initialize("GameServer", "1.0.0", "");
 
 	NetEngineInit netEngineInit;
 

@@ -12,10 +12,6 @@ public:
 
 	static void Crash();
 	static void CrashIf(const bool bCrash);
-	static std::filesystem::path GetExeDirectory();
-	static bool Initialize(const Wstring& appName, const Wstring& appVersion, const Wstring& url);
-
-private:
-	
-	static std::string toStdU8String(const Wstring& wStr);
+	static std::filesystem::path GetExeDirectoryPath();
+	static bool Initialize(const std::string& appName, const std::string& appVersion, const std::string& url);
 };
