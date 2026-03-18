@@ -24,6 +24,9 @@
     <Filter Include="Network">
       <UniqueIdentifier>{eccf4dc5-809a-491c-9a54-677b7571b6fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocol\PacketId">
+      <UniqueIdentifier>{482dfe13-a330-44d2-b3e3-baee1277f1b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -35,9 +38,6 @@
     <ClCompile Include="PacketServiceTypeHandler.cpp">
       <Filter>PacketHandler</Filter>
     </ClCompile>
-    <ClCompile Include="LoginPacketHandler.cpp">
-      <Filter>PacketHandler</Filter>
-    </ClCompile>
     <ClCompile Include="EchoPacketHandler.cpp">
       <Filter>PacketHandler</Filter>
     </ClCompile>
@@ -47,17 +47,14 @@
     <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\PacketId.pb.cc">
-      <Filter>Protocol</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
     <ClCompile Include="EchoServer.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
+      <Filter>Protocol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,9 +65,6 @@
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\EchoPacketHandler.h">
-      <Filter>PacketHandler</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketHandler\LoginPacketHandler.h">
       <Filter>PacketHandler</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h">
@@ -85,11 +79,11 @@
     <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Shared\Protocol\PacketId.pb.h">
-      <Filter>Protocol</Filter>
+    <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
+      <Filter>Protocol\PacketId</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -99,13 +93,10 @@
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
-    <None Include="..\..\Shared\Protocol\Proto\PacketId.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
-    <None Include="..\..\Shared\Protocol\Login.proto">
-      <Filter>Protocol\Proto</Filter>
-    </None>
     <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
   </ItemGroup>

@@ -41,8 +41,13 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 
-var result = PacketGenerator.Parser.ParseHandlersFromDesc(protoPath);
+var handlers = Parser.ParseHandlersFromDesc(protoPath);
 
-//Console.WriteLine(PacketHandlerGenerator.Generate(resultConfig, protoPath, prjBasePath)
-//    ? "SUCCESS"
-//    : "FAILED to generate packet handler.");
+EnumGenerator.GenerateSharedEnum(handlers, Path.Combine(prjBasePath, @"Shared\Protocol\PacketId\PacketId.h"));
+
+foreach (var prjConfig in resultConfig.Projects)
+{
+    var outputPath = Path.Combine(prjBasePath, prjConfig.Name, "PacketHandler");
+
+    Generator.GenerateCpps(handlers, prjConfig.Role, outputPath);
+}

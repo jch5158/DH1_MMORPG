@@ -13,7 +13,7 @@
       "role": "Client"
     },
         {
-      "name": "DH1_Server\\GatewayServer\\Network",
+      "name": "DH1_Server\\GatewayServer",
       "role": "Gateway_Server"
     }
   ]

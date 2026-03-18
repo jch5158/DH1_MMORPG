@@ -8,9 +8,10 @@
 
 #else
 
-#include "PacketId.pb.h"
 #include "Enum.pb.h"
 #include "Struct.pb.h"
+#include "PacketOption.pb.h"
+#include "PacketId.h"
 #include "Echo.pb.h"
 #include "StlTypes.h"
 #include "PacketSession.h"
@@ -23,12 +24,21 @@ public:
 
     using PacketHandle = std::function<bool(const uint16, byte*, PacketSessionRef&)>;
 
-    static void Init()
+    static constexpr uint32 MAKE_PACKET_HEADER_ID(const uint16 serviceType, const uint16 packetId)
     {
-        
+        return (static_cast<uint32>(serviceType) << 16) | static_cast<uint32>(packetId);
     }
 
-	static bool HandlePacket(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession)
+    static void Init()
+    {
+        sPacketHandleMap[packet_id::eEchoPacketId::S2C_ECHO_RES] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
+			{
+				return HandlePacket<Protocol::S2C_ECHO_RES>(size, pBuffer, pSession, HANDLE_S2C_ECHO_RES);
+			};
+
+    }
+
+	static bool HandlePacket(const uint16 size, const uint16 packetId, byte* pBuffer, PacketSessionRef& pSession)
 	{
 		const auto iter = sPacketHandleMap.find(packetId);
 		if (iter != sPacketHandleMap.end())
@@ -39,10 +49,12 @@ public:
 		return HANDLE_PACKET_ID_INVALID(size, packetId, pBuffer, pSession);
 	}
 
-	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession);
+	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, byte* pBuffer, PacketSessionRef& pSession);
+    static bool HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet, PacketSessionRef& pSession);
+
     
-    
-    
+    static NetSendBufferRef MakeSendBuffer(Protocol::C2S_ECHO_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_ECHO_REQ); }
+
 
 private:
 
@@ -59,7 +71,7 @@ private:
 	}
 
     template<typename T>
-	static NetSendBufferRef MakeSendBuffer(const T& packet, const uint32 packetId)
+	static NetSendBufferRef MakeSendBuffer(const T& packet, const uint16 packetId)
 	{
 		const uint16 dataSize = static_cast<uint16>(packet.ByteSizeLong());
 		const uint16 packetSize = dataSize + sizeof(PacketHeader);
@@ -81,10 +93,10 @@ private:
 
 		auto* header = reinterpret_cast<PacketHeader*>(pBuffer);
 		header->size = packetSize;
-		header->id = packetId;
+		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_ECHO, packetId);
 		if (!packet.SerializeToArray(&header[1], dataSize))
 		{
-			NET_ENGINE_LOG_FATAL("EchoPacketHandler::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
+			NET_ENGINE_LOG_FATAL("Echo::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
 	    }
 		
@@ -93,5 +105,5 @@ private:
         return sendBuffer;
 	}
 
-	inline static HashMap<uint32, PacketHandle> sPacketHandleMap;
+	inline static HashMap<uint16, PacketHandle> sPacketHandleMap;
 };
