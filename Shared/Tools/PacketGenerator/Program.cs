@@ -41,6 +41,8 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 
-Console.WriteLine(PacketHandlerGenerator.Generate(resultConfig, protoPath, prjBasePath)
-    ? "SUCCESS"
-    : "FAILED to generate packet handler.");
+var result = PacketGenerator.Parser.ParseHandlersFromDesc(protoPath);
+
+//Console.WriteLine(PacketHandlerGenerator.Generate(resultConfig, protoPath, prjBasePath)
+//    ? "SUCCESS"
+//    : "FAILED to generate packet handler.");

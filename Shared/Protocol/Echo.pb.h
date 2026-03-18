@@ -29,7 +29,7 @@
 #include "google/protobuf/repeated_field.h"  // IWYU pragma: export
 #include "google/protobuf/extension_set.h"  // IWYU pragma: export
 #include "google/protobuf/unknown_field_set.h"
-#include "Enum.pb.h"
+#include "PacketOption.pb.h"
 // @@protoc_insertion_point(includes)
 
 // Must be included last.
@@ -218,22 +218,22 @@ class S2C_ECHO_RES final : public ::google::protobuf::Message
 
   // accessors -------------------------------------------------------
   enum : int {
-    kEhcoMsgFieldNumber = 1,
+    kEchoMsgFieldNumber = 1,
   };
-  // string ehcoMsg = 1;
-  void clear_ehcomsg() ;
-  const std::string& ehcomsg() const;
+  // string echoMsg = 1;
+  void clear_echomsg() ;
+  const std::string& echomsg() const;
   template <typename Arg_ = const std::string&, typename... Args_>
-  void set_ehcomsg(Arg_&& arg, Args_... args);
-  std::string* mutable_ehcomsg();
-  PROTOBUF_NODISCARD std::string* release_ehcomsg();
-  void set_allocated_ehcomsg(std::string* value);
+  void set_echomsg(Arg_&& arg, Args_... args);
+  std::string* mutable_echomsg();
+  PROTOBUF_NODISCARD std::string* release_echomsg();
+  void set_allocated_echomsg(std::string* value);
 
   private:
-  const std::string& _internal_ehcomsg() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ehcomsg(
+  const std::string& _internal_echomsg() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_echomsg(
       const std::string& value);
-  std::string* _internal_mutable_ehcomsg();
+  std::string* _internal_mutable_echomsg();
 
   public:
   // @@protoc_insertion_point(class_scope:Protocol.S2C_ECHO_RES)
@@ -259,7 +259,7 @@ class S2C_ECHO_RES final : public ::google::protobuf::Message
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const S2C_ECHO_RES& from_msg);
-    ::google::protobuf::internal::ArenaStringPtr ehcomsg_;
+    ::google::protobuf::internal::ArenaStringPtr echomsg_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -414,22 +414,22 @@ class C2S_ECHO_REQ final : public ::google::protobuf::Message
 
   // accessors -------------------------------------------------------
   enum : int {
-    kEhcoMsgFieldNumber = 1,
+    kEchoMsgFieldNumber = 1,
   };
-  // string ehcoMsg = 1;
-  void clear_ehcomsg() ;
-  const std::string& ehcomsg() const;
+  // string echoMsg = 1;
+  void clear_echomsg() ;
+  const std::string& echomsg() const;
   template <typename Arg_ = const std::string&, typename... Args_>
-  void set_ehcomsg(Arg_&& arg, Args_... args);
-  std::string* mutable_ehcomsg();
-  PROTOBUF_NODISCARD std::string* release_ehcomsg();
-  void set_allocated_ehcomsg(std::string* value);
+  void set_echomsg(Arg_&& arg, Args_... args);
+  std::string* mutable_echomsg();
+  PROTOBUF_NODISCARD std::string* release_echomsg();
+  void set_allocated_echomsg(std::string* value);
 
   private:
-  const std::string& _internal_ehcomsg() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ehcomsg(
+  const std::string& _internal_echomsg() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_echomsg(
       const std::string& value);
-  std::string* _internal_mutable_ehcomsg();
+  std::string* _internal_mutable_echomsg();
 
   public:
   // @@protoc_insertion_point(class_scope:Protocol.C2S_ECHO_REQ)
@@ -455,7 +455,7 @@ class C2S_ECHO_REQ final : public ::google::protobuf::Message
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const C2S_ECHO_REQ& from_msg);
-    ::google::protobuf::internal::ArenaStringPtr ehcomsg_;
+    ::google::protobuf::internal::ArenaStringPtr echomsg_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -479,104 +479,104 @@ class C2S_ECHO_REQ final : public ::google::protobuf::Message
 
 // C2S_ECHO_REQ
 
-// string ehcoMsg = 1;
-inline void C2S_ECHO_REQ::clear_ehcomsg() {
+// string echoMsg = 1;
+inline void C2S_ECHO_REQ::clear_echomsg() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.ClearToEmpty();
+  _impl_.echomsg_.ClearToEmpty();
 }
-inline const std::string& C2S_ECHO_REQ::ehcomsg() const
+inline const std::string& C2S_ECHO_REQ::echomsg() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:Protocol.C2S_ECHO_REQ.ehcoMsg)
-  return _internal_ehcomsg();
+  // @@protoc_insertion_point(field_get:Protocol.C2S_ECHO_REQ.echoMsg)
+  return _internal_echomsg();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void C2S_ECHO_REQ::set_ehcomsg(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void C2S_ECHO_REQ::set_echomsg(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:Protocol.C2S_ECHO_REQ.ehcoMsg)
+  _impl_.echomsg_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:Protocol.C2S_ECHO_REQ.echoMsg)
 }
-inline std::string* C2S_ECHO_REQ::mutable_ehcomsg() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_ehcomsg();
-  // @@protoc_insertion_point(field_mutable:Protocol.C2S_ECHO_REQ.ehcoMsg)
+inline std::string* C2S_ECHO_REQ::mutable_echomsg() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_echomsg();
+  // @@protoc_insertion_point(field_mutable:Protocol.C2S_ECHO_REQ.echoMsg)
   return _s;
 }
-inline const std::string& C2S_ECHO_REQ::_internal_ehcomsg() const {
+inline const std::string& C2S_ECHO_REQ::_internal_echomsg() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.ehcomsg_.Get();
+  return _impl_.echomsg_.Get();
 }
-inline void C2S_ECHO_REQ::_internal_set_ehcomsg(const std::string& value) {
+inline void C2S_ECHO_REQ::_internal_set_echomsg(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.Set(value, GetArena());
+  _impl_.echomsg_.Set(value, GetArena());
 }
-inline std::string* C2S_ECHO_REQ::_internal_mutable_ehcomsg() {
+inline std::string* C2S_ECHO_REQ::_internal_mutable_echomsg() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.ehcomsg_.Mutable( GetArena());
+  return _impl_.echomsg_.Mutable( GetArena());
 }
-inline std::string* C2S_ECHO_REQ::release_ehcomsg() {
+inline std::string* C2S_ECHO_REQ::release_echomsg() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:Protocol.C2S_ECHO_REQ.ehcoMsg)
-  return _impl_.ehcomsg_.Release();
+  // @@protoc_insertion_point(field_release:Protocol.C2S_ECHO_REQ.echoMsg)
+  return _impl_.echomsg_.Release();
 }
-inline void C2S_ECHO_REQ::set_allocated_ehcomsg(std::string* value) {
+inline void C2S_ECHO_REQ::set_allocated_echomsg(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.ehcomsg_.IsDefault()) {
-    _impl_.ehcomsg_.Set("", GetArena());
+  _impl_.echomsg_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.echomsg_.IsDefault()) {
+    _impl_.echomsg_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_ECHO_REQ.ehcoMsg)
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_ECHO_REQ.echoMsg)
 }
 
 // -------------------------------------------------------------------
 
 // S2C_ECHO_RES
 
-// string ehcoMsg = 1;
-inline void S2C_ECHO_RES::clear_ehcomsg() {
+// string echoMsg = 1;
+inline void S2C_ECHO_RES::clear_echomsg() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.ClearToEmpty();
+  _impl_.echomsg_.ClearToEmpty();
 }
-inline const std::string& S2C_ECHO_RES::ehcomsg() const
+inline const std::string& S2C_ECHO_RES::echomsg() const
     ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  // @@protoc_insertion_point(field_get:Protocol.S2C_ECHO_RES.ehcoMsg)
-  return _internal_ehcomsg();
+  // @@protoc_insertion_point(field_get:Protocol.S2C_ECHO_RES.echoMsg)
+  return _internal_echomsg();
 }
 template <typename Arg_, typename... Args_>
-inline PROTOBUF_ALWAYS_INLINE void S2C_ECHO_RES::set_ehcomsg(Arg_&& arg,
+inline PROTOBUF_ALWAYS_INLINE void S2C_ECHO_RES::set_echomsg(Arg_&& arg,
                                                      Args_... args) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
-  // @@protoc_insertion_point(field_set:Protocol.S2C_ECHO_RES.ehcoMsg)
+  _impl_.echomsg_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:Protocol.S2C_ECHO_RES.echoMsg)
 }
-inline std::string* S2C_ECHO_RES::mutable_ehcomsg() ABSL_ATTRIBUTE_LIFETIME_BOUND {
-  std::string* _s = _internal_mutable_ehcomsg();
-  // @@protoc_insertion_point(field_mutable:Protocol.S2C_ECHO_RES.ehcoMsg)
+inline std::string* S2C_ECHO_RES::mutable_echomsg() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_echomsg();
+  // @@protoc_insertion_point(field_mutable:Protocol.S2C_ECHO_RES.echoMsg)
   return _s;
 }
-inline const std::string& S2C_ECHO_RES::_internal_ehcomsg() const {
+inline const std::string& S2C_ECHO_RES::_internal_echomsg() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.ehcomsg_.Get();
+  return _impl_.echomsg_.Get();
 }
-inline void S2C_ECHO_RES::_internal_set_ehcomsg(const std::string& value) {
+inline void S2C_ECHO_RES::_internal_set_echomsg(const std::string& value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.Set(value, GetArena());
+  _impl_.echomsg_.Set(value, GetArena());
 }
-inline std::string* S2C_ECHO_RES::_internal_mutable_ehcomsg() {
+inline std::string* S2C_ECHO_RES::_internal_mutable_echomsg() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  return _impl_.ehcomsg_.Mutable( GetArena());
+  return _impl_.echomsg_.Mutable( GetArena());
 }
-inline std::string* S2C_ECHO_RES::release_ehcomsg() {
+inline std::string* S2C_ECHO_RES::release_echomsg() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  // @@protoc_insertion_point(field_release:Protocol.S2C_ECHO_RES.ehcoMsg)
-  return _impl_.ehcomsg_.Release();
+  // @@protoc_insertion_point(field_release:Protocol.S2C_ECHO_RES.echoMsg)
+  return _impl_.echomsg_.Release();
 }
-inline void S2C_ECHO_RES::set_allocated_ehcomsg(std::string* value) {
+inline void S2C_ECHO_RES::set_allocated_echomsg(std::string* value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.ehcomsg_.SetAllocated(value, GetArena());
-  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.ehcomsg_.IsDefault()) {
-    _impl_.ehcomsg_.Set("", GetArena());
+  _impl_.echomsg_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.echomsg_.IsDefault()) {
+    _impl_.echomsg_.Set("", GetArena());
   }
-  // @@protoc_insertion_point(field_set_allocated:Protocol.S2C_ECHO_RES.ehcoMsg)
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S2C_ECHO_RES.echoMsg)
 }
 
 #ifdef __GNUC__

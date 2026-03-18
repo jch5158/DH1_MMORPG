@@ -1,370 +1,171 @@
-﻿using Google.Protobuf.Reflection;
-using Google.Protobuf;
+﻿using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using System.Data;
 
 namespace PacketGenerator
 {
-    internal class PacketHandlerGenerator
+    public class PacketInfo
     {
-        public static bool Generate(PacketProjectsConfig config, string protoPath, string prjBasePath)
+        public string MessageName { get; set; } = string.Empty;
+        public uint PacketId { get; set; }
+        public string Sender { get; set; } = string.Empty;
+        public string Receiver { get; set; } = string.Empty;
+    }
+
+    public class HandlerInfo
+    {
+        public string ProtoFileName { get; set; } = string.Empty;
+        public string HandlerName { get; set; } = string.Empty;
+        public string ServiceTypeName { get; set; } = string.Empty;
+        public List<PacketInfo> Packets { get; set; } = [];
+    }
+
+    public static class Parser
+    {
+        public static List<HandlerInfo> ParseHandlersFromDesc(string protocolDirPath)
         {
-            Path.Combine(protoPath + "Enum.desc");
+            var handlers = new List<HandlerInfo>();
 
-            var descBytes = File.ReadAllBytes(Path.Combine(protoPath + @"/Enum.desc")); // 예: "Protocol.desc"
-            var descriptorSet = FileDescriptorSet.Parser.ParseFrom(descBytes);
-
-            var eRoleDescriptor = descriptorSet.File
-                .SelectMany(f => f.EnumType)
-                .FirstOrDefault(e => e.Name == "eRole");
-
-            if (eRoleDescriptor == null)
-            {
-                Console.WriteLine("[Error] .desc 파일에서 'eRole' Enum을 찾을 수 없습니다.");
-                return false;
-            }
-
-            var validRoles = eRoleDescriptor.Value.Select(v => v.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var projectReceiver in config.Projects)
-            {
-                foreach (var projectSender in config.Projects)
-                {
-                    var receiverRole = projectReceiver.Role.ToUpper();
-                    var senderRole = projectSender.Role.ToUpper();
-
-                    if (!validRoles.Contains(receiverRole) || !validRoles.Contains(senderRole))
-                    {
-                        Console.WriteLine($"[Error] 프로젝트의 역할이 유효하지 않습니다. Receiver: {projectReceiver.Role}, Sender: {projectSender.Role}");
-                        return false;
-                    }
-
-                    if (string.Equals(projectSender.Role, projectReceiver.Role, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    var outputPath = Path.Combine(prjBasePath, @$"{projectReceiver.Name}\PacketHandler");
-                    if (!GenerateHandlerFile(receiverRole, senderRole, protoPath, outputPath))
-                    {
-                        Console.WriteLine("GenerateHandlerFile is Failed");
-                        return false;
-                    }
-
-                    // ReSharper disable once InvertIf
-                    if (!GenerateServiceTypeHandlerFile(receiverRole, senderRole, protoPath, outputPath))
-                    {
-                        Console.WriteLine("GenerateServiceTypeHandlerFile is Failed");
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        public static bool GenerateHandlerFile(string receiver, string sender, string protoDirPath, string outputDirPath)
-        {
-            var descFiles = Directory.GetFiles(protoDirPath, "*.desc");
+            var descFiles = Directory.GetFiles(protocolDirPath, "*.desc");
             if (descFiles.Length == 0)
             {
-                Console.WriteLine($"[Error] '{protoDirPath}' 경로에서 .desc 파일을 찾을 수 없습니다.");
-                return false;
+                Console.WriteLine($"[Error] '{protocolDirPath}' 경로에서 .desc 파일을 찾을 수 없습니다.");
+                return handlers;
             }
 
-            foreach (var protoFilePath in descFiles)
+            var serviceTypeDescriptor = getEnumDescriptorProto("eRole", protocolDirPath);
+            var roleDescriptor = getEnumDescriptorProto("eServiceType", protocolDirPath); ;
+            if (serviceTypeDescriptor == null || roleDescriptor == null)
             {
-                var protoName = Path.GetFileNameWithoutExtension(protoFilePath);
-                if (protoName is "Enum" or "PacketId" or "Struct")
+                return handlers;
+            }
+
+            string[] ignoreDescFiles = ["Enum.desc", "Struct.desc", "PacketOption.desc"];
+            foreach (var descFile in descFiles)
+            {
+                var fileName = Path.GetFileName(descFile);
+                if (ignoreDescFiles.Contains(fileName, StringComparer.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                var fileName = $"{protoName}PacketHandler.h";
-                var outputFilePath = Path.Combine(outputDirPath, fileName);
-
-                if (!GenerateHandleFileContent(receiver, sender, protoName, protoFilePath, out var handleFileContent))
-                {
-                    return false;
-                }
-
-                try
-                {
-                    var directoryPath = Path.GetDirectoryName(outputFilePath);
-                    if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
-                    {
-                        Directory.CreateDirectory(directoryPath);
-                    }
-
-                    File.WriteAllText(outputFilePath, handleFileContent, new System.Text.UTF8Encoding(true));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"[Generate] 패킷 핸들러 생성 중 오류 발생: {e.Message}");
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static bool GenerateHandleFileContent(string receiver, string sender, string protoName, string filePath,
-            out string handleFileContent)
-        {
-            handleFileContent = "";
-
-            try
-            {
-                // 1. 레지스트리 의존성 완전 제거: 순수 .desc 파일만 파싱
-                using var stream = File.OpenRead(filePath);
+                using var stream = File.OpenRead(descFile);
                 var descriptorSet = FileDescriptorSet.Parser.ParseFrom(stream);
 
-                // 2. 동적으로 eRole의 (정수 -> 대문자 문자열) 매핑 딕셔너리 생성
-                var eRoleDescriptor = descriptorSet.File
-                    .SelectMany(f => f.EnumType)
-                    .FirstOrDefault(e => e.Name == "eRole");
-
-                if (eRoleDescriptor == null)
-                {
-                    return false;
-                }
-
-                var roleMap = eRoleDescriptor.Value.ToDictionary(v => v.Number, v => v.Name.ToUpper());
-
-                var senderExt = descriptorSet.File.SelectMany(f => f.Extension).FirstOrDefault(e => e.Name == "sender");
-                var receiverExt = descriptorSet.File.SelectMany(f => f.Extension).FirstOrDefault(e => e.Name == "receiver");
-                if (senderExt == null || receiverExt == null)
-                {
-                    Console.WriteLine("[Error] .desc에서 sender 또는 receiver 확장을 찾을 수 없습니다.");
-                    return false;
-                }
-
-                var senderFieldNum = senderExt.Number;
-                var receiverFieldNum = receiverExt.Number;
-
-                var initHandleString = string.Empty;
-                var handleFunctionDeclareString = string.Empty;
-                var makeSendBufferFunctionString = string.Empty;
-
-                foreach (var fileProto in descriptorSet.File)
-                {
-                    if (!fileProto.Name.EndsWith($"{protoName}.proto"))
-                    {
-                        continue;
-                    }
-
-                    foreach (var msg in fileProto.MessageType)
-                    {
-                        if (msg.Options == null)
-                        {
-                            continue;
-                        }
-
-                        var optionsBytes = msg.Options.ToByteArray();
-                        var input = new CodedInputStream(optionsBytes);
-
-                        var currentSenderVal = -1;
-                        var currentReceiverVal = -1;
-
-                        while (!input.IsAtEnd)
-                        {
-                            var tag = input.ReadTag();
-                            var fieldNum = WireFormat.GetTagFieldNumber(tag);
-
-                            if (fieldNum == senderFieldNum)
-                            {
-                                currentSenderVal = input.ReadEnum();
-                            }
-                            else if (fieldNum == receiverFieldNum)
-                            {
-                                currentReceiverVal = input.ReadEnum();
-                            }
-                            else
-                            {
-                                input.SkipLastField(); // 필요 없는 옵션은 스킵
-                            }
-                        }
-
-                        if (currentSenderVal == -1 || currentReceiverVal == -1)
-                        {
-                            continue;
-                        }
-
-                        if (!roleMap.TryGetValue(currentSenderVal, out var senderName) ||
-                            !roleMap.TryGetValue(currentReceiverVal, out var receiverName))
-                        {
-                            continue;
-                        }
-
-                        if (sender == senderName && receiver == receiverName)
-                        {
-                            var packetName = msg.Name;
-                            initHandleString += string.Format(PacketFormatter.HANDLE_INIT_FORMAT, $"ID_{packetName}",
-                                packetName);
-
-                            handleFunctionDeclareString +=
-                                string.Format(PacketFormatter.HANDLE_DECLARE_FORMAT, packetName);
-                        }
-
-                        if (receiver == senderName && sender == receiverName)
-                        {
-                            var packetName = msg.Name;
-                            makeSendBufferFunctionString += string.Format(PacketFormatter.MAKE_SEND_BUFFER_FORMAT,
-                                packetName, $"ID_{packetName}");
-                        }
-                    }
-                }
-
-                handleFileContent = string.Format(PacketFormatter.HANDLE_FILE_FORMAT, protoName,
-                    initHandleString,
-                    handleFunctionDeclareString,
-                    makeSendBufferFunctionString);
-
-                handleFileContent = handleFileContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"[GenerateInitHandleString] 오류 발생: {e.Message}");
-                return false;
-            }
-
-            return true;
-        }
-
-
-        public static bool GenerateServiceTypeHandlerFile(string receiver, string sender, string protoDirPath, string outputDirPath)
-        {
-            var descFiles = Directory.GetFiles(protoDirPath, "*.desc");
-            if (descFiles.Length == 0)
-            {
-                Console.WriteLine($"[Error] '{protoDirPath}' 경로에서 .desc 파일을 찾을 수 없습니다.");
-                return false;
-            }
-
-            const string fileName = "PacketServiceTypeHandler.h";
-            var outputFilePath = Path.Combine(outputDirPath, fileName);
-
-            var includeString = string.Empty;
-            var initHandlerString = string.Empty;
-            var handleInitString = string.Empty;
-
-            foreach (var protoFilePath in descFiles)
-            {
-                var protoName = Path.GetFileNameWithoutExtension(protoFilePath);
-                if (protoName is "Enum" or "Struct")
+                var protoName = fileName.Replace(".desc", ".proto");
+                var protoFile = descriptorSet.File.FirstOrDefault(f => Path.GetFileName(f.Name) == protoName);
+                if (protoFile == null)
                 {
                     continue;
                 }
 
-                if (protoName is "PacketId")
+                // 1. 파일 옵션 파싱 (HandlerInfo 세팅)
+                var handlerInfo = new HandlerInfo
                 {
-                    if (GenerateHandleInitString(protoFilePath, ref handleInitString))
+                    ProtoFileName = Path.GetFileNameWithoutExtension(protoName) // 확장자 뺀 이름 (예: "Echo")
+                };
+
+                if (protoFile.Options != null)
+                {
+                    var optionsBytes = protoFile.Options.ToByteArray();
+                    var inputStream = new CodedInputStream(optionsBytes);
+                    uint tag;
+                    while ((tag = inputStream.ReadTag()) != 0)
+                    {
+                        var fieldNum = WireFormat.GetTagFieldNumber(tag);
+                        switch (fieldNum)
+                        {
+                            case 50001:
+                                var svcTypeValue = inputStream.ReadInt32();
+                                handlerInfo.ServiceTypeName =
+                                    serviceTypeDescriptor?.Value.FirstOrDefault(v => v.Number == svcTypeValue)
+                                        ?.Name ?? string.Empty;
+                                break;
+                            case 50002:
+                                handlerInfo.HandlerName = inputStream.ReadString();
+                                break;
+                            default:
+                                inputStream.SkipLastField();
+                                break;
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(handlerInfo.HandlerName) ||
+                    string.IsNullOrEmpty(handlerInfo.ServiceTypeName))
+                {
+                    continue;
+                }
+
+                foreach (var message in protoFile.MessageType)
+                {
+                    if (message.Options == null)
                     {
                         continue;
                     }
 
-                    Console.WriteLine("GenerateFile is Failed");
-                    return false;
-                }
-
-                includeString += string.Format(PacketFormatter.SERVICE_TYPE_INCLUDE_FORMAT, protoName);
-                initHandlerString += string.Format(PacketFormatter.SERVICE_TYPE_INIT_FORMAT, protoName);
-            }
-
-            var serviceTypeHandlerContent = string.Format(PacketFormatter.HANDLE_SERVICE_TYPE_FILE_FORMAT,
-                includeString,
-                initHandlerString,
-                handleInitString);
-
-            try
-            {
-                var directoryPath = Path.GetDirectoryName(outputFilePath);
-
-                if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-
-                serviceTypeHandlerContent = serviceTypeHandlerContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
-
-                File.WriteAllText(outputFilePath, serviceTypeHandlerContent, new System.Text.UTF8Encoding(true));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"[GenerateServiceTypeHandlerFile] 패킷 핸들러 생성 중 오류 발생: {e.Message}");
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool GenerateHandleInitString(string filePath, ref string handleInitString)
-        {
-            try
-            {
-                using var stream = File.OpenRead(filePath);
-                var descriptorSet = FileDescriptorSet.Parser.ParseFrom(stream);
-
-                var handlerNameExt = descriptorSet.File
-                    .SelectMany(f => f.Extension)
-                    .FirstOrDefault(e => e.Name.ToLower() == "handler_name");
-
-                if (handlerNameExt == null)
-                {
-                    Console.WriteLine("[Error] .desc에서 handler_name(또는 HandlerName) 확장을 찾을 수 없습니다.");
-                    return false;
-                }
-
-                var handlerNameFieldNum = handlerNameExt.Number;
-
-                foreach (var fileProto in descriptorSet.File)
-                {
-                    foreach (var enumType in fileProto.EnumType)
+                    var packetInfo = new PacketInfo
                     {
-                        foreach (var enumValue in enumType.Value)
+                        MessageName = message.Name
+                    };
+
+                    var optionsBytes = message.Options.ToByteArray();
+                    var inputStream = new CodedInputStream(optionsBytes);
+                    uint tag;
+                    while ((tag = inputStream.ReadTag()) != 0)
+                    {
+                        var fieldNum = WireFormat.GetTagFieldNumber(tag);
+                        switch (fieldNum)
                         {
-                            if (enumValue.Options == null) continue;
-
-                            var optionsBytes = enumValue.Options.ToByteArray();
-                            var input = new CodedInputStream(optionsBytes);
-
-                            string? handlerName = null;
-
-                            while (!input.IsAtEnd)
-                            {
-                                var tag = input.ReadTag();
-                                var fieldNum = WireFormat.GetTagFieldNumber(tag);
-
-                                if (fieldNum == handlerNameFieldNum)
-                                {
-                                    handlerName = input.ReadString();
-                                }
-                                else
-                                {
-                                    input.SkipLastField();
-                                }
-                            }
-
-                            if (string.IsNullOrEmpty(handlerName))
-                            {
-                                continue;
-                            }
-
-                            var enumName = enumValue.Name;
-                            handleInitString += string.Format(
-                                PacketFormatter.SERVICE_TYPE_HANDLE_INIT_FORMAT,
-                                enumName,
-                                handlerName
-                            );
+                            case 50003:
+                                packetInfo.PacketId = inputStream.ReadUInt32();
+                                break;
+                            case 50004:
+                                var senderValue = inputStream.ReadInt32();
+                                packetInfo.Sender =
+                                    roleDescriptor?.Value.FirstOrDefault(v => v.Number == senderValue)?.Name ??
+                                    string.Empty;
+                                break;
+                            case 50005:
+                                var receiverValue = inputStream.ReadInt32();
+                                packetInfo.Receiver =
+                                    roleDescriptor?.Value.FirstOrDefault(v => v.Number == receiverValue)?.Name ??
+                                    string.Empty;
+                                break;
+                            default:
+                                inputStream.SkipLastField();
+                                break;
                         }
                     }
+
+                    if (packetInfo.PacketId > 0 && !string.IsNullOrEmpty(packetInfo.Sender) &&
+                        !string.IsNullOrEmpty(packetInfo.Receiver))
+                    {
+                        handlerInfo.Packets.Add(packetInfo);
+                    }
+                }
+
+                if (handlerInfo.Packets.Count > 0)
+                {
+                    handlers.Add(handlerInfo);
                 }
             }
-            catch (Exception e)
+
+            return handlers;
+        }
+
+        private static EnumDescriptorProto? getEnumDescriptorProto(string enumName, string protocolDirPath)
+        {
+            var enumDescPath = Path.Combine(protocolDirPath, "Enum.desc");
+            if (!File.Exists(enumDescPath))
             {
-                Console.WriteLine($"[GenerateHandleInitString] 패킷 핸들러 생성 중 오류 발생: {e.Message}");
-                return false;
+                return null;
             }
 
-            return true;
+            using var stream = File.OpenRead(enumDescPath);
+            var descriptorSet = FileDescriptorSet.Parser.ParseFrom(stream);
+            var enumFile = descriptorSet.File.FirstOrDefault(f => Path.GetFileName(f.Name) == "Enum.proto");
+            return enumFile?.EnumType.FirstOrDefault(e => e.Name == enumName);
         }
     }
 }

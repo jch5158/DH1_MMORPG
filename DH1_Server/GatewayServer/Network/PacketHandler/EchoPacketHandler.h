@@ -11,13 +11,13 @@
 #include "PacketId.pb.h"
 #include "Enum.pb.h"
 #include "Struct.pb.h"
-#include "Login.pb.h"
+#include "Echo.pb.h"
 #include "StlTypes.h"
 #include "PacketSession.h"
 
 #endif
 
-class LoginPacketHandler
+class EchoPacketHandler
 {
 public:
 
@@ -25,11 +25,7 @@ public:
 
     static void Init()
     {
-        sPacketHandleMap[Protocol::ePacketId::ID_C2S_LOGIN_REQ] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
-			{
-				return HandlePacket<Protocol::C2S_LOGIN_REQ>(size, pBuffer, pSession, HANDLE_C2S_LOGIN_REQ);
-			};
-
+        
     }
 
 	static bool HandlePacket(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession)
@@ -44,11 +40,9 @@ public:
 	}
 
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession);
-    static bool HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& packet, PacketSessionRef& pSession);
-
     
-    static NetSendBufferRef MakeSendBuffer(Protocol::S2C_LOGIN_RES& packet) { return MakeSendBuffer(packet, static_cast<uint32>(Protocol::ID_S2C_LOGIN_RES)); }
-
+    
+    
 
 private:
 
@@ -90,7 +84,7 @@ private:
 		header->id = packetId;
 		if (!packet.SerializeToArray(&header[1], dataSize))
 		{
-			NET_ENGINE_LOG_FATAL("LoginPacketHandler::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
+			NET_ENGINE_LOG_FATAL("EchoPacketHandler::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
 	    }
 		

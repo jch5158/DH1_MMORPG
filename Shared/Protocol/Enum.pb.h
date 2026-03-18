@@ -27,7 +27,6 @@
 #include "google/protobuf/repeated_field.h"  // IWYU pragma: export
 #include "google/protobuf/extension_set.h"  // IWYU pragma: export
 #include "google/protobuf/generated_enum_reflection.h"
-#include "google/protobuf/descriptor.pb.h"
 // @@protoc_insertion_point(includes)
 
 // Must be included last.
@@ -56,10 +55,46 @@ namespace protobuf {
 }  // namespace google
 
 namespace Protocol {
+enum eServiceType : int {
+  SERVICE_TYPE_NONE = 0,
+  SERVICE_TYPE_ECHO = 1,
+  eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool eServiceType_IsValid(int value);
+extern const uint32_t eServiceType_internal_data_[];
+constexpr eServiceType eServiceType_MIN = static_cast<eServiceType>(0);
+constexpr eServiceType eServiceType_MAX = static_cast<eServiceType>(1);
+constexpr int eServiceType_ARRAYSIZE = 1 + 1;
+const ::google::protobuf::EnumDescriptor*
+eServiceType_descriptor();
+template <typename T>
+const std::string& eServiceType_Name(T value) {
+  static_assert(std::is_same<T, eServiceType>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to eServiceType_Name().");
+  return eServiceType_Name(static_cast<eServiceType>(value));
+}
+template <>
+inline const std::string& eServiceType_Name(eServiceType value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<eServiceType_descriptor,
+                                                 0, 1>(
+      static_cast<int>(value));
+}
+inline bool eServiceType_Parse(absl::string_view name, eServiceType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<eServiceType>(
+      eServiceType_descriptor(), name, value);
+}
 enum eRole : int {
   ROLE_NONE = 0,
   CLIENT = 1,
-  GAME_SERVER = 2,
+  ECHO_SERVER = 2,
+  GATEWAY_SERVER = 3,
+  WORLD_SERVER = 4,
+  CENTER_SERVER = 5,
   eRole_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   eRole_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -69,8 +104,8 @@ enum eRole : int {
 bool eRole_IsValid(int value);
 extern const uint32_t eRole_internal_data_[];
 constexpr eRole eRole_MIN = static_cast<eRole>(0);
-constexpr eRole eRole_MAX = static_cast<eRole>(2);
-constexpr int eRole_ARRAYSIZE = 2 + 1;
+constexpr eRole eRole_MAX = static_cast<eRole>(5);
+constexpr int eRole_ARRAYSIZE = 5 + 1;
 const ::google::protobuf::EnumDescriptor*
 eRole_descriptor();
 template <typename T>
@@ -83,7 +118,7 @@ const std::string& eRole_Name(T value) {
 template <>
 inline const std::string& eRole_Name(eRole value) {
   return ::google::protobuf::internal::NameOfDenseEnum<eRole_descriptor,
-                                                 0, 2>(
+                                                 0, 5>(
       static_cast<int>(value));
 }
 inline bool eRole_Parse(absl::string_view name, eRole* value) {
@@ -99,16 +134,6 @@ inline bool eRole_Parse(absl::string_view name, eRole* value) {
 
 
 
-static const int kSenderFieldNumber = 50000;
-extern ::google::protobuf::internal::ExtensionIdentifier<
-    ::google::protobuf::MessageOptions, ::google::protobuf::internal::EnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>, 14,
-    false>
-    sender;
-static const int kReceiverFieldNumber = 50001;
-extern ::google::protobuf::internal::ExtensionIdentifier<
-    ::google::protobuf::MessageOptions, ::google::protobuf::internal::EnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>, 14,
-    false>
-    receiver;
 
 // ===================================================================
 
@@ -128,6 +153,12 @@ extern ::google::protobuf::internal::ExtensionIdentifier<
 namespace google {
 namespace protobuf {
 
+template <>
+struct is_proto_enum<::Protocol::eServiceType> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::Protocol::eServiceType>() {
+  return ::Protocol::eServiceType_descriptor();
+}
 template <>
 struct is_proto_enum<::Protocol::eRole> : std::true_type {};
 template <>

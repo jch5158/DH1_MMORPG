@@ -26,7 +26,7 @@ namespace _pbi = ::google::protobuf::internal;
 namespace _fl = ::google::protobuf::internal::field_layout;
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[1];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[2];
 static constexpr const ::_pb::ServiceDescriptor**
     file_level_service_descriptors_Enum_2eproto = nullptr;
 const ::uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
@@ -34,28 +34,23 @@ static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 const char descriptor_table_protodef_Enum_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
-    "\n\nEnum.proto\022\010Protocol\032 google/protobuf/"
-    "descriptor.proto*3\n\005eRole\022\r\n\tROLE_NONE\020\000"
-    "\022\n\n\006CLIENT\020\001\022\017\n\013GAME_SERVER\020\002:B\n\006sender\022"
-    "\037.google.protobuf.MessageOptions\030\320\206\003 \001(\016"
-    "2\017.Protocol.eRole:D\n\010receiver\022\037.google.p"
-    "rotobuf.MessageOptions\030\321\206\003 \001(\0162\017.Protoco"
-    "l.eRoleb\006proto3"
-};
-static const ::_pbi::DescriptorTable* const descriptor_table_Enum_2eproto_deps[1] =
-    {
-        &::descriptor_table_google_2fprotobuf_2fdescriptor_2eproto,
+    "\n\nEnum.proto\022\010Protocol*<\n\014eServiceType\022\025"
+    "\n\021SERVICE_TYPE_NONE\020\000\022\025\n\021SERVICE_TYPE_EC"
+    "HO\020\001*l\n\005eRole\022\r\n\tROLE_NONE\020\000\022\n\n\006CLIENT\020\001"
+    "\022\017\n\013ECHO_SERVER\020\002\022\022\n\016GATEWAY_SERVER\020\003\022\020\n"
+    "\014WORLD_SERVER\020\004\022\021\n\rCENTER_SERVER\020\005b\006prot"
+    "o3"
 };
 static ::absl::once_flag descriptor_table_Enum_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
     false,
     false,
-    255,
+    202,
     descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once,
-    descriptor_table_Enum_2eproto_deps,
-    1,
+    nullptr,
+    0,
     0,
     schemas,
     file_default_instances,
@@ -64,25 +59,24 @@ PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto =
     file_level_service_descriptors_Enum_2eproto,
 };
 namespace Protocol {
-const ::google::protobuf::EnumDescriptor* eRole_descriptor() {
+const ::google::protobuf::EnumDescriptor* eServiceType_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
   return file_level_enum_descriptors_Enum_2eproto[0];
 }
-PROTOBUF_CONSTINIT const uint32_t eRole_internal_data_[] = {
-    196608u, 0u, };
-bool eRole_IsValid(int value) {
-  return 0 <= value && value <= 2;
+PROTOBUF_CONSTINIT const uint32_t eServiceType_internal_data_[] = {
+    131072u, 0u, };
+bool eServiceType_IsValid(int value) {
+  return 0 <= value && value <= 1;
 }
-PROTOBUF_CONSTINIT
-    PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 ::_pbi::
-        ExtensionIdentifier<::google::protobuf::MessageOptions, ::_pbi::EnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>,
-                            14, false>
-            sender(kSenderFieldNumber, static_cast< ::Protocol::eRole >(0));
-PROTOBUF_CONSTINIT
-    PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 ::_pbi::
-        ExtensionIdentifier<::google::protobuf::MessageOptions, ::_pbi::EnumTypeTraits< ::Protocol::eRole, ::Protocol::eRole_IsValid>,
-                            14, false>
-            receiver(kReceiverFieldNumber, static_cast< ::Protocol::eRole >(0));
+const ::google::protobuf::EnumDescriptor* eRole_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[1];
+}
+PROTOBUF_CONSTINIT const uint32_t eRole_internal_data_[] = {
+    393216u, 0u, };
+bool eRole_IsValid(int value) {
+  return 0 <= value && value <= 5;
+}
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
 namespace google {
@@ -93,11 +87,5 @@ namespace protobuf {
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::std::false_type
     _static_init2_ PROTOBUF_UNUSED =
         (::_pbi::AddDescriptors(&descriptor_table_Enum_2eproto),
-        ::_pbi::ExtensionSet::RegisterEnumExtension(
-            &::google::protobuf::MessageOptions::default_instance(), 50000, 14,
-            false, false, ::Protocol::eRole_IsValid),
-        ::_pbi::ExtensionSet::RegisterEnumExtension(
-            &::google::protobuf::MessageOptions::default_instance(), 50001, 14,
-            false, false, ::Protocol::eRole_IsValid),
          ::std::false_type{});
 #include "google/protobuf/port_undef.inc"

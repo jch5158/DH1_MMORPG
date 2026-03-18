@@ -1,20 +1,20 @@
 ﻿{
   "projects": [
     {
+      "name": "DH1_Engine\\EchoClient",
+      "role": "Client"
+    },
+    {
+      "name": "DH1_Engine\\EchoServer",
+      "role": "Echo_Server"
+    },
+        {
       "name": "DH1_Client\\Source\\DH1_Client\\Network",
       "role": "Client"
     },
-    {
-      "name": "DH1_Engine\\DummyClient",
-      "role": "Client"
-    },
-    {
-      "name": "DH1_Engine\\GameServer",
-      "role": "Game_Server"
-    },
-    {
-      "name": "DH1_Server\\GameServer",
-      "role": "Game_Server"
+        {
+      "name": "DH1_Server\\GatewayServer\\Network",
+      "role": "Gateway_Server"
     }
   ]
 }

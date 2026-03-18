@@ -35,15 +35,13 @@ static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 const char descriptor_table_protodef_PacketId_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\016PacketId.proto\022\010Protocol\032 google/proto"
-    "buf/descriptor.proto*\203\001\n\014eServiceType\022\025\n"
-    "\021SERVICE_TYPE_NONE\020\000\022,\n\021SERVICE_TYPE_ECH"
-    "O\020\001\032\025\222\265\030\021EchoPacketHandler\022.\n\022SERVICE_TY"
-    "PE_LOGIN\020\002\032\026\222\265\030\022LoginPacketHandler*v\n\teP"
-    "acketId\022\013\n\007ID_NONE\020\000\022\025\n\017ID_C2S_ECHO_REQ\020"
-    "\201\200\004\022\025\n\017ID_S2C_ECHO_RES\020\202\200\004\022\026\n\020ID_C2S_LOG"
-    "IN_REQ\020\201\200\010\022\026\n\020ID_S2C_LOGIN_RES\020\202\200\010:9\n\014ha"
-    "ndler_name\022!.google.protobuf.EnumValueOp"
-    "tions\030\322\206\003 \001(\tb\006proto3"
+    "buf/descriptor.proto*S\n\014eServiceType\022\025\n\021"
+    "SERVICE_TYPE_NONE\020\000\022,\n\021SERVICE_TYPE_ECHO"
+    "\020\001\032\025\222\265\030\021EchoPacketHandler*F\n\tePacketId\022\013"
+    "\n\007ID_NONE\020\000\022\025\n\017ID_C2S_ECHO_REQ\020\201\200\004\022\025\n\017ID"
+    "_S2C_ECHO_RES\020\202\200\004:9\n\014handler_name\022!.goog"
+    "le.protobuf.EnumValueOptions\030\322\206\003 \001(\tb\006pr"
+    "oto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_PacketId_2eproto_deps[1] =
     {
@@ -53,7 +51,7 @@ static ::absl::once_flag descriptor_table_PacketId_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_PacketId_2eproto = {
     false,
     false,
-    381,
+    284,
     descriptor_table_protodef_PacketId_2eproto,
     "PacketId.proto",
     &descriptor_table_PacketId_2eproto_once,
@@ -72,16 +70,16 @@ const ::google::protobuf::EnumDescriptor* eServiceType_descriptor() {
   return file_level_enum_descriptors_PacketId_2eproto[0];
 }
 PROTOBUF_CONSTINIT const uint32_t eServiceType_internal_data_[] = {
-    196608u, 0u, };
+    131072u, 0u, };
 bool eServiceType_IsValid(int value) {
-  return 0 <= value && value <= 2;
+  return 0 <= value && value <= 1;
 }
 const ::google::protobuf::EnumDescriptor* ePacketId_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&descriptor_table_PacketId_2eproto);
   return file_level_enum_descriptors_PacketId_2eproto[1];
 }
 PROTOBUF_CONSTINIT const uint32_t ePacketId_internal_data_[] = {
-    65536u, 262144u, 131073u, 65538u, 131074u, 65537u, };
+    65536u, 131072u, 65538u, 65537u, };
 bool ePacketId_IsValid(int value) {
   return ::_pbi::ValidateEnum(value, ePacketId_internal_data_);
 }

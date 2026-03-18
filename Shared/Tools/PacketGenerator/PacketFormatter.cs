@@ -44,20 +44,19 @@ private:
 }};";
 
         public static readonly string SERVICE_TYPE_INCLUDE_FORMAT =
-            @"#include ""{0}PacketHandler.h""
+            @"#include ""{0}.h""
 ";
 
         public static readonly string SERVICE_TYPE_INIT_FORMAT =
-            @"
-        {0}PacketHandler::Init();
+            @"{0}::Init();
 ";
 
         public static readonly string SERVICE_TYPE_HANDLE_INIT_FORMAT =
-            @"
-        sPacketServiceTypeMap[Protocol::eServiceType::{0}] = [](const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession) -> bool
-			{{
-				return {1}::HandlePacket(size, packetId, pBuffer, pSession);
-			}};
+            @"sPacketServiceTypeMap[Protocol::eServiceType::{0}] = [](const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession) -> bool
+            {{
+                return {1}::HandlePacket(size, packetId, pBuffer, pSession);
+            }};
+
 ";
 
         public static readonly string HANDLE_FILE_FORMAT =
@@ -80,7 +79,7 @@ private:
 
 #endif
 
-class {0}PacketHandler
+class {1}
 {{
 public:
 
@@ -88,7 +87,7 @@ public:
 
     static void Init()
     {{
-        {1}
+        {2}
     }}
 
 	static bool HandlePacket(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession)
@@ -103,9 +102,9 @@ public:
 	}}
 
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession);
-    {2}
-    
     {3}
+    
+    {4}
 
 private:
 
@@ -147,7 +146,7 @@ private:
 		header->id = packetId;
 		if (!packet.SerializeToArray(&header[1], dataSize))
 		{{
-			NET_ENGINE_LOG_FATAL(""{0}PacketHandler::MakeSendBuffer SerializeToArray is Failed, &header[1] : {{}}, packetId : {{}}, dataSize : {{}}"", fmt::ptr(&header[1]), header->id, dataSize);
+			NET_ENGINE_LOG_FATAL(""{0}::MakeSendBuffer SerializeToArray is Failed, &header[1] : {{}}, packetId : {{}}, dataSize : {{}}"", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
 	    }}
 		
@@ -160,12 +159,11 @@ private:
 }};";
 
         public static readonly string HANDLE_INIT_FORMAT = 
-            @"sPacketHandleMap[Protocol::ePacketId::{0}] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
+            @"sPacketHandleMap[{0}] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
 			{{
 				return HandlePacket<Protocol::{1}>(size, pBuffer, pSession, HANDLE_{1});
 			}};
 ";
-
 
 		public static readonly string HANDLE_DECLARE_FORMAT =
             @"static bool HANDLE_{0}(const Protocol::{0}& packet, PacketSessionRef& pSession);

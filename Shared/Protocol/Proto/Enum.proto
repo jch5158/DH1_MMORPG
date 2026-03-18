@@ -1,17 +1,18 @@
 ﻿syntax = "proto3";
 package Protocol;
 
-import "google/protobuf/descriptor.proto";
+enum eServiceType 
+{
+    SERVICE_TYPE_NONE = 0;
+    SERVICE_TYPE_ECHO = 1;
+}
 
 enum eRole 
 {
     ROLE_NONE = 0;
     CLIENT = 1;
-    GAME_SERVER = 2;
-}
-
-extend google.protobuf.MessageOptions 
-{
-    eRole sender = 50000;
-    eRole receiver = 50001;
+    ECHO_SERVER = 2;
+    GATEWAY_SERVER = 3;
+    WORLD_SERVER = 4;
+    CENTER_SERVER = 5;
 }

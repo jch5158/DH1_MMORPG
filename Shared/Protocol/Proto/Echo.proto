@@ -1,20 +1,25 @@
 syntax = "proto3";
 package Protocol;
 
-import "Enum.proto";
+import "PacketOption.proto";
 
-message	C2S_ECHO_REQ
+option (service_type) = SERVICE_TYPE_ECHO;
+option (handler_name) = "EchoPacketHandler";
+
+message C2S_ECHO_REQ 
 {
+    option (packet_id) = 1;
     option (sender) = CLIENT;
-    option (receiver) = GAME_SERVER;
+    option (receiver) = ECHO_SERVER;
 
-    string ehcoMsg = 1;
+    string echoMsg = 1;
 }
 
-message S2C_ECHO_RES
+message S2C_ECHO_RES 
 {
-    option (sender) = GAME_SERVER;
+    option (packet_id) = 2;
+    option (sender) = ECHO_SERVER;
     option (receiver) = CLIENT;
 
-    string ehcoMsg = 1;
+    string echoMsg = 1;
 }

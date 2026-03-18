@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "EchoPacketHandler.h"
-#include "LoginPacketHandler.h"
+#include "PacketOptionPacketHandler.h"
 
 
 class PacketServiceTypeHandler
@@ -17,19 +17,9 @@ public:
         
         EchoPacketHandler::Init();
 
-        LoginPacketHandler::Init();
+        PacketOptionPacketHandler::Init();
 
 		
-        sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_ECHO] = [](const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession) -> bool
-			{
-				return EchoPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
-			};
-
-        sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_LOGIN] = [](const uint16 size, const uint32 packetId, byte* pBuffer, PacketSessionRef& pSession) -> bool
-			{
-				return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
-			};
-
 	}
 
 	static bool HandlePacketServiceType(const uint16 len, byte* pBuffer, PacketSessionRef& pSession)
