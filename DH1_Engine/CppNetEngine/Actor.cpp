@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Actor.h"
+#include "ActorEventEnum.h"
 #include "ActorScheduler.h"
 #include "IocpEvent.h"
 
@@ -23,12 +24,12 @@ Actor::Actor()
 
 void Actor::Dispatch(class IocpEvent& iocpEvent, const uint32)
 {
-	switch (iocpEvent.GetEventType())  // NOLINT(clang-diagnostic-switch-enum)
+	switch (static_cast<eActorEventType>(iocpEvent.GetCustomType()))  // NOLINT(clang-diagnostic-switch-enum)
 	{
-	case eIocpEventType::ActorMessage:
+	case eActorEventType::ActorMessage:
 		processActorMessage();
 		break;
-	default:
+	default: // NOLINT(clang-diagnostic-covered-switch-default)
 		NET_ENGINE_LOG_ERROR("Actor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(iocpEvent.GetEventType()));
 		break;
 	}

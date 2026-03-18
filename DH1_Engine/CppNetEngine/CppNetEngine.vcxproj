@@ -219,6 +219,7 @@
   <ItemGroup>
     <ClInclude Include="Acceptor.h" />
     <ClInclude Include="ActorDispatcher.h" />
+    <ClInclude Include="ActorEventEnum.h" />
     <ClInclude Include="ActorMailbox.h" />
     <ClInclude Include="ActorManager.h" />
     <ClInclude Include="ActorService.h" />

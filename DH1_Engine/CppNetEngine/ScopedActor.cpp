@@ -1,14 +1,15 @@
 ﻿#include "pch.h"
 #include "ScopedActor.h"
+#include "ActorEventEnum.h"
 
 void ScopedActor::Dispatch(class IocpEvent& iocpEvent, const uint32)
 {
-	switch (iocpEvent.GetEventType())  // NOLINT(clang-diagnostic-switch-enum)
+	switch (static_cast<eActorEventType>(iocpEvent.GetCustomType()))
 	{
-	case eIocpEventType::ActorMessage:
+	case eActorEventType::ActorMessage:
 		processActorMessage();
 		break;
-	default:
+	default: // NOLINT(clang-diagnostic-covered-switch-default)
 		NET_ENGINE_LOG_ERROR("Actor::Dispatch - iocp event type is unmatched, actorEvent.GetEventType() : {}", static_cast<uint8>(iocpEvent.GetEventType()));
 		break;
 	}

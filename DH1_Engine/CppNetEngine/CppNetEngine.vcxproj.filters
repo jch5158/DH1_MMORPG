@@ -216,6 +216,9 @@
     <ClInclude Include="SocketIocpObject.h">
       <Filter>Network\IOCP</Filter>
     </ClInclude>
+    <ClInclude Include="ActorEventEnum.h">
+      <Filter>Actor\IOCP\Event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

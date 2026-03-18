@@ -4,12 +4,12 @@
 
 enum class eIocpEventType : uint8
 {
-	Accept,
+	Accept = 1,
 	Connect,
 	Disconnect,
 	Send,
 	Receive,
-	ActorMessage
+	CustomEvent
 };
 
 class IocpEvent : public OVERLAPPED
@@ -22,16 +22,20 @@ public:
 	IocpEvent& operator=(IocpEvent&&) = delete;
 
 	explicit IocpEvent(const eIocpEventType eventType);
+	explicit IocpEvent(const int32 customType);
 	~IocpEvent() = default;
 
 	void ClearOverlapped();
 	[[nodiscard]] eIocpEventType GetEventType() const;
 	[[nodiscard]] IocpObjectRef GetOwner() const;
+	[[nodiscard]] int32 GetCustomType() const;
+
 	void SetOwner(const IocpObjectRef& pOwner);
 	void ResetOwner();
 
 private:
 
 	const eIocpEventType mEventType;
+	const std::optional<int32> mCustomType;
 	IocpObjectWeak mpOwner;
 };

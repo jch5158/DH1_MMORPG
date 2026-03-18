@@ -1,9 +1,10 @@
 ﻿#include "pch.h"
 #include "ActorMailbox.h"
 #include "Actor.h"
+#include "ActorEventEnum.h"
 
 ActorMessageEvent::ActorMessageEvent()
-	:IocpEvent(eIocpEventType::ActorMessage)
+	:IocpEvent(static_cast<uint32>(eActorEventType::ActorMessage))
 {
 }
 
