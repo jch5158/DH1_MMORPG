@@ -12,13 +12,13 @@
 #include "Struct.pb.h"
 #include "PacketOption.pb.h"
 #include "PacketId.h"
-#include "Echo.pb.h"
+#include "Login.pb.h"
 #include "StlTypes.h"
 #include "PacketSession.h"
 
 #endif
 
-class EchoPacketHandler
+class LoginPacketHandler
 {
 public:
 
@@ -31,9 +31,9 @@ public:
 
     static void Init()
     {
-        sPacketHandleMap[packet_id::eEchoPacketId::C2S_ECHO_REQ] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
+        sPacketHandleMap[packet_id::eLoginPacketId::S2C_LOGIN_RES] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
 			{
-				return HandlePacket<Protocol::C2S_ECHO_REQ>(size, pBuffer, pSession, HANDLE_C2S_ECHO_REQ);
+				return HandlePacket<Protocol::S2C_LOGIN_RES>(size, pBuffer, pSession, HANDLE_S2C_LOGIN_RES);
 			};
 
     }
@@ -50,10 +50,11 @@ public:
 	}
 
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, byte* pBuffer, PacketSessionRef& pSession);
-    static bool HANDLE_C2S_ECHO_REQ(const Protocol::C2S_ECHO_REQ& packet, PacketSessionRef& pSession);
+    static bool HANDLE_S2C_LOGIN_RES(const Protocol::S2C_LOGIN_RES& packet, PacketSessionRef& pSession);
 
     
-    
+    static NetSendBufferRef MakeSendBuffer(Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGIN_REQ); }
+
 
 private:
 
@@ -92,10 +93,10 @@ private:
 
 		auto* header = reinterpret_cast<PacketHeader*>(pBuffer);
 		header->size = packetSize;
-		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_ECHO, packetId);
+		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_LOGIN, packetId);
 		if (!packet.SerializeToArray(&header[1], dataSize))
 		{
-			NET_ENGINE_LOG_FATAL("Echo::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
+			NET_ENGINE_LOG_FATAL("Login::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
 	    }
 		

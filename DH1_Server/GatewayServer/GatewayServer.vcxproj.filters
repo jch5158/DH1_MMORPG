@@ -1,22 +1,111 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
+    <Filter Include="Pch">
+      <UniqueIdentifier>{7abae0ed-1546-4327-9d5a-f4d0e7853f76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Network">
+      <UniqueIdentifier>{0a7d203d-cdc7-4746-9176-90c67c9ee3fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Network\Protocol">
+      <UniqueIdentifier>{592b4757-4bdd-486d-9eef-cef3330e1edd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Protocol\Proto">
+      <UniqueIdentifier>{7cfb2d0c-d280-4c3e-8ca3-70a19ec7c02a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Protocol\PacketId">
+      <UniqueIdentifier>{c3f97462-0578-4213-bced-50a34b3d4d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\PacketHandler">
+      <UniqueIdentifier>{02faff61-ac48-4355-9233-ac9d59eab975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Session">
+      <UniqueIdentifier>{2038bf49-2d7b-4a8a-9a33-81785e54f635}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GatewayServer.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="pch.cpp">
+      <Filter>Pch</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Echo.pb.cc">
+      <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
+      <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
+      <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
+      <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSession.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="GatewayServer.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
+      <Filter>Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp">
+      <Filter>Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\LoginPacketHandler.cpp">
+      <Filter>Network\PacketHandler</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
+      <Filter>Network\Protocol\PacketId</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSession.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\LoginPacketHandler.h">
+      <Filter>Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h">
+      <Filter>Network\PacketHandler</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
+      <Filter>Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
+      <Filter>Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
+      <Filter>Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
+      <Filter>Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Login.proto">
+      <Filter>Network\Protocol\Proto</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -34,18 +34,18 @@ static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 const char descriptor_table_protodef_Enum_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
-    "\n\nEnum.proto\022\010Protocol*<\n\014eServiceType\022\025"
+    "\n\nEnum.proto\022\010Protocol*T\n\014eServiceType\022\025"
     "\n\021SERVICE_TYPE_NONE\020\000\022\025\n\021SERVICE_TYPE_EC"
-    "HO\020\001*l\n\005eRole\022\r\n\tROLE_NONE\020\000\022\n\n\006CLIENT\020\001"
-    "\022\017\n\013ECHO_SERVER\020\002\022\022\n\016GATEWAY_SERVER\020\003\022\020\n"
-    "\014WORLD_SERVER\020\004\022\021\n\rCENTER_SERVER\020\005b\006prot"
-    "o3"
+    "HO\020\001\022\026\n\022SERVICE_TYPE_LOGIN\020\002*l\n\005eRole\022\r\n"
+    "\tROLE_NONE\020\000\022\n\n\006CLIENT\020\001\022\017\n\013ECHO_SERVER\020"
+    "\002\022\022\n\016GATEWAY_SERVER\020\003\022\020\n\014WORLD_SERVER\020\004\022"
+    "\021\n\rCENTER_SERVER\020\005b\006proto3"
 };
 static ::absl::once_flag descriptor_table_Enum_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
     false,
     false,
-    202,
+    226,
     descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once,
@@ -64,9 +64,9 @@ const ::google::protobuf::EnumDescriptor* eServiceType_descriptor() {
   return file_level_enum_descriptors_Enum_2eproto[0];
 }
 PROTOBUF_CONSTINIT const uint32_t eServiceType_internal_data_[] = {
-    131072u, 0u, };
+    196608u, 0u, };
 bool eServiceType_IsValid(int value) {
-  return 0 <= value && value <= 1;
+  return 0 <= value && value <= 2;
 }
 const ::google::protobuf::EnumDescriptor* eRole_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);

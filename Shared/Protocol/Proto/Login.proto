@@ -1,0 +1,26 @@
+syntax = "proto3";
+package Protocol;
+
+import "PacketOption.proto";
+
+option (service_type) = SERVICE_TYPE_LOGIN;
+option (handler_name) = "LoginPacketHandler";
+
+message C2S_LOGIN_REQ 
+{
+    option (packet_id) = 1;
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+
+    uint64 accountId = 1;
+    string ticket = 2;
+}
+
+message S2C_LOGIN_RES 
+{
+    option (packet_id) = 2;
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    int32 result = 1;
+}

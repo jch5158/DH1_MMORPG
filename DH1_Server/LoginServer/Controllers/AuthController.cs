@@ -2,10 +2,8 @@
 using LoginServer.Data.Table;
 using LoginServer.DTOs.Auth;
 using LoginServer.Services;
-using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MimeKit;
 using StackExchange.Redis;
 using System.Security.Cryptography;
 using LoginRequest = LoginServer.DTOs.Auth.LoginRequest;
@@ -15,12 +13,10 @@ namespace LoginServer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(AccountDbContext dbContext, IConnectionMultiplexer redisConnection, IConfiguration smtpConfig, IEmailQueue emailQueue) : ControllerBase
+    public class AuthController(AccountDbContext dbContext, IConnectionMultiplexer redisConnection, IEmailQueue emailQueue) : ControllerBase
     {
         private AccountDbContext DbContext { get; } = dbContext;
         private IConnectionMultiplexer RedisConnection { get; } = redisConnection;
-
-        private IConfiguration SmtpConfig { get; } = smtpConfig;
 
         private IEmailQueue EmailQueue { get; } = emailQueue;
 
@@ -136,7 +132,7 @@ namespace LoginServer.Controllers
                 message = "로그인 성공!",
                 ticket,
                 accountId = account.AccountId,
-                gatewayIp = "192.168.1.100",
+                gatewayIp = "192.168.50.3",
                 gatewayPort = 9000
             });
         }

@@ -5,6 +5,7 @@ enum eServiceType
 {
     SERVICE_TYPE_NONE = 0;
     SERVICE_TYPE_ECHO = 1;
+    SERVICE_TYPE_LOGIN = 2;
 }
 
 enum eRole 
