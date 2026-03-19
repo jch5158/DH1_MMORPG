@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "SessionReaper.h"
 #include "Session.h"
+#include "SocketUtils.h"
 
 SessionReaper::SessionReaper(const int64 timeoutMs)
 	: mTimeoutMs(timeoutMs)
@@ -21,7 +22,7 @@ void SessionReaper::ReapSession(const ServerServiceWeak& pServerServiceWeak, con
 	}
 
 	const SessionRef pSession = pSessionWeak.lock();
-	if (pSession == nullptr || pSession->IsDisconnected())
+	if (pSession == nullptr || pSession->IsDisconnectStarted())
 	{
 		return;
 	}
@@ -34,6 +35,17 @@ void SessionReaper::ReapSession(const ServerServiceWeak& pServerServiceWeak, con
 	{
 		pServerService->RegisterSessionReap(pSession);
 	}
+}
+
+void SessionReaper::AbortSession(const SessionWeak& pSessionWeak)
+{
+	const SessionRef pSession = pSessionWeak.lock();
+	if (pSession == nullptr || !pSession->IsDisconnecting())
+	{
+		return;
+	}
+
+	pSession->ForceCloseSocket();
 }
 
 bool SessionReaper::isExpired(const int64 lastActivityMs) const

@@ -13,11 +13,11 @@ enum class eServiceType : uint8
 	Client
 };
 
+using SessionFactory = std::function<SessionRef()>;
+
 class Service : public std::enable_shared_from_this<Service>
 {
 public:
-
-	using SessionFactory = std::function<SessionRef()>;
 
 	Service(const Service&) = delete;
 	Service& operator=(const Service&) = delete;
@@ -55,14 +55,18 @@ protected:
 	SessionManager mSessionManager;
 };
 
+struct ClientServiceConfig
+{
+	NetAddress netAddress;
+	int32 maxSessionCount;
+	NetworkSchedulerRef pNetworkScheduler;
+	SessionFactory sessionFactory;
+};
+
 class ClientService : public Service
 {
 public:
-	explicit ClientService(
-		const NetAddress& netAddress,
-		const int32 maxSessionCount,
-		NetworkSchedulerRef pNetworkScheduler,
-		SessionFactory pSessionFactory);
+	explicit ClientService(const ClientServiceConfig& config);
 	virtual ~ClientService() override = default;
 
 	virtual bool Start() override;
@@ -71,18 +75,21 @@ public:
 	virtual void RemoveSession(const SessionRef& pSession) override;
 };
 
+struct ServerServiceConfig
+{
+	NetAddress netAddress;
+	int32 acceptCount;
+	int32 maxSessionCount;
+	int32 maxWaitSessionCount;
+	int64 sessionTimeoutMs;
+	NetworkSchedulerRef pNetworkScheduler;
+	SessionFactory sessionFactory;
+};
+
 class ServerService : public Service
 {
 public:
-	explicit ServerService(
-		const NetAddress& netAddress,
-		const int32 acceptCount,
-		const int32 maxSessionCount,
-		const int32 maxWaitSize,
-		const int64 sessionTimeoutMs,
-		SessionFactory pSessionFactory,
-		NetworkSchedulerRef pNetworkScheduler
-	);
+	explicit ServerService(const ServerServiceConfig& config);
 	virtual ~ServerService() override = default;
 
 	virtual bool Start() override;
@@ -93,6 +100,7 @@ public:
 	[[nodiscard]] bool EnterWaitQueue(const SessionRef& pSession, uint64& outTicket);
 	[[nodiscard]] SessionRef DequeueWaitQueue();
 	void RegisterSessionReap(const SessionRef& pSession);
+	void RegisterAbortSession(const SessionRef& pSession);
 
 	[[nodiscard]] uint64 GetWaitCount(const uint64 myTicket);
 

@@ -20,7 +20,7 @@ Session::Session()
 
 Session::~Session()
 {
-	SocketUtils::Close(mSocket);
+	ForceCloseSocket();
 }
 
 void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
@@ -80,9 +80,19 @@ bool Session::IsWaiting() const
 	return mSessionState.load() == eSessionState::Waiting;
 }
 
+bool Session::IsDisconnecting() const
+{
+	return mSessionState.load() == eSessionState::Disconnecting;
+}
+
 bool Session::IsDisconnected() const
 {
 	return mSessionState.load() == eSessionState::Disconnected;
+}
+
+bool Session::IsDisconnectStarted() const
+{
+	return mSessionState.load() == eSessionState::Disconnecting || mSessionState.load() == eSessionState::Disconnected;
 }
 
 bool Session::SetSessionInGame()
@@ -98,7 +108,7 @@ bool Session::Connect()
 
 void Session::Disconnect(const eDisconnectReason reason)
 {
-	if (!setSessionDisconnected())
+	if (!setSessionDisconnecting())
 	{
 		return;
 	}
@@ -110,11 +120,6 @@ void Session::Disconnect(const eDisconnectReason reason)
 void Session::Send(const NetSendBufferRef& pSendBuffer)
 {
 	mSender.Send(pSendBuffer);
-}
-
-void Session::Clear()
-{
-	mpService.reset();
 }
 
 void Session::updateLastActivityMs()
@@ -169,12 +174,9 @@ void Session::processReceive(const uint32 numOfBytes)
 
 bool Session::Initialize(const ServiceRef& pService)
 {
-	if (mSocket == static_cast<SOCKET>(INVALID_SOCKET))
+	if (CreateSocket() == false)
 	{
-		if (SocketUtils::CreateTcpSocket(mSocket) == false)
-		{
-			return false;
-		}
+		return false;
 	}
 
 	mpService = pService;
@@ -211,22 +213,40 @@ void Session::setNetAddress(const NetAddress& address)
 bool Session::setSessionWaiting()
 {
 	auto expected = eSessionState::Disconnected;
-	return mSessionState.compare_exchange_weak(expected, eSessionState::Waiting);
+	return mSessionState.compare_exchange_strong(expected, eSessionState::Waiting);
 }
 
 bool Session::setWaitingToConnected()
 {
 	auto expected = eSessionState::Waiting;
-	return mSessionState.compare_exchange_weak(expected, eSessionState::Connected);
+	return mSessionState.compare_exchange_strong(expected, eSessionState::Connected);
 }
 
 bool Session::setSessionConnected()
 {
 	auto expected = eSessionState::Disconnected;
-	return mSessionState.compare_exchange_weak(expected, eSessionState::Connected);
+	return mSessionState.compare_exchange_strong(expected, eSessionState::Connected);
+}
+
+bool Session::setSessionDisconnecting()
+{
+	eSessionState expected = mSessionState.load();
+
+	while (expected == eSessionState::Connected ||
+		expected == eSessionState::InGame ||
+		expected == eSessionState::Waiting)
+	{
+		if (mSessionState.compare_exchange_strong(expected, eSessionState::Disconnecting))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool Session::setSessionDisconnected()
 {
-	return mSessionState.exchange(eSessionState::Disconnected) != eSessionState::Disconnected;
+	auto expected = eSessionState::Disconnecting;
+	return mSessionState.compare_exchange_strong(expected, eSessionState::Disconnected);
 }

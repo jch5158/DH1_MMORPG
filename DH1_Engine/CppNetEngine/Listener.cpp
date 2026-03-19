@@ -8,17 +8,16 @@
 #include "Service.h"
 #include "Session.h"
 
-Listener::Listener(const int32 acceptCount, std::function<void(const uint32)> pErrorHandle)
+Listener::Listener(const int32 acceptCount)
 	: SocketIocpObject()
 	, mAcceptCount(acceptCount)
-	, mpErrorHandle(std::move(pErrorHandle))
 	, mAcceptors()
 {
 }
 
 Listener::~Listener()
 {
-	SocketUtils::Close(mSocket);
+	ForceCloseSocket();
 }
 
 void Listener::Dispatch(class IocpEvent& iocpEvent, uint32 numOfBytes)
@@ -46,7 +45,7 @@ bool Listener::StartAccept(const ServerServiceRef& pServerService)
 		CrashReporter::Crash();
 	}
 
-	if (SocketUtils::CreateTcpSocket(mSocket) == false)
+	if (CreateSocket() == false)
 	{
 		NET_ENGINE_LOG_FATAL("SocketUtils::CreateTcpSocket is failed - errorCode : {}", WSAGetLastError());
 		CrashReporter::Crash();
@@ -107,6 +106,6 @@ bool Listener::StartAccept(const ServerServiceRef& pServerService)
 
 void Listener::CloseAccept()
 {
-	SocketUtils::Close(mSocket);
+	ForceCloseSocket();
 	mAcceptors.clear();
 }

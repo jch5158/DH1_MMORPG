@@ -2,10 +2,10 @@
 
 struct NetworkSchedulerConfig
 {
-	uint32 runningThreadCount = 0;
-	uint32 waitTimeoutMs = 16;
-	uint32 tickIntervalMs = 16;
-	std::function<void(const uint32)> onHandleError = nullptr;
+	uint32 runningThreadCount;
+	uint32 waitTimeoutMs;
+	uint32 tickIntervalMs;
+	std::function<void(const uint32)> onHandleError;
 };
 
 class NetworkScheduler final : public IocpCore

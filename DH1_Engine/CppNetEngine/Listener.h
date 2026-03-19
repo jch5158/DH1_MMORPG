@@ -19,7 +19,7 @@ public:
 	Listener(Listener&&) = delete;
 	Listener& operator=(Listener&&) = delete;
 
-	explicit Listener(const int32 acceptCount, ErrorHandle pErrorHandle);
+	explicit Listener(const int32 acceptCount);
 	virtual ~Listener() override;
 
 	virtual void Dispatch(IocpEvent& iocpEvent, uint32 numOfBytes) override;
@@ -32,7 +32,6 @@ public:
 private:
 
 	const int32 mAcceptCount;
-	const ErrorHandle mpErrorHandle;
 	Vector<AcceptorRef> mAcceptors;
 };
 

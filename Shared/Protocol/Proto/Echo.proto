@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 package Protocol;
 
 import "PacketOption.proto";
@@ -9,7 +9,7 @@ option (handler_name) = "EchoPacketHandler";
 message C2S_ECHO_REQ 
 {
     option (packet_id) = 1;
-    option (sender) = CLIENT;
+    option (sender) = ECHO_CLIENT;
     option (receiver) = ECHO_SERVER;
 
     string echoMsg = 1;
@@ -19,7 +19,7 @@ message S2C_ECHO_RES
 {
     option (packet_id) = 2;
     option (sender) = ECHO_SERVER;
-    option (receiver) = CLIENT;
+    option (receiver) = ECHO_CLIENT;
 
     string echoMsg = 1;
 }

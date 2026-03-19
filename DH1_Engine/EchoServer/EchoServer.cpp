@@ -14,19 +14,25 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(
-		NetAddress("127.0.0.1", 7777),
-		cpp_net_engine::MakeShared<GameSession>,
-		cpp_net_engine::MakeShared<Listener>(10,
-			[](const uint32 errorCode)->void
-			{
-			}),
-		cpp_net_engine::MakeShared<NetworkScheduler>(16, [](const uint32 errorCode)->void
-			{
-			}),
-		cpp_net_engine::MakeShared<SessionReaper>(15000),
-		cpp_net_engine::MakeShared<SessionManager>(5000),
-		cpp_net_engine::MakeShared<WaitQueueManager>(0));
+	NetworkSchedulerConfig netConfig{};
+	netConfig.runningThreadCount = 0;
+	netConfig.tickIntervalMs = 16;
+	netConfig.waitTimeoutMs = 16;
+	netConfig.onHandleError = [](const uint32 errorCode)->void
+		{
+		};
+
+	ServerServiceConfig serviceConfig{};
+	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);
+	serviceConfig.acceptCount = 50;
+	serviceConfig.maxSessionCount = 5000;
+	serviceConfig.maxWaitSessionCount = 10000;
+	serviceConfig.sessionTimeoutMs = 20000;
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
+	serviceConfig.sessionFactory = cpp_net_engine::MakeShared<GameSession>;
+
+
+	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
 
 	if (pService->Start() == false)
 	{
@@ -36,16 +42,16 @@ int main()
 
 	for (int32 i = 0; i < 5; ++i)
 	{ 
-		ThreadManager::GetInstance().Launch([pService]()->void
+		ThreadManager::GetInstance().Launch("NetWorkerThread",[pService]()->void
 			{
 				while (true)
 				{
-					pService->GetIocpCore()->Dispatch();
+					pService->GetNetworkScheduler()->Dispatch();
 				}
 			});
 	}
 
-	ThreadManager::GetInstance().Launch([pService]()->void
+	ThreadManager::GetInstance().Launch("MonitorThread",[pService]()->void
 		{
 			while (true)
 			{

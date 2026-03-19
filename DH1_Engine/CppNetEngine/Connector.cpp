@@ -31,7 +31,7 @@ bool Connector::Initialize(const SessionRef& pOwner, ServiceRef pService)
 bool Connector::Register()
 {
 	const SessionRef pSession = std::static_pointer_cast<Session>(mConnectEvent.GetOwner());
-	if (pSession == nullptr || !pSession->IsDisconnected())
+	if (pSession == nullptr || !pSession->IsDisconnectStarted())
 	{
 		return false;
 	}

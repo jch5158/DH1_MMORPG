@@ -65,6 +65,9 @@
     <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -103,6 +106,9 @@
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
       <Filter>Protocol\PacketId</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
@@ -115,6 +121,9 @@
       <Filter>Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
+      <Filter>Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Login.proto">
       <Filter>Protocol\Proto</Filter>
     </None>
   </ItemGroup>

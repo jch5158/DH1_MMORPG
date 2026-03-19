@@ -92,10 +92,11 @@ inline bool eServiceType_Parse(absl::string_view name, eServiceType* value) {
 enum eRole : int {
   ROLE_NONE = 0,
   CLIENT = 1,
-  ECHO_SERVER = 2,
-  GATEWAY_SERVER = 3,
-  WORLD_SERVER = 4,
-  CENTER_SERVER = 5,
+  ECHO_CLIENT = 2,
+  ECHO_SERVER = 3,
+  GATEWAY_SERVER = 4,
+  WORLD_SERVER = 5,
+  CENTER_SERVER = 6,
   eRole_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   eRole_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -105,8 +106,8 @@ enum eRole : int {
 bool eRole_IsValid(int value);
 extern const uint32_t eRole_internal_data_[];
 constexpr eRole eRole_MIN = static_cast<eRole>(0);
-constexpr eRole eRole_MAX = static_cast<eRole>(5);
-constexpr int eRole_ARRAYSIZE = 5 + 1;
+constexpr eRole eRole_MAX = static_cast<eRole>(6);
+constexpr int eRole_ARRAYSIZE = 6 + 1;
 const ::google::protobuf::EnumDescriptor*
 eRole_descriptor();
 template <typename T>
@@ -119,7 +120,7 @@ const std::string& eRole_Name(T value) {
 template <>
 inline const std::string& eRole_Name(eRole value) {
   return ::google::protobuf::internal::NameOfDenseEnum<eRole_descriptor,
-                                                 0, 5>(
+                                                 0, 6>(
       static_cast<int>(value));
 }
 inline bool eRole_Parse(absl::string_view name, eRole* value) {

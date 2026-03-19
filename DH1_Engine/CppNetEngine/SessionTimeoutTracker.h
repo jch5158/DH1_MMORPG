@@ -16,11 +16,11 @@ public:
 
 	void UpdateLastActivityMs();
 	[[nodiscard]] int64 GetLastActivityMs() const;
-	
+
 private:
 	
 	static int64 getNowTimeMs();
 	
-	std::atomic<int64> mLastActivityMs;
+	alignas(std::hardware_destructive_interference_size) std::atomic<int64> mLastActivityMs;
 };
 

@@ -120,8 +120,8 @@ const char descriptor_table_protodef_Login_2eproto[] ABSL_ATTRIBUTE_SECTION_VARI
     protodesc_cold) = {
     "\n\013Login.proto\022\010Protocol\032\022PacketOption.pr"
     "oto\"A\n\rC2S_LOGIN_REQ\022\021\n\taccountId\030\001 \001(\004\022"
-    "\016\n\006ticket\030\002 \001(\t:\r\230\265\030\001\240\265\030\001\252\265\030\001\003\".\n\rS2C_LO"
-    "GIN_RES\022\016\n\006result\030\001 \001(\005:\r\230\265\030\002\240\265\030\003\252\265\030\001\001B\032"
+    "\016\n\006ticket\030\002 \001(\t:\r\230\265\030\001\240\265\030\001\252\265\030\001\004\".\n\rS2C_LO"
+    "GIN_RES\022\016\n\006result\030\001 \001(\005:\r\230\265\030\002\240\265\030\004\252\265\030\001\001B\032"
     "\210\265\030\002\222\265\030\022LoginPacketHandlerb\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[1] =

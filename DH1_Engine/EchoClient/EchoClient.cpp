@@ -14,15 +14,21 @@ int32 main()
 
 	PacketServiceTypeHandler::Init();
 
-	ClientServiceRef pService = cpp_net_engine::MakeShared<ClientService>(
-		NetAddress(L"127.0.0.1", 7777),
-		cpp_net_engine::MakeShared<GameSession>,
-		cpp_net_engine::MakeShared<NetworkScheduler>(16, [](const uint32 errorCode)->void
-			{
-				NET_ENGINE_LOG_ERROR("NetworkScheduler - errorCode : {}", errorCode);
-			}),
-			cpp_net_engine::MakeShared<SessionManager>(5000)
-			);
+	NetworkSchedulerConfig netConfig{};
+	netConfig.runningThreadCount = 0;
+	netConfig.waitTimeoutMs = 16;
+	netConfig.tickIntervalMs = 16;
+	netConfig.onHandleError = [](const uint32 errorCode)->void
+		{
+		};
+
+	ClientServiceConfig serviceConfig{};
+	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);
+	serviceConfig.maxSessionCount = 1;
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
+	serviceConfig.sessionFactory = cpp_net_engine::MakeShared<GameSession>;
+
+	ClientServiceRef pService = cpp_net_engine::MakeShared<ClientService>(serviceConfig);
 
 	if (pService->Start() == false)
 	{
@@ -32,11 +38,11 @@ int32 main()
 
 	for (int32 i = 0; i < 5; ++i)
 	{
-		ThreadManager::GetInstance().Launch([pService]()->void
+		ThreadManager::GetInstance().Launch("NetWorkerThread",[pService]()->void
 			{
 				while (true)
 				{
-					pService->GetIocpCore()->Dispatch();
+					pService->GetNetworkScheduler()->Dispatch();
 				}
 			});
 	}

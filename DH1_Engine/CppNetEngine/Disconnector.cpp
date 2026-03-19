@@ -54,12 +54,11 @@ void Disconnector::Process() const
 		return;
 	}
 
+	pSession->setSessionDisconnected();
 	pSession->OnDisconnected();
 
 	if (mpService != nullptr)
 	{
 		mpService->RemoveSession(pSession);
 	}
-
-	pSession->Clear();
 }

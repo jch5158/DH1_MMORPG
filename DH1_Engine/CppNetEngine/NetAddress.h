@@ -3,15 +3,14 @@
 class NetAddress
 {
 public:
+	NetAddress(const NetAddress& netAddress) = default;
+	NetAddress& operator=(const NetAddress&) = default;
+	NetAddress(NetAddress&&) = default;
+	NetAddress& operator=(NetAddress&&) = default;
 	
-	NetAddress(NetAddress&&) = delete;
-	NetAddress& operator=(NetAddress&&) = delete;
-
 	explicit NetAddress() = default;
 	explicit NetAddress(const SOCKADDR_IN& sockAddr);
 	explicit NetAddress(const std::string& ip, const uint16 port);
-	explicit NetAddress(const NetAddress& netAddress) = default;
-	NetAddress& operator=(const NetAddress&) = default;
 
 	[[nodiscard]] SOCKADDR_IN& GetSockAddr();
 	[[nodiscard]] std::string GetIpAddress() const;
@@ -22,7 +21,6 @@ public:
 	static IN_ADDR IpToAddress(const std::string& ip);
 
 private:
-
 	SOCKADDR_IN	mSockAddr;
 };
 

@@ -186,8 +186,6 @@ private:
 	const int32 mMaxCount;
 
 	alignas(std::hardware_destructive_interference_size) std::atomic<int32> mCount;
-
 	alignas(std::hardware_destructive_interference_size) Node16 mHead;
-
 	alignas(std::hardware_destructive_interference_size) Node16 mTail;
 };

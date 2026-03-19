@@ -34,7 +34,7 @@ byte* Receiver::GetWritePtr() const
 void Receiver::Process(const uint32 numOfBytes)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnected())
+	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
 	{
 		return;
 	}
@@ -65,7 +65,7 @@ void Receiver::Process(const uint32 numOfBytes)
 void Receiver::Register()
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnected())
+	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
 	{
 		return;
 	}

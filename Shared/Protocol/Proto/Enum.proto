@@ -12,8 +12,9 @@ enum eRole
 {
     ROLE_NONE = 0;
     CLIENT = 1;
-    ECHO_SERVER = 2;
-    GATEWAY_SERVER = 3;
-    WORLD_SERVER = 4;
-    CENTER_SERVER = 5;
+    ECHO_CLIENT = 2;
+    ECHO_SERVER = 3;
+    GATEWAY_SERVER = 4;
+    WORLD_SERVER = 5;
+    CENTER_SERVER = 6;
 }

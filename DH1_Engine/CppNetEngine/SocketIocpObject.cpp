@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "SocketIocpObject.h"
 
+#include "SocketUtils.h"
+
 SocketIocpObject::SocketIocpObject()
 	:IocpObject()
 	, mSocket(INVALID_SOCKET)
@@ -14,5 +16,27 @@ SOCKET SocketIocpObject::GetSocket() const
 
 HANDLE SocketIocpObject::GetSocketHandle() const
 {
-	return reinterpret_cast<HANDLE>(mSocket);
+	const auto retHandle = reinterpret_cast<HANDLE>(mSocket);
+	return retHandle;
+}
+
+bool SocketIocpObject::CreateSocket()
+{
+	if (mSocket == static_cast<SOCKET>(INVALID_SOCKET))
+	{
+		SOCKET createSocket = INVALID_SOCKET;
+		if (SocketUtils::CreateTcpSocket(createSocket) == false)
+		{
+			return false;
+		}
+
+		mSocket = createSocket;
+	}
+
+	return true;
+}
+
+void SocketIocpObject::ForceCloseSocket()
+{
+	SocketUtils::Close(mSocket);
 }

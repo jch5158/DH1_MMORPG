@@ -256,6 +256,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -284,6 +290,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h" />
+    <ClInclude Include="..\..\Shared\Protocol\Login.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h" />
     <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h" />
@@ -298,6 +305,7 @@
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Echo.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto" />
+    <None Include="..\..\Shared\Protocol\Proto\Login.proto" />
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
   </ItemGroup>

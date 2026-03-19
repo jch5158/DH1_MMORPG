@@ -81,7 +81,7 @@ void Acceptor::Register()
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			pOwner->mpErrorHandle(errorCode);
+			NET_ENGINE_LOG_ERROR("Acceptor::Register() - SocketUtils::AcceptEx, errorCode : {}", errorCode);
 		}
 	}
 }

@@ -120,8 +120,8 @@ const char descriptor_table_protodef_Echo_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIA
     protodesc_cold) = {
     "\n\nEcho.proto\022\010Protocol\032\022PacketOption.pro"
     "to\".\n\014C2S_ECHO_REQ\022\017\n\007echoMsg\030\001 \001(\t:\r\230\265\030"
-    "\001\240\265\030\001\252\265\030\001\002\".\n\014S2C_ECHO_RES\022\017\n\007echoMsg\030\001 "
-    "\001(\t:\r\230\265\030\002\240\265\030\002\252\265\030\001\001B\031\210\265\030\001\222\265\030\021EchoPacketHa"
+    "\001\240\265\030\002\252\265\030\001\003\".\n\014S2C_ECHO_RES\022\017\n\007echoMsg\030\001 "
+    "\001(\t:\r\230\265\030\002\240\265\030\003\252\265\030\001\002B\031\210\265\030\001\222\265\030\021EchoPacketHa"
     "ndlerb\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_Echo_2eproto_deps[1] =

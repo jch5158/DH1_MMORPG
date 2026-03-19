@@ -17,6 +17,7 @@ enum class eSessionState : uint8
 	Connected,
 	Waiting,    // 대기열 상태
 	InGame,
+	Disconnecting,
 	Disconnected
 };
 
@@ -76,12 +77,13 @@ public:
 	[[nodiscard]] bool IsInGame() const;
 	[[nodiscard]] bool IsConnected() const;
 	[[nodiscard]] bool IsWaiting() const;
+	[[nodiscard]] bool IsDisconnecting() const;
 	[[nodiscard]] bool IsDisconnected() const;
+	[[nodiscard]] bool IsDisconnectStarted() const;
 	[[nodiscard]] bool SetSessionInGame();
 	[[nodiscard]] bool Connect();
 	void Disconnect(const eDisconnectReason reason);
 	void Send(const NetSendBufferRef& pSendBuffer);
-	void Clear();
 
 protected:
 
@@ -107,6 +109,7 @@ private:
 	bool setSessionWaiting();
 	bool setWaitingToConnected();
 	bool setSessionConnected();
+	bool setSessionDisconnecting();
 	bool setSessionDisconnected();
 
 	ServiceRef mpService;

@@ -2,7 +2,7 @@
   "projects": [
     {
       "name": "DH1_Engine\\EchoClient",
-      "role": "Client"
+      "role": "ECHO_CLIENT"
     },
     {
       "name": "DH1_Engine\\EchoServer",

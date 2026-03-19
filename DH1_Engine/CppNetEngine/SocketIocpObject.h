@@ -10,7 +10,9 @@ public:
 
 	SOCKET GetSocket() const;
 	HANDLE GetSocketHandle() const;
-	
+	bool CreateSocket();
+	void ForceCloseSocket();
+
 	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32 numOfBytes) override = 0;
 
 protected:

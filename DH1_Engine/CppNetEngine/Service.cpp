@@ -25,13 +25,11 @@ SessionRef Service::CreateSession()
 	SessionRef pSession = mSessionFactory();
 	if (pSession->Initialize(shared_from_this()) == false)
 	{
-		pSession->Clear();
 		pSession = nullptr;
 	}
 
 	if (mpNetworkScheduler->Register(pSession) == false)
 	{
-		pSession->Clear();
 		pSession = nullptr;
 	}
 
@@ -63,17 +61,14 @@ int32 Service::GetMaxSessionCount() const
 	return mMaxSessionCount;
 }
 
-ClientService::ClientService(
-	const NetAddress& netAddress,
-	const int32 maxSessionCount,
-	NetworkSchedulerRef pNetworkScheduler,
-	SessionFactory pSessionFactory)
+ClientService::ClientService(const ClientServiceConfig& config)
 	: Service(
 		eServiceType::Client,
-		netAddress,
-		maxSessionCount,
-		std::move(pNetworkScheduler),
-		std::move(pSessionFactory))
+		config.netAddress,
+		config.maxSessionCount,
+		config.pNetworkScheduler,
+		config.sessionFactory
+	)
 {}
 
 bool ClientService::Start()
@@ -86,6 +81,7 @@ bool ClientService::Start()
 		{
 			return false;
 		}
+		(void)mSessionManager.AddSession(pSession);
 	}
 
 	return true;
@@ -97,34 +93,30 @@ void ClientService::CloseService()
 
 bool ClientService::AddSession(const SessionRef& pSession)
 {
+	pSession->setSessionConnected();
+	//const bool result = mSessionManager.AddSession(pSession);
+	pSession->OnConnected();
 	return true;
 }
 
 void ClientService::RemoveSession(const SessionRef& pSession)
 {
+	mSessionManager.RemoveSession(pSession);
 }
 
-ServerService::ServerService(
-	const NetAddress& netAddress,
-	const int32 acceptCount,
-	const int32 maxSessionCount,
-	const int32 maxWaitSize,
-	const int64 sessionTimeoutMs,
-	SessionFactory pSessionFactory,
-	NetworkSchedulerRef pNetworkScheduler
-)
+ServerService::ServerService(const ServerServiceConfig& config)
 	: Service(
 		eServiceType::Server, 
-		netAddress,
-		maxSessionCount,
-		std::move(pNetworkScheduler),
-		std::move(pSessionFactory))
+		config.netAddress,
+		config.maxSessionCount,
+		config.pNetworkScheduler,
+		config.sessionFactory)
 	,mpListener()
-	,mWaitQueueManager(maxWaitSize)
+	,mWaitQueueManager(config.maxWaitSessionCount)
 	,mpSessionReaper()
 {
-	mpListener = cpp_net_engine::MakeShared<Listener>(acceptCount, [](const uint32)->void {});
-	mpSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(sessionTimeoutMs);
+	mpListener = cpp_net_engine::MakeShared<Listener>(config.acceptCount);
+	mpSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(config.sessionTimeoutMs);
 }
 
 bool ServerService::Start()
@@ -205,6 +197,16 @@ void ServerService::RegisterSessionReap(const SessionRef& pSession)
 		{
 			pSessionReaper->ReapSession(pServerServiceWeak, pSessionWeak);
 		}, mpSessionReaper->GetTimeoutMs());
+}
+
+void ServerService::RegisterAbortSession(const SessionRef& pSession)
+{
+	SessionWeak pSessionWeak = pSession;
+	ServerServiceWeak pServerServiceWeak = std::static_pointer_cast<ServerService>(shared_from_this());
+	mpNetworkScheduler->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak]()->void
+		{
+			pSessionReaper->AbortSession(pSessionWeak);
+		}, SessionReaper::GetAbortTimeoutMs());
 }
 
 uint64 ServerService::GetWaitCount(const uint64 myTicket)

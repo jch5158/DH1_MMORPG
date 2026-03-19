@@ -35,7 +35,7 @@ bool Sender::Initialize(const SessionRef& pOwner)
 void Sender::Send(NetSendBufferRef pSendBuffer)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnected())
+	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
 	{
 		return;
 	}
@@ -53,7 +53,7 @@ void Sender::Send(NetSendBufferRef pSendBuffer)
 void Sender::Process(const uint32 numOfBytes)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnected())
+	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
 	{
 		return;
 	}
@@ -79,7 +79,7 @@ void Sender::Register()
 	while (true)
 	{
 		const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
-		if (pOwner == nullptr || pOwner->IsDisconnected())
+		if (pOwner == nullptr || pOwner->IsDisconnectStarted())
 		{
 			return;
 		}
