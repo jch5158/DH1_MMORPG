@@ -52,7 +52,7 @@ bool Listener::StartAccept(const ServerServiceRef& pServerService)
 		CrashReporter::Crash();
 	}
 
-	if (pServerService->GetIocpCore()->Register(shared_from_this()) == false)
+	if (pServerService->GetNetworkScheduler()->Register(shared_from_this()) == false)
 	{
 		NET_ENGINE_LOG_FATAL("pServerService->GetIocpCore()->Register is failed - errorCode : {}", WSAGetLastError());
 		CrashReporter::Crash();

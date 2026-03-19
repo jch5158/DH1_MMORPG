@@ -28,7 +28,7 @@ public:
 		const eServiceType serviceType,
 		const NetAddress& netAddress,
 		const int32 maxSessionCount,
-		IocpCoreRef pIocpCore,
+		NetworkSchedulerRef pNetworkScheduler,
 		SessionFactory sessionFactory);
 	virtual ~Service() = default;
 
@@ -41,7 +41,7 @@ public:
 
 	[[nodiscard]] eServiceType GetServiceType() const;
 	[[nodiscard]] NetAddress& GetNetAddress();
-	[[nodiscard]] IocpCoreRef GetIocpCore() const;
+	[[nodiscard]] NetworkSchedulerRef GetNetworkScheduler() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 
@@ -50,7 +50,7 @@ protected:
 	const eServiceType mServiceType;
 	const int32	mMaxSessionCount;
 	NetAddress mNetAddress;
-	IocpCoreRef mpIocpCore;
+	NetworkSchedulerRef mpNetworkScheduler;
 	SessionFactory mSessionFactory;
 	SessionManager mSessionManager;
 };

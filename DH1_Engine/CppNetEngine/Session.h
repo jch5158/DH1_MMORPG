@@ -56,7 +56,7 @@ public:
 	Session& operator=(Session&&) = delete;
 
 	explicit Session();
-	virtual ~Session() override = default;
+	virtual ~Session() override;
 
 	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32 numOfBytes) override;
 

@@ -16,10 +16,11 @@ Session::Session()
 	, mReceiver()
 	, mSender()
 {
-	if (SocketUtils::CreateTcpSocket(mSocket) == false)
-	{
-		CrashReporter::Crash();
-	}
+}
+
+Session::~Session()
+{
+	SocketUtils::Close(mSocket);
 }
 
 void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
@@ -114,7 +115,6 @@ void Session::Send(const NetSendBufferRef& pSendBuffer)
 void Session::Clear()
 {
 	mpService.reset();
-	mSocket = INVALID_SOCKET;
 }
 
 void Session::updateLastActivityMs()
@@ -169,6 +169,14 @@ void Session::processReceive(const uint32 numOfBytes)
 
 bool Session::Initialize(const ServiceRef& pService)
 {
+	if (mSocket == static_cast<SOCKET>(INVALID_SOCKET))
+	{
+		if (SocketUtils::CreateTcpSocket(mSocket) == false)
+		{
+			return false;
+		}
+	}
+
 	mpService = pService;
 	const SessionRef pSession = GetSessionRef();
 
@@ -203,7 +211,7 @@ void Session::setNetAddress(const NetAddress& address)
 bool Session::setSessionWaiting()
 {
 	auto expected = eSessionState::Disconnected;
-	return mSessionState.compare_exchange_weak(expected, eSessionState::Disconnected);
+	return mSessionState.compare_exchange_weak(expected, eSessionState::Waiting);
 }
 
 bool Session::setWaitingToConnected()

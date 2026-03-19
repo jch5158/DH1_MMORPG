@@ -84,8 +84,4 @@ void Connector::Process() const
 		pSession->updateLastActivityMs();
 		pSession->registerReceive();
 	}
-	else
-	{
-		pSession->Disconnect(eDisconnectReason::ServerFull);
-	}
 }

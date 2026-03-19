@@ -104,7 +104,7 @@ bool SocketUtils::SetKeepAlive(const SOCKET socket, const uint32 timeMs, const u
 	return result != SOCKET_ERROR;
 }
 
-bool SocketUtils::SetRecvBufferSize(const SOCKET socket, const int32 size)
+bool SocketUtils::SetReceiveBufferSize(const SOCKET socket, const int32 size)
 {
 	return SetSockOpt(socket, SOL_SOCKET, SO_RCVBUF, size);
 }

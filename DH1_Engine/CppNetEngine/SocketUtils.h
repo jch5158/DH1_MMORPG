@@ -18,7 +18,7 @@ public:
 	static bool SetLinger(const SOCKET socket, const uint16 onOff, const uint16 linger);
 	static bool SetReuseAddress(const SOCKET socket, bool flag);
 	static bool SetKeepAlive(const SOCKET socket, const uint32 timeMs, const uint32 intervalMs);
-	static bool SetRecvBufferSize(const SOCKET socket, int32 size);
+	static bool SetReceiveBufferSize(const SOCKET socket, int32 size);
 	static bool SetSendBufferSize(const SOCKET socket, int32 size);
 	static bool SetTcpNoDelay(const SOCKET socket, bool flag);
 	static bool SetUpdateAcceptSocket(const SOCKET socket, const SOCKET listenSocket);
