@@ -24,7 +24,7 @@ int32 main()
 
 	ClientServiceConfig serviceConfig{};
 	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);
-	serviceConfig.maxSessionCount = 1;
+	serviceConfig.maxSessionCount = 5000;
 	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
 	serviceConfig.sessionFactory = cpp_net_engine::MakeShared<GameSession>;
 
