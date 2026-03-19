@@ -4,6 +4,8 @@
     "fmt",
     "mimalloc",
     "spdlog",
-    "protobuf"
+    "protobuf",
+    "utfcpp",
+    "redis-plus-plus"
   ]
 }

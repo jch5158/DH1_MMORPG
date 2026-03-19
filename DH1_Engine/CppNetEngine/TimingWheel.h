@@ -60,6 +60,8 @@ private:
 
 public:
 
+	static constexpr uint64 MIN_TICK_INTERVAL = 10;
+	static constexpr uint64 MAX_TICK_INTERVAL = 50;
 	static constexpr uint64 DEFAULT_TICK_INTERVAL = 16;
 
 	TimingWheel(const TimingWheel&) = delete;

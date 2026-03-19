@@ -12,8 +12,14 @@ int64 SessionReaper::GetTimeoutMs() const
 	return mTimeoutMs;
 }
 
-void SessionReaper::ReapSession(const SessionWeak& pSessionWeak) const
+void SessionReaper::ReapSession(const ServerServiceWeak& pServerServiceWeak, const SessionWeak& pSessionWeak) const
 {
+	const ServerServiceRef pServerService = pServerServiceWeak.lock();
+	if (pServerService == nullptr)
+	{
+		return;
+	}
+
 	const SessionRef pSession = pSessionWeak.lock();
 	if (pSession == nullptr || pSession->IsDisconnected())
 	{
@@ -26,7 +32,7 @@ void SessionReaper::ReapSession(const SessionWeak& pSessionWeak) const
 	}
 	else
 	{
-		pSession->registerReap();
+		pServerService->RegisterSessionReap(pSession);
 	}
 }
 

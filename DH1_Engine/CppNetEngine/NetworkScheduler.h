@@ -1,14 +1,22 @@
 ﻿#pragma once
-#include "IocpCore.h"
-#include "TimingWheel.h"
+
+struct NetworkSchedulerConfig
+{
+	uint32 runningThreadCount = 0;
+	uint32 waitTimeoutMs = 16;
+	uint32 tickIntervalMs = 16;
+	std::function<void(const uint32)> onHandleError = nullptr;
+};
 
 class NetworkScheduler final : public IocpCore
 {
 public:
 
+	static constexpr int64 DEFAULT_TIME_SLICE_MS = 16;
+
 	using IocpCore::Register;
 
-	explicit NetworkScheduler(const uint32 waitTimeoutMs, std::function<void(const uint32)> onHandleError);
+	explicit NetworkScheduler(const NetworkSchedulerConfig& config);
 	virtual ~NetworkScheduler() override = default;
 
 	virtual void Dispatch() override;
@@ -17,7 +25,7 @@ public:
 
 private:
 	const uint32 mWaitTimeoutMs;
-	const std::function<void(const uint32)> mOnHandleError;
 	TimingWheel mTimingWheel;
+	const std::function<void(const uint32)> mOnHandleError;
 };
 

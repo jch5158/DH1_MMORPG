@@ -82,7 +82,6 @@ void Connector::Process() const
 	if (mpService->AddSession(pSession))
 	{
 		pSession->updateLastActivityMs();
-		pSession->registerReap();
 		pSession->registerReceive();
 	}
 	else

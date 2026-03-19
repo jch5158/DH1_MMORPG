@@ -8,25 +8,16 @@
 Service::Service(
 	const eServiceType serviceType,
 	const NetAddress& netAddress,
-	SessionFactory sessionFactory,
+	const int32 maxSessionCount,
 	IocpCoreRef pIocpCore,
-	SessionReaperRef pSessionReaper,
-	SessionManagerRef pSessionManager,
-	WaitQueueManagerRef pWaitQueueManager)
+	SessionFactory sessionFactory)
 	: mServiceType(serviceType)
-	, mMaxSessionCount(pSessionManager->GetMaxSessionCount())
+	, mMaxSessionCount(maxSessionCount)
 	, mNetAddress(netAddress)
-	, mSessionFactory(std::move(sessionFactory))
 	, mpIocpCore(std::move(pIocpCore))
-	, mpSessionReaper(std::move(pSessionReaper))
-	, mpSessionManager(std::move(pSessionManager))
-	, mpWaitQueueManager(std::move(pWaitQueueManager))
+	, mSessionFactory(std::move(sessionFactory))
+	, mSessionManager(maxSessionCount)
 {
-}
-
-void Service::CloseService()
-{
-	// TODO : CloseService
 }
 
 SessionRef Service::CreateSession()
@@ -41,63 +32,6 @@ SessionRef Service::CreateSession()
 	}
 
 	return pSession;
-}
-
-bool Service::AddSession(const SessionRef& pSession) const
-{
-	if (mpSessionManager->AddSession(pSession))
-	{
-		if (pSession->setSessionConnected() || pSession->setWaitingToConnected())
-		{
-			pSession->OnConnected();
-			return true;
-		}
-
-		RemoveSession(pSession);
-		pSession->Disconnect(eDisconnectReason::StateError);
-	}
-	else
-	{
-		uint64 myTicket;
-		if (mpWaitQueueManager->EnterWaitQueue(pSession, myTicket))
-		{
-			if (pSession->setSessionWaiting())
-			{
-				pSession->OnEnterWaitQueue(myTicket);
-				return true;
-			}
-			
-			pSession->Disconnect(eDisconnectReason::StateError);
-		}
-	}
-
-	return false;
-}
-
-void Service::RemoveSession(const SessionRef& pSession) const
-{
-	mpSessionManager->RemoveSession(pSession, true);
-	admitWaitingSession();
-}
-
-bool Service::EnterWaitQueue(const SessionRef& pSession, uint64& outTicket) const
-{
-	return mpWaitQueueManager->EnterWaitQueue(pSession, outTicket);
-}
-
-SessionRef Service::DequeueWaitQueue() const
-{
-	return mpWaitQueueManager->DequeueWaitQueue();
-}
-
-void Service::RegisterSessionReap(const SessionRef& pSession) const
-{
-	SessionWeak pSessionWeak = pSession;
-	mpIocpCore->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak]()->void
-		{
-			pSessionReaper->ReapSession(pSessionWeak);
-		
-		}, mpSessionReaper->GetTimeoutMs());
 }
 
 eServiceType Service::GetServiceType() const
@@ -115,9 +49,9 @@ IocpCoreRef Service::GetIocpCore() const
 	return mpIocpCore;
 }
 
-int32 Service::GetCurrentSessionCount() const
+int32 Service::GetCurrentSessionCount()
 {
-	return mpSessionManager->GetCurrentSessionCount();
+	return mSessionManager.GetCurrentSessionCount();
 }
 
 int32 Service::GetMaxSessionCount() const
@@ -125,61 +59,18 @@ int32 Service::GetMaxSessionCount() const
 	return mMaxSessionCount;
 }
 
-bool Service::GetWaitCount(const uint64 myTicket, uint64& outWaitCount) const
-{
-	if (mpWaitQueueManager == nullptr)
-	{
-		return false;
-	}
-
-	outWaitCount = mpWaitQueueManager->GetWaitCount(myTicket);
-	return true;
-}
-
-void Service::admitWaitingSession() const
-{
-	const SessionRef pWaitSession = DequeueWaitQueue();
-	if (pWaitSession != nullptr)
-	{
-		if (mpSessionManager->AddWaitingSession(pWaitSession))
-		{
-			if (pWaitSession->setWaitingToConnected())
-			{
-				pWaitSession->OnConnected();
-			}
-			else
-			{
-				mpSessionManager->RemoveSession(pWaitSession);
-				pWaitSession->Disconnect(eDisconnectReason::StateError);
-			}
-		}
-		else
-		{
-			mpSessionManager->ReleaseKeepTicket();
-			pWaitSession->Disconnect(eDisconnectReason::StateError);
-		}
-	}
-	else
-	{
-		mpSessionManager->ReleaseKeepTicket();
-	}
-}
-
 ClientService::ClientService(
-	const NetAddress& targetAddress,
-	SessionFactory pSessionFactory,
+	const NetAddress& netAddress,
+	const int32 maxSessionCount,
 	NetworkSchedulerRef pNetworkScheduler,
-	SessionManagerRef pSessionManager)
+	SessionFactory pSessionFactory)
 	: Service(
-		eServiceType::Client, 
-		targetAddress, 
-		std::move(pSessionFactory), 
-		std::move(pNetworkScheduler), 
-		nullptr, 
-		std::move(pSessionManager), 
-		nullptr)
-{
-}
+		eServiceType::Client,
+		netAddress,
+		maxSessionCount,
+		std::move(pNetworkScheduler),
+		std::move(pSessionFactory))
+{}
 
 bool ClientService::Start()
 {
@@ -200,24 +91,36 @@ void ClientService::CloseService()
 {
 }
 
+bool ClientService::AddSession(const SessionRef& pSession)
+{
+	return true;
+}
+
+void ClientService::RemoveSession(const SessionRef& pSession)
+{
+}
+
 ServerService::ServerService(
-	const NetAddress& targetAddress,
+	const NetAddress& netAddress,
+	const int32 acceptCount,
+	const int32 maxSessionCount,
+	const int32 maxWaitSize,
+	const int64 sessionTimeoutMs,
 	SessionFactory pSessionFactory,
-	ListenerRef pListener, 
-	NetworkSchedulerRef pNetworkScheduler,
-	SessionReaperRef pSessionReaper,
-	SessionManagerRef pSessionManager, 
-	WaitQueueManagerRef pWaitQueueManager)
+	NetworkSchedulerRef pNetworkScheduler
+)
 	: Service(
 		eServiceType::Server, 
-		targetAddress, 
-		std::move(pSessionFactory), 
-		std::move(pNetworkScheduler), 
-		std::move(pSessionReaper), 
-		std::move(pSessionManager), 
-		std::move(pWaitQueueManager))
-	, mpListener(std::move(pListener))
+		netAddress,
+		maxSessionCount,
+		std::move(pNetworkScheduler),
+		std::move(pSessionFactory))
+	,mpListener()
+	,mWaitQueueManager(maxWaitSize)
+	,mpSessionReaper()
 {
+	mpListener = cpp_net_engine::MakeShared<Listener>(acceptCount, [](const uint32)->void {});
+	mpSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(sessionTimeoutMs);
 }
 
 bool ServerService::Start()
@@ -238,4 +141,98 @@ bool ServerService::Start()
 
 void ServerService::CloseService()
 {
+}
+
+bool ServerService::AddSession(const SessionRef& pSession)
+{
+	if (mSessionManager.AddSession(pSession))
+	{
+		if (pSession->setSessionConnected() || pSession->setWaitingToConnected())
+		{
+			RegisterSessionReap(pSession);
+			pSession->OnConnected();
+			return true;
+		}
+
+		RemoveSession(pSession);
+		pSession->Disconnect(eDisconnectReason::StateError);
+	}
+	else
+	{
+		uint64 myTicket;
+		if (mWaitQueueManager.EnterWaitQueue(pSession, myTicket))
+		{
+			if (pSession->setSessionWaiting())
+			{
+				RegisterSessionReap(pSession);
+				pSession->OnEnterWaitQueue(myTicket);
+				return true;
+			}
+
+			pSession->Disconnect(eDisconnectReason::StateError);
+		}
+	}
+
+	return false;
+}
+
+void ServerService::RemoveSession(const SessionRef& pSession)
+{
+	mSessionManager.RemoveSession(pSession, true);
+	admitWaitingSession();
+}
+
+bool ServerService::EnterWaitQueue(const SessionRef& pSession, uint64& outTicket)
+{
+	return mWaitQueueManager.EnterWaitQueue(pSession, outTicket);
+}
+
+SessionRef ServerService::DequeueWaitQueue()
+{
+	return mWaitQueueManager.DequeueWaitQueue();
+}
+
+void ServerService::RegisterSessionReap(const SessionRef& pSession)
+{
+	SessionWeak pSessionWeak = pSession;
+	ServerServiceWeak pServerServiceWeak = std::static_pointer_cast<ServerService>(shared_from_this());
+	mpIocpCore->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak, pServerServiceWeak]()->void
+		{
+			pSessionReaper->ReapSession(pServerServiceWeak, pSessionWeak);
+		}, mpSessionReaper->GetTimeoutMs());
+}
+
+uint64 ServerService::GetWaitCount(const uint64 myTicket)
+{
+	const uint64 waitCount = mWaitQueueManager.GetWaitCount(myTicket);
+	return waitCount;
+}
+
+void ServerService::admitWaitingSession()
+{
+	const SessionRef pWaitSession = DequeueWaitQueue();
+	if (pWaitSession != nullptr)
+	{
+		if (mSessionManager.AddWaitingSession(pWaitSession))
+		{
+			if (pWaitSession->setWaitingToConnected())
+			{
+				pWaitSession->OnConnected();
+			}
+			else
+			{
+				mSessionManager.RemoveSession(pWaitSession);
+				pWaitSession->Disconnect(eDisconnectReason::StateError);
+			}
+		}
+		else
+		{
+			mSessionManager.ReleaseKeepTicket();
+			pWaitSession->Disconnect(eDisconnectReason::StateError);
+		}
+	}
+	else
+	{
+		mSessionManager.ReleaseKeepTicket();
+	}
 }

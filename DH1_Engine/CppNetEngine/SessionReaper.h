@@ -11,7 +11,7 @@ public:
 	~SessionReaper() = default;
 
 	[[nodiscard]] int64 GetTimeoutMs() const;
-	void ReapSession(const SessionWeak& pSessionWeak) const;
+	void ReapSession(const ServerServiceWeak& pServerServiceWeak, const SessionWeak& pSessionWeak) const;
 
 private:
 

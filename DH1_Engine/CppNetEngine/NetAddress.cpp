@@ -7,7 +7,7 @@ NetAddress::NetAddress(const SOCKADDR_IN& sockAddr)
 {
 }
 
-NetAddress::NetAddress(const Wstring& ip, const uint16 port)
+NetAddress::NetAddress(const std::string& ip, const uint16 port)
 	: mSockAddr{}
 {
 	mSockAddr.sin_family = AF_INET;
@@ -20,12 +20,12 @@ SOCKADDR_IN& NetAddress::GetSockAddr()
 	return mSockAddr;
 }
 
-Wstring NetAddress::GetIpAddress() const
+std::string NetAddress::GetIpAddress() const
 {
-	WCHAR buffer[100];
-	InetNtopW(AF_INET, &mSockAddr.sin_addr, buffer, ARRAY_LEN_16(buffer));
-
-	return { buffer };
+	char buffer[100];
+	InetNtopA(AF_INET, &mSockAddr.sin_addr, buffer, ARRAY_LEN_16(buffer));
+	std::string ipAddress(buffer);
+	return ipAddress;
 }
 
 uint16 NetAddress::GetPort() const
@@ -38,10 +38,9 @@ void NetAddress::SetSocketAddr(const SOCKADDR_IN& sockAddr)
 	mSockAddr = sockAddr;
 }
 
-IN_ADDR NetAddress::IpToAddress(const Wstring& ip)
+IN_ADDR NetAddress::IpToAddress(const std::string& ip)
 {
 	IN_ADDR address{};
-	InetPtonW(AF_INET, ip.c_str(), &address);
-
+	InetPtonA(AF_INET, ip.c_str(), &address);
 	return address;
 }

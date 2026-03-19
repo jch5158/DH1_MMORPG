@@ -74,9 +74,9 @@ using HashMap = std::unordered_map<Key, Type, Hasher, KeyEq, StlAllocator<std::p
 template<typename Key, typename Hasher = std::hash<Key>, typename KeyEq = std::equal_to<Key>>
 using HashSet = std::unordered_set<Key, Hasher, KeyEq, StlAllocator<Key>>;
 
-using String = std::basic_string<char, std::char_traits<char>, StlAllocator<char>>;
+//using String = std::basic_string<char, std::char_traits<char>, StlAllocator<char>>;
 
-using Wstring = std::basic_string<wchar_t, std::char_traits<wchar_t>, StlAllocator<wchar_t>>;
+//using Wstring = std::basic_string<wchar_t, std::char_traits<wchar_t>, StlAllocator<wchar_t>>;
 
 using U8String = std::basic_string<char8_t, std::char_traits<char8_t>, StlAllocator<char8_t>>;
 

@@ -147,11 +147,6 @@ void Session::registerReceive()
 	mReceiver.Register();
 }
 
-void Session::registerReap()
-{
-	GetService()->RegisterSessionReap(GetSessionRef());
-}
-
 void Session::processConnect() const
 {
 	mConnector.Process();

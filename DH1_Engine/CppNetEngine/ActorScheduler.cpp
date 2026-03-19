@@ -2,20 +2,12 @@
 #include "ActorScheduler.h"
 #include "Actor.h"
 
-ActorScheduler::ActorScheduler(std::function<void(const uint32)> onHandleError,
-	const uint32 timeSliceMs,
-	const int32 maxExecuteMessageCount,
-	const int64 tickIntervalMs)
-	: mTimeSliceMs(timeSliceMs)
-	, mMaxExecuteMessageCount(maxExecuteMessageCount)
-	, mTimingWheel(TimingWheel(tickIntervalMs))
-	, mOnHandleError(std::move(onHandleError))
+ActorScheduler::ActorScheduler(const ActorSchedulerConfig& config)
+	: IocpCore(config.runningThreadCount)
+	, mWaitTimeoutMs(config.waitTimeoutMs)
+	, mTimingWheel(config.tickIntervalMs)
+	, mOnHandleError(config.onHandleError)
 {
-}
-
-int32 ActorScheduler::GetMaxExecuteMessageCount() const
-{
-	return mMaxExecuteMessageCount;
 }
 
 bool ActorScheduler::Register(const IocpObjectRef& pIocpObject)
@@ -50,13 +42,16 @@ void ActorScheduler::Dispatch()
 	ULONG_PTR pCompletionKey = 0;
 	ActorMessageEvent* pActorMessageEvent = nullptr;
 
-	const int32 gqcsRet = GetQueuedCompletionStatus(mIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorMessageEvent), mTimeSliceMs);
+	const int32 gqcsRet = GetQueuedCompletionStatus(mIocpHandle, &bytesTransferred, &pCompletionKey, reinterpret_cast<LPOVERLAPPED*>(&pActorMessageEvent), mWaitTimeoutMs);
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
 		if (!IsIgnorableError(errorCode))
 		{
-			mOnHandleError(errorCode);
+			if (mOnHandleError != nullptr)
+			{
+				mOnHandleError(errorCode);
+			}
 		}
 	}
 

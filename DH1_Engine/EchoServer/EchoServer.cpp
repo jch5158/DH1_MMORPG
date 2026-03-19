@@ -15,7 +15,7 @@ int main()
 	PacketServiceTypeHandler::Init();
 
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(
-		NetAddress(L"127.0.0.1", 7777),
+		NetAddress("127.0.0.1", 7777),
 		cpp_net_engine::MakeShared<GameSession>,
 		cpp_net_engine::MakeShared<Listener>(10,
 			[](const uint32 errorCode)->void
@@ -35,7 +35,7 @@ int main()
 	}
 
 	for (int32 i = 0; i < 5; ++i)
-	{
+	{ 
 		ThreadManager::GetInstance().Launch([pService]()->void
 			{
 				while (true)

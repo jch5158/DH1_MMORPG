@@ -8,23 +8,35 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Network">
+    <Filter Include="Core">
+      <UniqueIdentifier>{54d84910-67c6-46e6-9f8d-742fb0aaf49e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Network">
       <UniqueIdentifier>{0a7d203d-cdc7-4746-9176-90c67c9ee3fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\Protocol">
+    <Filter Include="Core\Network\Protocol">
       <UniqueIdentifier>{592b4757-4bdd-486d-9eef-cef3330e1edd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\Protocol\Proto">
+    <Filter Include="Core\Network\Protocol\Proto">
       <UniqueIdentifier>{7cfb2d0c-d280-4c3e-8ca3-70a19ec7c02a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\Protocol\PacketId">
+    <Filter Include="Core\Network\Protocol\PacketId">
       <UniqueIdentifier>{c3f97462-0578-4213-bced-50a34b3d4d48}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\PacketHandler">
+    <Filter Include="Core\Network\PacketHandler">
       <UniqueIdentifier>{02faff61-ac48-4355-9233-ac9d59eab975}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\Session">
+    <Filter Include="Core\Network\Session">
       <UniqueIdentifier>{2038bf49-2d7b-4a8a-9a33-81785e54f635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Thread">
+      <UniqueIdentifier>{ae9314b0-9c91-47d8-95c5-cdddd1b07e14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents">
+      <UniqueIdentifier>{b26309a7-b673-4e11-a3d7-bc987232f195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\Database">
+      <UniqueIdentifier>{0552340a-0078-4f95-8185-805874d30be3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,31 +44,37 @@
       <Filter>Pch</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Echo.pb.cc">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="GameSession.cpp">
-      <Filter>Network\Session</Filter>
+      <Filter>Core\Network\Session</Filter>
     </ClCompile>
     <ClCompile Include="GatewayServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp">
-      <Filter>Network\PacketHandler</Filter>
+      <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler\LoginPacketHandler.cpp">
-      <Filter>Network\PacketHandler</Filter>
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisActor.cpp">
+      <Filter>Contents\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="MySqlActor.cpp">
+      <Filter>Contents\Database</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,48 +82,54 @@
       <Filter>Pch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
-      <Filter>Network\Protocol\PacketId</Filter>
+      <Filter>Core\Network\Protocol\PacketId</Filter>
     </ClInclude>
     <ClInclude Include="GameSession.h">
-      <Filter>Network\Session</Filter>
+      <Filter>Core\Network\Session</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
-      <Filter>Network\Protocol</Filter>
+      <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\LoginPacketHandler.h">
-      <Filter>Network\PacketHandler</Filter>
+      <Filter>Core\Network\PacketHandler</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h">
-      <Filter>Network\PacketHandler</Filter>
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisActor.h">
+      <Filter>Contents\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="MySqlActor.h">
+      <Filter>Contents\Database</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
-      <Filter>Network\Protocol\Proto</Filter>
+      <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
-      <Filter>Network\Protocol\Proto</Filter>
+      <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
-      <Filter>Network\Protocol\Proto</Filter>
+      <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
-      <Filter>Network\Protocol\Proto</Filter>
+      <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Login.proto">
-      <Filter>Network\Protocol\Proto</Filter>
+      <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>
 </Project>

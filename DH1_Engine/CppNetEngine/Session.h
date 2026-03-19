@@ -39,6 +39,8 @@ public:
 
 	friend class Listener;
 	friend class Service;
+	friend class ClientService;
+	friend class ServerService;
 	friend class SessionManager;
 	friend class SessionReaper;
 	friend class Sender;
@@ -92,7 +94,6 @@ private:
 	void registerDisconnect();
 	void registerSend();
 	void registerReceive();
-	void registerReap();
 
 	void processConnect() const;
 	void processDisconnect() const;

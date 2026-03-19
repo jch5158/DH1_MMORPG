@@ -27,74 +27,80 @@ public:
 	explicit Service(
 		const eServiceType serviceType,
 		const NetAddress& netAddress,
-		SessionFactory sessionFactory,
+		const int32 maxSessionCount,
 		IocpCoreRef pIocpCore,
-		SessionReaperRef pSessionReaper,
-		SessionManagerRef pSessionManager,
-		WaitQueueManagerRef pWaitQueueManager);
+		SessionFactory sessionFactory);
 	virtual ~Service() = default;
 
 	virtual bool Start() = 0;
-	virtual void CloseService();
+	virtual void CloseService() = 0;
+	virtual bool AddSession(const SessionRef& pSession) = 0;
+	virtual void RemoveSession(const SessionRef& pSession) = 0;
 
 	SessionRef CreateSession();
-	[[nodiscard]] bool AddSession(const SessionRef& pSession) const;
-	void RemoveSession(const SessionRef& pSession) const;
-	[[nodiscard]] bool EnterWaitQueue(const SessionRef& pSession, uint64& outTicket) const;
-	[[nodiscard]] SessionRef DequeueWaitQueue() const;
-	void RegisterSessionReap(const SessionRef& pSession) const;
 
 	[[nodiscard]] eServiceType GetServiceType() const;
 	[[nodiscard]] NetAddress& GetNetAddress();
 	[[nodiscard]] IocpCoreRef GetIocpCore() const;
-	[[nodiscard]] int32 GetCurrentSessionCount() const;
+	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
-	[[nodiscard]] bool GetWaitCount(const uint64 myTicket, uint64& outWaitCount) const;
 
-private:
-
-	void admitWaitingSession() const;
-
+protected:
+	
 	const eServiceType mServiceType;
 	const int32	mMaxSessionCount;
 	NetAddress mNetAddress;
-	SessionFactory mSessionFactory;
 	IocpCoreRef mpIocpCore;
-	SessionReaperRef mpSessionReaper;
-	SessionManagerRef mpSessionManager;
-	WaitQueueManagerRef mpWaitQueueManager;
+	SessionFactory mSessionFactory;
+	SessionManager mSessionManager;
 };
 
 class ClientService : public Service
 {
 public:
 	explicit ClientService(
-		const NetAddress& targetAddress, 
-		SessionFactory pSessionFactory,
+		const NetAddress& netAddress,
+		const int32 maxSessionCount,
 		NetworkSchedulerRef pNetworkScheduler,
-		SessionManagerRef pSessionManager);
+		SessionFactory pSessionFactory);
 	virtual ~ClientService() override = default;
 
 	virtual bool Start() override;
 	virtual void CloseService() override;
+	virtual bool AddSession(const SessionRef& pSession) override;
+	virtual void RemoveSession(const SessionRef& pSession) override;
 };
 
 class ServerService : public Service
 {
 public:
 	explicit ServerService(
-		const NetAddress& targetAddress,
+		const NetAddress& netAddress,
+		const int32 acceptCount,
+		const int32 maxSessionCount,
+		const int32 maxWaitSize,
+		const int64 sessionTimeoutMs,
 		SessionFactory pSessionFactory,
-		ListenerRef pListener,
-		NetworkSchedulerRef pNetworkScheduler,
-		SessionReaperRef pSessionReaper,
-		SessionManagerRef pSessionManager,
-		WaitQueueManagerRef pWaitQueueManager);
+		NetworkSchedulerRef pNetworkScheduler
+	);
 	virtual ~ServerService() override = default;
 
 	virtual bool Start() override;
-	virtual void CloseService() override;
+	virtual void CloseService() override;	
+	virtual bool AddSession(const SessionRef& pSession) override;
+	virtual void RemoveSession(const SessionRef& pSession) override;
+
+	[[nodiscard]] bool EnterWaitQueue(const SessionRef& pSession, uint64& outTicket);
+	[[nodiscard]] SessionRef DequeueWaitQueue();
+	void RegisterSessionReap(const SessionRef& pSession);
+
+	[[nodiscard]] uint64 GetWaitCount(const uint64 myTicket);
 
 private:
+
+	void admitWaitingSession();
+	
 	ListenerRef mpListener;
+	WaitQueueManager mWaitQueueManager;
+	SessionReaperRef mpSessionReaper;
 };

@@ -5,6 +5,7 @@
 #include "Service.h"
 #include "GameSession.h"
 #include "PacketServiceTypeHandler.h"
+#include "RedisActor.h"
 
 int main()
 {
@@ -15,7 +16,7 @@ int main()
 	PacketServiceTypeHandler::Init();
 
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(
-		NetAddress(L"127.0.0.1", 9000),
+		NetAddress("127.0.0.1", 9000),
 		cpp_net_engine::MakeShared<GameSession>,
 		cpp_net_engine::MakeShared<Listener>(10,
 			[](const uint32 errorCode)->void
@@ -36,7 +37,7 @@ int main()
 
 	for (int32 i = 0; i < 5; ++i)
 	{
-		ThreadManager::GetInstance().Launch([pService]()->void
+		ThreadManager::GetInstance().Launch("Network Dispatch",[pService]()->void
 			{
 				while (true)
 				{
@@ -45,7 +46,7 @@ int main()
 			});
 	}
 
-	ThreadManager::GetInstance().Launch([pService]()->void
+	ThreadManager::GetInstance().Launch("Monitor",[pService]()->void
 		{
 			while (true)
 			{
@@ -54,6 +55,7 @@ int main()
 				std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 			}
 		});
+
 
 	ThreadManager::GetInstance().JoinWithClear();
 }

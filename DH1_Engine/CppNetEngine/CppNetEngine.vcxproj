@@ -236,6 +236,7 @@
     <ClInclude Include="ActorScheduler.h" />
     <ClInclude Include="NetworkScheduler.h" />
     <ClInclude Include="SocketIocpObject.h" />
+    <ClInclude Include="StringUtils.h" />
     <ClInclude Include="TimingWheel.h" />
     <ClInclude Include="Listener.h" />
     <ClInclude Include="LockFreeQueue.h" />
@@ -285,6 +286,7 @@
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="NetworkScheduler.cpp" />
     <ClCompile Include="SocketIocpObject.cpp" />
+    <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="TimingWheel.cpp" />
     <ClCompile Include="Listener.cpp" />
     <ClCompile Include="MemoryAllocator.cpp" />

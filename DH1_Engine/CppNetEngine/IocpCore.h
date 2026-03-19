@@ -23,7 +23,7 @@ public:
 	IocpCore(IocpCore&&) = delete;
 	IocpCore& operator=(IocpCore&&) = delete;
 
-	explicit IocpCore();
+	explicit IocpCore(const uint32 runningThreadCount = 0);
 	virtual ~IocpCore();
 
 	[[nodiscard]] HANDLE GetHandle() const;
@@ -34,8 +34,12 @@ public:
 	virtual TimerHandle RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs) = 0;
 	[[nodiscard]] static bool IsIgnorableError(const uint32 errorCode);
 
-protected:
+	[[nodiscard]] uint32 GetRunningThreadCount() const;
 
+protected:
 	HANDLE mIocpHandle;
+
+private:
+	const uint32 mRunningThreadCount;
 };
 

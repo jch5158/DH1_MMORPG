@@ -3,10 +3,11 @@
 #include "IocpCore.h"
 #include "CrashReporter.h"
 
-IocpCore::IocpCore()
+IocpCore::IocpCore(const uint32 runningThreadCount)
 	: mIocpHandle(nullptr)
+	, mRunningThreadCount(runningThreadCount)
 {
-	mIocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
+	mIocpHandle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, runningThreadCount);
 	if (mIocpHandle == nullptr)
 	{
 		CrashReporter::Crash();
@@ -53,4 +54,9 @@ bool IocpCore::IsIgnorableError(const uint32 errorCode)
 	default:
 		return false;
 	}
+}
+
+uint32 IocpCore::GetRunningThreadCount() const
+{
+	return mRunningThreadCount;
 }

@@ -18,13 +18,11 @@
 #include <functional>
 #include <filesystem>
 
-#ifdef _WIN32
 #include <WinSock2.h>
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include <mstcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
-#endif
 
 #include <mimalloc.h>
 #include <fmt/core.h>
@@ -35,9 +33,12 @@
 #include "NetEngineMacro.h"
 #include "Types.h"
 #include "StlTypes.h"
+#include "StringUtils.h"
 #include "SharedPtrUtils.h"
 #include "UniquePtrUtils.h"
 #include "AllocatorUtils.h"
 #include "NetEngineInit.h"
 #include "NetEngineLogger.h"
 #include "CrashReporter.h"
+#include "Service.h"
+#include "PacketSession.h"

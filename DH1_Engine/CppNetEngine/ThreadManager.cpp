@@ -17,29 +17,44 @@ ThreadManager::~ThreadManager()
 	JoinWithClear();
 }
 
-void ThreadManager::Launch(std::function<void()> callback)
+void ThreadManager::Launch(const std::string& threadName, std::function<void()> callback)
 {
 	LockGuard guard(mLock);
 
-	mThreads.emplace_back([argCallback = std::move(callback)]()->void
-	{
-		ThreadManager::InitTls();
-		argCallback();
-		ThreadManager::DestroyTls();
-	});
+	mThreads.emplace_back([threadName, argCallback = std::move(callback)]()->void
+		{
+			ThreadManager::InitTls();
+
+			const std::wstring threadNameWithTag = std::format(L"{}_{}", cpp_net_engine::ToWstring(threadName), sTlsThreadId);
+			const HRESULT result = SetThreadDescription(GetCurrentThread(), threadNameWithTag.c_str());
+			if (FAILED(result))
+			{
+				NET_ENGINE_LOG_FATAL("ThreadManager::Launch - SetThreadDescription Failed, HRESULT : {:#X}", static_cast<uint32>(result));
+				CrashReporter::Crash();
+			}
+
+			argCallback();
+
+			ThreadManager::DestroyTls();
+		});
 }
 
 void ThreadManager::JoinWithClear()
 {
-	for (auto& thread : mThreads)
+	Vector<std::thread> localThreads;
+
+	{
+		LockGuard guard(mLock);
+		localThreads = std::move(mThreads);
+	}
+
+	for (auto& thread : localThreads)
 	{
 		if (thread.joinable())
 		{
 			thread.join();
 		}
 	}
-
-	mThreads.clear();
 }
 
 void ThreadManager::InitTls()

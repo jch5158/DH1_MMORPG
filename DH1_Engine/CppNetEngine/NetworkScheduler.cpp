@@ -4,11 +4,11 @@
 #include "SessionReaper.h"
 #include "SocketIocpObject.h"
 
-NetworkScheduler::NetworkScheduler(const uint32 waitTimeoutMs, std::function<void(const uint32)> onHandleError)
-	: IocpCore()
-	, mWaitTimeoutMs(waitTimeoutMs)
-	, mOnHandleError(std::move(onHandleError))
-	, mTimingWheel()
+NetworkScheduler::NetworkScheduler(const NetworkSchedulerConfig& config)
+	: IocpCore(config.runningThreadCount)
+	, mWaitTimeoutMs(config.waitTimeoutMs)
+	, mTimingWheel(config.tickIntervalMs)
+	, mOnHandleError(config.onHandleError)
 {
 }
 
@@ -23,7 +23,10 @@ void NetworkScheduler::Dispatch()
 		const uint32 errorCode = GetLastError();
 		if (!IsIgnorableError(errorCode))
 		{
-			mOnHandleError(errorCode);
+			if (mOnHandleError != nullptr)
+			{
+				mOnHandleError(errorCode);
+			}
 		}
 	}
 

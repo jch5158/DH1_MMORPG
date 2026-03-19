@@ -20,7 +20,7 @@ public:
 
 	~ThreadManager();
 
-	void Launch(std::function<void()> callback);
+	void Launch(const std::string& threadName, std::function<void()> callback);
 	void JoinWithClear();
 
 	static void InitTls();
