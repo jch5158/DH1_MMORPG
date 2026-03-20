@@ -22,7 +22,7 @@ void GameSession::OnSend(const int32 len)
 {
 }
 
-void GameSession::OnReceivePacket(byte* pBuffer, const int32 len)
+void GameSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 {
 }
 

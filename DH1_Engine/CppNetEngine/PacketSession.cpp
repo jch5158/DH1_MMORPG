@@ -11,7 +11,7 @@ PacketSessionRef PacketSession::GetPacketSessionRef()
 	return static_pointer_cast<PacketSession>(shared_from_this());
 }
 
-int32 PacketSession::OnReceive(byte* pBuffer, const int32 len)
+int32 PacketSession::OnReceive(const byte* pBuffer, const int32 len)
 {
 	int32 processLen = 0;
 
@@ -23,7 +23,7 @@ int32 PacketSession::OnReceive(byte* pBuffer, const int32 len)
 			break;
 		}
 
-		auto [size, id] = *(reinterpret_cast<PacketHeader*>(&pBuffer[processLen]));
+		auto [size, id] = *(reinterpret_cast<const PacketHeader*>(&pBuffer[processLen]));
 		if (std::cmp_less(size, SIZE_OF_16(PacketHeader)) || std::cmp_less(mMaxPacketSize, size))
 		{
 			return -1;

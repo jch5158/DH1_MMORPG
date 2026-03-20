@@ -22,7 +22,7 @@ class EchoPacketHandler
 {
 public:
 
-    using PacketHandle = std::function<bool(const uint16, byte*, PacketSessionRef&)>;
+    using PacketHandle = std::function<bool(const uint16, const byte*, PacketSessionRef&)>;
 
     static constexpr uint32 MAKE_PACKET_HEADER_ID(const uint16 serviceType, const uint16 packetId)
     {
@@ -31,14 +31,14 @@ public:
 
     static void Init()
     {
-        sPacketHandleMap[packet_id::eEchoPacketId::S2C_ECHO_RES] = [](const uint16 size, byte* pBuffer, PacketSessionRef& pSession)->bool
+        sPacketHandleMap[packet_id::eEchoPacketId::S2C_ECHO_RES] = [](const uint16 size, const byte* pBuffer, PacketSessionRef& pSession)->bool
 			{
 				return HandlePacket<Protocol::S2C_ECHO_RES>(size, pBuffer, pSession, HANDLE_S2C_ECHO_RES);
 			};
 
     }
 
-	static bool HandlePacket(const uint16 size, const uint16 packetId, byte* pBuffer, PacketSessionRef& pSession)
+	static bool HandlePacket(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession)
 	{
 		const auto iter = sPacketHandleMap.find(packetId);
 		if (iter != sPacketHandleMap.end())
@@ -49,17 +49,17 @@ public:
 		return HANDLE_PACKET_ID_INVALID(size, packetId, pBuffer, pSession);
 	}
 
-	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, byte* pBuffer, PacketSessionRef& pSession);
+	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession);
     static bool HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet, PacketSessionRef& pSession);
 
     
-    static NetSendBufferRef MakeSendBuffer(Protocol::C2S_ECHO_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_ECHO_REQ); }
+    static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_ECHO_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_ECHO_REQ); }
 
 
 private:
 
 	template<typename PacketType, typename Handle>
-	static bool HandlePacket(const uint16 size, byte* pBuffer, PacketSessionRef& pSession, Handle handlePacket)
+	static bool HandlePacket(const uint16 size, const byte* pBuffer, PacketSessionRef& pSession, Handle handlePacket)
 	{
 		PacketType packet{};
 		if (packet.ParseFromArray(pBuffer + SIZE_OF_16(PacketHeader), size - SIZE_OF_16(PacketHeader)) == false)

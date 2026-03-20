@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "ActorScheduler.h"
 #include "Actor.h"
+#include "SocketUtils.h"
 
 ActorScheduler::ActorScheduler(const ActorSchedulerConfig& config)
 	: IocpCore(config.runningThreadCount)
@@ -46,7 +47,7 @@ void ActorScheduler::Dispatch()
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
-		if (!IsIgnorableError(errorCode))
+		if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
 		{
 			if (mOnHandleError != nullptr)
 			{
