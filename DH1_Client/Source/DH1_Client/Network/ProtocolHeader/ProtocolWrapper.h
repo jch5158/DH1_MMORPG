@@ -19,10 +19,11 @@ THIRD_PARTY_INCLUDES_START
 // ---------------------------------------------------------
 // 4. Shared 폴더에 있는 실제 프로토버퍼 헤더들을 여기서 일괄 인클루드
 // (새로운 패킷 헤더가 추가되면 여기에만 추가하시면 됩니다.)
-#include "PacketId.pb.h"
 #include "Enum.pb.h"
+#include "PacketOption.pb.h"
 #include "Struct.pb.h"
 #include "Echo.pb.h"
+#include "PacketId/PacketId.h"
 #include "Login.pb.h"
 // ---------------------------------------------------------
 

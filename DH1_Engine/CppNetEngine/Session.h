@@ -20,14 +20,14 @@ enum class eSessionState : uint8
 	Disconnected
 };
 
-// 1. 끊김 사유를 명확히 정의
-enum class eDisconnectReason : uint16  // NOLINT(performance-enum-size)
+enum class eDisconnectReason : uint8  // NOLINT(performance-enum-size)
 {
-	Closed,			// 클라이언트가 정상 종료
-	Timeout,        // 하트비트 응답 없음
-	Kicked,         // 서버에서 강퇴
-	ServerFull,		// 대기큐마저 꽉 찼을 때
-	ServerShutdown, // 서버 종료
+	Closed,			 // 클라이언트가 정상 종료
+	DuplicateLogin,  // 중복 접속
+	Timeout,         // 하트비트 응답 없음
+	Kicked,          // 서버에서 강퇴
+	ServerFull,		 // 대기큐마저 꽉 찼을 때
+	ServerShutdown,  // 서버 종료
 	SocketError,     // 네트워크 에러
 	StateError,
 	ServiceError,

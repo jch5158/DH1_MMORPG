@@ -1,6 +1,6 @@
 ﻿#include "LoginPacketHandler.h"
 
-bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint32 packetId, byte* pBuffer,
+bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
 	PacketSessionRef& pSession)
 {
 	return true;

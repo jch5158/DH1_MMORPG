@@ -3,7 +3,7 @@
 #include "NetAddress.h"
 #include "ThreadManager.h"
 #include "Service.h"
-#include "GameSession.h"
+#include "ClientSession.h"
 #include "PacketServiceTypeHandler.h"
 #include "RedisActor.h"
 
@@ -27,9 +27,9 @@ int main()
 	serviceConfig.netAddress = NetAddress("127.0.0.1", 9000);
 	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
 	serviceConfig.sessionTimeoutMs = 60000;
-	serviceConfig.sessionFactory = []()->GameSessionRef
+	serviceConfig.sessionFactory = []()->ClientSessionRef
 		{
-			return cpp_net_engine::MakeShared<GameSession>(8192, 4096);
+			return cpp_net_engine::MakeShared<ClientSession>(8192, 4096);
 		};
 
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);

@@ -58,7 +58,7 @@
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="GameSession.cpp">
+    <ClCompile Include="ClientSession.cpp">
       <Filter>Core\Network\Session</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
@@ -88,6 +88,9 @@
     <ClCompile Include="GatewayServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="ClientSessionManager.cpp">
+      <Filter>Core\Network\Session</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
@@ -105,7 +108,7 @@
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
       <Filter>Core\Network\Protocol\PacketId</Filter>
     </ClInclude>
-    <ClInclude Include="GameSession.h">
+    <ClInclude Include="ClientSession.h">
       <Filter>Core\Network\Session</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
@@ -137,6 +140,9 @@
     </ClInclude>
     <ClInclude Include="EnumType.h">
       <Filter>Core\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientSessionManager.h">
+      <Filter>Core\Network\Session</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

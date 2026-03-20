@@ -86,3 +86,22 @@ std::optional<std::string> RedisActor::GetString(const std::string& key) const
         return std::nullopt;
     }
 }
+
+bool RedisActor::DeleteKey(const std::string& key) const
+{
+    if (!mRedis)
+    {
+        return false;
+    }
+
+    try
+    {
+        const int64 delCount = mRedis->del(key);
+        return delCount > 0;
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] Delete Error : {}", e.what());
+        return false;
+    }
+}

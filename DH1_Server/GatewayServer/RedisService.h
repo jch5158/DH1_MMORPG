@@ -5,6 +5,7 @@
 
 using SetStringCallback = std::function<void(const bool)>;
 using GetStringCallback = std::function<void(const std::optional<std::string>&)>;
+using DeleteKeyCallback = std::function<void(const bool)>;
 
 struct RedisGatewayInfo
 {
@@ -28,6 +29,7 @@ public:
 	void SetStringAsync(std::string key, std::string value, SetStringCallback callback);
 	void SetExpireStringAsync(std::string key, std::string value, const int64 ttlSeconds, SetStringCallback callback);
 	void GetStringAsync(std::string key, GetStringCallback callback);
+	void DeleteKeyAsync(std::string key, DeleteKeyCallback callback);
 
 private:
 	uint64 mRedisActorId;

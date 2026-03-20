@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "ClientSessionManager.h"
 #include "RedisService.h"
 
 struct GatewayServiceConfig
@@ -21,12 +22,19 @@ public:
 	~GatewayService() = default;
 
 	[[nodiscard]] bool Initialize(ServerServiceRef pService, RedisServiceRef pRedisService);
+
+	[[nodiscard]] ClientSessionManagerRef GetClientSessionManagerRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 
 private:
 
-	GatewayService() = default;
+	GatewayService()
+		:mpClientSessionManager()
+		, mpServerService()
+		, mpRedisService()
+	{}
 
+	ClientSessionManagerRef mpClientSessionManager;
 	ServerServiceRef mpServerService;
 	RedisServiceRef mpRedisService;
 };

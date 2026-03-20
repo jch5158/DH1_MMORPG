@@ -13,6 +13,11 @@ bool GatewayService::Initialize(ServerServiceRef pService, RedisServiceRef pRedi
 	return true;
 }
 
+ClientSessionManagerRef GatewayService::GetClientSessionManagerRef() const
+{
+	return mpClientSessionManager;
+}
+
 RedisServiceRef GatewayService::GetRedisServiceRef() const
 {
 	return mpRedisService;
