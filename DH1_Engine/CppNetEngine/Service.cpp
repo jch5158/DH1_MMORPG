@@ -69,20 +69,13 @@ ClientService::ClientService(const ClientServiceConfig& config)
 		config.pNetworkScheduler,
 		config.sessionFactory
 	)
-{}
+{
+	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionManager>(config.maxSessionCount);
+}
 
 bool ClientService::Start()
 {
-	const int32 sessionCount = GetMaxSessionCount();
-	for (int32 i = 0; i < sessionCount; ++i)
-	{
-		const SessionRef pSession = CreateSession();
-		if (pSession->Connect() == false)
-		{
-			return false;
-		}
-		(void)mSessionManager.AddSession(pSession);
-	}
+	mpConnectionManager->Connect(std::static_pointer_cast<ClientService>(shared_from_this()));
 
 	return true;
 }
@@ -91,16 +84,21 @@ void ClientService::CloseService()
 {
 }
 
-bool ClientService::AddSession(const SessionRef& pSession)
+void ClientService::OnSessionConnected(const SessionRef& pSession)
 {
-	pSession->setSessionConnected();
-	//const bool result = mSessionManager.AddSession(pSession);
-	pSession->OnConnected();
-	return true;
+	if (mSessionManager.AddSession(pSession) == false)
+	{
+		pSession->Disconnect(eDisconnectReason::ServerFull);
+		return;
+	}
+
+	pSession->Start();
 }
 
-void ClientService::RemoveSession(const SessionRef& pSession)
+void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 {
+	pSession->Stop();
+
 	mSessionManager.RemoveSession(pSession);
 }
 
@@ -112,7 +110,6 @@ ServerService::ServerService(const ServerServiceConfig& config)
 		config.pNetworkScheduler,
 		config.sessionFactory)
 	,mpListener()
-	,mWaitQueueManager(config.maxWaitSessionCount)
 	,mpSessionReaper()
 {
 	mpListener = cpp_net_engine::MakeShared<Listener>(config.acceptCount);
@@ -139,54 +136,22 @@ void ServerService::CloseService()
 {
 }
 
-bool ServerService::AddSession(const SessionRef& pSession)
+void ServerService::OnSessionConnected(const SessionRef& pSession)
 {
-	if (mSessionManager.AddSession(pSession))
+	if (mSessionManager.AddSession(pSession) == false)
 	{
-		if (pSession->setSessionConnected() || pSession->setWaitingToConnected())
-		{
-			RegisterSessionReap(pSession);
-			pSession->OnConnected();
-			return true;
-		}
-
-		RemoveSession(pSession);
-		pSession->Disconnect(eDisconnectReason::StateError);
-		return false;
+		pSession->Disconnect(eDisconnectReason::ServerFull);
+		return;
 	}
 
-	uint64 myTicket = 0;
-	if (mWaitQueueManager.EnterWaitQueue(pSession, myTicket))
-	{
-		if (pSession->setSessionWaiting())
-		{
-			RegisterSessionReap(pSession);
-			pSession->OnEnterWaitQueue(myTicket);
-			return true;
-		}
-
-		pSession->Disconnect(eDisconnectReason::StateError);
-		return false;
-	}
-
-	pSession->Disconnect(eDisconnectReason::ServerFull);
-	return false;
+	pSession->Start();
 }
 
-void ServerService::RemoveSession(const SessionRef& pSession)
+void ServerService::OnSessionDisconnected(const SessionRef& pSession)
 {
-	mSessionManager.RemoveSession(pSession, true);
-	admitWaitingSession();
-}
+	pSession->Stop();
 
-bool ServerService::EnterWaitQueue(const SessionRef& pSession, uint64& outTicket)
-{
-	return mWaitQueueManager.EnterWaitQueue(pSession, outTicket);
-}
-
-SessionRef ServerService::DequeueWaitQueue()
-{
-	return mWaitQueueManager.DequeueWaitQueue();
+	mSessionManager.RemoveSession(pSession);
 }
 
 void ServerService::RegisterSessionReap(const SessionRef& pSession)
@@ -203,40 +168,8 @@ void ServerService::RegisterAbortSession(const SessionRef& pSession)
 {
 	SessionWeak pSessionWeak = pSession;
 	ServerServiceWeak pServerServiceWeak = std::static_pointer_cast<ServerService>(shared_from_this());
-	mpNetworkScheduler->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak]()->void
+	mpNetworkScheduler->RegisterDelay([pSessionWeak]()->void
 		{
-			pSessionReaper->AbortSession(pSessionWeak);
+			SessionReaper::AbortSession(pSessionWeak);
 		}, SessionReaper::GetAbortTimeoutMs());
-}
-
-uint64 ServerService::GetWaitCount(const uint64 myTicket)
-{
-	const uint64 waitCount = mWaitQueueManager.GetWaitCount(myTicket);
-	return waitCount;
-}
-
-void ServerService::admitWaitingSession()
-{
-	const SessionRef pWaitSession = DequeueWaitQueue();
-	if (pWaitSession == nullptr)
-	{
-		mSessionManager.ReleaseKeepTicket();
-		return;
-	}
-
-	if (!mSessionManager.AddWaitingSession(pWaitSession))
-	{
-		mSessionManager.ReleaseKeepTicket();
-		pWaitSession->Disconnect(eDisconnectReason::StateError);
-		return;
-	}
-
-	if (!pWaitSession->setWaitingToConnected())
-	{
-		mSessionManager.RemoveSession(pWaitSession);
-		pWaitSession->Disconnect(eDisconnectReason::StateError);
-		return;
-	}
-
-	pWaitSession->OnConnected();
 }

@@ -2,22 +2,14 @@
 #include "GameSession.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
-GameSession::GameSession()
-	:PacketSession()
-{
-}
-
-GameSession::~GameSession()
+GameSession::GameSession(const int32 receiveBufferSize, const int32 maxPacketSize)
+	:PacketSession(receiveBufferSize, maxPacketSize)
 {
 }
 
 void GameSession::OnConnected()
 {
 	fmt::print(L"Client Connect\n");
-}
-
-void GameSession::OnEnterWaitQueue(const uint64 myTicket)
-{
 }
 
 void GameSession::OnDisconnecting(const eDisconnectReason reason)

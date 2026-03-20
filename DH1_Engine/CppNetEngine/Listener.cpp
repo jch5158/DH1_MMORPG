@@ -24,7 +24,7 @@ void Listener::Dispatch(class IocpEvent& iocpEvent, uint32 numOfBytes)
 {
 	if (iocpEvent.GetEventType() != eIocpEventType::Accept)
 	{
-		NET_ASSERT(false, "Listener::Dispatch - eIocpEventType is not Accept");
+		NET_ENGINE_LOG_FATAL("Listener::Dispatch - eIocpEventType is not Accept");
 		return;
 	}
 

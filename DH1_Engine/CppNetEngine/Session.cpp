@@ -5,15 +5,14 @@
 #include "SocketUtils.h"
 #include "NetSendBuffer.h"
 
-Session::Session()
+Session::Session(const int32 receiveBufferSize)
 	: SocketIocpObject()
 	, mpService()
 	, mNetAddress()
 	, mSessionState(eSessionState::Disconnected)
 	, mTimeoutTracker()
-	, mConnector()
 	, mDisconnector()
-	, mReceiver()
+	, mReceiver(receiveBufferSize)
 	, mSender()
 {
 }
@@ -27,9 +26,6 @@ void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 {
 	switch (iocpEvent.GetEventType())  // NOLINT(clang-diagnostic-switch-enum)
 	{
-	case eIocpEventType::Connect:
-		processConnect();
-		break;
 	case eIocpEventType::Disconnect:
 		processDisconnect();
 		break;
@@ -43,6 +39,20 @@ void Session::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 		NET_ENGINE_LOG_ERROR("Session::Dispatch - iocp event type is unmatched, iocpEvent.GetEventType() : {}", static_cast<uint8>(iocpEvent.GetEventType()));
 		break;
 	}
+}
+
+void Session::Start()
+{
+	updateLastActivityMs();
+
+	registerReceive();
+
+	OnConnected();
+}
+
+void Session::Stop()
+{
+	OnDisconnected();
 }
 
 ServiceRef Session::GetService() const
@@ -75,11 +85,6 @@ bool Session::IsConnected() const
 	return mSessionState.load() == eSessionState::Connected;
 }
 
-bool Session::IsWaiting() const
-{
-	return mSessionState.load() == eSessionState::Waiting;
-}
-
 bool Session::IsDisconnecting() const
 {
 	return mSessionState.load() == eSessionState::Disconnecting;
@@ -99,11 +104,6 @@ bool Session::SetSessionInGame()
 {
 	auto expected = eSessionState::Connected;
 	return mSessionState.compare_exchange_weak(expected, eSessionState::InGame);
-}
-
-bool Session::Connect()
-{
-	return registerConnect();
 }
 
 void Session::Disconnect(const eDisconnectReason reason)
@@ -132,11 +132,6 @@ int64 Session::getLastActivityMs() const
 	return mTimeoutTracker.GetLastActivityMs();
 }
 
-bool Session::registerConnect()
-{
-	return mConnector.Register();
-}
-
 void Session::registerDisconnect()
 {
 	mDisconnector.Register();
@@ -150,11 +145,6 @@ void Session::registerSend()
 void Session::registerReceive()
 {
 	mReceiver.Register();
-}
-
-void Session::processConnect() const
-{
-	mConnector.Process();
 }
 
 void Session::processDisconnect() const
@@ -182,11 +172,6 @@ bool Session::Initialize(const ServiceRef& pService)
 	mpService = pService;
 	const SessionRef pSession = GetSessionRef();
 
-	if (mConnector.Initialize(pSession, pService) == false)
-	{
-		return false;
-	}
-	
 	if (mDisconnector.Initialize(pSession, pService) == false)
 	{
 		return false;
@@ -210,16 +195,10 @@ void Session::setNetAddress(const NetAddress& address)
 	mNetAddress = address;
 }
 
-bool Session::setSessionWaiting()
+void Session::startReceive()
 {
-	auto expected = eSessionState::Disconnected;
-	return mSessionState.compare_exchange_strong(expected, eSessionState::Waiting);
-}
-
-bool Session::setWaitingToConnected()
-{
-	auto expected = eSessionState::Waiting;
-	return mSessionState.compare_exchange_strong(expected, eSessionState::Connected);
+	updateLastActivityMs();
+	registerReceive();
 }
 
 bool Session::setSessionConnected()
@@ -233,8 +212,7 @@ bool Session::setSessionDisconnecting()
 	eSessionState expected = mSessionState.load();
 
 	while (expected == eSessionState::Connected ||
-		expected == eSessionState::InGame ||
-		expected == eSessionState::Waiting)
+		expected == eSessionState::InGame)
 	{
 		if (mSessionState.compare_exchange_strong(expected, eSessionState::Disconnecting))
 		{

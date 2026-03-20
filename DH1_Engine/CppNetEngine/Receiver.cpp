@@ -8,9 +8,9 @@ IocpReceiveEvent::IocpReceiveEvent()
 {
 }
 
-Receiver::Receiver()
+Receiver::Receiver(const int32 receiveBufferSize)
 	: mReceiveEvent()
-	, mNetReceiveBuffer(NetReceiveBuffer::DEFAULT_BUFFER_SIZE)
+	, mNetReceiveBuffer(receiveBufferSize)
 {
 }
 

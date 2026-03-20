@@ -224,6 +224,7 @@
     <ClInclude Include="ActorManager.h" />
     <ClInclude Include="ActorService.h" />
     <ClInclude Include="AllocatorUtils.h" />
+    <ClInclude Include="ConnectionManager.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="CrashReporter.h" />
     <ClInclude Include="Disconnector.h" />
@@ -276,6 +277,7 @@
     <ClCompile Include="ActorMailbox.cpp" />
     <ClCompile Include="ActorManager.cpp" />
     <ClCompile Include="ActorService.cpp" />
+    <ClCompile Include="ConnectionManager.cpp" />
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="CrashReporter.cpp" />
     <ClCompile Include="Disconnector.cpp" />

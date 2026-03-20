@@ -15,7 +15,6 @@
 enum class eSessionState : uint8
 {
 	Connected,
-	Waiting,    // 대기열 상태
 	InGame,
 	Disconnecting,
 	Disconnected
@@ -56,18 +55,20 @@ public:
 	Session(Session&&) = delete;
 	Session& operator=(Session&&) = delete;
 
-	explicit Session();
+	explicit Session(const int32 receiveBufferSize);
 	virtual ~Session() override;
 
 	virtual void Dispatch(class IocpEvent& iocpEvent, const uint32 numOfBytes) override;
 
 	virtual void OnConnected() = 0;
-	virtual void OnEnterWaitQueue(const uint64 myTicket) = 0;
 	virtual void OnDisconnecting(const eDisconnectReason reason) = 0;
 	virtual void OnDisconnected() = 0;
 	virtual void OnSend(const int32 len) = 0;
 	virtual int32 OnReceive(byte* pBuffer, const int32 len) = 0;
 	virtual void OnError(const int32 errorCode) = 0;
+
+	void Start();
+	void Stop();
 
 	[[nodiscard]] ServiceRef GetService() const;
 	[[nodiscard]] NetAddress& GetAddress();
@@ -76,12 +77,10 @@ public:
 	
 	[[nodiscard]] bool IsInGame() const;
 	[[nodiscard]] bool IsConnected() const;
-	[[nodiscard]] bool IsWaiting() const;
 	[[nodiscard]] bool IsDisconnecting() const;
 	[[nodiscard]] bool IsDisconnected() const;
 	[[nodiscard]] bool IsDisconnectStarted() const;
 	[[nodiscard]] bool SetSessionInGame();
-	[[nodiscard]] bool Connect();
 	void Disconnect(const eDisconnectReason reason);
 	void Send(const NetSendBufferRef& pSendBuffer);
 
@@ -92,22 +91,18 @@ protected:
 
 private:
 
-	bool registerConnect();
 	void registerDisconnect();
 	void registerSend();
 	void registerReceive();
 
-	void processConnect() const;
 	void processDisconnect() const;
 	void processSend(const uint32 numOfBytes);
 	void processReceive(const uint32 numOfBytes);
 
 	bool Initialize(const ServiceRef& pService);
-
 	void setNetAddress(const NetAddress& address);
+	void startReceive();
 
-	bool setSessionWaiting();
-	bool setWaitingToConnected();
 	bool setSessionConnected();
 	bool setSessionDisconnecting();
 	bool setSessionDisconnected();
@@ -116,7 +111,6 @@ private:
 	NetAddress mNetAddress;
 	std::atomic<eSessionState> mSessionState;
 	SessionTimeoutTracker mTimeoutTracker;
-	Connector mConnector;
 	Disconnector mDisconnector;
 	Receiver mReceiver;
 	Sender mSender;

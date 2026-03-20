@@ -14,7 +14,7 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	NetworkSchedulerConfig netConfig{};
+	NetworkSchedulerConfig netConfig;
 	netConfig.runningThreadCount = 0;
 	netConfig.tickIntervalMs = 16;
 	netConfig.waitTimeoutMs = 16;
@@ -26,11 +26,12 @@ int main()
 	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);
 	serviceConfig.acceptCount = 50;
 	serviceConfig.maxSessionCount = 5000;
-	serviceConfig.maxWaitSessionCount = 10000;
 	serviceConfig.sessionTimeoutMs = 20000;
 	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
-	serviceConfig.sessionFactory = cpp_net_engine::MakeShared<GameSession>;
-
+	serviceConfig.sessionFactory = []()->GameSessionRef
+		{
+			return cpp_net_engine::MakeShared<GameSession>(8192, 4096);
+		};
 
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
 

@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "pch.h"
 #include "ObjectAllocator.h"
 
 template <typename T>

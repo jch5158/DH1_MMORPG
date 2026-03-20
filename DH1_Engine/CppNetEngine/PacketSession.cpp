@@ -1,6 +1,11 @@
 ﻿#include "pch.h"
 #include "PacketSession.h"
 
+PacketSession::PacketSession(const int32 receiveBufferSize, const int32 maxPacketSize)
+	:Session(receiveBufferSize)
+	, mMaxPacketSize(maxPacketSize)
+{}
+
 PacketSessionRef PacketSession::GetPacketSessionRef()
 {
 	return static_pointer_cast<PacketSession>(shared_from_this());
@@ -19,7 +24,7 @@ int32 PacketSession::OnReceive(byte* pBuffer, const int32 len)
 		}
 
 		auto [size, id] = *(reinterpret_cast<PacketHeader*>(&pBuffer[processLen]));
-		if (std::cmp_less(size, SIZE_OF_16(PacketHeader)) || std::cmp_less(NetReceiveBuffer::DEFAULT_BUFFER_SIZE, size))
+		if (std::cmp_less(size, SIZE_OF_16(PacketHeader)) || std::cmp_less(mMaxPacketSize, size))
 		{
 			return -1;
 		}

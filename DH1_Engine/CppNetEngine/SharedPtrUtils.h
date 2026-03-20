@@ -81,7 +81,9 @@ using SharedPtr = std::shared_ptr<T>;
 DECLARE_SMART_PTR(IocpObject);
 DECLARE_SMART_PTR(SocketIocpObject)
 DECLARE_SMART_PTR(Listener);
+DECLARE_SMART_PTR(ConnectionManager);
 DECLARE_SMART_PTR(Acceptor);
+DECLARE_SMART_PTR(Connector);
 DECLARE_SMART_PTR(Session);
 DECLARE_SMART_PTR(GameSession);
 DECLARE_SMART_PTR(PacketSession);

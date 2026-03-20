@@ -219,6 +219,9 @@
     <ClInclude Include="ActorEventEnum.h">
       <Filter>Actor\Core</Filter>
     </ClInclude>
+    <ClInclude Include="ConnectionManager.h">
+      <Filter>Network\Service</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NetEngineInit.cpp">
@@ -334,6 +337,9 @@
     </ClCompile>
     <ClCompile Include="ActorMailbox.cpp">
       <Filter>Actor\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionManager.cpp">
+      <Filter>Network\Service</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

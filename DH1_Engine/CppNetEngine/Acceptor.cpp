@@ -7,7 +7,6 @@
 IocpAcceptEvent::IocpAcceptEvent(const int32 acceptorIndex)
 	: IocpEvent(eIocpEventType::Accept)
 	, mAcceptorIndex(acceptorIndex)
-	, mpClientSession()
 {
 }
 
@@ -16,28 +15,9 @@ int32 IocpAcceptEvent::GetAcceptorIndex() const
 	return mAcceptorIndex;
 }
 
-void IocpAcceptEvent::ResetSession()
-{
-	mpClientSession.reset();
-}
-
-void IocpAcceptEvent::SetSession(SessionRef pSession)
-{
-	if (pSession == nullptr)
-	{
-		return;
-	}
-
-	mpClientSession = std::move(pSession);
-}
-
-SessionRef IocpAcceptEvent::GetClientSession() const
-{
-	return mpClientSession;
-}
-
 Acceptor::Acceptor(const int32 acceptorIndex)
 	: mAcceptEvent(acceptorIndex)
+	, mpSession()
 	, mpServerService()
 {
 }
@@ -68,15 +48,14 @@ void Acceptor::Register()
 		return;
 	}
 
-	const SessionRef pSession = mpServerService->CreateSession();
-	if (pSession == nullptr)
+	mpSession = mpServerService->CreateSession();
+	if (mpSession == nullptr)
 	{
 		return;
 	}
 
 	mAcceptEvent.ClearOverlapped();
-	mAcceptEvent.SetSession(pSession);
-	if (false == SocketUtils::AcceptEx(pOwner->GetSocket(), pSession->GetSocket(), pSession->GetReceiveBufferPtr(), &mAcceptEvent))
+	if (false == SocketUtils::AcceptEx(pOwner->GetSocket(), mpSession->GetSocket(), mpSession->GetReceiveBufferPtr(), &mAcceptEvent))
 	{
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
@@ -88,18 +67,18 @@ void Acceptor::Register()
 
 void Acceptor::Process()
 {
-	const ListenerRef pOwner = static_pointer_cast<Listener>(mAcceptEvent.GetOwner());
-	const SessionRef pSession = mAcceptEvent.GetClientSession();
-	mAcceptEvent.ResetSession();
-
 	do
 	{
-		if (pOwner == nullptr)
+		const SessionRef pSession = mpSession;
+		mpSession.reset();
+
+		if (pSession == nullptr || mpServerService == nullptr)
 		{
 			break;
 		}
 
-		if (pSession == nullptr)
+		const ListenerRef pOwner = static_pointer_cast<Listener>(mAcceptEvent.GetOwner());
+		if (pOwner == nullptr)
 		{
 			break;
 		}
@@ -117,7 +96,20 @@ void Acceptor::Process()
 		}
 
 		pSession->setNetAddress(NetAddress(sockAddr));
-		pSession->processConnect();
+		
+		if (pSession->setSessionConnected() == false)
+		{
+			pSession->Disconnect(eDisconnectReason::StateError);
+			return;
+		}
+
+		if (mpServerService == nullptr)
+		{
+			pSession->Disconnect(eDisconnectReason::ServiceError);
+			return;
+		}
+
+		mpServerService->OnSessionConnected(pSession);
 
 	} while (false);
 

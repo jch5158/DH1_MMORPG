@@ -3,19 +3,25 @@
 #include "Service.h"
 #include "Session.h"
 #include "SocketUtils.h"
+#include "ConnectionManager.h"
 
-IocpConnectEvent::IocpConnectEvent()
+IocpConnectEvent::IocpConnectEvent(const int32 connectorIndex)
 	:IocpEvent(eIocpEventType::Connect)
+	, mConnectorIndex(connectorIndex)
+{}
+
+int32 IocpConnectEvent::GetConnectorIndex() const
 {
+	return mConnectorIndex;
 }
 
-Connector::Connector()
-	: mConnectEvent()
+Connector::Connector(const int32 connectorIndex)
+	: mConnectEvent(connectorIndex)
     , mpService()
 {
 }
 
-bool Connector::Initialize(const SessionRef& pOwner, ServiceRef pService)
+bool Connector::Initialize(const ConnectionManagerRef& pOwner, ClientServiceRef pService)
 {
 	if (pOwner == nullptr || pService == nullptr)
 	{
@@ -30,13 +36,13 @@ bool Connector::Initialize(const SessionRef& pOwner, ServiceRef pService)
 
 bool Connector::Register()
 {
-	const SessionRef pSession = std::static_pointer_cast<Session>(mConnectEvent.GetOwner());
-	if (pSession == nullptr || !pSession->IsDisconnectStarted())
+	if (mpService == nullptr || mpService->GetServiceType() != eServiceType::Client)
 	{
 		return false;
 	}
 
-	if (mpService == nullptr || mpService->GetServiceType() != eServiceType::Client)
+	const SessionRef pSession = mpService->CreateSession();
+	if (pSession == nullptr || !pSession->IsDisconnectStarted())
 	{
 		return false;
 	}
@@ -51,6 +57,7 @@ bool Connector::Register()
 		return false;
 	}
 
+	mpSession = pSession;
 	mConnectEvent.ClearOverlapped();
 	if (false == SocketUtils::ConnectEx(pSession->GetSocket(), mpService->GetNetAddress().GetSockAddr(), &mConnectEvent))
 	{
@@ -66,22 +73,27 @@ bool Connector::Register()
 	return true;
 }
 
-void Connector::Process() const
+void Connector::Process()
 {
-	const SessionRef pSession = std::static_pointer_cast<Session>(mConnectEvent.GetOwner());
+	const SessionRef pSession = mpSession;
 	if (pSession == nullptr)
 	{
 		return;
 	}
 
-	if (mpService == nullptr)
+	mpSession.reset();
+
+	if (pSession->setSessionConnected() == false)
 	{
+		pSession->Disconnect(eDisconnectReason::StateError);
 		return;
 	}
 
-	if (mpService->AddSession(pSession))
+	if (mpService == nullptr)
 	{
-		pSession->updateLastActivityMs();
-		pSession->registerReceive();
+		pSession->Disconnect(eDisconnectReason::ServiceError);
+		return;
 	}
+
+	mpService->OnSessionConnected(pSession);
 }

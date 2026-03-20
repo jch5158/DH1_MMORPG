@@ -6,7 +6,12 @@ class Service;
 class IocpConnectEvent final : public IocpEvent
 {
 public:
-	IocpConnectEvent();
+	explicit IocpConnectEvent(const int32 connectorIndex);
+
+	[[nodiscard]] int32 GetConnectorIndex() const;
+
+private:
+	const int32 mConnectorIndex;
 };
 
 class Connector
@@ -18,16 +23,17 @@ public:
 	Connector(Connector&&) = delete;
 	Connector operator=(Connector&&) = delete;
 
-	explicit Connector();
+	explicit Connector(const int32 connectorIndex);
 	~Connector() = default;
 
-	[[nodiscard]] bool Initialize(const SessionRef& pOwner, ServiceRef pService);
+	[[nodiscard]] bool Initialize(const ConnectionManagerRef& pOwner, ClientServiceRef pService);
 	bool Register();
-	void Process() const;
+	void Process();
 
 private:
 
 	IocpConnectEvent mConnectEvent;
-	ServiceRef mpService;
+	SessionRef mpSession;
+	ClientServiceRef mpService;
 };
 

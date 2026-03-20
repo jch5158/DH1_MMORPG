@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "IocpCore.h"
-#include "SharedPtrUtils.h"
 #include "SocketIocpObject.h"
 
 class ServerService;
@@ -22,7 +20,7 @@ public:
 	explicit Listener(const int32 acceptCount);
 	virtual ~Listener() override;
 
-	virtual void Dispatch(IocpEvent& iocpEvent, uint32 numOfBytes) override;
+	virtual void Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes) override;
 
 	ListenerRef GetListenerRef();
 
@@ -34,4 +32,3 @@ private:
 	const int32 mAcceptCount;
 	Vector<AcceptorRef> mAcceptors;
 };
-

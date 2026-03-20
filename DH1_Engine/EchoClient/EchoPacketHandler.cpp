@@ -15,12 +15,17 @@ bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16
 
 bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet, PacketSessionRef& pSession)
 {
-	Protocol::C2S_ECHO_REQ retPacket;
+    if (packet.echomsg() != "Hello World\n")
+    {
+        CrashReporter::Crash();
+    }
 
-	retPacket.set_echomsg("Hello World\n");
-	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(retPacket);
+    Protocol::C2S_ECHO_REQ retPacket;
+    retPacket.set_echomsg("Hello World\n");
 
-	pSession->Send(pSendBuffer);
+    const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(retPacket);
 
-	return true;
+    pSession->Send(pSendBuffer);
+
+    return true;
 }

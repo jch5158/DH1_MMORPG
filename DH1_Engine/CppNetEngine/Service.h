@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "ConnectionManager.h"
 #include "Listener.h"
 #include "NetAddress.h"
 #include "LockFreeStack.h"
@@ -34,8 +35,8 @@ public:
 
 	virtual bool Start() = 0;
 	virtual void CloseService() = 0;
-	virtual bool AddSession(const SessionRef& pSession) = 0;
-	virtual void RemoveSession(const SessionRef& pSession) = 0;
+	virtual void OnSessionConnected(const SessionRef& pSession) = 0;
+	virtual void OnSessionDisconnected(const SessionRef& pSession) = 0;
 
 	SessionRef CreateSession();
 
@@ -71,8 +72,12 @@ public:
 
 	virtual bool Start() override;
 	virtual void CloseService() override;
-	virtual bool AddSession(const SessionRef& pSession) override;
-	virtual void RemoveSession(const SessionRef& pSession) override;
+	virtual void OnSessionConnected(const SessionRef& pSession) override;
+	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
+
+private:
+
+	ConnectionManagerRef mpConnectionManager;
 };
 
 struct ServerServiceConfig
@@ -80,7 +85,6 @@ struct ServerServiceConfig
 	NetAddress netAddress;
 	int32 acceptCount;
 	int32 maxSessionCount;
-	int32 maxWaitSessionCount;
 	int64 sessionTimeoutMs;
 	NetworkSchedulerRef pNetworkScheduler;
 	SessionFactory sessionFactory;
@@ -94,21 +98,14 @@ public:
 
 	virtual bool Start() override;
 	virtual void CloseService() override;	
-	virtual bool AddSession(const SessionRef& pSession) override;
-	virtual void RemoveSession(const SessionRef& pSession) override;
+	virtual void OnSessionConnected(const SessionRef& pSession) override;
+	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
 
-	[[nodiscard]] bool EnterWaitQueue(const SessionRef& pSession, uint64& outTicket);
-	[[nodiscard]] SessionRef DequeueWaitQueue();
 	void RegisterSessionReap(const SessionRef& pSession);
 	void RegisterAbortSession(const SessionRef& pSession);
 
-	[[nodiscard]] uint64 GetWaitCount(const uint64 myTicket);
-
 private:
-
-	void admitWaitingSession();
-	
+		
 	ListenerRef mpListener;
-	WaitQueueManager mWaitQueueManager;
 	SessionReaperRef mpSessionReaper;
 };

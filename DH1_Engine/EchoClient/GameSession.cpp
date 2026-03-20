@@ -6,12 +6,8 @@
 #include "PlayerManager.h"
 #include "Service.h"
 
-GameSession::GameSession()
-	:PacketSession()
-{
-}
-
-GameSession::~GameSession()
+GameSession::GameSession(const int32 receiveBufferSize, const int32 maxPacketSize)
+	:PacketSession(receiveBufferSize, maxPacketSize)
 {
 }
 
@@ -21,10 +17,6 @@ void GameSession::OnConnected()
 	packet.set_echomsg("Hello World\n");
 	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(packet);
 	Send(pSendBuffer);
-}
-
-void GameSession::OnEnterWaitQueue(const uint64 myTicket)
-{
 }
 
 void GameSession::OnDisconnecting(const eDisconnectReason reason)

@@ -19,7 +19,7 @@ public:
 	Receiver(Receiver&&) = delete;
 	Receiver operator=(Receiver&&) = delete;
 
-	explicit Receiver();
+	explicit Receiver(const int32 receiveBufferSize);
 	~Receiver() = default;
 
 	[[nodiscard]] bool Initialize(const SessionRef& pOwner);

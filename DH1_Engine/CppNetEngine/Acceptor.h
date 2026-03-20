@@ -7,16 +7,12 @@ class IocpAcceptEvent final : public IocpEvent
 {
 public:
 	explicit IocpAcceptEvent(const int32 acceptorIndex);
+	~IocpAcceptEvent() = default;
 
 	[[nodiscard]] int32 GetAcceptorIndex() const;
 
-	void ResetSession();
-	void SetSession(SessionRef pSession);
-	[[nodiscard]] SessionRef GetClientSession() const;
-
 private:
 	const int32 mAcceptorIndex;
-	SessionRef mpClientSession;
 };
 
 class Acceptor
@@ -32,12 +28,14 @@ public:
 	~Acceptor() = default;
 
 	[[nodiscard]] bool Initialize(const ListenerRef& pOwner, ServerServiceRef pService);
+
 	void Register();
 	void Process();
 
 private:
 
 	IocpAcceptEvent mAcceptEvent;
+	SessionRef mpSession; 
 	ServerServiceRef mpServerService;
 };
 
