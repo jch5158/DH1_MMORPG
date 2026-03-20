@@ -17,7 +17,7 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 		return false;
 	}
 
-	pRedisService->GetStringAsync(packet.ticket(), [argAccountIdStr = packet.accountid()](const std::optional<std::string>& resultStr)->void
+	pRedisService->GetStringAsync(packet.ticket(), [argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
 		{
 			if (!resultStr.has_value())
 			{
@@ -25,7 +25,7 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 			}
 
 			const std::string& accountId = resultStr.value();
-			if (accountId != std::to_string(argAccountIdStr))
+			if (accountId != std::to_string(argAccountId))
 			{
 				// TODO : Failed;
 			}
