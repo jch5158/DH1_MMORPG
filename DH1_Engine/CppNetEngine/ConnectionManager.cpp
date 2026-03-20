@@ -1,12 +1,19 @@
 ﻿#include "pch.h"
 #include "ConnectionManager.h"
 
-ConnectionManager::ConnectionManager(const int32 connectCount)
-	:mConnectCount(connectCount)
-	, mFreeIndexStack(connectCount)
+ConnectionManager::ConnectionManager(const int32 maxConnectionCount)
+	:mMaxConnectionCount(maxConnectionCount)
+	, mCurrentConnectionCount(0)
+	, mFreeIndexStack(maxConnectionCount)
 	, mConnectors()
 {
-	mConnectors.reserve(connectCount);
+	mConnectors.reserve(maxConnectionCount);
+	for (int32 i = 0; i < maxConnectionCount; ++i)
+	{
+		ConnectorRef pConnector = cpp_net_engine::MakeShared<Connector>(i);
+		mConnectors.emplace_back(pConnector);
+		(void)mFreeIndexStack.TryPush(i);
+	}
 }
 
 void ConnectionManager::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
@@ -19,6 +26,7 @@ void ConnectionManager::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 
 	const auto* pConnectionEvent = static_cast<IocpConnectEvent*>(&iocpEvent);
 	mConnectors[pConnectionEvent->GetConnectorIndex()]->Process();
+	(void)mFreeIndexStack.TryPush(pConnectionEvent->GetConnectorIndex());
 }
 
 ConnectionManagerRef ConnectionManager::GetConnectionManagerRef()
@@ -28,42 +36,42 @@ ConnectionManagerRef ConnectionManager::GetConnectionManagerRef()
 
 bool ConnectionManager::Connect(const ClientServiceRef& pService)
 {
-	for (int32 i = 0; i < mConnectCount; ++i)
+	if (mCurrentConnectionCount.fetch_add(1) >= mMaxConnectionCount)
 	{
-		ConnectorRef pConnector = cpp_net_engine::MakeShared<Connector>(i);
-		if (pConnector->Initialize(GetConnectionManagerRef(), pService) == false)
-		{
-			NET_ENGINE_LOG_ERROR("ConnectionManager::Connect - pConnector->Initialize is failed");
-			continue;
-		}
+		mCurrentConnectionCount.fetch_sub(1);
+		return false;
+	}
 
-		mConnectors.emplace_back(pConnector);
-		pConnector->Register();
+	int32 index;
+	if (mFreeIndexStack.TryPop(index) == false)
+	{
+		mCurrentConnectionCount.fetch_sub(1);
+		return false;
+	}
+
+	if (mConnectors[index]->Initialize(GetConnectionManagerRef(), pService) == false)
+	{
+		(void)mFreeIndexStack.TryPush(index);
+		mCurrentConnectionCount.fetch_sub(1);
+		return false;
+	}
+
+	if (mConnectors[index]->Register() == false)
+	{
+		(void)mFreeIndexStack.TryPush(index);
+		mCurrentConnectionCount.fetch_sub(1);
+		return false;
 	}
 
 	return true;
 }
 
-void ConnectionManager::Connect(const ClientServiceRef& pService, const int32 connectCount)
-{
-	const int32 freeConnectorCount = mFreeIndexStack.Count();
-	const int32 remainConnectCount = std::min(freeConnectorCount, connectCount);
-
-	for (int32 i = 0; i < remainConnectCount; ++i)
-	{
-		int32 index;
-		if (mFreeIndexStack.TryPop(index) == false)
-		{
-			break;
-		}
-
-		mConnectors[index]->Register();
-	}
-
-	return;
-}
-
 void ConnectionManager::Close()
 {
 	mConnectors.clear();
+}
+
+void ConnectionManager::FreeConnection()
+{
+	mCurrentConnectionCount.fetch_sub(1);
 }

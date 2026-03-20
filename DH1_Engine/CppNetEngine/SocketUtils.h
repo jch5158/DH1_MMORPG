@@ -31,6 +31,7 @@ public:
 	static void CancelIoEx(const SOCKET socket, OVERLAPPED* pOverlapped);
 	static bool WsaSend(const SOCKET socket, WSABUF* pWsabuf, const int32 bufSize, OVERLAPPED* pOverlapped);
 	static bool WsaReceive(const SOCKET socket, WSABUF* pWsabuf, const int32 bufSize, OVERLAPPED* pOverlapped);
+	static bool IsLoggingIgnorableIocpError(const uint32 errorCode);
 
 private:
 

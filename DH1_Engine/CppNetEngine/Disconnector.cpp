@@ -41,7 +41,10 @@ void Disconnector::Register()
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			pSession->OnError(errorCode);
+			if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
+			{
+				pSession->OnError(errorCode);
+			}
 		}
 	}
 }

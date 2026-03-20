@@ -98,7 +98,10 @@ void Receiver::Register()
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			pOwner->OnError(errorCode);
+			if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
+			{
+				pOwner->OnError(errorCode);
+			}
 			pOwner->Disconnect(eDisconnectReason::SocketError);
 		}
 	}

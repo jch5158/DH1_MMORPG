@@ -75,7 +75,10 @@ ClientService::ClientService(const ClientServiceConfig& config)
 
 bool ClientService::Start()
 {
-	mpConnectionManager->Connect(std::static_pointer_cast<ClientService>(shared_from_this()));
+	for (int32 i = 0; i < mMaxSessionCount; ++i)
+	{
+		mpConnectionManager->Connect(std::static_pointer_cast<ClientService>(shared_from_this()));
+	}
 
 	return true;
 }
@@ -100,6 +103,8 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 	pSession->Stop();
 
 	mSessionManager.RemoveSession(pSession);
+
+	mpConnectionManager->FreeConnection();
 }
 
 ServerService::ServerService(const ServerServiceConfig& config)

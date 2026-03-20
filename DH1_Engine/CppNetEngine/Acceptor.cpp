@@ -60,7 +60,10 @@ void Acceptor::Register()
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			NET_ENGINE_LOG_ERROR("Acceptor::Register() - SocketUtils::AcceptEx, errorCode : {}", errorCode);
+			if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
+			{
+				NET_ENGINE_LOG_ERROR("Acceptor::Register() - SocketUtils::AcceptEx, errorCode : {}", errorCode);
+			}
 		}
 	}
 }

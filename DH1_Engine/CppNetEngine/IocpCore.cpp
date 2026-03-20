@@ -37,25 +37,6 @@ bool IocpCore::Register(IocpEvent& iocpEvent)
 	return true;
 }
 
-bool IocpCore::IsIgnorableError(const uint32 errorCode)
-{
-	switch (errorCode)
-	{
-	case WSAENOTCONN:
-	case WSAEWOULDBLOCK:
-	case ERROR_CONNECTION_ABORTED:
-	case WSA_IO_PENDING:
-	case ERROR_NETNAME_DELETED:
-	case ERROR_OPERATION_ABORTED:
-	case WSAECONNRESET:
-	case WSAECONNABORTED:
-	case WAIT_TIMEOUT:
-		return true;
-	default:
-		return false;
-	}
-}
-
 uint32 IocpCore::GetRunningThreadCount() const
 {
 	return mRunningThreadCount;

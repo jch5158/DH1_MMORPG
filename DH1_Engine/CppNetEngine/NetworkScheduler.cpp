@@ -3,6 +3,7 @@
 #include "IocpEvent.h"
 #include "SessionReaper.h"
 #include "SocketIocpObject.h"
+#include "SocketUtils.h"
 
 NetworkScheduler::NetworkScheduler(const NetworkSchedulerConfig& config)
 	: IocpCore(config.runningThreadCount)
@@ -21,7 +22,7 @@ void NetworkScheduler::Dispatch()
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
-		if (!IsIgnorableError(errorCode))
+		if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
 		{
 			if (mOnHandleError != nullptr)
 			{

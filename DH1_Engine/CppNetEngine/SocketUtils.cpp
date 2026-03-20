@@ -181,6 +181,25 @@ bool SocketUtils::WsaReceive(const SOCKET socket, WSABUF* pWsabuf, const int32 b
 	return SOCKET_ERROR != WSARecv(socket, pWsabuf, bufSize, &numOfBytes, &flags, pOverlapped, nullptr);
 }
 
+bool SocketUtils::IsLoggingIgnorableIocpError(const uint32 errorCode)
+{
+	switch (errorCode)
+	{
+	case WSAENOTCONN:
+	case WSAEWOULDBLOCK:
+	case ERROR_CONNECTION_ABORTED:
+	case WSA_IO_PENDING:
+	case ERROR_NETNAME_DELETED:
+	case ERROR_OPERATION_ABORTED:
+	case WSAECONNRESET:
+	case WSAECONNABORTED:
+	case WAIT_TIMEOUT:
+		return true;
+	default:
+		return false;
+	}
+}
+
 bool SocketUtils::bindWindowsFunction(const SOCKET socket, GUID guid, LPVOID* fn)
 {
 	DWORD bytes = 0;
