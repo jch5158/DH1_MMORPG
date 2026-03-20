@@ -15,7 +15,7 @@ public:
 
     bool Initialize(const std::string& connectionUri);
 
-    bool SetString(const std::string& key, const std::string& value) const;
+    bool SetString(const std::string& key, const std::string& value, const int64 ttlSeconds) const;
     std::optional<std::string> GetString(const std::string& key) const;
 
 private:

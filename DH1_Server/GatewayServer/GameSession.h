@@ -5,11 +5,10 @@ class GameSession final : public PacketSession
 {
 public:
 
-	GameSession() = default;
+	GameSession(const int32 receiveBufferSize, const int32 maxPacketSize);
 	virtual ~GameSession() override = default;
 
 	virtual void OnConnected() override;
-	virtual void OnEnterWaitQueue(const uint64 myTicket) override;
 	virtual void OnDisconnecting(const eDisconnectReason reason) override;
 	virtual void OnDisconnected() override;
 	virtual void OnSend(const int32 len) override;

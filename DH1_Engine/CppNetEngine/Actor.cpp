@@ -50,9 +50,9 @@ void Actor::Release()
 	mbAcquire.store(false);
 }
 
-bool Actor::Activate(ActorScheduler& scheduler)
+bool Actor::Activate(ActorSchedulerRef pScheduler)
 {
-	if (mMailbox.Initialize(shared_from_this(), scheduler) == false)
+	if (mMailbox.Initialize(shared_from_this(), std::move(pScheduler)) == false)
 	{
 		return false;
 	}

@@ -2,6 +2,7 @@
   "dependencies": [
     "crashpad",
     "fmt",
+    "nlohmann-json",
     "mimalloc",
     "spdlog",
     "protobuf",

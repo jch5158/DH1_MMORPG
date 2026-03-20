@@ -16,7 +16,7 @@ ActorMailbox::ActorMailbox()
 {
 }
 
-bool ActorMailbox::Initialize(const IocpObjectRef& pOwner, ActorScheduler& scheduler)
+bool ActorMailbox::Initialize(const IocpObjectRef& pOwner, ActorSchedulerRef scheduler)
 {
 	if (pOwner == nullptr)
 	{
@@ -24,9 +24,7 @@ bool ActorMailbox::Initialize(const IocpObjectRef& pOwner, ActorScheduler& sched
 	}
 
 	mActorMessageEvent.SetOwner(pOwner);
-
-	mpScheduler = &scheduler;
-
+	mpScheduler = std::move(scheduler);
 	return true;
 }
 

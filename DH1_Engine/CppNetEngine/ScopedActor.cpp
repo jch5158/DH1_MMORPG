@@ -62,9 +62,9 @@ void ScopedActor::Release()
 	mAcquireIndex = -1;
 }
 
-bool ScopedActor::Activate(ActorScheduler &scheduler)
+bool ScopedActor::Activate(ActorSchedulerRef pScheduler)
 {
-	if (mMailbox.Initialize(shared_from_this(), scheduler) == false)
+	if (mMailbox.Initialize(shared_from_this(), std::move(pScheduler)) == false)
 	{
 		return false;
 	}

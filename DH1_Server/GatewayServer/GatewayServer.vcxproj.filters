@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Pch">
-      <UniqueIdentifier>{7abae0ed-1546-4327-9d5a-f4d0e7853f76}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Main">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
@@ -38,11 +35,17 @@
     <Filter Include="Contents\Database">
       <UniqueIdentifier>{0552340a-0078-4f95-8185-805874d30be3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Type">
+      <UniqueIdentifier>{484bcbcd-9541-45f4-8fa9-01fed9e5159f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Pch">
+      <UniqueIdentifier>{7abae0ed-1546-4327-9d5a-f4d0e7853f76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\Service">
+      <UniqueIdentifier>{bbd28d3a-3234-4326-b8ac-ba03a0d690bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <Filter>Pch</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Echo.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
@@ -57,9 +60,6 @@
     </ClCompile>
     <ClCompile Include="GameSession.cpp">
       <Filter>Core\Network\Session</Filter>
-    </ClCompile>
-    <ClCompile Include="GatewayServer.cpp">
-      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
@@ -76,11 +76,20 @@
     <ClCompile Include="MySqlActor.cpp">
       <Filter>Contents\Database</Filter>
     </ClCompile>
+    <ClCompile Include="RedisService.cpp">
+      <Filter>Contents\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Core\Pch</Filter>
+    </ClCompile>
+    <ClCompile Include="GatewayService.cpp">
+      <Filter>Contents\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="GatewayServer.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>Pch</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
@@ -113,6 +122,21 @@
     </ClInclude>
     <ClInclude Include="MySqlActor.h">
       <Filter>Contents\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisService.h">
+      <Filter>Contents\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="PointerType.h">
+      <Filter>Core\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Core\Pch</Filter>
+    </ClInclude>
+    <ClInclude Include="GatewayService.h">
+      <Filter>Contents\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumType.h">
+      <Filter>Core\Type</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

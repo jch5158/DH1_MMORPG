@@ -4,13 +4,13 @@
 
 ActorManager::ActorManager()
 	: mLock()
-	, mActorMap()
+	  , mActorMap()
 {
 }
 
 ActorRef ActorManager::GetActorRef(const uint64 actorId)
 {
-	UniqueLock lock(mLock);
+	SharedLock lock(mLock);
 
 	const auto iter = mActorMap.find(actorId);
 	if (iter == mActorMap.end())
@@ -21,7 +21,13 @@ ActorRef ActorManager::GetActorRef(const uint64 actorId)
 	return  iter->second;
 }
 
-bool ActorManager::SetActorRef(ActorRef pActor)
+uint64 ActorManager::GetActorCount()
+{
+	SharedLock lock(mLock);
+	return mActorMap.size();
+}
+
+bool ActorManager::AddActorRef(ActorRef pActor)
 {
 	if (pActor == nullptr)
 	{
@@ -32,9 +38,9 @@ bool ActorManager::SetActorRef(ActorRef pActor)
 	return mActorMap.try_emplace(pActor->GetId(), std::move(pActor)).second;
 }
 
-uint64 ActorManager::GetActorCount()
+bool ActorManager::RemoveActorRef(const uint64 actorId)
 {
 	UniqueLock lock(mLock);
-
-	return mActorMap.size();
+	const auto ret = mActorMap.erase(actorId);
+	return ret != 0;
 }

@@ -14,6 +14,15 @@ using uint64 = unsigned __int64;
 #endif
 
 using Mutex = std::mutex;
+using SharedMutex = std::shared_mutex;
+
 using ConditionVar = std::condition_variable;
-using UniqueLock = std::unique_lock<std::mutex>;
-using LockGuard = std::scoped_lock<std::mutex>;
+
+template <typename T>
+using SharedLock = std::shared_lock<T>;
+
+template <typename T>
+using UniqueLock = std::unique_lock<T>;
+
+template <typename... MutexTypes>
+using LockGuard = std::scoped_lock<MutexTypes...>;

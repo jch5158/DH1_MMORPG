@@ -14,10 +14,8 @@ public:
 	~SessionManager() = default;
 
 	[[nodiscard]] bool AddSession(SessionRef pSession);
-	[[nodiscard]] bool AddWaitingSession(SessionRef pSession);
-	void RemoveSession(const SessionRef& pSession, const bool bKeepWaitingSession = false);
-	void ReleaseKeepTicket();
-
+	void RemoveSession(const SessionRef& pSession);
+	
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
 
@@ -25,7 +23,6 @@ private:
 
 	const int32 mMaxSessionCount;
 
-	Mutex mLock;
-	int32 mCurrentSessionCount;
+	SharedMutex mLock;
 	Set<SessionRef> mSessions;
 };

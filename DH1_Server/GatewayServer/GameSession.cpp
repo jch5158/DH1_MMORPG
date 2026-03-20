@@ -1,13 +1,13 @@
 ﻿#include "pch.h"
 #include "GameSession.h"
 
-void GameSession::OnConnected()
+GameSession::GameSession(const int32 receiveBufferSize, const int32 maxPacketSize)
+	:PacketSession(receiveBufferSize, maxPacketSize)
 {
 }
 
-void GameSession::OnEnterWaitQueue(const uint64 myTicket)
+void GameSession::OnConnected()
 {
-	
 }
 
 void GameSession::OnDisconnecting(const eDisconnectReason reason)

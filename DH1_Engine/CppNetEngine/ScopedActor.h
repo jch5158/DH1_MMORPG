@@ -40,7 +40,7 @@ public:
 	virtual bool TryAcquire() override;
 	virtual void Release() override;
 
-	virtual bool Activate(ActorScheduler& scheduler) override;
+	virtual bool Activate(ActorSchedulerRef pScheduler) override;
 	virtual void Flush() override;
 	virtual IocpEvent& GetIocpEvent() override;
 	virtual int32 GetMessageCount() override;

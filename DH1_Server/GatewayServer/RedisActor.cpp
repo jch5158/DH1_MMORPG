@@ -45,6 +45,25 @@ bool RedisActor::SetString(const std::string& key, const std::string& value) con
     }
 }
 
+bool RedisActor::SetExpireString(const std::string& key, const std::string& value, const int64 ttlSeconds) const
+{
+    if (!mRedis)
+    {
+        return false;
+    }
+
+    try
+    {
+        const bool isSet = mRedis->set(key, value, std::chrono::seconds(ttlSeconds));
+        return isSet;
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] Set Error : {}", e.what());
+        return false;
+    }
+}
+
 std::optional<std::string> RedisActor::GetString(const std::string& key) const
 {
     if (!mRedis)

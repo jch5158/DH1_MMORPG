@@ -6,12 +6,12 @@ public:
 	~ActorManager() = default;
 
 	[[nodiscard]] ActorRef GetActorRef(const uint64 actorId);
-	[[nodiscard]] bool SetActorRef(ActorRef pActor);
 	[[nodiscard]] uint64 GetActorCount();
-
+	[[nodiscard]] bool AddActorRef(ActorRef pActor);
+	[[nodiscard]] bool RemoveActorRef(const uint64 actorId);
 private:
 
-	Mutex mLock;
+	SharedMutex mLock;
 	HashMap<uint64, ActorRef> mActorMap;
 };
 

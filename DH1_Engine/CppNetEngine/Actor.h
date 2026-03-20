@@ -21,7 +21,7 @@ public:
 	virtual bool TryAcquire() = 0;
 	virtual void Release() = 0;
 
-	virtual bool Activate(ActorScheduler& scheduler) = 0;
+	virtual bool Activate(ActorSchedulerRef pScheduler) = 0;
 	virtual void Flush() = 0;
 	virtual IocpEvent& GetIocpEvent() = 0;
 	virtual int32 GetMessageCount()  = 0;
@@ -44,7 +44,7 @@ public:
 	virtual bool TryAcquire() override;
 	virtual void Release() override;
 
-	virtual bool Activate(ActorScheduler& scheduler) override;
+	virtual bool Activate(ActorSchedulerRef pScheduler) override;
 	virtual void Flush() override;
 	virtual IocpEvent& GetIocpEvent() override;
 	virtual int32 GetMessageCount() override;

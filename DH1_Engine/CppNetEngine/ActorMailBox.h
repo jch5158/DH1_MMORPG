@@ -20,7 +20,7 @@ public:
 	explicit ActorMailbox();
 	~ActorMailbox() = default;
 
-	bool Initialize(const IocpObjectRef& pOwner, ActorScheduler& scheduler);
+	bool Initialize(const IocpObjectRef& pOwner, ActorSchedulerRef scheduler);
 
 	ActorMessageEvent& GetActorMessageEvent();
 	void SetExecuteMsgCount(const int32 executeMsgCount);
@@ -35,6 +35,6 @@ public:
 private:
 	ActorMessageEvent mActorMessageEvent;
 	int32 mMaxExecuteMsgCount;
-	ActorScheduler* mpScheduler;
+	ActorSchedulerRef mpScheduler;
 	LockFreeQueue<MessageRef> mMailbox;
 };
