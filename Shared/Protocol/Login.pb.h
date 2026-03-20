@@ -29,6 +29,7 @@
 #include "google/protobuf/repeated_field.h"  // IWYU pragma: export
 #include "google/protobuf/extension_set.h"  // IWYU pragma: export
 #include "google/protobuf/unknown_field_set.h"
+#include "Enum.pb.h"
 #include "PacketOption.pb.h"
 // @@protoc_insertion_point(includes)
 
@@ -220,14 +221,14 @@ class S2C_LOGIN_RES final : public ::google::protobuf::Message
   enum : int {
     kResultFieldNumber = 1,
   };
-  // int32 result = 1;
+  // .Protocol.eLoginResult result = 1;
   void clear_result() ;
-  ::int32_t result() const;
-  void set_result(::int32_t value);
+  ::Protocol::eLoginResult result() const;
+  void set_result(::Protocol::eLoginResult value);
 
   private:
-  ::int32_t _internal_result() const;
-  void _internal_set_result(::int32_t value);
+  ::Protocol::eLoginResult _internal_result() const;
+  void _internal_set_result(::Protocol::eLoginResult value);
 
   public:
   // @@protoc_insertion_point(class_scope:Protocol.S2C_LOGIN_RES)
@@ -253,7 +254,7 @@ class S2C_LOGIN_RES final : public ::google::protobuf::Message
     inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const S2C_LOGIN_RES& from_msg);
-    ::int32_t result_;
+    int result_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -485,28 +486,6 @@ class C2S_LOGIN_REQ final : public ::google::protobuf::Message
 
 // C2S_LOGIN_REQ
 
-// uint64 accountId = 1;
-inline void C2S_LOGIN_REQ::clear_accountid() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.accountid_ = ::uint64_t{0u};
-}
-inline ::uint64_t C2S_LOGIN_REQ::accountid() const {
-  // @@protoc_insertion_point(field_get:Protocol.C2S_LOGIN_REQ.accountId)
-  return _internal_accountid();
-}
-inline void C2S_LOGIN_REQ::set_accountid(::uint64_t value) {
-  _internal_set_accountid(value);
-  // @@protoc_insertion_point(field_set:Protocol.C2S_LOGIN_REQ.accountId)
-}
-inline ::uint64_t C2S_LOGIN_REQ::_internal_accountid() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.accountid_;
-}
-inline void C2S_LOGIN_REQ::_internal_set_accountid(::uint64_t value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.accountid_ = value;
-}
-
 // string ticket = 2;
 inline void C2S_LOGIN_REQ::clear_ticket() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
@@ -555,28 +534,50 @@ inline void C2S_LOGIN_REQ::set_allocated_ticket(std::string* value) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_LOGIN_REQ.ticket)
 }
 
+// uint64 accountId = 1;
+inline void C2S_LOGIN_REQ::clear_accountid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.accountid_ = ::uint64_t{0u};
+}
+inline ::uint64_t C2S_LOGIN_REQ::accountid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_LOGIN_REQ.accountId)
+  return _internal_accountid();
+}
+inline void C2S_LOGIN_REQ::set_accountid(::uint64_t value) {
+  _internal_set_accountid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C2S_LOGIN_REQ.accountId)
+}
+inline ::uint64_t C2S_LOGIN_REQ::_internal_accountid() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.accountid_;
+}
+inline void C2S_LOGIN_REQ::_internal_set_accountid(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.accountid_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // S2C_LOGIN_RES
 
-// int32 result = 1;
+// .Protocol.eLoginResult result = 1;
 inline void S2C_LOGIN_RES::clear_result() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.result_ = 0;
 }
-inline ::int32_t S2C_LOGIN_RES::result() const {
+inline ::Protocol::eLoginResult S2C_LOGIN_RES::result() const {
   // @@protoc_insertion_point(field_get:Protocol.S2C_LOGIN_RES.result)
   return _internal_result();
 }
-inline void S2C_LOGIN_RES::set_result(::int32_t value) {
+inline void S2C_LOGIN_RES::set_result(::Protocol::eLoginResult value) {
   _internal_set_result(value);
   // @@protoc_insertion_point(field_set:Protocol.S2C_LOGIN_RES.result)
 }
-inline ::int32_t S2C_LOGIN_RES::_internal_result() const {
+inline ::Protocol::eLoginResult S2C_LOGIN_RES::_internal_result() const {
   ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.result_;
+  return static_cast<::Protocol::eLoginResult>(_impl_.result_);
 }
-inline void S2C_LOGIN_RES::_internal_set_result(::int32_t value) {
+inline void S2C_LOGIN_RES::_internal_set_result(::Protocol::eLoginResult value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.result_ = value;
 }

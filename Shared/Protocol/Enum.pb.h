@@ -127,6 +127,42 @@ inline bool eRole_Parse(absl::string_view name, eRole* value) {
   return ::google::protobuf::internal::ParseNamedEnum<eRole>(
       eRole_descriptor(), name, value);
 }
+enum eLoginResult : int {
+  LOGIN_SUCCESS = 0,
+  LOGIN_FAIL_INVALID_TICKET = 1,
+  LOGIN_FAIL_SERVER_FULL = 2,
+  LOGIN_FAIL_MAINTENANCE = 3,
+  LOGIN_FAIL_INTERNAL_ERROR = 4,
+  eLoginResult_INT_MIN_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::min(),
+  eLoginResult_INT_MAX_SENTINEL_DO_NOT_USE_ =
+      std::numeric_limits<::int32_t>::max(),
+};
+
+bool eLoginResult_IsValid(int value);
+extern const uint32_t eLoginResult_internal_data_[];
+constexpr eLoginResult eLoginResult_MIN = static_cast<eLoginResult>(0);
+constexpr eLoginResult eLoginResult_MAX = static_cast<eLoginResult>(4);
+constexpr int eLoginResult_ARRAYSIZE = 4 + 1;
+const ::google::protobuf::EnumDescriptor*
+eLoginResult_descriptor();
+template <typename T>
+const std::string& eLoginResult_Name(T value) {
+  static_assert(std::is_same<T, eLoginResult>::value ||
+                    std::is_integral<T>::value,
+                "Incorrect type passed to eLoginResult_Name().");
+  return eLoginResult_Name(static_cast<eLoginResult>(value));
+}
+template <>
+inline const std::string& eLoginResult_Name(eLoginResult value) {
+  return ::google::protobuf::internal::NameOfDenseEnum<eLoginResult_descriptor,
+                                                 0, 4>(
+      static_cast<int>(value));
+}
+inline bool eLoginResult_Parse(absl::string_view name, eLoginResult* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<eLoginResult>(
+      eLoginResult_descriptor(), name, value);
+}
 
 // ===================================================================
 
@@ -166,6 +202,12 @@ struct is_proto_enum<::Protocol::eRole> : std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor<::Protocol::eRole>() {
   return ::Protocol::eRole_descriptor();
+}
+template <>
+struct is_proto_enum<::Protocol::eLoginResult> : std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor<::Protocol::eLoginResult>() {
+  return ::Protocol::eLoginResult_descriptor();
 }
 
 }  // namespace protobuf

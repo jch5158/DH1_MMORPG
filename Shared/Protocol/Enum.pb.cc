@@ -26,7 +26,7 @@ namespace _pbi = ::google::protobuf::internal;
 namespace _fl = ::google::protobuf::internal::field_layout;
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[2];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[3];
 static constexpr const ::_pb::ServiceDescriptor**
     file_level_service_descriptors_Enum_2eproto = nullptr;
 const ::uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
@@ -39,14 +39,17 @@ const char descriptor_table_protodef_Enum_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIA
     "HO\020\001\022\026\n\022SERVICE_TYPE_LOGIN\020\002*}\n\005eRole\022\r\n"
     "\tROLE_NONE\020\000\022\n\n\006CLIENT\020\001\022\017\n\013ECHO_CLIENT\020"
     "\002\022\017\n\013ECHO_SERVER\020\003\022\022\n\016GATEWAY_SERVER\020\004\022\020"
-    "\n\014WORLD_SERVER\020\005\022\021\n\rCENTER_SERVER\020\006b\006pro"
-    "to3"
+    "\n\014WORLD_SERVER\020\005\022\021\n\rCENTER_SERVER\020\006*\227\001\n\014"
+    "eLoginResult\022\021\n\rLOGIN_SUCCESS\020\000\022\035\n\031LOGIN"
+    "_FAIL_INVALID_TICKET\020\001\022\032\n\026LOGIN_FAIL_SER"
+    "VER_FULL\020\002\022\032\n\026LOGIN_FAIL_MAINTENANCE\020\003\022\035"
+    "\n\031LOGIN_FAIL_INTERNAL_ERROR\020\004b\006proto3"
 };
 static ::absl::once_flag descriptor_table_Enum_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
     false,
     false,
-    243,
+    397,
     descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once,
@@ -77,6 +80,15 @@ PROTOBUF_CONSTINIT const uint32_t eRole_internal_data_[] = {
     458752u, 0u, };
 bool eRole_IsValid(int value) {
   return 0 <= value && value <= 6;
+}
+const ::google::protobuf::EnumDescriptor* eLoginResult_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[2];
+}
+PROTOBUF_CONSTINIT const uint32_t eLoginResult_internal_data_[] = {
+    327680u, 0u, };
+bool eLoginResult_IsValid(int value) {
+  return 0 <= value && value <= 4;
 }
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol

@@ -18,3 +18,12 @@ enum eRole
     WORLD_SERVER = 5;
     CENTER_SERVER = 6;
 }
+
+enum eLoginResult
+{
+    LOGIN_SUCCESS = 0;              // 성공
+    LOGIN_FAIL_INVALID_TICKET = 1;  // 티켓이 만료되었거나 일치하지 않음 (보안)
+    LOGIN_FAIL_SERVER_FULL = 2;     // 게이트웨이 수용 인원 초과 (아까 만든 상태값 연동)
+    LOGIN_FAIL_MAINTENANCE = 3;     // 서버 점검 중
+    LOGIN_FAIL_INTERNAL_ERROR = 4;  // Redis 조회 실패 등 서버 내부 에러
+}

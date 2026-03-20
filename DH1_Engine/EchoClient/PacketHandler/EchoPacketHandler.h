@@ -88,7 +88,7 @@ private:
 		if (pBuffer == nullptr)
 		{
 			NET_ENGINE_LOG_FATAL("MakeSendBuffer sendBuffer->Reserve(packetSize) is failed");
-			return nullptr;
+			CrashReporter::Crash();
 		}
 
 		auto* header = reinterpret_cast<PacketHeader*>(pBuffer);

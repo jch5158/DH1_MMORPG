@@ -28,7 +28,7 @@ namespace Protocol {
 
 inline constexpr S2C_LOGIN_RES::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
-      : result_{0},
+      : result_{static_cast< ::Protocol::eLoginResult >(0)},
         _cached_size_{0} {}
 
 template <typename>
@@ -94,8 +94,8 @@ const ::uint32_t
         ~0u,  // no _inlined_string_donated_
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
-        PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGIN_REQ, _impl_.accountid_),
         PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGIN_REQ, _impl_.ticket_),
+        PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGIN_REQ, _impl_.accountid_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::Protocol::S2C_LOGIN_RES, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -118,26 +118,28 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 const char descriptor_table_protodef_Login_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
-    "\n\013Login.proto\022\010Protocol\032\022PacketOption.pr"
-    "oto\"A\n\rC2S_LOGIN_REQ\022\021\n\taccountId\030\001 \001(\004\022"
-    "\016\n\006ticket\030\002 \001(\t:\r\230\265\030\001\240\265\030\001\252\265\030\001\004\".\n\rS2C_LO"
-    "GIN_RES\022\016\n\006result\030\001 \001(\005:\r\230\265\030\002\240\265\030\004\252\265\030\001\001B\032"
-    "\210\265\030\002\222\265\030\022LoginPacketHandlerb\006proto3"
+    "\n\013Login.proto\022\010Protocol\032\nEnum.proto\032\022Pac"
+    "ketOption.proto\"A\n\rC2S_LOGIN_REQ\022\016\n\006tick"
+    "et\030\002 \001(\t\022\021\n\taccountId\030\001 \001(\004:\r\230\265\030\001\240\265\030\001\252\265\030"
+    "\001\004\"F\n\rS2C_LOGIN_RES\022&\n\006result\030\001 \001(\0162\026.Pr"
+    "otocol.eLoginResult:\r\230\265\030\002\240\265\030\004\252\265\030\001\001B\032\210\265\030\002"
+    "\222\265\030\022LoginPacketHandlerb\006proto3"
 };
-static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[1] =
+static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[2] =
     {
+        &::descriptor_table_Enum_2eproto,
         &::descriptor_table_PacketOption_2eproto,
 };
 static ::absl::once_flag descriptor_table_Login_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Login_2eproto = {
     false,
     false,
-    194,
+    230,
     descriptor_table_protodef_Login_2eproto,
     "Login.proto",
     &descriptor_table_Login_2eproto_once,
     descriptor_table_Login_2eproto_deps,
-    1,
+    2,
     2,
     schemas,
     file_default_instances,
@@ -497,15 +499,15 @@ const ::_pbi::TcParseTable<0, 1, 0, 0, 2> S2C_LOGIN_RES::_table_ = {
     ::_pbi::TcParser::GetTable<::Protocol::S2C_LOGIN_RES>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    // int32 result = 1;
+    // .Protocol.eLoginResult result = 1;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(S2C_LOGIN_RES, _impl_.result_), 63>(),
      {8, 63, 0, PROTOBUF_FIELD_OFFSET(S2C_LOGIN_RES, _impl_.result_)}},
   }}, {{
     65535, 65535
   }}, {{
-    // int32 result = 1;
+    // .Protocol.eLoginResult result = 1;
     {PROTOBUF_FIELD_OFFSET(S2C_LOGIN_RES, _impl_.result_), 0, 0,
-    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
+    (0 | ::_fl::kFcSingular | ::_fl::kOpenEnum)},
   }},
   // no aux_entries
   {{
@@ -538,11 +540,11 @@ PROTOBUF_NOINLINE void S2C_LOGIN_RES::Clear() {
           ::uint32_t cached_has_bits = 0;
           (void)cached_has_bits;
 
-          // int32 result = 1;
+          // .Protocol.eLoginResult result = 1;
           if (this_._internal_result() != 0) {
-            target = ::google::protobuf::internal::WireFormatLite::
-                WriteInt32ToArrayWithField<1>(
-                    stream, this_._internal_result(), target);
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteEnumToArray(
+                1, this_._internal_result(), target);
           }
 
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
@@ -569,10 +571,10 @@ PROTOBUF_NOINLINE void S2C_LOGIN_RES::Clear() {
           (void)cached_has_bits;
 
            {
-            // int32 result = 1;
+            // .Protocol.eLoginResult result = 1;
             if (this_._internal_result() != 0) {
-              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
-                  this_._internal_result());
+              total_size += 1 +
+                            ::_pbi::WireFormatLite::EnumSize(this_._internal_result());
             }
           }
           return this_.MaybeComputeUnknownFieldsSize(total_size,
@@ -604,7 +606,7 @@ void S2C_LOGIN_RES::CopyFrom(const S2C_LOGIN_RES& from) {
 void S2C_LOGIN_RES::InternalSwap(S2C_LOGIN_RES* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-        swap(_impl_.result_, other->_impl_.result_);
+  swap(_impl_.result_, other->_impl_.result_);
 }
 
 ::google::protobuf::Metadata S2C_LOGIN_RES::GetMetadata() const {

@@ -42,3 +42,51 @@ RedisActorRef RedisService::GetRedisActorRef()
 	RedisActorRef pRedis = std::static_pointer_cast<RedisActor>(mActorManager.GetActorRef(mRedisActorId));
 	return pRedis;
 }
+
+void RedisService::SetStringAsync(std::string key, std::string value, SetStringCallback callback)
+{
+	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argRedisService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argRedisService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				argCallback(false);
+				return;
+			}
+
+			const bool isSuccess = pRedis->SetString(argKey, argValue);
+			argCallback(isSuccess);
+		});
+}
+
+void RedisService::SetExpireStringAsync(std::string key, std::string value, const int64 ttlSeconds, SetStringCallback callback)
+{
+	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argTtlSeconds = ttlSeconds, argRedisService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argRedisService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				argCallback(false);
+				return;
+			}
+
+			const bool isSuccess = pRedis->SetExpireString(argKey, argValue, argTtlSeconds);
+			argCallback(isSuccess);
+		});
+}
+
+void RedisService::GetStringAsync(std::string key, GetStringCallback callback)
+{
+	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argRedisService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argRedisService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				argCallback(std::nullopt); // 액터가 죽었으면 실패 처리
+				return;
+			}
+
+			const auto retValue = pRedis->GetString(argKey);
+			argCallback(retValue);
+		});
+}

@@ -1,6 +1,7 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 package Protocol;
 
+import "Enum.proto";
 import "PacketOption.proto";
 
 option (service_type) = SERVICE_TYPE_LOGIN;
@@ -12,8 +13,8 @@ message C2S_LOGIN_REQ
     option (sender) = CLIENT;
     option (receiver) = GATEWAY_SERVER;
 
-    uint64 accountId = 1;
     string ticket = 2;
+    uint64 accountId = 1;
 }
 
 message S2C_LOGIN_RES 
@@ -22,5 +23,5 @@ message S2C_LOGIN_RES
     option (sender) = GATEWAY_SERVER;
     option (receiver) = CLIENT;
 
-    int32 result = 1;
+    eLoginResult result = 1;
 }
