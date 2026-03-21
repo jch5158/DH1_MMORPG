@@ -11,18 +11,19 @@ public:
 	SessionManager(SessionManager&&) = delete;
 	SessionManager operator=(SessionManager&&) = delete;
 
-	explicit SessionManager(const int32 maxSessionCount);
+	explicit SessionManager();
 	~SessionManager() = default;
 
 	[[nodiscard]] bool AddSession(SessionRef pSession);
 	void RemoveSession(const SessionRef& pSession);
 	
+	void SetMaxSessionCount(const int32 maxSessionCount);
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
+	[[nodiscard]] SessionRef GetFirstSessionRef();
 
 private:
-
-	const int32 mMaxSessionCount;
+	int32 mMaxSessionCount;
 
 	SharedMutex mLock;
 	Set<SessionRef> mSessions;

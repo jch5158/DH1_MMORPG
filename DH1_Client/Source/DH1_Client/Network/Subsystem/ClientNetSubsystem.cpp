@@ -1,31 +1,15 @@
 ﻿#include "ClientNetSubsystem.h"
+
+#include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
-#include "E:/Projects/DH1_MMORPG/DH1_Engine/CppNetEngine/Service.h"
 
 void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	NetEngineInit NetEngineInit;
-
 	PacketServiceTypeHandler::Init();
 
-	NetworkSchedulerConfig SchedulerConfig;
-	SchedulerConfig.waitTimeoutMs = 16;
-	SchedulerConfig.tickIntervalMs = 16;
-	SchedulerConfig.runningThreadCount = 0;
-	SchedulerConfig.onHandleError = [](const uint32)->void {};
-
-	ClientServiceConfig Config;
-	Config.netAddress = NetAddress("127.0.0.1", 7000);
-	Config.maxSessionCount = 1;
-	Config.sessionFactory = []()->NetSessionRef
-		{
-			return cpp_net_engine::MakeShared<NetSession>(8192, 4096);
-		};
-	Config.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(SchedulerConfig);
-	
-	ClientService = cpp_net_engine::MakeShared<ClientService>(Config);
+	ServiceRef = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
 }
 
 void UClientNetSubsystem::Deinitialize()
@@ -35,33 +19,53 @@ void UClientNetSubsystem::Deinitialize()
 
 void UClientNetSubsystem::Tick(float DeltaTime)
 {
+	if (!ServiceRef)
+	{
+		return;
+	}
+
+	ServiceRef->Dispatch();
 }
 
 TStatId UClientNetSubsystem::GetStatId() const
 {
-	return TStatId();
+	RETURN_QUICK_DECLARE_CYCLE_STAT(UClientNetSubsystem, STATGROUP_Tickables);
 }
 
 bool UClientNetSubsystem::IsTickable() const
 {
-	return FTickableGameObject::IsTickable();
+	return ServiceRef != nullptr;
 }
 
 bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 {
-	if (!ClientService)
+	if (!ServiceRef)
 	{
 		return false;
 	}
 
-	// 주의: Initialize에서 Config.netAddress에 127.0.0.1, 7000을 하드코딩했음.
-	// 인자로 받은 IPAddress와 Port를 사용하려면 여기서 연결 대상 주소를 덮어씌우거나 연결 함수 인자로 넘겨야 함.
+	ClientServiceConfig ClientConfig;
+	ClientConfig.maxSessionCount = 1;
+	ClientConfig.maxConnectionCount = 1;
+	ClientConfig.netAddress = NetAddress(TCHAR_TO_UTF8(*IPAddress), static_cast<uint16>(Port));
+	ClientConfig.sessionFactory = []() -> NetSessionRef
+		{
+			return	cpp_net_engine::MakeShared<NetSession>(8192, 4096);
+		};
 
-	// FString을 std::string 또는 엔진 호환 타입으로 변환 (예: UTF8)
-	// std::string IPStr = TCHAR_TO_UTF8(*IPAddress);
+	NetworkSchedulerConfig SchedulerConfig;
+	SchedulerConfig.waitTimeoutMs = 16;
+	SchedulerConfig.tickIntervalMs = 16;
+	SchedulerConfig.runningThreadCount = 0;
+	SchedulerConfig.onHandleError = [](const uint32)->void {};
 
-	// 엔진의 연결 함수 호출 (함수명은 실제 API에 맞게 수정)
-	//return ClientService->Connect(IPStr, Port);
+	ClientConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(SchedulerConfig);
+
+	if (!ServiceRef->Initialize(ClientConfig) || !ServiceRef->Start())
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -71,4 +75,23 @@ void UClientNetSubsystem::Disconnect()
 
 void UClientNetSubsystem::SendPacket(const uint8* PacketData, int32 Size)
 {
+	if (ServiceRef == nullptr)
+	{
+		return;
+	}
+
+	const SessionRef pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	const NetSendBufferRef pSendBuffer = cpp_net_engine::MakeShared<NetSendBuffer>(Size);
+	byte* pBuffer = pSendBuffer->Reserve(Size);
+	if (pBuffer != nullptr)
+	{
+		std::copy_n(PacketData, Size, pBuffer);
+		pSendBuffer->Commit(Size);
+		pSession->Send(pSendBuffer);
+	}
 }

@@ -36,6 +36,11 @@ ConnectionManagerRef ConnectionManager::GetConnectionManagerRef()
 	return std::static_pointer_cast<ConnectionManager>(shared_from_this());
 }
 
+int32 ConnectionManager::GetMaxConnectionCount() const
+{
+	return mMaxConnectionCount;
+}
+
 bool ConnectionManager::Connect(const ClientServiceRef& pService)
 {
 	if (mCurrentConnectionCount.fetch_add(1) >= mMaxConnectionCount)

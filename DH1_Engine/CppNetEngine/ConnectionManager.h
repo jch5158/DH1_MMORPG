@@ -14,6 +14,7 @@ public:
 	
 	ConnectionManagerRef GetConnectionManagerRef();
 
+	int32 GetMaxConnectionCount() const;
 	bool Connect(const ClientServiceRef& pService);
 	void Close();
 	void FreeConnection();

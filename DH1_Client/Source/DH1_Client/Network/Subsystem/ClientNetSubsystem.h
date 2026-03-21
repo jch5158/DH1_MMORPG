@@ -50,6 +50,6 @@ public:
 private:
     // 내부적으로 연결 상태를 관리할 변수
     bool bIsConnected = false;
-    ClientServiceRef ClientService;
-    NetSessionRef CurrentSession; // 연결된 세션을 보관 (필요시)
+    NetEngineInit EnginInit;
+    ClientServiceRef ServiceRef;
 };

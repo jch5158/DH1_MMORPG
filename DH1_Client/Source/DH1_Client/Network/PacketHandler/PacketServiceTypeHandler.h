@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "CoreMinimal.h"
-#include "Network/CppNetEngine/NetEngineWrapper.h"
 #include "LoginPacketHandler.h"
 
 class PacketServiceTypeHandler

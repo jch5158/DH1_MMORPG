@@ -29,8 +29,8 @@ THIRD_PARTY_INCLUDES_START
 #include "NetSendBuffer.h"
 #include "NetworkScheduler.h"
 #include "PacketSession.h"
-#include "NetSession.h"   
-#include "Service.h"
+#include "Session.h"   
+#include "NetService.h"
 
 #include "Windows/HideWindowsPlatformTypes.h"
 #undef DrawText

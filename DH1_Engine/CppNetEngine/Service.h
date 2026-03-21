@@ -45,7 +45,6 @@ public:
 protected:
 	
 	const eServiceType mServiceType;
-	const int32	mMaxSessionCount;
 	NetAddress mNetAddress;
 	NetworkSchedulerRef mpNetworkScheduler;
 	SessionFactory mSessionFactory;

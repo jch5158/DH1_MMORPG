@@ -6,19 +6,39 @@
 #include "Session.h"
 #include "SessionReaper.h"
 
-NetService::NetService(
-	const eServiceType serviceType,
-	const NetAddress& netAddress,
-	const int32 maxSessionCount,
-	NetworkSchedulerRef pNetworkScheduler,
-	SessionFactory sessionFactory)
-	: mServiceType(serviceType)
-	, mMaxSessionCount(maxSessionCount)
-	, mNetAddress(netAddress)
-	, mpNetworkScheduler(std::move(pNetworkScheduler))
-	, mSessionFactory(std::move(sessionFactory))
-	, mSessionManager(maxSessionCount)
+NetService::NetService(const eServiceType serviceType)
+	: mbInitialize(false)
+	, mServiceType(serviceType)
+	, mNetAddress()
+	, mpNetworkScheduler()
+	, mSessionFactory()
+	, mSessionManager()
 {
+}
+
+bool NetService::Initialize(const NetServiceConfig& config)
+{
+	if (mbInitialize.exchange(true) == true)
+	{
+		return false;
+	}
+
+	mNetAddress = config.netAddress;
+	mpNetworkScheduler = config.pNetworkScheduler;
+	mSessionFactory = config.sessionFactory;
+	mSessionManager.SetMaxSessionCount(config.maxSessionCount);
+
+	return true;
+}
+
+void NetService::Dispatch()
+{
+	if (mpNetworkScheduler == nullptr)
+	{
+		return;
+	}
+
+	mpNetworkScheduler->Dispatch();
 }
 
 SessionRef NetService::CreateSession()
@@ -35,6 +55,11 @@ SessionRef NetService::CreateSession()
 	}
 
 	return pSession;
+}
+
+bool NetService::IsInitialized() const
+{
+	return mbInitialize.load();
 }
 
 eServiceType NetService::GetServiceType() const
@@ -59,24 +84,42 @@ int32 NetService::GetCurrentSessionCount()
 
 int32 NetService::GetMaxSessionCount() const
 {
-	return mMaxSessionCount;
+	return mSessionManager.GetMaxSessionCount();
 }
 
-ClientService::ClientService(const ClientServiceConfig& config)
-	: NetService(
-		eServiceType::Client,
-		config.netAddress,
-		config.maxSessionCount,
-		config.pNetworkScheduler,
-		config.sessionFactory
-	)
+ClientService::ClientService(const eServiceType serviceType)
+	: NetService(eServiceType::Client)
+	, mpConnectionManager()
 {
-	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionManager>(config.maxSessionCount);
+}
+
+bool ClientService::Initialize(const NetServiceConfig& config)
+{
+	if (!NetService::Initialize(config))
+	{
+		return false;
+	}
+
+	const auto* pClientConfig = dynamic_cast<const ClientServiceConfig*>(&config);
+	if (pClientConfig == nullptr)
+	{
+		NET_ENGINE_LOG_FATAL("ClientService::Initialize - dynamic_cast is failed");
+		return false;
+	}
+
+	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionManager>(pClientConfig->maxConnectionCount);
+	return true;
 }
 
 bool ClientService::Start()
 {
-	for (int32 i = 0; i < mMaxSessionCount; ++i)
+	if (!IsInitialized())
+	{
+		return false;
+	}
+
+	const int32 maxConnectionCount = mpConnectionManager->GetMaxConnectionCount();
+	for (int32 i = 0; i < maxConnectionCount; ++i)
 	{
 		mpConnectionManager->Connect(std::static_pointer_cast<ClientService>(shared_from_this()));
 	}
@@ -108,22 +151,44 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 	mpConnectionManager->FreeConnection();
 }
 
-ServerService::ServerService(const ServerServiceConfig& config)
-	: NetService(
-		eServiceType::Server, 
-		config.netAddress,
-		config.maxSessionCount,
-		config.pNetworkScheduler,
-		config.sessionFactory)
-	,mpListener()
-	,mpSessionReaper()
+SessionRef ClientService::GetFirstSessionRef()
 {
-	mpListener = cpp_net_engine::MakeShared<Listener>(config.acceptCount);
-	mpSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(config.sessionTimeoutMs);
+	return mSessionManager.GetFirstSessionRef();
+}
+
+ServerService::ServerService(const eServiceType serviceType)
+	:NetService(serviceType)
+	, mpListener()
+	, mpSessionReaper()
+{
+}
+
+bool ServerService::Initialize(const NetServiceConfig& config)
+{
+	if (!NetService::Initialize(config))
+	{
+		return false;
+	}
+
+	const auto* pServerConfig = dynamic_cast<const ServerServiceConfig*>(&config);
+	if (pServerConfig == nullptr)
+	{
+		NET_ENGINE_LOG_FATAL("ServerService::Initialize - dynamic_cast is failed");
+		return false;
+	}
+
+	mpListener = cpp_net_engine::MakeShared<Listener>(pServerConfig->acceptCount);
+	mpSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(pServerConfig->sessionTimeoutMs);
+	return true;
 }
 
 bool ServerService::Start()
 {
+	if (!IsInitialized())
+	{
+		return false;
+	}
+
 	if (mpListener == nullptr)
 	{
 		return false;

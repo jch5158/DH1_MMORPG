@@ -12,6 +12,16 @@ enum class eServiceType : uint8
 
 using SessionFactory = std::function<SessionRef()>;
 
+struct NetServiceConfig
+{
+	virtual ~NetServiceConfig() = default;;
+
+	int32 maxSessionCount;
+	NetAddress netAddress;
+	NetworkSchedulerRef pNetworkScheduler;
+	SessionFactory sessionFactory;
+};
+
 class NetService : public std::enable_shared_from_this<NetService>
 {
 public:
@@ -21,76 +31,76 @@ public:
 	NetService(NetService&&) = delete;
 	NetService& operator=(NetService&&) = delete;
 
-	explicit NetService(
-		const eServiceType serviceType,
-		const NetAddress& netAddress,
-		const int32 maxSessionCount,
-		NetworkSchedulerRef pNetworkScheduler,
-		SessionFactory sessionFactory);
+	explicit NetService(const eServiceType serviceType);
 	virtual ~NetService() = default;
+
+	virtual bool Initialize(const NetServiceConfig& config);
 
 	virtual bool Start() = 0;
 	virtual void CloseService() = 0;
-	virtual void OnSessionConnected(const SessionRef& pSession) = 0;
-	virtual void OnSessionDisconnected(const SessionRef& pSession) = 0;
+	virtual void OnSessionConnected(const SessionRef&) = 0;
+	virtual void OnSessionDisconnected(const SessionRef&) = 0;
+	virtual void Dispatch();
 
 	SessionRef CreateSession();
 
+	[[nodiscard]] bool IsInitialized() const;
 	[[nodiscard]] eServiceType GetServiceType() const;
 	[[nodiscard]] NetAddress& GetNetAddress();
 	[[nodiscard]] NetworkSchedulerRef GetNetworkScheduler() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 
+private:
+	std::atomic<bool> mbInitialize;
+
 protected:
-	
 	const eServiceType mServiceType;
-	const int32	mMaxSessionCount;
 	NetAddress mNetAddress;
 	NetworkSchedulerRef mpNetworkScheduler;
 	SessionFactory mSessionFactory;
 	SessionManager mSessionManager;
 };
 
-struct ClientServiceConfig
+struct ClientServiceConfig : public NetServiceConfig
 {
-	NetAddress netAddress;
-	int32 maxSessionCount;
-	NetworkSchedulerRef pNetworkScheduler;
-	SessionFactory sessionFactory;
+	virtual ~ClientServiceConfig() override = default;
+	int32 maxConnectionCount;
 };
 
 class ClientService : public NetService
 {
 public:
-	explicit ClientService(const ClientServiceConfig& config);
+	explicit ClientService(const eServiceType serviceType);
 	virtual ~ClientService() override = default;
+
+	virtual bool Initialize(const NetServiceConfig& config) override;
 
 	virtual bool Start() override;
 	virtual void CloseService() override;
 	virtual void OnSessionConnected(const SessionRef& pSession) override;
 	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
 
-private:
+	SessionRef GetFirstSessionRef();
 
+private:
 	ConnectionManagerRef mpConnectionManager;
 };
 
-struct ServerServiceConfig
+struct ServerServiceConfig : public NetServiceConfig
 {
-	NetAddress netAddress;
+	virtual ~ServerServiceConfig() override = default;
 	int32 acceptCount;
-	int32 maxSessionCount;
 	int64 sessionTimeoutMs;
-	NetworkSchedulerRef pNetworkScheduler;
-	SessionFactory sessionFactory;
 };
 
 class ServerService : public NetService
 {
 public:
-	explicit ServerService(const ServerServiceConfig& config);
+	explicit ServerService(const eServiceType serviceType);
 	virtual ~ServerService() override = default;
+
+	virtual bool Initialize(const NetServiceConfig& config) override;
 
 	virtual bool Start() override;
 	virtual void CloseService() override;	

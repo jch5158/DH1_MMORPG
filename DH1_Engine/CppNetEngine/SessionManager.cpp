@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
 #include "SessionManager.h"
 
-SessionManager::SessionManager(const int32 maxSessionCount)
-	: mMaxSessionCount(maxSessionCount)
+SessionManager::SessionManager()
+	: mMaxSessionCount(0)
 	, mSessions()
 {
 }
@@ -26,6 +26,11 @@ void SessionManager::RemoveSession(const SessionRef& pSession)
 	mSessions.erase(pSession);
 }
 
+void SessionManager::SetMaxSessionCount(const int32 maxSessionCount)
+{
+	mMaxSessionCount = maxSessionCount;
+}
+
 int32 SessionManager::GetMaxSessionCount() const
 {
 	return mMaxSessionCount;
@@ -35,4 +40,15 @@ int32 SessionManager::GetCurrentSessionCount()
 {
 	UniqueLock lock(mLock);
 	return static_cast<int32>(mSessions.size());
+}
+
+SessionRef SessionManager::GetFirstSessionRef()
+{
+	UniqueLock lock(mLock);
+	if (mSessions.begin() == mSessions.end())
+	{
+		return nullptr;
+	}
+
+	return *mSessions.begin();
 }
