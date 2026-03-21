@@ -1,6 +1,11 @@
 ﻿#pragma once
+#include <new>
+#include <atomic>
+#include <type_traits>
+#include <utility>
 
-#include "ObjectAllocator.h"
+#include "Types.h"
+#include "AllocatorUtils.h"
 
 template <typename T>
 class LockFreeQueue final

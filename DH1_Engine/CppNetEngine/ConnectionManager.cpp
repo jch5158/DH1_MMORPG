@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "ConnectionManager.h"
+#include "Connector.h"
+#include "IocpEvent.h"
 
 ConnectionManager::ConnectionManager(const int32 maxConnectionCount)
 	:mMaxConnectionCount(maxConnectionCount)

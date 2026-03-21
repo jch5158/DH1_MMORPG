@@ -1,12 +1,8 @@
 ﻿#pragma once
-
-#include "ConnectionManager.h"
-#include "Listener.h"
 #include "NetAddress.h"
-#include "LockFreeStack.h"
-#include "NetworkScheduler.h"
 #include "SessionManager.h"
-#include "WaitQueueManager.h"
+#include "SharedPtrUtils.h"
+#include "Types.h"
 
 enum class eServiceType : uint8
 {

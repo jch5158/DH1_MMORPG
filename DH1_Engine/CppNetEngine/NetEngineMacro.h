@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cassert>
+#include "Types.h"
 
 #define NET_ASSERT(exp, msg) assert((exp) && (msg))
 

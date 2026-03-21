@@ -6,14 +6,14 @@
 #include "Service.h"
 
 bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
-                                                 PacketSessionRef& pSession)
+                                                 const PacketSessionRef& pSession)
 {
 	NET_ENGINE_LOG_ERROR("EchoPacketHandler::HANDLE_PACKET_ID_INVALID\n");
 
 	return false;
 }
 
-bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet, PacketSessionRef& pSession)
+bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet, const PacketSessionRef& pSession)
 {
     if (packet.echomsg() != "Hello World\n")
     {

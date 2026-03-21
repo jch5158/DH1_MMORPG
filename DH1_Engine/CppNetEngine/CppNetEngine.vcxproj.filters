@@ -40,9 +40,6 @@
     <Filter Include="Network\Service">
       <UniqueIdentifier>{d9b35aa5-2f92-45a7-a0e7-9805fe354091}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Actor\Service">
-      <UniqueIdentifier>{d9f4f2e1-55ec-4a79-9779-44108ab7c519}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{3c4c591c-85df-442a-8c66-8a0ff2ac51c0}</UniqueIdentifier>
     </Filter>
@@ -147,9 +144,6 @@
     <ClInclude Include="Listener.h">
       <Filter>Network\Service</Filter>
     </ClInclude>
-    <ClInclude Include="ActorService.h">
-      <Filter>Actor\Service</Filter>
-    </ClInclude>
     <ClInclude Include="SocketIocpObject.h">
       <Filter>Network\IOCP</Filter>
     </ClInclude>
@@ -179,9 +173,6 @@
     </ClInclude>
     <ClInclude Include="NetAddress.h">
       <Filter>Network\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="WaitQueueManager.h">
-      <Filter>Network\Session</Filter>
     </ClInclude>
     <ClInclude Include="SessionManager.h">
       <Filter>Network\Session</Filter>
@@ -287,9 +278,6 @@
     <ClCompile Include="Listener.cpp">
       <Filter>Network\Service</Filter>
     </ClCompile>
-    <ClCompile Include="ActorService.cpp">
-      <Filter>Actor\Service</Filter>
-    </ClCompile>
     <ClCompile Include="SocketIocpObject.cpp">
       <Filter>Network\IOCP</Filter>
     </ClCompile>
@@ -318,9 +306,6 @@
       <Filter>Network\Core</Filter>
     </ClCompile>
     <ClCompile Include="SessionManager.cpp">
-      <Filter>Network\Session</Filter>
-    </ClCompile>
-    <ClCompile Include="WaitQueueManager.cpp">
       <Filter>Network\Session</Filter>
     </ClCompile>
     <ClCompile Include="SessionReaper.cpp">

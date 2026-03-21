@@ -5,6 +5,8 @@
 #include <spdlog/async.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/daily_file_sink.h> // [핵심] 데일리 싱크 헤더로 변경
+#include "AllocatorUtils.h"
+#include "StlTypes.h"
 
 void NetEngineLogger::Init()
 {

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
-
 #include "NetAddress.h"
+#include "NetEngineMacro.h"
 
 NetAddress::NetAddress(const SOCKADDR_IN& sockAddr)
 	: mSockAddr(sockAddr)
@@ -15,7 +15,7 @@ NetAddress::NetAddress(const std::string& ip, const uint16 port)
 	mSockAddr.sin_port = ::htons(port);
 }
 
-SOCKADDR_IN& NetAddress::GetSockAddr()
+SOCKADDR_IN NetAddress::GetSockAddr() const
 {
 	return mSockAddr;
 }

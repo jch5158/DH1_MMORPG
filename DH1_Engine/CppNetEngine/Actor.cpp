@@ -1,8 +1,6 @@
 ﻿#include "pch.h"
 #include "Actor.h"
 #include "ActorEventEnum.h"
-#include "ActorScheduler.h"
-#include "IocpEvent.h"
 
 IActor::IActor()
 	:mId(sSeedBase.fetch_add(1))

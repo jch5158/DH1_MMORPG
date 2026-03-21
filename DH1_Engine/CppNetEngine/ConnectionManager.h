@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "LockFreeStack.h"
 #include "SocketIocpObject.h"
 

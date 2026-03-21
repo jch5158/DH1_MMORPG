@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "IocpEvent.h"
-
 #include "Session.h"
 
 IocpEvent::IocpEvent(const eIocpEventType eventType)

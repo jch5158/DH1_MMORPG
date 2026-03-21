@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "IocpCore.h"
-#include "Message.h"
-#include "TimingWheel.h"
+#include "SharedPtrUtils.h"
 
 struct ActorSchedulerConfig
 {

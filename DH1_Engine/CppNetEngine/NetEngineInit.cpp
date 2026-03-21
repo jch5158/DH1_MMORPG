@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "NetEngineInit.h"
+#include "NetEngineLogger.h"
 #include "SocketUtils.h"
 
 NetEngineInit::NetEngineInit()

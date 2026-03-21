@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Types.h"
+
 class NetAddress
 {
 public:
@@ -12,7 +14,7 @@ public:
 	explicit NetAddress(const SOCKADDR_IN& sockAddr);
 	explicit NetAddress(const std::string& ip, const uint16 port);
 
-	[[nodiscard]] SOCKADDR_IN& GetSockAddr();
+	[[nodiscard]] SOCKADDR_IN GetSockAddr() const;
 	[[nodiscard]] std::string GetIpAddress() const;
 	[[nodiscard]] uint16 GetPort() const;
 

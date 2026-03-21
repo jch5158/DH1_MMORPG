@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Types.h"
+
 namespace packet_id
 {
 	enum eEchoPacketId : uint16

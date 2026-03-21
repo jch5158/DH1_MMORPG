@@ -1,8 +1,7 @@
 ﻿#include "pch.h"
 #include "ThreadManager.h"
-
-#include "Actor.h"
-#include "ActorScheduler.h"
+#include "CrashReporter.h"
+#include "StringUtils.h"
 
 ThreadManager::ThreadManager()
 	: ISingleton<ThreadManager>()

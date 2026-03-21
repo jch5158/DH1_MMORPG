@@ -1,10 +1,8 @@
 ﻿// ReSharper disable CppMemberFunctionMayBeConst
 #pragma once
+#include "Types.h"
 #include "ISingleton.h"
 #include "MemoryPool.h"
-#include <tuple>
-#include <utility> // std::integer_sequence
-#include <array>
 
 class MemoryAllocator final : public ISingleton<MemoryAllocator>
 {

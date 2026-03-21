@@ -1,16 +1,11 @@
 ﻿#pragma once
-#include "Connector.h"
 #include "Disconnector.h"
-#include "IocpCore.h"
-#include "IocpEvent.h"
-#include "LockFreeQueue.h"
 #include "NetAddress.h"
-#include "NetReceiveBuffer.h"
 #include "Receiver.h"
 #include "Sender.h"
 #include "SessionTimeoutTracker.h"
-#include "SharedPtrUtils.h"
 #include "SocketIocpObject.h"
+#include "Types.h"
 
 enum class eSessionState : uint8
 {
@@ -48,8 +43,7 @@ public:
 	friend class Connector;
 	friend class Disconnector;
 	friend class Receiver;
-	friend class Sender;
-
+	
 	Session(const Session&) = delete;
 	Session& operator=(const Session&) = delete;
 	Session(Session&&) = delete;

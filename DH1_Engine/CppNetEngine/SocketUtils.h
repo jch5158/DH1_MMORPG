@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Types.h"
 
 class SocketUtils final  // NOLINT(cppcoreguidelines-special-member-functions)
 {
@@ -26,7 +27,7 @@ public:
 	static bool BindAnyAddress(const SOCKET socket, const uint16 port);
 	static bool Listen(const SOCKET socket, const int32 backlog);
 	static bool AcceptEx(const SOCKET listenSock, const SOCKET acceptSock, void* pOutputBuffer, OVERLAPPED* pOverlapped);
-	static bool ConnectEx(const SOCKET socket, SOCKADDR_IN& sockAddr, OVERLAPPED* pOverlapped);
+	static bool ConnectEx(const SOCKET socket, SOCKADDR_IN sockAddr, OVERLAPPED* pOverlapped);
 	static bool DisconnectEx(const SOCKET socket, OVERLAPPED* pOverlapped);
 	static void CancelIoEx(const SOCKET socket, OVERLAPPED* pOverlapped);
 	static bool WsaSend(const SOCKET socket, WSABUF* pWsabuf, const int32 bufSize, OVERLAPPED* pOverlapped);

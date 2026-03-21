@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "ISingleton.h"
+#include "StlTypes.h"
 #include "Types.h"
 
 class PlayerManager final : public ISingleton<PlayerManager>
@@ -13,8 +14,6 @@ public:
 	[[nodiscard]] bool AddPlayer(PacketSessionRef pSession, PlayerRef pPlayer);
 	[[nodiscard]] PlayerRef FindPlayer(const PacketSessionRef& pSession);
 	void RemovePlayer(const PacketSessionRef& pSession);
-
-
 
 private:
 

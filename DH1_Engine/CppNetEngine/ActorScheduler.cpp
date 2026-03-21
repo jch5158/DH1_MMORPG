@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "ActorScheduler.h"
 #include "Actor.h"
+#include "ActorMailbox.h"
 #include "SocketUtils.h"
 
 ActorScheduler::ActorScheduler(const ActorSchedulerConfig& config)

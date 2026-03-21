@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "IocpEvent.h"
+#include "LockFreeQueue.h"
 
 class ActorScheduler;
 

@@ -13,7 +13,8 @@
 #include "PacketOption.pb.h"
 #include "PacketId.h"
 #include "Login.pb.h"
-#include "StlTypes.h"
+#include "CrashReporter.h"
+#include "NetEngineMacro.h"
 #include "PacketSession.h"
 
 #endif
@@ -22,7 +23,7 @@ class LoginPacketHandler
 {
 public:
 
-    using PacketHandle = std::function<bool(const uint16, const byte*, PacketSessionRef&)>;
+    using PacketHandle = std::function<bool(const uint16, const byte*, const PacketSessionRef&)>;
 
     static constexpr uint32 MAKE_PACKET_HEADER_ID(const uint16 serviceType, const uint16 packetId)
     {
@@ -31,14 +32,14 @@ public:
 
     static void Init()
     {
-        sPacketHandleMap[packet_id::eLoginPacketId::S2C_LOGIN_RES] = [](const uint16 size, const byte* pBuffer, PacketSessionRef& pSession)->bool
+        sPacketHandleMap[packet_id::eLoginPacketId::S2C_LOGIN_RES] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession)->bool
 			{
 				return HandlePacket<Protocol::S2C_LOGIN_RES>(size, pBuffer, pSession, HANDLE_S2C_LOGIN_RES);
 			};
 
     }
 
-	static bool HandlePacket(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession)
+	static bool HandlePacket(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession)
 	{
 		const auto iter = sPacketHandleMap.find(packetId);
 		if (iter != sPacketHandleMap.end())
@@ -49,8 +50,8 @@ public:
 		return HANDLE_PACKET_ID_INVALID(size, packetId, pBuffer, pSession);
 	}
 
-	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession);
-    static bool HANDLE_S2C_LOGIN_RES(const Protocol::S2C_LOGIN_RES& packet, PacketSessionRef& pSession);
+	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
+    static bool HANDLE_S2C_LOGIN_RES(const Protocol::S2C_LOGIN_RES& packet, const PacketSessionRef& pSession);
 
     
     static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGIN_REQ); }
@@ -59,7 +60,7 @@ public:
 private:
 
 	template<typename PacketType, typename Handle>
-	static bool HandlePacket(const uint16 size, const byte* pBuffer, PacketSessionRef& pSession, Handle handlePacket)
+	static bool HandlePacket(const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession, Handle handlePacket)
 	{
 		PacketType packet{};
 		if (packet.ParseFromArray(pBuffer + SIZE_OF_16(PacketHeader), size - SIZE_OF_16(PacketHeader)) == false)

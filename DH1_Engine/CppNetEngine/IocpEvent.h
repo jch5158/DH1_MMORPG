@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "LockFreeQueue.h"
+#include "Types.h"
 #include "SharedPtrUtils.h"
 
 enum class eIocpEventType : uint8

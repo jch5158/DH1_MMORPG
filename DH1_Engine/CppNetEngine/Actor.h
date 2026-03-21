@@ -1,9 +1,8 @@
 ﻿#pragma once
-#include "ActorMailbox.h"
-#include "LockFreeQueue.h"
-#include "Message.h"
-#include "ActorScheduler.h"
 #include "IocpCore.h"
+#include "ActorScheduler.h"
+#include "SharedPtrUtils.h"
+#include "ActorMailbox.h"
 
 class IActor : public IocpObject
 {

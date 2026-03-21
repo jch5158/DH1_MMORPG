@@ -5,6 +5,8 @@
         public static readonly string ENUM_PACKET_ID_FORMAT =
             @"#pragma once
 
+#include ""Types.h""
+
 namespace packet_id
 {{{0}}}";
 
@@ -16,7 +18,7 @@ class PacketServiceTypeHandler
 {{
 public:
 
-	using PacketServiceTypeHandle = std::function<bool(const uint16, const uint16, const byte*, PacketSessionRef&)>;
+	using PacketServiceTypeHandle = std::function<bool(const uint16, const uint16, const byte*, const PacketSessionRef&)>;
 
 	static constexpr uint16 GET_SERVICE_TYPE(const uint32 packetId) {{ return (packetId >> 16) & 0x0000FFFF; }}
 	static constexpr uint16 GET_PACKET_ID(const uint32 packetId) {{ return packetId & 0x0000FFFF; }}
@@ -27,7 +29,7 @@ public:
 		{2}
 	}}
 
-	static bool HandlePacketServiceType(const uint16 len, const byte* pBuffer, PacketSessionRef& pSession)
+	static bool HandlePacketServiceType(const uint16 len, const byte* pBuffer, const PacketSessionRef& pSession)
 	{{
 		const auto [packetSize, headerId] = *(reinterpret_cast<const PacketHeader*>(pBuffer));
 		
@@ -43,7 +45,7 @@ public:
 		return HANDLE_SERVICE_TYPE_INVALID(packetSize, packetId, pBuffer, pSession);
 	}}
 
-	static bool HANDLE_SERVICE_TYPE_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession);
+	static bool HANDLE_SERVICE_TYPE_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
 
 private:
 
@@ -59,7 +61,7 @@ private:
 ";
 
         public static readonly string SERVICE_TYPE_HANDLE_INIT_FORMAT =
-            @"sPacketServiceTypeMap[Protocol::eServiceType::{0}] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession) -> bool
+            @"sPacketServiceTypeMap[Protocol::eServiceType::{0}] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
             {{
                 return {1}::HandlePacket(size, packetId, pBuffer, pSession);
             }};
@@ -82,7 +84,8 @@ private:
 #include ""PacketOption.pb.h""
 #include ""PacketId.h""
 #include ""{0}.pb.h""
-#include ""StlTypes.h""
+#include ""CrashReporter.h""
+#include ""NetEngineMacro.h""
 #include ""PacketSession.h""
 
 #endif
@@ -91,7 +94,7 @@ class {1}
 {{
 public:
 
-    using PacketHandle = std::function<bool(const uint16, const byte*, PacketSessionRef&)>;
+    using PacketHandle = std::function<bool(const uint16, const byte*, const PacketSessionRef&)>;
 
     static constexpr uint32 MAKE_PACKET_HEADER_ID(const uint16 serviceType, const uint16 packetId)
     {{
@@ -103,7 +106,7 @@ public:
         {2}
     }}
 
-	static bool HandlePacket(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession)
+	static bool HandlePacket(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession)
 	{{
 		const auto iter = sPacketHandleMap.find(packetId);
 		if (iter != sPacketHandleMap.end())
@@ -114,7 +117,7 @@ public:
 		return HANDLE_PACKET_ID_INVALID(size, packetId, pBuffer, pSession);
 	}}
 
-	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession);
+	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
     {3}
     
     {4}
@@ -122,7 +125,7 @@ public:
 private:
 
 	template<typename PacketType, typename Handle>
-	static bool HandlePacket(const uint16 size, const byte* pBuffer, PacketSessionRef& pSession, Handle handlePacket)
+	static bool HandlePacket(const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession, Handle handlePacket)
 	{{
 		PacketType packet{{}};
 		if (packet.ParseFromArray(pBuffer + SIZE_OF_16(PacketHeader), size - SIZE_OF_16(PacketHeader)) == false)
@@ -174,14 +177,14 @@ private:
         public static readonly string PROTO_FILE_INCLUDE_FORMAT = "";
 
         public static readonly string RECEIVE_HANDLE_INIT_FORMAT =
-            @"sPacketHandleMap[packet_id::e{0}PacketId::{1}] = [](const uint16 size, const byte* pBuffer, PacketSessionRef& pSession)->bool
+            @"sPacketHandleMap[packet_id::e{0}PacketId::{1}] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession)->bool
 			{{
 				return HandlePacket<Protocol::{1}>(size, pBuffer, pSession, HANDLE_{1});
 			}};
 ";
 
 		public static readonly string RECEIVE_HANDLE_DECLARE_FORMAT =
-            @"static bool HANDLE_{0}(const Protocol::{0}& packet, PacketSessionRef& pSession);
+            @"static bool HANDLE_{0}(const Protocol::{0}& packet, const PacketSessionRef& pSession);
 ";
 
         public static readonly string SEND_MAKE_SEND_BUFFER_FORMAT =

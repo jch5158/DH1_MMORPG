@@ -1,6 +1,11 @@
 ﻿#pragma once
+#include <new>
+#include <atomic>
+#include <type_traits>
+#include <utility>
 
-#include "ObjectAllocator.h"
+#include "Types.h"
+#include "AllocatorUtils.h"
 
 template <typename T>
 class LockFreeStack final
@@ -129,8 +134,6 @@ public:
 private:
 
 	const int32 mMaxCount;
-
 	alignas(std::hardware_destructive_interference_size) std::atomic<int32> mCount;
-
 	alignas(std::hardware_destructive_interference_size) Node16 mTopAlineNode16;
 };

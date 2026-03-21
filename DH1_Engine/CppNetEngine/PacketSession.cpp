@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "PacketSession.h"
 
+#include "NetEngineMacro.h"
+
 PacketSession::PacketSession(const int32 receiveBufferSize, const int32 maxPacketSize)
 	:Session(receiveBufferSize)
 	, mMaxPacketSize(maxPacketSize)

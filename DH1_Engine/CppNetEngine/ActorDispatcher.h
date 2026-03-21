@@ -2,6 +2,8 @@
 #pragma once
 #include "Actor.h"
 #include "ActorManager.h"
+#include "AllocatorUtils.h"
+#include "Message.h"
 
 class ActorDispatcher
 {

@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 
+#include "CrashReporter.h"
 #include "GameSession.h"
+#include "NetEngineInit.h"
+#include "NetworkScheduler.h"
 #include "Service.h"
 #include "ThreadManager.h"
 

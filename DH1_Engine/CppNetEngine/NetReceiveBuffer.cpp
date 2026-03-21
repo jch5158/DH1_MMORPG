@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "NetReceiveBuffer.h"
+#include "AllocatorUtils.h"
+#include "StlTypes.h"
 
 NetReceiveBuffer::NetReceiveBuffer(const int32 maxSize)
 	: mMaxBufferSize(maxSize + 1)

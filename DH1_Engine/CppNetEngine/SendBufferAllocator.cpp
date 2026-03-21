@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "SendBufferAllocator.h"
+#include "NetSendBuffer.h"
 
 NetSendBufferRef SendBufferAllocator::Alloc(const int32 size)
 {

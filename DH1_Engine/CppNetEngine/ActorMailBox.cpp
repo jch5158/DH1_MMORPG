@@ -1,10 +1,13 @@
 ﻿#include "pch.h"
 #include "ActorMailbox.h"
-#include "Actor.h"
 #include "ActorEventEnum.h"
+#include "ActorScheduler.h"
+#include "IocpEvent.h"
+#include "Message.h"
+#include "SharedPtrUtils.h"
 
 ActorMessageEvent::ActorMessageEvent()
-	:IocpEvent(static_cast<uint32>(eActorEventType::ActorMessage))
+	: ::IocpEvent(static_cast<uint32>(eActorEventType::ActorMessage))
 {
 }
 

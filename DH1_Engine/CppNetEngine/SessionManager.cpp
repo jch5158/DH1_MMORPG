@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "SessionManager.h"
-#include "Session.h"
 
 SessionManager::SessionManager(const int32 maxSessionCount)
 	: mMaxSessionCount(maxSessionCount)

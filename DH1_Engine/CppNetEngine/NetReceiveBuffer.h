@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Types.h"
+#include "UniquePtrUtils.h"
 
 class NetReceiveBuffer
 {

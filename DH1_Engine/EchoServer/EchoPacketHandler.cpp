@@ -2,13 +2,13 @@
 #include "PacketHandler/EchoPacketHandler.h"
 #include "GameSession.h"
 
-bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, PacketSessionRef& pSession)
+bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession)
 {
 	NET_ENGINE_LOG_ERROR("EchoPacketHandler::HANDLE_PACKET_ID_INVALID\n");
 	return false;
 }
 
-bool EchoPacketHandler::HANDLE_C2S_ECHO_REQ(const Protocol::C2S_ECHO_REQ& packet, PacketSessionRef& pSession)
+bool EchoPacketHandler::HANDLE_C2S_ECHO_REQ(const Protocol::C2S_ECHO_REQ& packet, const PacketSessionRef& pSession)
 {
 	if (packet.echomsg() != "Hello World\n")
 	{

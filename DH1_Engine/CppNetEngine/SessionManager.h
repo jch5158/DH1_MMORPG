@@ -1,6 +1,7 @@
 ﻿#pragma once
-#include "LockFreeStack.h"
-#include "SessionReaper.h"
+#include "SharedPtrUtils.h"
+#include "StlTypes.h"
+#include "Types.h"
 
 class SessionManager
 {

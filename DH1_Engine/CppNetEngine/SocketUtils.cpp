@@ -152,7 +152,7 @@ bool SocketUtils::AcceptEx(const SOCKET listenSock, const SOCKET acceptSock, voi
 	return retVal == TRUE;
 }
 
-bool SocketUtils::ConnectEx(const SOCKET socket, SOCKADDR_IN& sockAddr, OVERLAPPED* pOverlapped)
+bool SocketUtils::ConnectEx(const SOCKET socket, SOCKADDR_IN sockAddr, OVERLAPPED* pOverlapped)
 {
 	DWORD numOfBytes = 0;
 	return connectEx(socket, reinterpret_cast<SOCKADDR*>(&sockAddr), sizeof(SOCKADDR_IN), nullptr, 0, &numOfBytes, pOverlapped);

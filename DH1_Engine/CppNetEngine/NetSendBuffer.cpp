@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "NetSendBuffer.h"
 
+#include "AllocatorUtils.h"
+
 NetSendBuffer::NetSendBuffer(const int32 maxSize)
 	: mMaxBufferSize(maxSize)
 	, mReadPos(0)
@@ -51,8 +53,6 @@ byte* NetSendBuffer::Reserve(const int32 size) const
 	{
 		return nullptr;
 	}
-
-	byte test = mpBuffer[0];
 
 	return &mpBuffer[mWritePos];
 }

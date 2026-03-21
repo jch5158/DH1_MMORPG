@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
-#include "IocpEvent.h"
 #include "IocpCore.h"
 #include "CrashReporter.h"
+#include "IocpEvent.h"
 
 IocpCore::IocpCore(const uint32 runningThreadCount)
 	: mIocpHandle(nullptr)

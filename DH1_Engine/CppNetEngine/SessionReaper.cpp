@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "SessionReaper.h"
+#include "Service.h"
 #include "Session.h"
-#include "SocketUtils.h"
 
 SessionReaper::SessionReaper(const int64 timeoutMs)
 	: mTimeoutMs(timeoutMs)

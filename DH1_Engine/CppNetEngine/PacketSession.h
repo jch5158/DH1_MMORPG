@@ -1,6 +1,7 @@
 ﻿#pragma once
+
 #include "Session.h"
-#include "SessionTimeoutTracker.h"
+#include "Types.h"
 
 #pragma pack(push, 1)
 struct PacketHeader

@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "SocketIocpObject.h"
-
 #include "SocketUtils.h"
 
 SocketIocpObject::SocketIocpObject()

@@ -1,10 +1,7 @@
 ﻿#pragma once
-
 #include "SharedPtrUtils.h"
-#include "NetSendBuffer.h"
-#include <tuple>
-#include <utility> // std::integer_sequence
-#include <array>
+#include "Types.h"
+
 
 class SendBufferAllocator
 {

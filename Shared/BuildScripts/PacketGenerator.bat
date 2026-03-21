@@ -25,3 +25,10 @@ if not exist "%GENERATOR_EXE%" (
 )
 
 "%GENERATOR_EXE%" "%ARG_CONFIG%" "%ARG_PROTO%" "%ARG_BASE_PRJ%"
+
+set "PACKET_ID_PATH=%BASE_DIR%..\Protocol\PacketId"
+set "DH1_CLIENT_PATH=%ARG_BASE_PRJ%\DH1_Client\Source\DH1_Client\Network\Protocol\PacketId"
+
+if not exist "%DH1_CLIENT_PATH%" mkdir "%DH1_CLIENT_PATH%"
+
+xcopy /S /Y "%PACKET_ID_PATH%\PacketId.h" "%DH1_CLIENT_PATH%\"

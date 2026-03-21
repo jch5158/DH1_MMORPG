@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "ISingleton.h"
+#include "StlTypes.h"
+#include "Types.h"
 
 class ThreadManager final : public ISingleton<ThreadManager>
 {

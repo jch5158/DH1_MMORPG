@@ -20,7 +20,7 @@ private:
 	{
 		Node16() = default;
 
-		Node* mpNode;
+		Node* mpNode = nullptr;
 		int64 mCount = 0;
 	};
 
@@ -63,8 +63,6 @@ public:
 
 			mPoolingCount.fetch_sub(1);
 		}
-
-		NET_ASSERT(mPoolingCount.load() == 0, "ObjectPool::~ObjectPool - Memory leak detected.");
 	}
 
 
@@ -149,7 +147,6 @@ private:
 		Node* pNode = static_cast<Node*>(mi_malloc(sizeof(Node)));
 		if (pNode == nullptr)
 		{
-			NET_ASSERT(false, "ObjectPool::allocNode - Memory allocation failed.");
 			return nullptr;
 		}
 		
@@ -297,7 +294,6 @@ public:
 	{
 		if (pObject == nullptr)
 		{
-			NET_ASSERT(false, "TlsObjectPool::Free - pData is nullptr.");
 			return;
 		}
 

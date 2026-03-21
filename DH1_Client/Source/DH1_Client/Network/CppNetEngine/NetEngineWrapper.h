@@ -14,9 +14,10 @@ THIRD_PARTY_INCLUDES_START
 #include "Windows/AllowWindowsPlatformTypes.h"
 
 #include "EnginePch.h"
-#include "PacketSession.h"
 
 #include "Windows/HideWindowsPlatformTypes.h"
+
+#undef DrawText
 
 #pragma pop_macro("cast")
 #pragma pop_macro("verify")
