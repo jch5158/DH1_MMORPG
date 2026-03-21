@@ -1,6 +1,7 @@
 ﻿#include "Network/Subsystem/ClientNetSubsystem.h"
-#include "Network/CppNetEngine/NetSession.h"
+
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
+
 
 void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -16,16 +17,16 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	SchedulerConfig.runningThreadCount = 0;
 	SchedulerConfig.onHandleError = [](const uint32)->void {};
 
-	ClientServiceConfig Config;
-	Config.netAddress = NetAddress("127.0.0.1", 7000);
-	Config.maxSessionCount = 1;
-	Config.sessionFactory = []()->NetSessionRef
-		{
-			return cpp_net_engine::MakeShared<NetSession>(8192, 4096);
-		};
-	Config.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(SchedulerConfig);
-	
-	ClientService = cpp_net_engine::MakeShared<class ClientService>(Config);
+	//ClientServiceConfig Config;
+	//Config.netAddress = NetAddress("127.0.0.1", 7000);
+	//Config.maxSessionCount = 1;
+	//Config.sessionFactory = []()->NetSessionRef
+	//	{
+	//		return cpp_net_engine::MakeShared<NetSession>(8192, 4096);
+	//	};
+	//Config.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(SchedulerConfig);
+	//
+	//ClientService = cpp_net_engine::MakeShared<ClientService>(Config);
 }
 
 void UClientNetSubsystem::Deinitialize()

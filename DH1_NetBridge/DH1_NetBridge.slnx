@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="DH1_NetBridge.vcxproj" Id="8e2a68d2-7270-4fbf-b7f8-e4dd2d5c2bc4" />
+</Solution>

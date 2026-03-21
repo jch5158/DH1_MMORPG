@@ -13,10 +13,21 @@ THIRD_PARTY_INCLUDES_START
 
 #include "Windows/AllowWindowsPlatformTypes.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
 #include "EnginePch.h"
+#include "Types.h"
+#include "NetEngineInit.h"
+#include "CrashReporter.h"
+#include "NetSendBuffer.h"
+#include "AllocatorUtils.h"
+#include "NetEngineMacro.h"
+#include "PacketSession.h"
+#include "NetworkScheduler.h"
+#include "Service.h"
 
 #include "Windows/HideWindowsPlatformTypes.h"
-
 #undef DrawText
 
 #pragma pop_macro("cast")
