@@ -3,7 +3,7 @@
 
 #include "Player.h"
 #include "PlayerManager.h"
-#include "Service.h"
+#include "NetService.h"
 
 bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
                                                  const PacketSessionRef& pSession)

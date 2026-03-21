@@ -102,6 +102,6 @@ DECLARE_SMART_PTR(IocpCore);
 DECLARE_SMART_PTR(NetworkScheduler);
 DECLARE_SMART_PTR(ActorScheduler);
 
-DECLARE_SMART_PTR(Service);
+DECLARE_SMART_PTR(NetService);
 DECLARE_SMART_PTR(ClientService);
 DECLARE_SMART_PTR(ServerService);

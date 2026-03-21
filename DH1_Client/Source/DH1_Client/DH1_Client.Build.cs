@@ -56,7 +56,7 @@ public class DH1_Client : ModuleRules
             Path.Combine(VcpkgLibPath, "fmt.lib"),
             Path.Combine(VcpkgLibPath, ProtobufLibName),
             Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/CppNetEngine/{ConfigName}/CppNetEngine.lib")),
-            Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/DH1_NetBridge/{ConfigName}/DH1_NetBridge.lib"))
+            Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/ProtoBridge/{ConfigName}/ProtoBridge.lib"))
         ]);
 
         if (Directory.Exists(VcpkgLibPath))

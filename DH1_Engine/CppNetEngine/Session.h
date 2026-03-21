@@ -33,7 +33,7 @@ class Session : public SocketIocpObject
 public:
 
 	friend class Listener;
-	friend class Service;
+	friend class NetService;
 	friend class ClientService;
 	friend class ServerService;
 	friend class SessionManager;
@@ -64,7 +64,7 @@ public:
 	void Start();
 	void Stop();
 
-	[[nodiscard]] ServiceRef GetService() const;
+	[[nodiscard]] NetServiceRef GetService() const;
 	[[nodiscard]] NetAddress& GetAddress();
 	[[nodiscard]] byte* GetReceiveBufferPtr() const;
 	[[nodiscard]] SessionRef GetSessionRef();
@@ -93,7 +93,7 @@ private:
 	void processSend(const uint32 numOfBytes);
 	void processReceive(const uint32 numOfBytes);
 
-	bool Initialize(const ServiceRef& pService);
+	bool Initialize(const NetServiceRef& pService);
 	void setNetAddress(const NetAddress& address);
 	void startReceive();
 
@@ -101,7 +101,7 @@ private:
 	bool setSessionDisconnecting();
 	bool setSessionDisconnected();
 
-	ServiceRef mpService;
+	NetServiceRef mpService;
 	NetAddress mNetAddress;
 	std::atomic<eSessionState> mSessionState;
 	SessionTimeoutTracker mTimeoutTracker;

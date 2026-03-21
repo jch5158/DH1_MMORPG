@@ -18,13 +18,18 @@ THIRD_PARTY_INCLUDES_START
 
 #include "EnginePch.h"
 #include "Types.h"
-#include "NetEngineInit.h"
-#include "CrashReporter.h"
-#include "NetSendBuffer.h"
-#include "AllocatorUtils.h"
 #include "NetEngineMacro.h"
-#include "PacketSession.h"
+#include "NetAddress.h"
+
+#include "AllocatorUtils.h"
+#include "CrashReporter.h"
+#include "SessionManager.h"
+#include "SharedPtrUtils.h"
+#include "NetEngineInit.h"
+#include "NetSendBuffer.h"
 #include "NetworkScheduler.h"
+#include "PacketSession.h"
+#include "NetSession.h"   
 #include "Service.h"
 
 #include "Windows/HideWindowsPlatformTypes.h"
@@ -35,3 +40,4 @@ THIRD_PARTY_INCLUDES_START
 #pragma pop_macro("check")
 
 THIRD_PARTY_INCLUDES_END
+

@@ -1,10 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Tickable.h"
 #include "Network/CppNetEngine/NetEngineWrapper.h"
-#include "Network/CppNetEngine/NetSession.h"
-#include "Subsystems/GameInstanceSubsystem.h"
 #include "ClientNetSubsystem.generated.h"
 
 UCLASS()

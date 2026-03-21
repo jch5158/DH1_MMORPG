@@ -1,12 +1,12 @@
 ﻿#include "pch.h"
-#include "Service.h"
+#include "NetService.h"
 #include "ConnectionManager.h"
 #include "Listener.h"
 #include "NetworkScheduler.h"
 #include "Session.h"
 #include "SessionReaper.h"
 
-Service::Service(
+NetService::NetService(
 	const eServiceType serviceType,
 	const NetAddress& netAddress,
 	const int32 maxSessionCount,
@@ -21,7 +21,7 @@ Service::Service(
 {
 }
 
-SessionRef Service::CreateSession()
+SessionRef NetService::CreateSession()
 {
 	SessionRef pSession = mSessionFactory();
 	if (pSession->Initialize(shared_from_this()) == false)
@@ -37,33 +37,33 @@ SessionRef Service::CreateSession()
 	return pSession;
 }
 
-eServiceType Service::GetServiceType() const
+eServiceType NetService::GetServiceType() const
 {
 	return mServiceType;
 }
 
-NetAddress& Service::GetNetAddress()
+NetAddress& NetService::GetNetAddress()
 {
 	return mNetAddress;
 }
 
-NetworkSchedulerRef Service::GetNetworkScheduler() const
+NetworkSchedulerRef NetService::GetNetworkScheduler() const
 {
 	return mpNetworkScheduler;
 }
 
-int32 Service::GetCurrentSessionCount()
+int32 NetService::GetCurrentSessionCount()
 {
 	return mSessionManager.GetCurrentSessionCount();
 }
 
-int32 Service::GetMaxSessionCount() const
+int32 NetService::GetMaxSessionCount() const
 {
 	return mMaxSessionCount;
 }
 
 ClientService::ClientService(const ClientServiceConfig& config)
-	: Service(
+	: NetService(
 		eServiceType::Client,
 		config.netAddress,
 		config.maxSessionCount,
@@ -109,7 +109,7 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 }
 
 ServerService::ServerService(const ServerServiceConfig& config)
-	: Service(
+	: NetService(
 		eServiceType::Server, 
 		config.netAddress,
 		config.maxSessionCount,

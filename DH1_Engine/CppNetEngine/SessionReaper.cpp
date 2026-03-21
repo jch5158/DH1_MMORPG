@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "SessionReaper.h"
-#include "Service.h"
+#include "NetService.h"
 #include "Session.h"
 
 SessionReaper::SessionReaper(const int64 timeoutMs)

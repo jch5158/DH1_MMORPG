@@ -18,19 +18,19 @@
     <ClCompile Include="pch.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Echo.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Echo.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Enum.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Login.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Login.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\PacketOption.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Protocol\Struct.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,36 +38,36 @@
     <ClInclude Include="pch.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Echo.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Enum.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Login.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\PacketOption.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\Login.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Protocol\Struct.pb.h">
+    <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Shared\Protocol\Proto\PacketOption.proto">
+    <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
-    <None Include="..\Shared\Protocol\Proto\Struct.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
-    <None Include="..\Shared\Protocol\Proto\Echo.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
-    <None Include="..\Shared\Protocol\Proto\Enum.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
-    <None Include="..\Shared\Protocol\Proto\Login.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Login.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>

@@ -51,7 +51,7 @@ void Session::Stop()
 	OnDisconnected();
 }
 
-ServiceRef Session::GetService() const
+NetServiceRef Session::GetService() const
 {
 	return mpService;
 }
@@ -158,7 +158,7 @@ void Session::processReceive(const uint32 numOfBytes)
 	mReceiver.Process(numOfBytes);
 }
 
-bool Session::Initialize(const ServiceRef& pService)
+bool Session::Initialize(const NetServiceRef& pService)
 {
 	if (CreateSocket() == false)
 	{

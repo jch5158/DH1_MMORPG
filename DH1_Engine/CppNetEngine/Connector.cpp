@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Connector.h"
-#include "Service.h"
+#include "NetService.h"
 #include "Session.h"
 #include "SocketUtils.h"
 #include "ConnectionManager.h"

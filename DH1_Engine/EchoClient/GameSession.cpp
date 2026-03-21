@@ -4,7 +4,7 @@
 
 #include "Player.h"
 #include "PlayerManager.h"
-#include "Service.h"
+#include "NetService.h"
 
 GameSession::GameSession(const int32 receiveBufferSize, const int32 maxPacketSize)
 	:PacketSession(receiveBufferSize, maxPacketSize)

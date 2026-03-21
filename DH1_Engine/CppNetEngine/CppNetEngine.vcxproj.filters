@@ -138,7 +138,7 @@
     <ClInclude Include="NetworkScheduler.h">
       <Filter>Network\IOCP</Filter>
     </ClInclude>
-    <ClInclude Include="Service.h">
+    <ClInclude Include="NetService.h">
       <Filter>Network\Service</Filter>
     </ClInclude>
     <ClInclude Include="Listener.h">
@@ -272,7 +272,7 @@
     <ClCompile Include="NetworkScheduler.cpp">
       <Filter>Network\IOCP</Filter>
     </ClCompile>
-    <ClCompile Include="Service.cpp">
+    <ClCompile Include="NetService.cpp">
       <Filter>Network\Service</Filter>
     </ClCompile>
     <ClCompile Include="Listener.cpp">

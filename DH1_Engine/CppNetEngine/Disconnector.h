@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
-class Service;
+class NetService;
 
 class IocpDisconnectEvent final : public IocpEvent
 {
@@ -21,13 +21,13 @@ public:
 	explicit Disconnector();
 	~Disconnector() = default;
 	
-	[[nodiscard]] bool Initialize(const SessionRef& pOwner, ServiceRef pService);
+	[[nodiscard]] bool Initialize(const SessionRef& pOwner, NetServiceRef pService);
 	void Register();
 	void Process() const;
 
 private:
 
 	IocpDisconnectEvent mDisconnectEvent;
-	ServiceRef mpService;
+	NetServiceRef mpService;
 };
 

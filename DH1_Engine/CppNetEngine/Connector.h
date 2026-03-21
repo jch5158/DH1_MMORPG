@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "IocpEvent.h"
 
-class Service;
+class NetService;
 
 class IocpConnectEvent final : public IocpEvent
 {

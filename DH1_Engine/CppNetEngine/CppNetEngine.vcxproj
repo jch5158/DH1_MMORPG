@@ -257,7 +257,7 @@
     <ClInclude Include="ScopedActor.h" />
     <ClInclude Include="SendBufferAllocator.h" />
     <ClInclude Include="Sender.h" />
-    <ClInclude Include="Service.h" />
+    <ClInclude Include="NetService.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="SessionManager.h" />
     <ClInclude Include="SessionReaper.h" />
@@ -305,7 +305,7 @@
     <ClCompile Include="ScopedActor.cpp" />
     <ClCompile Include="SendBufferAllocator.cpp" />
     <ClCompile Include="Sender.cpp" />
-    <ClCompile Include="Service.cpp" />
+    <ClCompile Include="NetService.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="SessionReaper.cpp" />

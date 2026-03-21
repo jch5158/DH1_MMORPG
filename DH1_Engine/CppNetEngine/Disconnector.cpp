@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Disconnector.h"
-#include "Service.h"
+#include "NetService.h"
 #include "Session.h"
 #include "SocketUtils.h"
 
@@ -15,7 +15,7 @@ Disconnector::Disconnector()
 {
 }
 
-bool Disconnector::Initialize(const SessionRef& pOwner, ServiceRef pService)
+bool Disconnector::Initialize(const SessionRef& pOwner, NetServiceRef pService)
 {
 	if (pOwner == nullptr || pService == nullptr)
 	{

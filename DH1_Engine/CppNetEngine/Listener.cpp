@@ -6,7 +6,7 @@
 #include "CrashReporter.h"
 #include "IocpEvent.h"
 #include "NetworkScheduler.h"
-#include "Service.h"
+#include "NetService.h"
 #include "SocketUtils.h"
 
 Listener::Listener(const int32 acceptCount)
