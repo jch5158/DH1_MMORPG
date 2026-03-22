@@ -14,9 +14,10 @@ protected:
 
 		spdlog::memory_buf_t formatted;
 		this->formatter_->format(msg, formatted);
-		const std::string logStr = fmt::to_string(formatted);
 
-		auto netLevel = eNetLogLevel::Info;
+		formatted.push_back('\0');
+
+		eNetLogLevel netLevel;
 		switch (msg.level)
 		{
 		case spdlog::level::trace: netLevel = eNetLogLevel::Trace; break;
@@ -29,10 +30,10 @@ protected:
 		case spdlog::level::n_levels:
 		default:  // NOLINT(clang-diagnostic-covered-switch-default)
 			CrashReporter::Crash();
-			break;
+			return;
 		}
 
-		NetEngineLogger::spLogCallback(netLevel, logStr.c_str());
+		NetEngineLogger::spLogCallback(netLevel, formatted.data());
 	}
 
 	virtual void flush_() override {}
@@ -45,22 +46,19 @@ void NetEngineLogger::SetLogCallback(LogCallback callback)
 
 void NetEngineLogger::Init(const bool bIsUnrealClient)
 {
-	if (spLogCallback)
+	if (spLogger)
 	{
 		return;
 	}
 
-	// [수정 완료] 언리얼/서버 무관하게 비동기 로거 스레드 풀 초기화 보장
+	// 비동기 로거 스레드 풀 초기화 보장
 	spdlog::init_thread_pool(8192, 1);
 
 	Vector<spdlog::sink_ptr> sinks;
 
 	if (bIsUnrealClient)
 	{
-		// [수정 완료] 빈 껍데기 포인터 생성으로 인한 널 포인터 역참조 크래시 해결.
-		// 실제 메모리를 할당하여 스마트 포인터에 전달합니다.
 		const auto unrealSink = cpp_net_engine::MakeShared<UnrealCallbackSink<std::mutex>>();
-
 		unrealSink->set_pattern("%v");
 		sinks.push_back(unrealSink);
 	}
@@ -68,12 +66,12 @@ void NetEngineLogger::Init(const bool bIsUnrealClient)
 	{
 		const auto fileSink = cpp_net_engine::MakeShared<spdlog::sinks::daily_file_sink_mt>("logs/NetEngine.log", 0, 0);
 		fileSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%s:%#] [%^%l%$] %v");
-		sinks.emplace_back(fileSink);
+		sinks.push_back(fileSink);
 
 #ifdef _DEBUG
 		const auto consoleSink = cpp_net_engine::MakeShared<spdlog::sinks::stdout_color_sink_mt>();
 		consoleSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%s:%#] [%^%l%$] %v");
-		sinks.emplace_back(consoleSink);
+		sinks.push_back(consoleSink);
 #endif	
 	}
 
