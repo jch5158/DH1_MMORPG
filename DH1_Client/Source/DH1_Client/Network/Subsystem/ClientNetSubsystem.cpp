@@ -7,10 +7,10 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+	NetEngineInit EnginInit(true);
+
 	PacketServiceTypeHandler::Init();
 	
-	NetEngineLogger::Init(true);
-
 	ServiceRef = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
 }
 
@@ -50,9 +50,9 @@ bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 	ClientConfig.maxSessionCount = 1;
 	ClientConfig.maxConnectionCount = 1;
 	ClientConfig.netAddress = NetAddress(TCHAR_TO_UTF8(*IPAddress), static_cast<uint16>(Port));
-	ClientConfig.sessionFactory = []() -> NetSessionRef
+	ClientConfig.sessionFactory = [argAuthData = ClientAuthData]() -> NetSessionRef
 		{
-			return	cpp_net_engine::MakeShared<NetSession>(8192, 4096);
+			return	cpp_net_engine::MakeShared<NetSession>(8192, 4096, argAuthData);
 		};
 
 	NetworkSchedulerConfig SchedulerConfig;
@@ -60,7 +60,6 @@ bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 	SchedulerConfig.tickIntervalMs = 16;
 	SchedulerConfig.runningThreadCount = 0;
 	SchedulerConfig.onHandleError = [](const uint32)->void {};
-
 	ClientConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(SchedulerConfig);
 
 	if (!ServiceRef->Initialize(ClientConfig) || !ServiceRef->Start())
@@ -100,6 +99,11 @@ void UClientNetSubsystem::SendPacket(const uint8* PacketData, int32 Size)
 
 void UClientNetSubsystem::SetAuthData(const FString& ArgTicket, const FString& ArgAccountId)
 {
-	Ticket = ArgTicket;
-	AccountId = ArgAccountId;
+	ClientAuthData.Ticket = ArgTicket;
+	ClientAuthData.AccountId = ArgAccountId;
+}
+
+AuthData UClientNetSubsystem::GetAuthData() const
+{
+	return ClientAuthData;
 }

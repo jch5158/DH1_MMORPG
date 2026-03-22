@@ -45,6 +45,11 @@ void NetEngineLogger::SetLogCallback(LogCallback callback)
 
 void NetEngineLogger::Init(const bool bIsUnrealClient)
 {
+	if (spLogCallback)
+	{
+		return;
+	}
+
 	// [수정 완료] 언리얼/서버 무관하게 비동기 로거 스레드 풀 초기화 보장
 	spdlog::init_thread_pool(8192, 1);
 

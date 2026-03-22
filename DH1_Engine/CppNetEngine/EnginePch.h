@@ -4,6 +4,12 @@
 #define NOMINMAX
 #endif
 
+#include <WinSock2.h>
+#include <MSWSock.h>
+#include <mstcpip.h>
+#include <WS2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
+
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -47,12 +53,6 @@
 
 #include <utf8cpp/utf8.h>
 
-#include <WinSock2.h>
-#include <MSWSock.h>
-#include <mstcpip.h>
-#include <WS2tcpip.h>
-#pragma comment(lib, "Ws2_32.lib")
-
 #include "Types.h"
 #include "StringUtils.h"
 #include "CrashReporter.h"
@@ -71,3 +71,6 @@
 #include "StlTypes.h"
 #include "UniquePtrUtils.h"
 #include "SharedPtrUtils.h"
+#include "SendBufferAllocator.h"
+
+#include "NetEngineInit.h"

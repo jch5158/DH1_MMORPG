@@ -100,13 +100,7 @@ bool ClientService::Initialize(const NetServiceConfig& config)
 		return false;
 	}
 
-	const auto* pClientConfig = dynamic_cast<const ClientServiceConfig*>(&config);
-	if (pClientConfig == nullptr)
-	{
-		NET_ENGINE_LOG_FATAL("ClientService::Initialize - dynamic_cast is failed");
-		return false;
-	}
-
+	const auto* pClientConfig = static_cast<const ClientServiceConfig*>(&config);
 	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionManager>(pClientConfig->maxConnectionCount);
 	return true;
 }
@@ -170,13 +164,7 @@ bool ServerService::Initialize(const NetServiceConfig& config)
 		return false;
 	}
 
-	const auto* pServerConfig = dynamic_cast<const ServerServiceConfig*>(&config);
-	if (pServerConfig == nullptr)
-	{
-		NET_ENGINE_LOG_FATAL("ServerService::Initialize - dynamic_cast is failed");
-		return false;
-	}
-
+	const auto* pServerConfig = static_cast<const ServerServiceConfig*>(&config);
 	mpListener = cpp_net_engine::MakeShared<Listener>(pServerConfig->acceptCount);
 	mpSessionReaper = cpp_net_engine::MakeShared<SessionReaper>(pServerConfig->sessionTimeoutMs);
 	return true;
@@ -216,6 +204,7 @@ void ServerService::OnSessionConnected(const SessionRef& pSession)
 	}
 
 	pSession->Start();
+	RegisterSessionReap(pSession);
 }
 
 void ServerService::OnSessionDisconnected(const SessionRef& pSession)

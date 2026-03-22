@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Network/CppNetEngine/NetEngineWrapper.h"
+#include "Network/CppNetEngine/NetSession.h"
+
 #include "ClientNetSubsystem.generated.h"
 
 UCLASS()
@@ -49,12 +51,12 @@ public:
 
     void SetAuthData(const FString& ArgTicket, const FString& ArgAccountId);
 
+    AuthData GetAuthData() const;
+
 private:
     // 내부적으로 연결 상태를 관리할 변수
     bool bIsConnected = false;
-    NetEngineInit EnginInit;
     ClientServiceRef ServiceRef;
 
-    FString Ticket;
-    FString AccountId;
+    AuthData ClientAuthData;
 };

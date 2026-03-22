@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "LoginPacketHandler.h"
 #include "ClientSession.h"
+#include "ClientSessionManager.h"
+#include "RedisService.h"
 #include "GatewayService.h"
 
 bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
@@ -11,13 +13,13 @@ bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint1
 
 bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& packet, const PacketSessionRef& pSession)
 {
-	const RedisServiceRef pRedisService = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
+	RedisServiceRef pRedisService = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
 	if (pRedisService == nullptr)
 	{
 		return false;
 	}
 
-	pRedisService->GetStringAsync(packet.ticket(), [pSession, pRedisService, argTicket = packet.ticket(), argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
+	pRedisService->GetStringAsync("ticket:" + packet.ticket(), [pSession, pRedisService, argTicket = "ticket:" + packet.ticket(), argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
 		{
 			Protocol::S2C_LOGIN_RES retPacket;
 

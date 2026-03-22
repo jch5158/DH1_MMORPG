@@ -1,12 +1,6 @@
 ﻿#pragma once
-#include <Service.h>
-#include "ClientSessionManager.h"
-#include "RedisService.h"
 
-struct GatewayServiceConfig
-{
-	ServerServiceConfig serviceConfig;
-};
+#include "RedisService.h"
 
 class GatewayService : public ISingleton<GatewayService>
 {

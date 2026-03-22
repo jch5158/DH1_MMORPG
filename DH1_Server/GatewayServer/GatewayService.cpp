@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "GatewayService.h"
+#include "ClientSessionManager.h"
 
 bool GatewayService::Initialize(ServerServiceRef pService, RedisServiceRef pRedisService)
 {
@@ -10,6 +11,7 @@ bool GatewayService::Initialize(ServerServiceRef pService, RedisServiceRef pRedi
 
 	mpServerService = std::move(pService);
 	mpRedisService = std::move(pRedisService);
+	mpClientSessionManager = cpp_net_engine::MakeShared<ClientSessionManager>(1);
 	return true;
 }
 

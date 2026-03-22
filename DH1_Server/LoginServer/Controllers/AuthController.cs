@@ -131,7 +131,7 @@ namespace LoginServer.Controllers
             {
                 ticket,
                 accountId = account.AccountId,
-                gatewayIp = "192.168.50.3",
+                gatewayIp = "127.0.0.1",
                 gatewayPort = 9000
             });
         }

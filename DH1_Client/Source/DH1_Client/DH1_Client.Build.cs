@@ -54,7 +54,6 @@ public class DH1_Client : ModuleRules
             Path.Combine(VcpkgLibPath, "utf8_range.lib"),
             Path.Combine(VcpkgLibPath, "mimalloc.lib"),
             Path.Combine(VcpkgLibPath, "fmt.lib"),
-	        Path.Combine(VcpkgLibPath, "spdlog.lib"),
             Path.Combine(VcpkgLibPath, ProtobufLibName),
             Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/CppNetEngine/{ConfigName}/CppNetEngine.lib")),
             Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/ProtoBridge/{ConfigName}/ProtoBridge.lib"))
