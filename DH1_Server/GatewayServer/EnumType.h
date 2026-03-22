@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <Types.h>
 
 enum class eGatewayStatus : uint8 
 {

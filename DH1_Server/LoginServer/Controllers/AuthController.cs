@@ -129,7 +129,6 @@ namespace LoginServer.Controllers
 
             return Ok(new
             {
-                message = "로그인 성공!",
                 ticket,
                 accountId = account.AccountId,
                 gatewayIp = "192.168.50.3",

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "ISingleton.h"
-
 template <typename T, int32 CHUNK_SIZE = 500>
 class ObjectAllocator final : public ISingleton<ObjectAllocator<T, CHUNK_SIZE>>
 {
@@ -56,3 +54,17 @@ private:
 	TlsObjectPool<T, CHUNK_SIZE> mTlsObjectPool;
 };
 
+namespace cpp_net_engine
+{
+	template <typename T, typename... Args>
+	T* NewObject(Args&&... args)
+	{
+		return ObjectAllocator<T>::GetInstance().Alloc(std::forward<Args>(args)...);
+	}
+
+	template <typename T>
+	void DeleteObject(T* pData)
+	{
+		ObjectAllocator<T>::GetInstance().Free(pData);
+	}
+}

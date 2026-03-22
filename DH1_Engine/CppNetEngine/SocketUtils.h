@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Types.h"
 
 class SocketUtils final  // NOLINT(cppcoreguidelines-special-member-functions)
 {

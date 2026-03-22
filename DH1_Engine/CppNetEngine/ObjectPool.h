@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "NetEngineLogger.h"
 
 template <typename T>
 class ObjectPool final
@@ -56,15 +55,11 @@ public:
 		while (pNode != nullptr)
 		{
 			Node* pNextNode = pNode->mpNextNode;
-
-			mi_free(pNode);
-
+			mi_free(static_cast<void*>(pNode));
 			pNode = pNextNode;
-
 			mPoolingCount.fetch_sub(1);
 		}
 	}
-
 
 	template <typename... Args>
 	T* Alloc(Args&&... args)

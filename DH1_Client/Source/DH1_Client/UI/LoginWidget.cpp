@@ -4,6 +4,9 @@
 #include "Components/EditableTextBox.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
+
+#include "Network/Subsystem/ClientNetSubsystem.h"
+
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
@@ -113,38 +116,67 @@ void ULoginWidget::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpRespons
 		return;
 	}
 
-	FString ResServerCode = TEXT("");
-	FString ResEmail = TEXT("");
-	FString ResMessage = TEXT("서버 처리 중 오류가 발생했습니다.");
-
-	const FString JsonString = Response->GetContentAsString();
-	TSharedPtr<FJsonObject> JsonObject;
-	const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
-	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
-	{
-		JsonObject->TryGetStringField(TEXT("code"), ResServerCode);
-		JsonObject->TryGetStringField(TEXT("email"), ResEmail);
-		JsonObject->TryGetStringField(TEXT("message"), ResMessage);
-	}
-
+	FString Message = TEXT("서버 처리 중 오류가 발생했습니다.");
 	const int32 ResponseCode = Response->GetResponseCode();
 	if (ResponseCode == 200)
 	{
-		SetStatusTextMessage(ResMessage);
+		FString Ticket = TEXT("");
+		FString AccountId = TEXT("");
+		FString GatewayIp = TEXT("");
+		FString Port = TEXT("");
+
+		const FString JsonString = Response->GetContentAsString();
+		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+		TSharedPtr<FJsonObject> JsonObject;
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			JsonObject->TryGetStringField(TEXT("ticket"), Ticket);
+			JsonObject->TryGetStringField(TEXT("accountId"), AccountId);
+			JsonObject->TryGetStringField(TEXT("gatewayIp"), GatewayIp);
+			JsonObject->TryGetStringField(TEXT("gatewayPort"), Port);
+		}
+
+		if (const UGameInstance* GameInstance = GetGameInstance())
+		{
+			if (UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>())
+			{
+				NetSubsystem->SetAuthData(Ticket, AccountId);
+
+				const int32 ResPort = FCString::Atoi(*Port);
+				NetSubsystem->ConnectToServer(GatewayIp, ResPort);
+			}
+		}
+
 		if (OnLoginSuccess.IsBound())
 		{
 			OnLoginSuccess.Broadcast();
 		}
 	}
-	else if (ResponseCode == 403 && ResServerCode == TEXT("EMAIL_UNVERIFIED"))
-	{
-		if (OnGoToEmailVerification.IsBound())
-		{
-			OnGoToEmailVerification.Broadcast(ResMessage, ResEmail);
-		}
-	}
 	else
 	{
-		SetStatusTextMessage(ResMessage);
+		FString Code = TEXT("");
+		FString Email = TEXT("");
+
+		const FString JsonString = Response->GetContentAsString();
+		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+		TSharedPtr<FJsonObject> JsonObject;
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			JsonObject->TryGetStringField(TEXT("message"), Message);
+			JsonObject->TryGetStringField(TEXT("code"), Code);
+			JsonObject->TryGetStringField(TEXT("email"), Email);
+		}
+
+		if (ResponseCode == 403 && Code == TEXT("EMAIL_UNVERIFIED"))
+		{
+			if (OnGoToEmailVerification.IsBound())
+			{
+				OnGoToEmailVerification.Broadcast(Message, Email);
+			}
+		}
+		else
+		{
+			SetStatusTextMessage(Message);
+		}
 	}
 }

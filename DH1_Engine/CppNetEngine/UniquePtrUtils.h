@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "MemoryAllocator.h"
-
 template <typename T>
 class UniquePtrUtils final  // NOLINT(cppcoreguidelines-special-member-functions)
 {
@@ -106,3 +104,19 @@ using UniquePtr = GetUniquePtrType<T>::Type;
 
 template <typename T>
 using UniqueContPtr = GetUniquePtrType<const T>::Type;
+
+
+namespace cpp_net_engine
+{
+	template <typename T, typename... Args>
+	UniquePtr<T> MakeUnique(Args&&... args)
+	{
+		return UniquePtrUtils<T>::Alloc(std::forward<Args>(args)...);
+	}
+
+	template <typename T>
+	UniquePtr<T[]> MakeUniqueArray(const int32 count)
+	{
+		return UniquePtrUtils<T[]>::Alloc(count);
+	}
+}

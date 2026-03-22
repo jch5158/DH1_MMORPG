@@ -1,20 +1,25 @@
 ﻿#pragma once
 
-#include <spdlog/spdlog.h>
-#include <spdlog/logger.h>
+enum class eNetLogLevel { Trace, Debug, Info, Warn, Error, Fatal };
 
 class NetEngineLogger
 {
 public:
+	template<typename Mutex> 
+	friend class UnrealCallbackSink;
+
+	using LogCallback = std::function<void(eNetLogLevel, const char*)>;
+
 	NetEngineLogger() = delete;
 	~NetEngineLogger() = delete;
 
-	static void Init();
-	static std::shared_ptr<spdlog::logger> GetLogger() { return mpLogger; }
+	static void SetLogCallback(LogCallback callback);
+	static void Init(const bool bIsUnrealClient = false);
+	static std::shared_ptr<spdlog::logger> GetLogger();
 
 private:
-
-	static std::shared_ptr<spdlog::logger> mpLogger;
+	inline static std::shared_ptr<spdlog::logger> spLogger = nullptr;
+	inline static LogCallback spLogCallback = nullptr;
 };
 
 #define NET_ENGINE_LOG_TRACE(...) SPDLOG_LOGGER_TRACE(NetEngineLogger::GetLogger(), __VA_ARGS__)

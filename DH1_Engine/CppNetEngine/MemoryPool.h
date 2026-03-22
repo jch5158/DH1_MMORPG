@@ -1,9 +1,6 @@
 ﻿// ReSharper disable CppClangTidyClangDiagnosticPadded
 #pragma once
 
-#include "Types.h"
-#include "ObjectPool.h"
-
 template <uint32 ALLOC_SIZE, uint32 ALIGN_SIZE = 16, int32 CHUNK_SIZE = 500>
 class MemoryPool final
 {

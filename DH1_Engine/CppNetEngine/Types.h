@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-#include <mutex>
-#include <shared_mutex>
-#include <condition_variable>
-
 using byte = unsigned char;
 
 #ifndef _UNREAL_

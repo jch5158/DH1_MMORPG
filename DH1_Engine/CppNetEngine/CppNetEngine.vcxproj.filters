@@ -189,9 +189,6 @@
     <ClInclude Include="UniquePtrUtils.h">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="AllocatorUtils.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="SharedPtrUtils.h">
       <Filter>Memory</Filter>
     </ClInclude>
@@ -223,9 +220,6 @@
     </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
       <Filter>Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryAllocator.cpp">
-      <Filter>Memory</Filter>
     </ClCompile>
     <ClCompile Include="NetEngineLogger.cpp">
       <Filter>Core</Filter>

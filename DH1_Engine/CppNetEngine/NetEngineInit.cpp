@@ -1,12 +1,10 @@
 ﻿#include "pch.h"
 #include "NetEngineInit.h"
-#include "NetEngineLogger.h"
-#include "SocketUtils.h"
 
-NetEngineInit::NetEngineInit()
+NetEngineInit::NetEngineInit(const bool isUnrealClient)
 {
 	SocketUtils::Init();
-	NetEngineLogger::Init();
+	NetEngineLogger::Init(isUnrealClient);
 }
 
 NetEngineInit::~NetEngineInit()

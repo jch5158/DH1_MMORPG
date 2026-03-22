@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "RedisActor.h"
 #include "RedisService.h"
+#include <CrashReporter.h>
 #include "nlohmann/json.hpp"
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisGatewayInfo, gatewayId, ip, port, status, currentSessionCount)

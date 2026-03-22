@@ -2,7 +2,6 @@
 #include "SharedPtrUtils.h"
 #include "Types.h"
 
-
 class SendBufferAllocator
 {
 private:
@@ -30,3 +29,10 @@ private:
 	[[nodiscard]] static int32 getAllocSize (const int32 size);
 };
 
+namespace cpp_net_engine
+{
+	inline NetSendBufferRef MakeSendBuffer(const int32 size)
+	{
+		return SendBufferAllocator::Alloc(size);
+	}
+}

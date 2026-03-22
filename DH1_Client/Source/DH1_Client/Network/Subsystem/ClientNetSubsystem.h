@@ -47,9 +47,14 @@ public:
     // 패킷 전송 (직렬화된 바이트 배열을 엔진 계층으로 전달)
     void SendPacket(const uint8* PacketData, int32 Size);
 
+    void SetAuthData(const FString& ArgTicket, const FString& ArgAccountId);
+
 private:
     // 내부적으로 연결 상태를 관리할 변수
     bool bIsConnected = false;
     NetEngineInit EnginInit;
     ClientServiceRef ServiceRef;
+
+    FString Ticket;
+    FString AccountId;
 };

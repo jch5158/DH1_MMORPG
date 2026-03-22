@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <Service.h>
 #include "ClientSessionManager.h"
 #include "RedisService.h"
 

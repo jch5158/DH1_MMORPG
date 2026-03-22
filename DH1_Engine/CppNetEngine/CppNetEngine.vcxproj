@@ -222,7 +222,6 @@
     <ClInclude Include="ActorEventEnum.h" />
     <ClInclude Include="ActorMailbox.h" />
     <ClInclude Include="ActorManager.h" />
-    <ClInclude Include="AllocatorUtils.h" />
     <ClInclude Include="ConnectionManager.h" />
     <ClInclude Include="Connector.h" />
     <ClInclude Include="CrashReporter.h" />
@@ -288,7 +287,6 @@
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="TimingWheel.cpp" />
     <ClCompile Include="Listener.cpp" />
-    <ClCompile Include="MemoryAllocator.cpp" />
     <ClCompile Include="NetAddress.cpp" />
     <ClCompile Include="NetEngineInit.cpp" />
     <ClCompile Include="NetEngineLogger.cpp" />

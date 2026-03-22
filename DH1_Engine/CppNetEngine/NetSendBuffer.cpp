@@ -1,8 +1,6 @@
 ﻿#include "pch.h"
 #include "NetSendBuffer.h"
 
-#include "AllocatorUtils.h"
-
 NetSendBuffer::NetSendBuffer(const int32 maxSize)
 	: mMaxBufferSize(maxSize)
 	, mReadPos(0)

@@ -8,6 +8,6 @@ public:
 	NetEngineInit(NetEngineInit&&) = delete;
 	NetEngineInit& operator=(NetEngineInit&&) = delete;
 
-	NetEngineInit();
+	explicit NetEngineInit(const bool isUnrealClient = false);
 	~NetEngineInit();
 };

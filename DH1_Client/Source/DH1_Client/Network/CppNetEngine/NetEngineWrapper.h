@@ -20,6 +20,7 @@ THIRD_PARTY_INCLUDES_START
 #include "Types.h"
 #include "NetEngineMacro.h"
 #include "NetAddress.h"
+#include "NetEngineLogger.h"
 
 #include "AllocatorUtils.h"
 #include "CrashReporter.h"

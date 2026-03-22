@@ -8,6 +8,8 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
 	PacketServiceTypeHandler::Init();
+	
+	NetEngineLogger::Init(true);
 
 	ServiceRef = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
 }
@@ -94,4 +96,10 @@ void UClientNetSubsystem::SendPacket(const uint8* PacketData, int32 Size)
 		pSendBuffer->Commit(Size);
 		pSession->Send(pSendBuffer);
 	}
+}
+
+void UClientNetSubsystem::SetAuthData(const FString& ArgTicket, const FString& ArgAccountId)
+{
+	Ticket = ArgTicket;
+	AccountId = ArgAccountId;
 }

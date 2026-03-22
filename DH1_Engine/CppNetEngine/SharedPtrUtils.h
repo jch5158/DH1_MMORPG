@@ -1,7 +1,5 @@
 ﻿// ReSharper disable CppInconsistentNaming
 #pragma once
-#include "Types.h"
-#include "MemoryAllocator.h"
 
 template <typename T>
 class SharedPtrAllocator final
@@ -67,6 +65,15 @@ using WeakPtr = std::weak_ptr<T>;
 
 template <typename T>
 using SharedPtr = std::shared_ptr<T>;
+
+namespace cpp_net_engine
+{
+	template <typename T, typename... Args>
+	SharedPtr<T> MakeShared(Args&&... args)
+	{
+		return SharedPtrUtils::Alloc<T>(std::forward<Args>(args)...);
+	}
+}
 
 #define DECLARE_SHARED_PTR(TypeName) \
 	class TypeName; /*NOLINT(bugprone-macro-parentheses)*/ \

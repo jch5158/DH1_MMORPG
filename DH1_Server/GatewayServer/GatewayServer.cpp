@@ -1,8 +1,10 @@
 ﻿#include "pch.h"
 #include "EnginePch.h"
 #include "NetAddress.h"
+#include "NetEngineInit.h"
 #include "ThreadManager.h"
-#include "Service.h"
+#include "NetworkScheduler.h"
+#include "NetService.h"
 #include "ClientSession.h"
 #include "PacketServiceTypeHandler.h"
 #include "RedisActor.h"
@@ -12,6 +14,8 @@ int main()
 	CrashReporter::Initialize("GatewayServer", "1.0.0", "");
 
 	NetEngineInit netEngineInit;
+
+	NetEngineLogger::Init();
 
 	PacketServiceTypeHandler::Init();
 
@@ -32,7 +36,9 @@ int main()
 			return cpp_net_engine::MakeShared<ClientSession>(8192, 4096);
 		};
 
-	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
+	ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
+
+	pService->Initialize(serviceConfig);
 
 	if (pService->Start() == false)
 	{
