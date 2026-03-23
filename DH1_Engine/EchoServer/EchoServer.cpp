@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "GameSession.h"
 #include "NetEngineInit.h"
@@ -41,7 +41,8 @@ int main()
 			return cpp_net_engine::MakeShared<GameSession>(receiveBufferSize, sendBufferSize);
 		};
 
-	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
+	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
+	pService->Initialize(serviceConfig);
 
 	if (pService->Start() == false)
 	{

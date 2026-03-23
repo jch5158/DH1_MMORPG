@@ -4,6 +4,7 @@
 
 #include "EnginePch.h"
 #include "EngineNetwork.h"
+#include "EngineActor.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "CppNetEngine")
