@@ -171,6 +171,9 @@
     <ClInclude Include="ActorScheduler.h">
       <Filter>Actor\System</Filter>
     </ClInclude>
+    <ClInclude Include="ActorService.h">
+      <Filter>Actor\System</Filter>
+    </ClInclude>
     <ClInclude Include="SocketUtils.h">
       <Filter>Network\Core</Filter>
     </ClInclude>
@@ -306,6 +309,9 @@
       <Filter>Actor\System</Filter>
     </ClCompile>
     <ClCompile Include="ActorScheduler.cpp">
+      <Filter>Actor\System</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorService.cpp">
       <Filter>Actor\System</Filter>
     </ClCompile>
     <ClCompile Include="NetAddress.cpp">
