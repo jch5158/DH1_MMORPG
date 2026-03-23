@@ -98,6 +98,7 @@ namespace PacketGenerator
                     continue;
                 }
 
+                uint autoPacketId = 0;
                 foreach (var message in protoFile.MessageType)
                 {
                     if (message.Options == null)
@@ -119,7 +120,8 @@ namespace PacketGenerator
                         switch (fieldNum)
                         {
                             case 50003:
-                                packetInfo.PacketId = inputStream.ReadUInt32();
+                                // packet_id is now auto-assigned, skip if present for backward compatibility
+                                inputStream.ReadUInt32();
                                 break;
                             case 50004:
                                 var senderValue = inputStream.ReadInt32();
@@ -153,8 +155,10 @@ namespace PacketGenerator
                         }
                     }
 
-                    if (packetInfo.PacketId > 0 && !string.IsNullOrEmpty(packetInfo.Sender) && packetInfo.Receivers.Count > 0)
+                    if (!string.IsNullOrEmpty(packetInfo.Sender) && packetInfo.Receivers.Count > 0)
                     {
+                        // Auto-assign packet ID based on message order (1-based)
+                        packetInfo.PacketId = ++autoPacketId;
                         handlerInfo.Packets.Add(packetInfo);
                     }
                 }

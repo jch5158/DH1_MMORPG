@@ -1,4 +1,4 @@
-﻿{
+{
   "projects": [
     {
       "name": "DH1_Engine\\EchoClient",
@@ -6,15 +6,15 @@
     },
     {
       "name": "DH1_Engine\\EchoServer",
-      "role": "Echo_Server"
+      "role": "ECHO_SERVER"
     },
-        {
+    {
       "name": "DH1_Client\\Source\\DH1_Client\\Network",
-      "role": "Client"
+      "role": "CLIENT"
     },
-        {
+    {
       "name": "DH1_Server\\GatewayServer",
-      "role": "Gateway_Server"
+      "role": "GATEWAY_SERVER"
     }
   ]
 }
