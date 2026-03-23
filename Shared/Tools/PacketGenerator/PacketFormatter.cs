@@ -159,13 +159,15 @@ private:
 	static NetSendBufferRef MakeSendBuffer(const T& packet, const uint16 packetId)
 	{{
 		const uint16 dataSize = static_cast<uint16>(packet.ByteSizeLong());
-		const uint16 packetSize = dataSize + sizeof(PacketHeader);
+		const uint32 rawPacketSize = static_cast<uint32>(dataSize) + sizeof(PacketHeader);
 
-	    if (packetSize > std::numeric_limits<uint16>::max())
+	    if (rawPacketSize > std::numeric_limits<uint16>::max())
 	    {{
-		    NET_ENGINE_LOG_FATAL(""MakeSendBuffer Size Overflow, packetId : {{}}, packetSize : {{}}"", packetId, packetSize);
+		    NET_ENGINE_LOG_FATAL(""MakeSendBuffer Size Overflow, packetId : {{}}, packetSize : {{}}"", packetId, rawPacketSize);
 		    CrashReporter::Crash();
 	    }}
+
+		const uint16 packetSize = static_cast<uint16>(rawPacketSize);
 
 		auto sendBuffer = cpp_net_engine::MakeSendBuffer(packetSize);
 
