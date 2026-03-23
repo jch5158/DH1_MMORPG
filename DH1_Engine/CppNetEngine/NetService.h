@@ -103,11 +103,12 @@ public:
 	virtual void OnSessionConnected(const SessionRef& pSession) override;
 	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
 
-	void RegisterSessionReap(const SessionRef& pSession);
-	void RegisterAbortSession(const SessionRef& pSession);
+	[[nodiscard]] Vector<SessionRef> GetActiveSessions();
 
 private:
-		
+
+	void registerReaperSweep();
+
 	ListenerRef mpListener;
 	SessionReaperRef mpSessionReaper;
 };

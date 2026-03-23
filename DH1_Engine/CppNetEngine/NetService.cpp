@@ -188,6 +188,8 @@ bool ServerService::Start()
 		return false;
 	}
 
+	registerReaperSweep();
+
 	return true;
 }
 
@@ -204,7 +206,6 @@ void ServerService::OnSessionConnected(const SessionRef& pSession)
 	}
 
 	pSession->Start();
-	RegisterSessionReap(pSession);
 }
 
 void ServerService::OnSessionDisconnected(const SessionRef& pSession)
@@ -214,22 +215,25 @@ void ServerService::OnSessionDisconnected(const SessionRef& pSession)
 	mSessionManager.RemoveSession(pSession);
 }
 
-void ServerService::RegisterSessionReap(const SessionRef& pSession)
+Vector<SessionRef> ServerService::GetActiveSessions()
 {
-	SessionWeak pSessionWeak = pSession;
-	ServerServiceWeak pServerServiceWeak = std::static_pointer_cast<ServerService>(shared_from_this());
-	mpNetworkScheduler->RegisterDelay([pSessionReaper = mpSessionReaper, pSessionWeak, pServerServiceWeak]()->void
-		{
-			pSessionReaper->ReapSession(pServerServiceWeak, pSessionWeak);
-		}, mpSessionReaper->GetTimeoutMs());
+	return mSessionManager.GetActiveSessions();
 }
 
-void ServerService::RegisterAbortSession(const SessionRef& pSession)
+void ServerService::registerReaperSweep()
 {
-	SessionWeak pSessionWeak = pSession;
-	ServerServiceWeak pServerServiceWeak = std::static_pointer_cast<ServerService>(shared_from_this());
-	mpNetworkScheduler->RegisterDelay([pSessionWeak]()->void
+	ServerServiceWeak pWeak = std::static_pointer_cast<ServerService>(shared_from_this());
+	mpNetworkScheduler->RegisterDelay([pWeak]()->void
 		{
-			SessionReaper::AbortSession(pSessionWeak);
-		}, SessionReaper::GetAbortTimeoutMs());
+			const ServerServiceRef pService = pWeak.lock();
+			if (pService == nullptr)
+			{
+				return;
+			}
+
+			pService->mpSessionReaper->Sweep(pWeak);
+			pService->mpSessionReaper->SweepAbort();
+
+			pService->registerReaperSweep();
+		}, SessionReaper::GetSweepIntervalMs());
 }
