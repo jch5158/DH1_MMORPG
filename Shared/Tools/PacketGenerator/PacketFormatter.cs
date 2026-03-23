@@ -2,6 +2,11 @@
 {
     internal static class PacketFormatter
     {
+        public static string NormalizeToCRLF(string content)
+        {
+            return content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
+        }
+
         public static readonly string AUTO_GENERATED_WARNING =
             @"// =============================================================================
 // AUTO-GENERATED FILE - DO NOT EDIT
