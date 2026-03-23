@@ -6,7 +6,14 @@
         "maxSessionCount": 5000,
         "sessionTimeoutMs": 20000
     },
-    "network": {
+    "session": {
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 4096
+    },
+    "networkScheduler": {
+        "runningThreadCount": 0,
+        "waitTimeoutMs": 16,
+        "tickIntervalMs": 16,
         "dispatchThreadCount": 5
     }
 }

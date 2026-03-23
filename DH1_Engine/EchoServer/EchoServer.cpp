@@ -17,24 +17,28 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("config.json");
+	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/EchoServerConfig.json");
 	const JsonConfig serverConfig = config.GetSection("server");
-	const JsonConfig networkConfig = config.GetSection("network");
+	const JsonConfig sessionConfig = config.GetSection("session");
+	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");
 
-	NetworkSchedulerConfig netSchedulerConfig;
-	netSchedulerConfig.runningThreadCount = 0;
-	netSchedulerConfig.tickIntervalMs = 16;
-	netSchedulerConfig.waitTimeoutMs = 16;
+	NetworkSchedulerConfig netConfig;
+	netConfig.runningThreadCount = networkSchedulerConfig.GetUInt32("runningThreadCount");
+	netConfig.waitTimeoutMs = networkSchedulerConfig.GetUInt32("waitTimeoutMs");
+	netConfig.tickIntervalMs = networkSchedulerConfig.GetUInt32("tickIntervalMs");
+
+	const int32 receiveBufferSize = sessionConfig.GetInt32("receiveBufferSize");
+	const int32 sendBufferSize = sessionConfig.GetInt32("sendBufferSize");
 
 	ServerServiceConfig serviceConfig{};
 	serviceConfig.netAddress = NetAddress(serverConfig.GetString("ip"), serverConfig.GetUInt16("port"));
 	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
 	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
 	serviceConfig.sessionTimeoutMs = serverConfig.GetInt64("sessionTimeoutMs");
-	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netSchedulerConfig);
-	serviceConfig.sessionFactory = []()->GameSessionRef
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
+	serviceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]()->GameSessionRef
 		{
-			return cpp_net_engine::MakeShared<GameSession>(8192, 4096);
+			return cpp_net_engine::MakeShared<GameSession>(receiveBufferSize, sendBufferSize);
 		};
 
 	const ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
@@ -45,7 +49,7 @@ int main()
 		CrashReporter::Crash();
 	}
 
-	const int32 networkThreadCount = networkConfig.GetInt32("dispatchThreadCount");
+	const int32 networkThreadCount = networkSchedulerConfig.GetInt32("dispatchThreadCount");
 	for (int32 i = 0; i < networkThreadCount; ++i)
 	{
 		ThreadManager::GetInstance().Launch("NetWorkerThread", [pService]()->void
