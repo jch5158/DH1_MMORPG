@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ConnectionPool.h"
 
 ConnectionPool::ConnectionPool(const int32 maxConnectionCount)
@@ -8,11 +8,11 @@ ConnectionPool::ConnectionPool(const int32 maxConnectionCount)
 	, mConnectors()
 {
 	mConnectors.reserve(maxConnectionCount);
-	for (int32 iter = 0; iter < maxConnectionCount; ++iter)
+	for (int32 i = 0; i < maxConnectionCount; ++i)
 	{
-		ConnectorRef pConnector = cpp_net_engine::MakeShared<Connector>(iter);
+		ConnectorRef pConnector = cpp_net_engine::MakeShared<Connector>(i);
 		mConnectors.emplace_back(pConnector);
-		(void)mFreeIndexStack.TryPush(iter);
+		(void)mFreeIndexStack.TryPush(i);
 	}
 }
 

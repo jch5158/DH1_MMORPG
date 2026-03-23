@@ -1,6 +1,8 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "EchoClientService.h"
 #include "JsonConfig.h"
+#include "NetEngineInit.h"
+
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
 int32 main()
