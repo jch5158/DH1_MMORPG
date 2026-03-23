@@ -18,7 +18,7 @@ int32 main()
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/EchoClientConfig.json");
+	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/Client/EchoClientConfig.json");
 	const JsonConfig clientConfig = config.GetSection("client");
 	const JsonConfig sessionConfig = config.GetSection("session");
 	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");

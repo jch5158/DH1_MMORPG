@@ -20,7 +20,7 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/GatewayServerConfig.json");
+	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/Server/GatewayServerConfig.json");
 	const JsonConfig serverConfig = config.GetSection("server");
 	const JsonConfig sessionConfig = config.GetSection("session");
 	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");

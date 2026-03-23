@@ -17,7 +17,7 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/EchoServerConfig.json");
+	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/Server/EchoServerConfig.json");
 	const JsonConfig serverConfig = config.GetSection("server");
 	const JsonConfig sessionConfig = config.GetSection("session");
 	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");
