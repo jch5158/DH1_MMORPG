@@ -33,8 +33,12 @@ public:
 
 private:
 
+	static constexpr int32 ACCEPT_ADDRESS_LENGTH = sizeof(SOCKADDR_IN) + 16;
+	static constexpr int32 ACCEPT_BUFFER_SIZE = ACCEPT_ADDRESS_LENGTH * 2;
+
 	IocpAcceptEvent mAcceptEvent;
-	SessionRef mpSession; 
+	SessionRef mpSession;
 	ServerServiceRef mpServerService;
+	byte mAcceptAddressBuffer[ACCEPT_BUFFER_SIZE];
 };
 

@@ -1,9 +1,5 @@
 ﻿#include "pch.h"
 #include "Connector.h"
-#include "NetService.h"
-#include "Session.h"
-#include "SocketUtils.h"
-#include "ConnectionPool.h"
 
 IocpConnectEvent::IocpConnectEvent(const int32 connectorIndex)
 	:IocpEvent(eIocpEventType::Connect)

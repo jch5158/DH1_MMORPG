@@ -36,7 +36,7 @@ void NetworkScheduler::Dispatch()
 		}
 	}
 
-	mTimingWheel.Tick();
+	//mTimingWheel.Tick();
 }
 
 bool NetworkScheduler::Register(const IocpObjectRef& pIocpObject)

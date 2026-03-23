@@ -106,7 +106,7 @@ public:
 			}
 
 			expected.mCount = mHead.mCount;
-			std::atomic_thread_fence(std::memory_order_acquire);
+			std::atomic_thread_fence(std::memory_order_seq_cst);
 			expected.mpNode = mHead.mpNode;
 			if (expected.mpNode == nullptr)
 			{
@@ -167,7 +167,7 @@ private:
 		Node16 desired;
 
 		expected.mCount = mTail.mCount;
-		std::atomic_thread_fence(std::memory_order_acquire);
+		std::atomic_thread_fence(std::memory_order_seq_cst);
 		expected.mpNode = mTail.mpNode;
 
 		desired.mCount = expected.mCount + 1;

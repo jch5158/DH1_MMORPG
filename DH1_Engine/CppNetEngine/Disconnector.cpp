@@ -1,8 +1,5 @@
 ﻿#include "pch.h"
 #include "Disconnector.h"
-#include "NetService.h"
-#include "Session.h"
-#include "SocketUtils.h"
 
 IocpDisconnectEvent::IocpDisconnectEvent()
 	:IocpEvent(eIocpEventType::Disconnect)

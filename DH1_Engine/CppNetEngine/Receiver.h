@@ -23,7 +23,6 @@ public:
 	~Receiver() = default;
 
 	[[nodiscard]] bool Initialize(const SessionRef& pOwner);
-	[[nodiscard]] byte* GetWritePtr() const;
 	void Process(const uint32 numOfBytes);
 	void Register();
 	

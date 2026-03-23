@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
 #include "Sender.h"
-#include "Session.h"
-#include "SocketUtils.h"
 
 IocpSendEvent::IocpSendEvent()
 	:IocpEvent(eIocpEventType::Send)

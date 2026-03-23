@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
 #include "Receiver.h"
-#include "Session.h"
-#include "SocketUtils.h"
 
 IocpReceiveEvent::IocpReceiveEvent()
 	:IocpEvent(eIocpEventType::Receive)
@@ -24,11 +22,6 @@ bool Receiver::Initialize(const SessionRef& pOwner)
 	mReceiveEvent.SetOwner(pOwner);
 
 	return true;
-}
-
-byte* Receiver::GetWritePtr() const
-{
-	return mNetReceiveBuffer.GetWritePtr();
 }
 
 void Receiver::Process(const uint32 numOfBytes)

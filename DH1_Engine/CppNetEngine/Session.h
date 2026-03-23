@@ -59,7 +59,6 @@ public:
 
 	[[nodiscard]] NetServiceRef GetService() const;
 	[[nodiscard]] NetAddress& GetAddress();
-	[[nodiscard]] byte* GetReceiveBufferPtr() const;
 	[[nodiscard]] SessionRef GetSessionRef();
 	
 	[[nodiscard]] bool IsInGame() const;

@@ -61,10 +61,6 @@ NetAddress& Session::GetAddress()
 	return mNetAddress;
 }
 
-byte* Session::GetReceiveBufferPtr() const
-{
-	return mReceiver.GetWritePtr();
-}
 
 SessionRef Session::GetSessionRef()
 {

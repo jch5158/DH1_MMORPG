@@ -1,12 +1,6 @@
 ﻿#include "pch.h"
 #include "Acceptor.h"
 
-#include "Listener.h"
-#include "NetEngineMacro.h"
-#include "NetService.h"
-#include "Session.h"
-#include "SocketUtils.h"
-
 IocpAcceptEvent::IocpAcceptEvent(const int32 acceptorIndex)
 	: IocpEvent(eIocpEventType::Accept)
 	, mAcceptorIndex(acceptorIndex)
@@ -22,6 +16,7 @@ Acceptor::Acceptor(const int32 acceptorIndex)
 	: mAcceptEvent(acceptorIndex)
 	, mpSession()
 	, mpServerService()
+	, mAcceptAddressBuffer{}
 {
 }
 
@@ -58,7 +53,7 @@ void Acceptor::Register()
 	}
 
 	mAcceptEvent.ClearOverlapped();
-	if (false == SocketUtils::AcceptEx(pOwner->GetSocket(), mpSession->GetSocket(), mpSession->GetReceiveBufferPtr(), &mAcceptEvent))
+	if (false == SocketUtils::AcceptEx(pOwner->GetSocket(), mpSession->GetSocket(), mAcceptAddressBuffer, &mAcceptEvent))
 	{
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
