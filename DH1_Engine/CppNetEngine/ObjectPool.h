@@ -83,7 +83,7 @@ public:
 		do
 		{
 			expected.mCount = mTopNode16.mCount;
-			std::atomic_thread_fence(std::memory_order_seq_cst);
+			std::atomic_thread_fence(std::memory_order_acquire);
 			expected.mpNode = mTopNode16.mpNode;
 			
 			desired.mCount = expected.mCount + 1;
@@ -158,7 +158,7 @@ private:
 };
 
 
-template <typename T, int32 CHUNK_SIZE = 500>
+template <typename T, int32 CHUNK_SIZE = 128>
 class TlsObjectPool final
 {
 private:
@@ -318,6 +318,13 @@ public:
 	{
 		if (spTlsChunk != nullptr)
 		{
+#ifdef _DEBUG
+			const int32 unreleased = spTlsChunk->mAllocCount - spTlsChunk->mFreeCount.load();
+			if (unreleased > 0)
+			{
+				NET_ENGINE_LOG_WARN("TlsObjectPool::AllFree - {} unreleased objects in current chunk.", unreleased);
+			}
+#endif
 			spTlsChunk->ChunkReset();
 			mObjectPool.Free(spTlsChunk);
 			spTlsChunk = nullptr;

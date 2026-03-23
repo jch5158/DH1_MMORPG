@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-template <typename T, int32 CHUNK_SIZE = 500>
+template <typename T, int32 CHUNK_SIZE = 128>
 class ObjectAllocator final : public ISingleton<ObjectAllocator<T, CHUNK_SIZE>>
 {
 public:

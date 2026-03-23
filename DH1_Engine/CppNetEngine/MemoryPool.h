@@ -1,7 +1,7 @@
 ﻿// ReSharper disable CppClangTidyClangDiagnosticPadded
 #pragma once
 
-template <uint32 ALLOC_SIZE, uint32 ALIGN_SIZE = 16, int32 CHUNK_SIZE = 500>
+template <uint32 ALLOC_SIZE, uint32 ALIGN_SIZE = 16, int32 CHUNK_SIZE = (ALLOC_SIZE <= 1024 ? 128 : (ALLOC_SIZE <= 8192 ? 64 : 32))>
 class MemoryPool final
 {
 private:
@@ -158,6 +158,13 @@ public:
 	{
 		if (spTlsChunk != nullptr)
 		{
+#ifdef _DEBUG
+			const int32 unreleased = spTlsChunk->mAllocCount - spTlsChunk->mFreeCount.load();
+			if (unreleased > 0)
+			{
+				NET_ENGINE_LOG_WARN("MemoryPool::AllFree - {} unreleased blocks in current chunk.", unreleased);
+			}
+#endif
 			spTlsChunk->ChunkReset();
 			mObjectPool.Free(spTlsChunk);
 			spTlsChunk = nullptr;
