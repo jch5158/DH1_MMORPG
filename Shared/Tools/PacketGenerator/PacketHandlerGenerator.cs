@@ -224,7 +224,7 @@ namespace PacketGenerator
             }
 
             var fileContent = string.Format(PacketFormatter.ENUM_PACKET_ID_FORMAT, enumsBuilder.ToString());
-            var normalizedContent = fileContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
+            var normalizedContent = PacketFormatter.NormalizeToCRLF(fileContent);
 
             var directoryPath = Path.GetDirectoryName(outputDirPath);
             if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
@@ -288,7 +288,7 @@ namespace PacketGenerator
                     makeSendBufferBuilder.ToString(),
                     handler.ServiceTypeName); // {4}
 
-                var normalizedHandlerContent = handlerContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
+                var normalizedHandlerContent = PacketFormatter.NormalizeToCRLF(handlerContent);
                 var handlerFilePath = Path.Combine(outputDirPath, $"{handler.HandlerName}.h");
                 File.WriteAllText(handlerFilePath, normalizedHandlerContent, new UTF8Encoding(true));
 
@@ -309,7 +309,7 @@ namespace PacketGenerator
                 serviceInitBuilder.ToString(),
                 serviceHandleInitBuilder.ToString());
 
-            var normalizedDispatcherContent = dispatcherContent.Replace("\r\n", "\n").Replace("\n", "\r\n");
+            var normalizedDispatcherContent = PacketFormatter.NormalizeToCRLF(dispatcherContent);
             var dispatcherFilePath = Path.Combine(outputDirPath, "PacketServiceTypeHandler.h");
             File.WriteAllText(dispatcherFilePath, normalizedDispatcherContent, new UTF8Encoding(true));
         }
