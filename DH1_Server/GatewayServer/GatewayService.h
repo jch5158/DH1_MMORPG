@@ -1,6 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "RedisService.h"
+
+class JsonConfig;
 
 class GatewayService : public ISingleton<GatewayService>
 {
@@ -16,21 +18,33 @@ public:
 
 	~GatewayService() = default;
 
-	[[nodiscard]] bool Initialize(ServerServiceRef pService, RedisServiceRef pRedisService);
+	[[nodiscard]] bool Initialize(const JsonConfig& config);
+	[[nodiscard]] bool Start();
+	void Run();
+	void Stop();
 
+	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
+	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 	[[nodiscard]] ClientSessionManagerRef GetClientSessionManagerRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 
 private:
 
 	GatewayService()
-		:mpClientSessionManager()
-		, mpServerService()
+		: mpServerService()
+		, mpActorService()
 		, mpRedisService()
+		, mpClientSessionManager()
+		, mbRunning(false)
 	{}
 
-	ClientSessionManagerRef mpClientSessionManager;
 	ServerServiceRef mpServerService;
+	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
-};
+	ClientSessionManagerRef mpClientSessionManager;
 
+	int32 mNetworkDispatchThreadCount = 0;
+	int32 mActorDispatchThreadCount = 0;
+
+	std::atomic<bool> mbRunning;
+};
