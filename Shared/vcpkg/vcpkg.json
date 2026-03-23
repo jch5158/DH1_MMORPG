@@ -8,5 +8,11 @@
     "protobuf",
     "utfcpp",
     "redis-plus-plus"
+  ],
+  "overrides": [
+    {
+      "name": "protobuf",
+      "version": "3.21.12"
+    }
   ]
 }
