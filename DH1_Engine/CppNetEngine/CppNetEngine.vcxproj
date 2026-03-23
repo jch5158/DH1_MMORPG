@@ -226,6 +226,7 @@
     <ClInclude Include="Connector.h" />
     <ClInclude Include="CrashReporter.h" />
     <ClInclude Include="Disconnector.h" />
+    <ClInclude Include="EngineActor.h" />
     <ClInclude Include="EngineNetwork.h" />
     <ClInclude Include="EnginePch.h" />
     <ClInclude Include="IocpCore.h" />

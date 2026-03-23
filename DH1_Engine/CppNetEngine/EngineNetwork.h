@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #ifndef ENGINE_PCH
-#error "B.h must be included after A.h! Please include 'A.h' first."
+#error "EngineNetwork.h must be included after EnginePch.h! Please include 'EnginePch.h' first."
 #endif
 
 #include "NetAddress.h"

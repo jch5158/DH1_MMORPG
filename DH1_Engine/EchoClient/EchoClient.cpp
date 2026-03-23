@@ -1,13 +1,7 @@
 ﻿#include "pch.h"
-
-#include "CrashReporter.h"
-#include "GameSession.h"
 #include "NetEngineInit.h"
-#include "NetworkScheduler.h"
-#include "NetService.h"
-#include "ThreadManager.h"
-
 #include "PacketHandler/PacketServiceTypeHandler.h"
+#include "GameSession.h"
 
 int32 main()
 {
@@ -34,7 +28,8 @@ int32 main()
 			return cpp_net_engine::MakeShared<GameSession>(8192, 4096);
 		};
 
-	ClientServiceRef pService = cpp_net_engine::MakeShared<ClientService>(serviceConfig);
+	ClientServiceRef pService = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
+	pService->Initialize(serviceConfig);
 
 	if (pService->Start() == false)
 	{
