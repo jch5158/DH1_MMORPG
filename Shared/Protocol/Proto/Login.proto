@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 package Protocol;
 
 import "Enum.proto";
@@ -12,8 +12,8 @@ message C2S_LOGIN_REQ
     option (sender) = CLIENT;
     option (receiver) = GATEWAY_SERVER;
 
-    string ticket = 2;
     uint64 accountId = 1;
+    string ticket = 2;
 }
 
 message S2C_LOGIN_RES

@@ -119,10 +119,10 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_Echo_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\nEcho.proto\022\010Protocol\032\022PacketOption.pro"
-    "to\".\n\014C2S_ECHO_REQ\022\017\n\007echoMsg\030\001 \001(\t:\r\230\265\030"
-    "\001\240\265\030\002\252\265\030\001\003\".\n\014S2C_ECHO_RES\022\017\n\007echoMsg\030\001 "
-    "\001(\t:\r\230\265\030\002\240\265\030\003\252\265\030\001\002B\031\210\265\030\001\222\265\030\021EchoPacketHa"
-    "ndlerb\006proto3"
+    "to\"*\n\014C2S_ECHO_REQ\022\017\n\007echoMsg\030\001 \001(\t:\t\240\265\030"
+    "\002\252\265\030\001\003\"*\n\014S2C_ECHO_RES\022\017\n\007echoMsg\030\001 \001(\t:"
+    "\t\240\265\030\003\252\265\030\001\002B\031\210\265\030\001\222\265\030\021EchoPacketHandlerb\006p"
+    "roto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_Echo_2eproto_deps[1] =
     {
@@ -132,7 +132,7 @@ static ::absl::once_flag descriptor_table_Echo_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Echo_2eproto = {
     false,
     false,
-    173,
+    165,
     descriptor_table_protodef_Echo_2eproto,
     "Echo.proto",
     &descriptor_table_Echo_2eproto_once,

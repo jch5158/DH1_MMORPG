@@ -119,11 +119,11 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_Login_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\013Login.proto\022\010Protocol\032\nEnum.proto\032\022Pac"
-    "ketOption.proto\"A\n\rC2S_LOGIN_REQ\022\016\n\006tick"
-    "et\030\002 \001(\t\022\021\n\taccountId\030\001 \001(\004:\r\230\265\030\001\240\265\030\001\252\265\030"
-    "\001\004\"F\n\rS2C_LOGIN_RES\022&\n\006result\030\001 \001(\0162\026.Pr"
-    "otocol.eLoginResult:\r\230\265\030\002\240\265\030\004\252\265\030\001\001B\032\210\265\030\002"
-    "\222\265\030\022LoginPacketHandlerb\006proto3"
+    "ketOption.proto\"=\n\rC2S_LOGIN_REQ\022\016\n\006tick"
+    "et\030\002 \001(\t\022\021\n\taccountId\030\001 \001(\004:\t\240\265\030\001\252\265\030\001\004\"B"
+    "\n\rS2C_LOGIN_RES\022&\n\006result\030\001 \001(\0162\026.Protoc"
+    "ol.eLoginResult:\t\240\265\030\004\252\265\030\001\001B\032\210\265\030\002\222\265\030\022Logi"
+    "nPacketHandlerb\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[2] =
     {
@@ -134,7 +134,7 @@ static ::absl::once_flag descriptor_table_Login_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_Login_2eproto = {
     false,
     false,
-    230,
+    222,
     descriptor_table_protodef_Login_2eproto,
     "Login.proto",
     &descriptor_table_Login_2eproto_once,

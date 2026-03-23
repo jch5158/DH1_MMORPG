@@ -1,12 +1,7 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "JsonConfig.h"
 
 #include <fstream>
-
-JsonConfig::JsonConfig(nlohmann::json json)
-	: mJson(std::move(json))
-{
-}
 
 JsonConfig JsonConfig::LoadFromFile(const std::string& filePath)
 {
@@ -119,4 +114,9 @@ JsonConfig JsonConfig::GetSection(const std::string& key) const
 bool JsonConfig::HasKey(const std::string& key) const
 {
 	return mJson.contains(key);
+}
+
+JsonConfig::JsonConfig(nlohmann::json json)
+	: mJson(std::move(json))
+{
 }
