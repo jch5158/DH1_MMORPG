@@ -52,3 +52,9 @@ SessionRef SessionManager::GetFirstSessionRef()
 
 	return *mSessions.begin();
 }
+
+Vector<SessionRef> SessionManager::GetActiveSessions()
+{
+	SharedLock lock(mLock);
+	return Vector<SessionRef>(mSessions.begin(), mSessions.end());
+}

@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "SessionReaper.h"
 #include "NetService.h"
 #include "Session.h"
@@ -13,7 +13,7 @@ int64 SessionReaper::GetTimeoutMs() const
 	return mTimeoutMs;
 }
 
-void SessionReaper::ReapSession(const ServerServiceWeak& pServerServiceWeak, const SessionWeak& pSessionWeak) const
+void SessionReaper::Sweep(const ServerServiceWeak& pServerServiceWeak)
 {
 	const ServerServiceRef pServerService = pServerServiceWeak.lock();
 	if (pServerService == nullptr)
@@ -21,47 +21,63 @@ void SessionReaper::ReapSession(const ServerServiceWeak& pServerServiceWeak, con
 		return;
 	}
 
-	const SessionRef pSession = pSessionWeak.lock();
-	if (pSession == nullptr || pSession->IsDisconnectStarted())
-	{
-		return;
-	}
+	Vector<SessionRef> sessions = pServerService->GetActiveSessions();
+	const int64 now = getNowTimeMs();
 
-	if (isExpired(pSession->getLastActivityMs()))
+	for (const auto& pSession : sessions)
 	{
-		pSession->Disconnect(eDisconnectReason::Timeout);
-	}
-	else
-	{
-		pServerService->RegisterSessionReap(pSession);
+		if (pSession == nullptr || pSession->IsDisconnectStarted())
+		{
+			continue;
+		}
+
+		if (isExpired(pSession->getLastActivityMs()))
+		{
+			pSession->Disconnect(eDisconnectReason::Timeout);
+
+			UniqueLock lock(mAbortLock);
+			mAbortPendingSessions.push_back({ SessionWeak(pSession), now });
+		}
 	}
 }
 
-void SessionReaper::AbortSession(const SessionWeak& pSessionWeak)
+void SessionReaper::SweepAbort()
 {
-	const SessionRef pSession = pSessionWeak.lock();
-	if (pSession == nullptr || !pSession->IsDisconnecting())
-	{
-		return;
-	}
+	UniqueLock lock(mAbortLock);
 
-	pSession->ForceCloseSocket();
+	auto iter = mAbortPendingSessions.begin();
+	while (iter != mAbortPendingSessions.end())
+	{
+		const SessionRef pSession = iter->pSessionWeak.lock();
+		if (pSession == nullptr || pSession->IsDisconnected())
+		{
+			iter = mAbortPendingSessions.erase(iter);
+			continue;
+		}
+
+		if (isAbortExpired(iter->disconnectStartMs))
+		{
+			pSession->ForceCloseSocket();
+			iter = mAbortPendingSessions.erase(iter);
+			continue;
+		}
+
+		++iter;
+	}
 }
 
 bool SessionReaper::isExpired(const int64 lastActivityMs) const
 {
-	const auto now = getNowTimeMs();
-	if (now - lastActivityMs > mTimeoutMs)
-	{
-		return true;
-	}
+	return (getNowTimeMs() - lastActivityMs) > mTimeoutMs;
+}
 
-	return false;
+bool SessionReaper::isAbortExpired(const int64 disconnectStartMs) const
+{
+	return (getNowTimeMs() - disconnectStartMs) > ABORT_TIMEOUT_MS;
 }
 
 int64 SessionReaper::getNowTimeMs()
 {
-	const int64 nowTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-
-	return nowTimeMs;
+	return std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
 }
