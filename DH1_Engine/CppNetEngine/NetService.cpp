@@ -90,6 +90,10 @@ int32 NetService::GetMaxSessionCount() const
 ClientService::ClientService(const eServiceType serviceType)
 	: NetService(eServiceType::Client)
 	, mpConnectionManager()
+	, mbAutoReconnect(false)
+	, mReconnectIntervalMs(0)
+	, mMaxReconnectCount(0)
+	, mReconnectAttemptCount(0)
 {
 }
 
@@ -102,6 +106,9 @@ bool ClientService::Initialize(const NetServiceConfig& config)
 
 	const auto* pClientConfig = static_cast<const ClientServiceConfig*>(&config);
 	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionPool>(pClientConfig->maxConnectionCount);
+	mbAutoReconnect = pClientConfig->bAutoReconnect;
+	mReconnectIntervalMs = pClientConfig->reconnectIntervalMs;
+	mMaxReconnectCount = pClientConfig->maxReconnectCount;
 	return true;
 }
 
@@ -143,6 +150,37 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 	mSessionManager.RemoveSession(pSession);
 
 	mpConnectionManager->FreeConnection();
+
+	if (mbAutoReconnect)
+	{
+		scheduleReconnect();
+	}
+}
+
+void ClientService::scheduleReconnect()
+{
+	if (mMaxReconnectCount > 0)
+	{
+		const int32 attemptCount = mReconnectAttemptCount.fetch_add(1) + 1;
+		if (attemptCount > mMaxReconnectCount)
+		{
+			NET_ENGINE_LOG_ERROR("ClientService::scheduleReconnect - Max reconnect count reached ({})", mMaxReconnectCount);
+			return;
+		}
+	}
+
+	ClientServiceWeak pWeak = std::static_pointer_cast<ClientService>(shared_from_this());
+	mpNetworkScheduler->RegisterDelay([pWeak]()->void
+		{
+			const ClientServiceRef pService = pWeak.lock();
+			if (pService == nullptr)
+			{
+				return;
+			}
+
+			NET_ENGINE_LOG_INFO("ClientService::scheduleReconnect - Attempting reconnect...");
+			pService->mpConnectionManager->Connect(pService);
+		}, mReconnectIntervalMs);
 }
 
 SessionRef ClientService::GetFirstSessionRef()
