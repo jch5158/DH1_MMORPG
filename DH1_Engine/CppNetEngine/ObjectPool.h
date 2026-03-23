@@ -83,7 +83,7 @@ public:
 		do
 		{
 			expected.mCount = mTopNode16.mCount;
-			std::atomic_thread_fence(std::memory_order_acquire);
+			std::atomic_thread_fence(std::memory_order_seq_cst);
 			expected.mpNode = mTopNode16.mpNode;
 			
 			desired.mCount = expected.mCount + 1;
