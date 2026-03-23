@@ -9,7 +9,6 @@ NetworkScheduler::NetworkScheduler(const NetworkSchedulerConfig& config)
 	: IocpCore(config.runningThreadCount)
 	, mWaitTimeoutMs(config.waitTimeoutMs)
 	, mTimingWheel(config.tickIntervalMs)
-	, mOnHandleError(config.onHandleError)
 {
 }
 
@@ -22,12 +21,9 @@ void NetworkScheduler::Dispatch()
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
-		if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
+		if (!SocketUtils::IsExpectedIocpError(errorCode))
 		{
-			if (mOnHandleError != nullptr)
-			{
-				mOnHandleError(errorCode);
-			}
+			NET_ENGINE_LOG_ERROR("NetworkScheduler::Dispatch - GQCS failed, errorCode : {}", errorCode);
 		}
 	}
 

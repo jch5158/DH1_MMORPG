@@ -15,9 +15,6 @@ int32 main()
 	netConfig.runningThreadCount = 0;
 	netConfig.waitTimeoutMs = 16;
 	netConfig.tickIntervalMs = 16;
-	netConfig.onHandleError = [](const uint32 errorCode)->void
-		{
-		};
 
 	ClientServiceConfig serviceConfig{};
 	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);

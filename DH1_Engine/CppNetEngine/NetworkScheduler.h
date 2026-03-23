@@ -5,7 +5,6 @@ struct NetworkSchedulerConfig
 	uint32 runningThreadCount;
 	uint32 waitTimeoutMs;
 	uint32 tickIntervalMs;
-	std::function<void(const uint32)> onHandleError;
 };
 
 class NetworkScheduler final : public IocpCore
@@ -26,6 +25,5 @@ public:
 private:
 	const uint32 mWaitTimeoutMs;
 	TimingWheel mTimingWheel;
-	const std::function<void(const uint32)> mOnHandleError;
 };
 
