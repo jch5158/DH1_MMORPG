@@ -1,4 +1,4 @@
-﻿syntax = "proto3";
+syntax = "proto3";
 package Protocol;
 
 import "PacketOption.proto";
@@ -6,18 +6,16 @@ import "PacketOption.proto";
 option (service_type) = SERVICE_TYPE_ECHO;
 option (handler_name) = "EchoPacketHandler";
 
-message C2S_ECHO_REQ 
+message C2S_ECHO_REQ
 {
-    option (packet_id) = 1;
     option (sender) = ECHO_CLIENT;
     option (receiver) = ECHO_SERVER;
 
     string echoMsg = 1;
 }
 
-message S2C_ECHO_RES 
+message S2C_ECHO_RES
 {
-    option (packet_id) = 2;
     option (sender) = ECHO_SERVER;
     option (receiver) = ECHO_CLIENT;
 
