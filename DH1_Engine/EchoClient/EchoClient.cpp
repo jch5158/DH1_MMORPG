@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #include "CrashReporter.h"
 #include "GameSession.h"
@@ -6,6 +6,7 @@
 #include "NetworkScheduler.h"
 #include "NetService.h"
 #include "ThreadManager.h"
+#include "JsonConfig.h"
 
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
@@ -17,15 +18,19 @@ int32 main()
 
 	PacketServiceTypeHandler::Init();
 
-	NetworkSchedulerConfig netConfig;
-	netConfig.runningThreadCount = 0;
-	netConfig.waitTimeoutMs = 16;
-	netConfig.tickIntervalMs = 16;
+	const JsonConfig config = JsonConfig::LoadFromFile("config.json");
+	const JsonConfig clientConfig = config.GetSection("client");
+	const JsonConfig networkConfig = config.GetSection("network");
+
+	NetworkSchedulerConfig netSchedulerConfig;
+	netSchedulerConfig.runningThreadCount = 0;
+	netSchedulerConfig.waitTimeoutMs = 16;
+	netSchedulerConfig.tickIntervalMs = 16;
 
 	ClientServiceConfig serviceConfig{};
-	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);
-	serviceConfig.maxSessionCount = 5000;
-	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
+	serviceConfig.netAddress = NetAddress(clientConfig.GetString("ip"), clientConfig.GetUInt16("port"));
+	serviceConfig.maxSessionCount = clientConfig.GetInt32("maxSessionCount");
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netSchedulerConfig);
 	serviceConfig.sessionFactory = []()->GameSessionRef
 		{
 			return cpp_net_engine::MakeShared<GameSession>(8192, 4096);
@@ -39,9 +44,10 @@ int32 main()
 		CrashReporter::Crash();
 	}
 
-	for (int32 i = 0; i < 5; ++i)
+	const int32 networkThreadCount = networkConfig.GetInt32("dispatchThreadCount");
+	for (int32 i = 0; i < networkThreadCount; ++i)
 	{
-		ThreadManager::GetInstance().Launch("NetWorkerThread",[pService]()->void
+		ThreadManager::GetInstance().Launch("NetWorkerThread", [pService]()->void
 			{
 				while (true)
 				{

@@ -1,0 +1,12 @@
+{
+    "server": {
+        "ip": "127.0.0.1",
+        "port": 7777,
+        "acceptCount": 50,
+        "maxSessionCount": 5000,
+        "sessionTimeoutMs": 20000
+    },
+    "network": {
+        "dispatchThreadCount": 5
+    }
+}

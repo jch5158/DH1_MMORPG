@@ -54,6 +54,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include <nlohmann/json.hpp>
+
 #include <utf8cpp/utf8.h>
 
 #include "Types.h"
