@@ -1,17 +1,11 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SessionReaper.h"
-#include "NetService.h"
-#include "Session.h"
 
 SessionReaper::SessionReaper(const int64 timeoutMs)
 	: mTimeoutMs(timeoutMs)
-{
-}
-
-int64 SessionReaper::GetTimeoutMs() const
-{
-	return mTimeoutMs;
-}
+	, mAbortLock()
+	, mAbortPendingSessions()
+{}
 
 void SessionReaper::Sweep(const ServerServiceWeak& pServerServiceWeak)
 {
@@ -21,7 +15,7 @@ void SessionReaper::Sweep(const ServerServiceWeak& pServerServiceWeak)
 		return;
 	}
 
-	Vector<SessionRef> sessions = pServerService->GetActiveSessions();
+	const Vector<SessionRef> sessions = pServerService->GetActiveSessions();
 	const int64 now = getNowTimeMs();
 
 	for (const auto& pSession : sessions)
@@ -36,7 +30,7 @@ void SessionReaper::Sweep(const ServerServiceWeak& pServerServiceWeak)
 			pSession->Disconnect(eDisconnectReason::Timeout);
 
 			UniqueLock lock(mAbortLock);
-			mAbortPendingSessions.push_back({ SessionWeak(pSession), now });
+			mAbortPendingSessions.push_back({.pSessionWeak = SessionWeak(pSession), .disconnectStartMs = now });
 		}
 	}
 }
@@ -66,18 +60,24 @@ void SessionReaper::SweepAbort()
 	}
 }
 
+int64 SessionReaper::GetTimeoutMs() const
+{
+	return mTimeoutMs;
+}
+
 bool SessionReaper::isExpired(const int64 lastActivityMs) const
 {
 	return (getNowTimeMs() - lastActivityMs) > mTimeoutMs;
 }
 
-bool SessionReaper::isAbortExpired(const int64 disconnectStartMs) const
+bool SessionReaper::isAbortExpired(const int64 disconnectStartMs)
 {
 	return (getNowTimeMs() - disconnectStartMs) > ABORT_TIMEOUT_MS;
 }
 
 int64 SessionReaper::getNowTimeMs()
 {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(
+	const int64 now = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now().time_since_epoch()).count();
+	return now;
 }

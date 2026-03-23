@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class SessionReaper final
 {
@@ -26,7 +26,7 @@ private:
 	};
 
 	[[nodiscard]] bool isExpired(const int64 lastActivityMs) const;
-	[[nodiscard]] bool isAbortExpired(const int64 disconnectStartMs) const;
+	[[nodiscard]] static bool isAbortExpired(const int64 disconnectStartMs);
 	[[nodiscard]] static int64 getNowTimeMs();
 
 	const int64 mTimeoutMs;
