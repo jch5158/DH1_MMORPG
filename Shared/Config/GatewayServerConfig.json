@@ -6,10 +6,20 @@
         "maxSessionCount": 10000,
         "sessionTimeoutMs": 60000
     },
-    "actor": {
+    "session": {
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 4096
+    },
+    "networkScheduler": {
+        "runningThreadCount": 0,
+        "waitTimeoutMs": 16,
+        "tickIntervalMs": 16,
         "dispatchThreadCount": 5
     },
-    "network": {
+    "actorScheduler": {
+        "runningThreadCount": 0,
+        "waitTimeoutMs": 16,
+        "tickIntervalMs": 16,
         "dispatchThreadCount": 5
     },
     "redis": {

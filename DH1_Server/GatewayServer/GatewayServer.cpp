@@ -20,38 +20,42 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("config.json");
+	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/GatewayServerConfig.json");
 	const JsonConfig serverConfig = config.GetSection("server");
-	const JsonConfig networkConfig = config.GetSection("network");
-	const JsonConfig actorConfig = config.GetSection("actor");
+	const JsonConfig sessionConfig = config.GetSection("session");
+	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");
+	const JsonConfig actorSchedulerConfig = config.GetSection("actorScheduler");
 	const JsonConfig redisConfig = config.GetSection("redis");
 
-	NetworkSchedulerConfig netSchedulerConfig;
-	netSchedulerConfig.runningThreadCount = 0;
-	netSchedulerConfig.tickIntervalMs = 16;
-	netSchedulerConfig.waitTimeoutMs = 16;
+	NetworkSchedulerConfig netConfig;
+	netConfig.runningThreadCount = networkSchedulerConfig.GetUInt32("runningThreadCount");
+	netConfig.waitTimeoutMs = networkSchedulerConfig.GetUInt32("waitTimeoutMs");
+	netConfig.tickIntervalMs = networkSchedulerConfig.GetUInt32("tickIntervalMs");
+
+	const int32 receiveBufferSize = sessionConfig.GetInt32("receiveBufferSize");
+	const int32 sendBufferSize = sessionConfig.GetInt32("sendBufferSize");
 
 	ServerServiceConfig serviceConfig;
 	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
 	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
 	serviceConfig.netAddress = NetAddress(serverConfig.GetString("ip"), serverConfig.GetUInt16("port"));
-	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netSchedulerConfig);
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
 	serviceConfig.sessionTimeoutMs = serverConfig.GetInt64("sessionTimeoutMs");
-	serviceConfig.sessionFactory = []()->ClientSessionRef
+	serviceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]()->ClientSessionRef
 		{
-			return cpp_net_engine::MakeShared<ClientSession>(8192, 4096);
+			return cpp_net_engine::MakeShared<ClientSession>(receiveBufferSize, sendBufferSize);
 		};
 
 	ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
 	pService->Initialize(serviceConfig);
 
-	ActorServiceConfig actorServiceConfig;
-	actorServiceConfig.schedulerConfig.runningThreadCount = 0;
-	actorServiceConfig.schedulerConfig.tickIntervalMs = 16;
-	actorServiceConfig.schedulerConfig.waitTimeoutMs = 16;
+	ActorServiceConfig actorSvcConfig;
+	actorSvcConfig.schedulerConfig.runningThreadCount = actorSchedulerConfig.GetUInt32("runningThreadCount");
+	actorSvcConfig.schedulerConfig.waitTimeoutMs = actorSchedulerConfig.GetUInt32("waitTimeoutMs");
+	actorSvcConfig.schedulerConfig.tickIntervalMs = actorSchedulerConfig.GetUInt32("tickIntervalMs");
 
 	ActorServiceRef pActorService = cpp_net_engine::MakeShared<ActorService>();
-	if (pActorService->Initialize(actorServiceConfig) == false)
+	if (pActorService->Initialize(actorSvcConfig) == false)
 	{
 		CrashReporter::Crash();
 	}
@@ -70,7 +74,7 @@ int main()
 		CrashReporter::Crash();
 	}
 
-	const int32 networkThreadCount = networkConfig.GetInt32("dispatchThreadCount");
+	const int32 networkThreadCount = networkSchedulerConfig.GetInt32("dispatchThreadCount");
 	for (int32 i = 0; i < networkThreadCount; ++i)
 	{
 		ThreadManager::GetInstance().Launch("Network Dispatch", [pService]()->void
@@ -82,7 +86,7 @@ int main()
 			});
 	}
 
-	const int32 actorThreadCount = actorConfig.GetInt32("dispatchThreadCount");
+	const int32 actorThreadCount = actorSchedulerConfig.GetInt32("dispatchThreadCount");
 	for (int32 i = 0; i < actorThreadCount; ++i)
 	{
 		ThreadManager::GetInstance().Launch("Actor Dispatch", [pActorService]()->void
