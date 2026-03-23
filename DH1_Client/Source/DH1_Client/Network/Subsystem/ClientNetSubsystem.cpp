@@ -1,5 +1,6 @@
 ﻿#include "ClientNetSubsystem.h"
 
+#include "NetEngineInit.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 

@@ -17,14 +17,7 @@ THIRD_PARTY_INCLUDES_START
 #include <ws2tcpip.h>
 
 #include "EnginePch.h"
-#include "NetAddress.h"
-
-#include "SessionManager.h"
-#include "NetSendBuffer.h"
-#include "NetworkScheduler.h"
-#include "PacketSession.h"
-#include "Session.h"   
-#include "NetService.h"
+#include "EngineNetwork.h"
 
 #include "Windows/HideWindowsPlatformTypes.h"
 #undef DrawText
