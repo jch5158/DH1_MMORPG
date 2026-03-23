@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "NetAddress.h"
 #include "SessionManager.h"
-#include "SharedPtrUtils.h"
-#include "Types.h"
 
 enum class eServiceType : uint8
 {

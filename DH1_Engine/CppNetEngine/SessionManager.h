@@ -1,7 +1,4 @@
 ﻿#pragma once
-#include "SharedPtrUtils.h"
-#include "StlTypes.h"
-#include "Types.h"
 
 class SessionManager
 {

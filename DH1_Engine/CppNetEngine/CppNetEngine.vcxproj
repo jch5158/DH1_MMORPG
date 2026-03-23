@@ -234,6 +234,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="ActorScheduler.h" />
     <ClInclude Include="NetworkScheduler.h" />
+    <ClInclude Include="SharedPtrTypes.h" />
     <ClInclude Include="SocketIocpObject.h" />
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="TimingWheel.h" />
@@ -261,12 +262,12 @@
     <ClInclude Include="SessionManager.h" />
     <ClInclude Include="SessionReaper.h" />
     <ClInclude Include="SessionTimeoutTracker.h" />
-    <ClInclude Include="SharedPtrUtils.h" />
+    <ClInclude Include="SharedPtrAllocator.h" />
     <ClInclude Include="SocketUtils.h" />
     <ClInclude Include="StlTypes.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="UniquePtrUtils.h" />
+    <ClInclude Include="UniquePtrAllocator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Acceptor.cpp" />

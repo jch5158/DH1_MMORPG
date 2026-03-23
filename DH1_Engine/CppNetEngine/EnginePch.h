@@ -69,8 +69,9 @@
 #include "LockFreeQueue.h"
 
 #include "StlTypes.h"
-#include "UniquePtrUtils.h"
-#include "SharedPtrUtils.h"
+#include "UniquePtrAllocator.h"
+#include "SharedPtrAllocator.h"
+#include "SharedPtrTypes.h"
 #include "SendBufferAllocator.h"
 
 #include "NetEngineInit.h"

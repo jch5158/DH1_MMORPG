@@ -108,9 +108,6 @@
     <ClInclude Include="NetSendBuffer.h">
       <Filter>Network\Session\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="SendBufferAllocator.h">
-      <Filter>Network\Session\Buffer</Filter>
-    </ClInclude>
     <ClInclude Include="SessionTimeoutTracker.h">
       <Filter>Network\Session\Timeout</Filter>
     </ClInclude>
@@ -186,10 +183,10 @@
     <ClInclude Include="CrashReporter.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="UniquePtrUtils.h">
+    <ClInclude Include="UniquePtrAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="SharedPtrUtils.h">
+    <ClInclude Include="SharedPtrAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
@@ -213,6 +210,12 @@
     <ClInclude Include="StlTypes.h">
       <Filter>Core\Type</Filter>
     </ClInclude>
+    <ClInclude Include="SharedPtrTypes.h">
+      <Filter>Core\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBufferAllocator.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NetEngineInit.cpp">
@@ -234,9 +237,6 @@
       <Filter>Network\Session\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="NetSendBuffer.cpp">
-      <Filter>Network\Session\Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="SendBufferAllocator.cpp">
       <Filter>Network\Session\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="SessionTimeoutTracker.cpp">
@@ -322,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="ConnectionManager.cpp">
       <Filter>Network\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="SendBufferAllocator.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

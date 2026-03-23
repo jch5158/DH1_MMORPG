@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "SharedPtrUtils.h"
-#include "Types.h"
 
 class SessionReaper final
 {

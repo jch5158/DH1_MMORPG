@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 template <typename T>
-class UniquePtrUtils final  // NOLINT(cppcoreguidelines-special-member-functions)
+class UniquePtrAllocator final  // NOLINT(cppcoreguidelines-special-member-functions)
 {
 public:
 
@@ -34,7 +34,7 @@ public:
 
 // 2. [특수화] 배열용 (Array, 예: char[])
 template <typename T>
-class UniquePtrUtils<T[]> final
+class UniquePtrAllocator<T[]> final
 {
 public:
 	class ArrayDeleter
@@ -90,13 +90,13 @@ public:
 template <typename T>
 struct GetUniquePtrType
 {
-	using Type = std::unique_ptr<T, typename UniquePtrUtils<T>::Deleter>;
+	using Type = std::unique_ptr<T, typename UniquePtrAllocator<T>::Deleter>;
 };
 
 template <typename T>
 struct GetUniquePtrType<T[]>
 {
-	using Type = std::unique_ptr<T[], typename UniquePtrUtils<T[]>::ArrayDeleter>;
+	using Type = std::unique_ptr<T[], typename UniquePtrAllocator<T[]>::ArrayDeleter>;
 };
 
 template <typename T>
@@ -111,12 +111,12 @@ namespace cpp_net_engine
 	template <typename T, typename... Args>
 	UniquePtr<T> MakeUnique(Args&&... args)
 	{
-		return UniquePtrUtils<T>::Alloc(std::forward<Args>(args)...);
+		return UniquePtrAllocator<T>::Alloc(std::forward<Args>(args)...);
 	}
 
 	template <typename T>
 	UniquePtr<T[]> MakeUniqueArray(const int32 count)
 	{
-		return UniquePtrUtils<T[]>::Alloc(count);
+		return UniquePtrAllocator<T[]>::Alloc(count);
 	}
 }

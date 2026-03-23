@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "StlTypes.h"
-#include "SharedPtrUtils.h"
 
 class ActorManager
 {

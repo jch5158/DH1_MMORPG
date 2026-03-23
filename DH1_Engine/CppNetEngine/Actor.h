@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "IocpCore.h"
 #include "ActorScheduler.h"
-#include "SharedPtrUtils.h"
 #include "ActorMailbox.h"
 
 class IActor : public IocpObject

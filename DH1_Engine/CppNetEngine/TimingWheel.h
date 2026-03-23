@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "SharedPtrUtils.h"
-#include "StlTypes.h"
 
 class TimerHandle final
 {
