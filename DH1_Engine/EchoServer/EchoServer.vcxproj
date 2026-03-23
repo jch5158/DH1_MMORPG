@@ -264,6 +264,7 @@
     </ClCompile>
     <ClCompile Include="EchoPacketHandler.cpp" />
     <ClCompile Include="EchoServer.cpp" />
+    <ClCompile Include="EchoServerService.cpp" />
     <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="PacketServiceTypeHandler.cpp" />
     <ClCompile Include="pch.cpp">
@@ -279,6 +280,7 @@
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h" />
     <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h" />
+    <ClInclude Include="EchoServerService.h" />
     <ClInclude Include="GameSession.h" />
     <ClInclude Include="PacketHandler\EchoPacketHandler.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
