@@ -89,7 +89,7 @@ public:
 			desired.mCount = expected.mCount + 1;
 			desired.mpNode = expected.mpNode->mpNextNode;
 
-		} while (topNode16.compare_exchange_weak(expected, desired) == false);
+		} while (topNode16.compare_exchange_strong(expected, desired) == false);
 
 		new(&expected.mpNode->mData) T(std::forward<Args>(args)...);
 
@@ -124,7 +124,7 @@ public:
 			pExpected = mTopNode16.mpNode;
 			pDesired->mpNextNode = pExpected;
 
-		} while (topNodePtr.compare_exchange_weak(pExpected, pDesired) == false);
+		} while (topNodePtr.compare_exchange_strong(pExpected, pDesired) == false);
 
 		mPoolingCount.fetch_add(1);
 	}

@@ -70,7 +70,7 @@ public:
 		{
 			Node* pExpected = mTail.mpNode->mpNextNode;
 			std::atomic_ref<Node*> atomicTailNextNodePtr(mTail.mpNode->mpNextNode);
-			if (pExpected == nullptr && (atomicTailNextNodePtr.compare_exchange_weak(pExpected, pDesired) == true))
+			if (pExpected == nullptr && (atomicTailNextNodePtr.compare_exchange_strong(pExpected, pDesired) == true))
 			{
 				moveTail();
 				break;
@@ -122,7 +122,7 @@ public:
 
 			outData = desired.mpNode->mData;
 
-			if (atomicHead.compare_exchange_weak(expected, desired) == true)
+			if (atomicHead.compare_exchange_strong(expected, desired) == true)
 			{
 				cpp_net_engine::DeleteObject(expected.mpNode);
 				break;
@@ -178,7 +178,7 @@ private:
 		}
 
 		std::atomic_ref<Node16> atomicTail(mTail);
-		atomicTail.compare_exchange_weak(expected, desired);
+		atomicTail.compare_exchange_strong(expected, desired);
 	}
 
 	const int32 mMaxCount;

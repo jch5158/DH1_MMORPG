@@ -99,7 +99,7 @@ bool Session::IsDisconnectStarted() const
 bool Session::SetSessionInGame()
 {
 	auto expected = eSessionState::Connected;
-	return mSessionState.compare_exchange_weak(expected, eSessionState::InGame);
+	return mSessionState.compare_exchange_strong(expected, eSessionState::InGame);
 }
 
 void Session::Disconnect(const eDisconnectReason reason)

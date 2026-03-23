@@ -76,7 +76,7 @@ public:
 			pExpected = mTopAlineNode16.mpNode;
 			pDesired->mpNextNode = pExpected;
 
-		} while (topNodePtr.compare_exchange_weak(pExpected, pDesired) == false);
+		} while (topNodePtr.compare_exchange_strong(pExpected, pDesired) == false);
 
 		mCount.fetch_add(1);
 
@@ -106,7 +106,7 @@ public:
 			desired.mCount = expected.mCount + 1;
 			desired.mpNode = expected.mpNode->mpNextNode;
 
-		} while (topAlign16Node.compare_exchange_weak(expected, desired) == false);
+		} while (topAlign16Node.compare_exchange_strong(expected, desired) == false);
 
 		outData = std::move(expected.mpNode->mData);
 		cpp_net_engine::DeleteObject(expected.mpNode);
