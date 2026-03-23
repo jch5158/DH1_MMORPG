@@ -37,10 +37,10 @@ bool GatewayService::Initialize(const JsonConfig& config)
 			return cpp_net_engine::MakeShared<ClientSession>(receiveBufferSize, sendBufferSize);
 		};
 
-	mpServerService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
-	if (mpServerService->Initialize(serviceConfig) == false)
+	mpServerService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
+	if (mpServerService == nullptr)
 	{
-		NET_ENGINE_LOG_ERROR("GatewayService::Initialize - ServerService initialization failed");
+		NET_ENGINE_LOG_ERROR("GatewayService::Initialize - ServerService creation failed");
 		return false;
 	}
 

@@ -62,6 +62,9 @@ struct ClientServiceConfig : public NetServiceConfig
 {
 	virtual ~ClientServiceConfig() override = default;
 	int32 maxConnectionCount;
+	bool bAutoReconnect = true;
+	int64 reconnectIntervalMs = 3000;
+	int32 maxReconnectCount = 0; // 0 = unlimited
 };
 
 class ClientService : public NetService
@@ -80,7 +83,14 @@ public:
 	SessionRef GetFirstSessionRef();
 
 private:
+
+	void scheduleReconnect();
+
 	ConnectionPoolRef mpConnectionManager;
+	bool mbAutoReconnect;
+	int64 mReconnectIntervalMs;
+	int32 mMaxReconnectCount;
+	std::atomic<int32> mReconnectAttemptCount;
 };
 
 struct ServerServiceConfig : public NetServiceConfig

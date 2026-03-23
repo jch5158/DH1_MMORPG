@@ -33,10 +33,10 @@ bool EchoServerService::Initialize(const JsonConfig& config)
 			return cpp_net_engine::MakeShared<GameSession>(receiveBufferSize, sendBufferSize);
 		};
 
-	mpServerService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
-	if (mpServerService == nullptr)
+	mpServerService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
+	if (mpServerService->Initialize(serviceConfig) == false)
 	{
-		NET_ENGINE_LOG_ERROR("EchoServerService::Initialize - ServerService creation failed");
+		NET_ENGINE_LOG_ERROR("EchoServerService::Initialize - ServerService initialization failed");
 		return false;
 	}
 
