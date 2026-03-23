@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ActorService.h"
 #include "Actor.h"
 
@@ -37,7 +37,7 @@ void ActorService::CloseService()
 {
 }
 
-void ActorService::Dispatch()
+void ActorService::Dispatch() const
 {
 	if (mpActorScheduler == nullptr)
 	{

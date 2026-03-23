@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ActorScheduler.h"
 #include "ActorManager.h"
@@ -25,7 +25,7 @@ public:
 
 	virtual bool Start();
 	virtual void CloseService();
-	void Dispatch();
+	void Dispatch() const;
 
 	bool RegisterActor(const ActorRef& pActor);
 	bool UnregisterActor(const uint64 actorId);
