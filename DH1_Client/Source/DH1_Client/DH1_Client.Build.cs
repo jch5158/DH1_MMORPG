@@ -50,8 +50,7 @@ public class DH1_Client : ModuleRules
 	        Path.Combine(VcpkgLibPath, "vcpkg_crashpad_client.lib"),
             Path.Combine(VcpkgLibPath, "vcpkg_crashpad_util.lib"),
             Path.Combine(VcpkgLibPath, "vcpkg_crashpad_base.lib"),
-            Path.Combine(VcpkgLibPath, "utf8_validity.lib"),
-            Path.Combine(VcpkgLibPath, "utf8_range.lib"),
+            // utf8_validity/utf8_range are protobuf 4.x+ only (removed for 3.21.x)
             Path.Combine(VcpkgLibPath, "mimalloc.lib"),
             Path.Combine(VcpkgLibPath, "fmt.lib"),
             Path.Combine(VcpkgLibPath, ProtobufLibName),
@@ -59,16 +58,18 @@ public class DH1_Client : ModuleRules
             Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/ProtoBridge/{ConfigName}/ProtoBridge.lib"))
         ]);
 
-        if (Directory.Exists(VcpkgLibPath))
-        {
-            var AbslLibs = Directory.GetFiles(VcpkgLibPath, "absl_*.lib");
-            PublicAdditionalLibraries.AddRange(AbslLibs);
-        }
+        // protobuf 3.21.x has no abseil dependency - remove absl linking if upgrading to 4.x+
+        // if (Directory.Exists(VcpkgLibPath))
+        // {
+        //     var AbslLibs = Directory.GetFiles(VcpkgLibPath, "absl_*.lib");
+        //     PublicAdditionalLibraries.AddRange(AbslLibs);
+        // }
 
         bEnableExceptions = true;
         CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off; // 최신 5.6+ 문법 적용
 
         PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
+        PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0");
         PublicDefinitions.Add("_UNREAL_=1");
     }
 }
