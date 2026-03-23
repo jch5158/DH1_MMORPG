@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "ConnectionPool.h"
 
 ConnectionPool::ConnectionPool(const int32 maxConnectionCount)
@@ -8,11 +8,11 @@ ConnectionPool::ConnectionPool(const int32 maxConnectionCount)
 	, mConnectors()
 {
 	mConnectors.reserve(maxConnectionCount);
-	for (int32 i = 0; i < maxConnectionCount; ++i)
+	for (int32 iter = 0; iter < maxConnectionCount; ++iter)
 	{
-		ConnectorRef pConnector = cpp_net_engine::MakeShared<Connector>(i);
+		ConnectorRef pConnector = cpp_net_engine::MakeShared<Connector>(iter);
 		mConnectors.emplace_back(pConnector);
-		(void)mFreeIndexStack.TryPush(i);
+		(void)mFreeIndexStack.TryPush(iter);
 	}
 }
 
@@ -25,13 +25,9 @@ void ConnectionPool::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 	}
 
 	const auto* pConnectionEvent = static_cast<IocpConnectEvent*>(&iocpEvent);
-	mConnectors[pConnectionEvent->GetConnectorIndex()]->Process();
-	(void)mFreeIndexStack.TryPush(pConnectionEvent->GetConnectorIndex());
-}
-
-ConnectionPoolRef ConnectionPool::GetConnectionManagerRef()
-{
-	return std::static_pointer_cast<ConnectionPool>(shared_from_this());
+	const int32 connectorIndex = pConnectionEvent->GetConnectorIndex();
+	mConnectors[connectorIndex]->Process();
+	(void)mFreeIndexStack.TryPush(connectorIndex);
 }
 
 int32 ConnectionPool::GetMaxConnectionCount() const
@@ -39,11 +35,17 @@ int32 ConnectionPool::GetMaxConnectionCount() const
 	return mMaxConnectionCount;
 }
 
+int32 ConnectionPool::GetCurrentConnectionCount() const
+{
+	return mCurrentConnectionCount.load();
+}
+
 bool ConnectionPool::Connect(const ClientServiceRef& pService)
 {
 	if (mCurrentConnectionCount.fetch_add(1) >= mMaxConnectionCount)
 	{
 		mCurrentConnectionCount.fetch_sub(1);
+		NET_ENGINE_LOG_WARN("ConnectionPool::Connect - Connection pool is full ({}/{})", mCurrentConnectionCount.load(), mMaxConnectionCount);
 		return false;
 	}
 
@@ -51,13 +53,15 @@ bool ConnectionPool::Connect(const ClientServiceRef& pService)
 	if (mFreeIndexStack.TryPop(index) == false)
 	{
 		mCurrentConnectionCount.fetch_sub(1);
+		NET_ENGINE_LOG_ERROR("ConnectionPool::Connect - No free connector index available");
 		return false;
 	}
 
-	if (mConnectors[index]->Initialize(GetConnectionManagerRef(), pService) == false)
+	if (mConnectors[index]->Initialize(std::static_pointer_cast<ConnectionPool>(shared_from_this()), pService) == false)
 	{
 		(void)mFreeIndexStack.TryPush(index);
 		mCurrentConnectionCount.fetch_sub(1);
+		NET_ENGINE_LOG_ERROR("ConnectionPool::Connect - Connector[{}] initialization failed", index);
 		return false;
 	}
 
