@@ -1,7 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "ActorDispatcher.h"
-#include "ActorScheduler.h"
+#include "ActorService.h"
 
 using SetStringCallback = std::function<void(const bool)>;
 using GetStringCallback = std::function<void(const std::optional<std::string>&)>;
@@ -20,7 +19,7 @@ class RedisService final : public std::enable_shared_from_this<RedisService>
 {
 public:
 
-	explicit RedisService(const std::string& connectionUri, ActorSchedulerRef pScheduler);
+	explicit RedisService(const std::string& connectionUri, ActorServiceRef pActorService);
 	~RedisService() = default;
 
 	void UpdateGatewayInfo(const RedisGatewayInfo& gatewayInfo);
@@ -33,8 +32,5 @@ public:
 
 private:
 	uint64 mRedisActorId;
-	ActorManager mActorManager;
-	ActorSchedulerRef mpRedisScheduler;
-	ActorDispatcher mActorDispatcher;
+	ActorServiceRef mpActorService;
 };
-

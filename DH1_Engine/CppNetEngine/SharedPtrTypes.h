@@ -37,3 +37,5 @@ DECLARE_SMART_PTR(ActorScheduler);
 DECLARE_SMART_PTR(NetService);
 DECLARE_SMART_PTR(ClientService);
 DECLARE_SMART_PTR(ServerService);
+
+DECLARE_SMART_PTR(ActorService);

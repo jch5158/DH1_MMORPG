@@ -1,11 +1,11 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "NetAddress.h"
 #include "ThreadManager.h"
 #include "NetworkScheduler.h"
 #include "NetService.h"
 #include "ClientSession.h"
 #include "PacketServiceTypeHandler.h"
-#include "ActorScheduler.h"
+#include "ActorService.h"
 #include "GatewayService.h"
 #include "RedisActor.h"
 
@@ -39,14 +39,20 @@ int main()
 	ServerServiceRef pService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
 	pService->Initialize(serviceConfig);
 
+	ActorServiceConfig actorServiceConfig;
+	actorServiceConfig.schedulerConfig.onHandleError = [](const uint32)->void {};
+	actorServiceConfig.schedulerConfig.runningThreadCount = 0;
+	actorServiceConfig.schedulerConfig.tickIntervalMs = 16;
+	actorServiceConfig.schedulerConfig.waitTimeoutMs = 16;
 
-	ActorSchedulerConfig aSchedulerConfig;
-	aSchedulerConfig.onHandleError = [](const uint32)->void {};
-	aSchedulerConfig.runningThreadCount = 0;
-	aSchedulerConfig.tickIntervalMs = 16;
-	aSchedulerConfig.waitTimeoutMs = 16;
-	ActorSchedulerRef aSchedulerRef = cpp_net_engine::MakeShared<ActorScheduler>(aSchedulerConfig);
-	RedisServiceRef pRedisService = cpp_net_engine::MakeShared<RedisService>("tcp://127.0.0.1:6379?pool_size=10",aSchedulerRef);
+	ActorServiceRef pActorService = cpp_net_engine::MakeShared<ActorService>();
+	if (pActorService->Initialize(actorServiceConfig) == false)
+	{
+		CrashReporter::Crash();
+	}
+	pActorService->Start();
+
+	RedisServiceRef pRedisService = cpp_net_engine::MakeShared<RedisService>("tcp://127.0.0.1:6379?pool_size=10", pActorService);
 
 	if (ISingleton<GatewayService>::GetInstance().Initialize(pService, pRedisService) ==false)
 	{
@@ -72,11 +78,11 @@ int main()
 
 	for (int32 i = 0; i < 5; ++i)
 	{
-		ThreadManager::GetInstance().Launch("Network Dispatch", [aSchedulerRef]()->void
+		ThreadManager::GetInstance().Launch("Actor Dispatch", [pActorService]()->void
 			{
 				while (true)
 				{
-					aSchedulerRef->Dispatch();
+					pActorService->Dispatch();
 				}
 			});
 	}

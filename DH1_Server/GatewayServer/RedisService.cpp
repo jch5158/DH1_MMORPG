@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "RedisActor.h"
 #include "RedisService.h"
 #include <CrashReporter.h>
@@ -6,18 +6,15 @@
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisGatewayInfo, gatewayId, ip, port, status, currentSessionCount)
 
-RedisService::RedisService(const std::string& connectionUri, ActorSchedulerRef pScheduler)
+RedisService::RedisService(const std::string& connectionUri, ActorServiceRef pActorService)
 	:mRedisActorId(0)
-	, mActorManager()
-	, mpRedisScheduler(std::move(pScheduler))
-	, mActorDispatcher(*mpRedisScheduler, mActorManager)
+	, mpActorService(std::move(pActorService))
 {
 	const auto pRedis = cpp_net_engine::MakeShared<RedisActor>();
 	pRedis->Initialize(connectionUri);
-	pRedis->Activate(mpRedisScheduler);
-	if (mActorManager.AddActorRef(std::static_pointer_cast<Actor>(pRedis)) == false)
+	if (mpActorService->RegisterActor(std::static_pointer_cast<Actor>(pRedis)) == false)
 	{
-		NET_ENGINE_LOG_FATAL("RedisService::RedisService - mActorManager.AddActorRef if failed");
+		NET_ENGINE_LOG_FATAL("RedisService::RedisService - RegisterActor failed");
 		CrashReporter::Crash();
 	}
 
@@ -26,11 +23,11 @@ RedisService::RedisService(const std::string& connectionUri, ActorSchedulerRef p
 
 void RedisService::UpdateGatewayInfo(const RedisGatewayInfo& gatewayInfo)
 {
-	mActorDispatcher.Post(mRedisActorId, [argRedisService = shared_from_this(), argInfo = gatewayInfo]()->void
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argRedisService = shared_from_this(), argInfo = gatewayInfo]()->void
 		{
 			const RedisActorRef pRedis = argRedisService->GetRedisActorRef();
 			const std::string redisKey = "Gateway:" + std::to_string(argInfo.gatewayId);
-			
+
 			const nlohmann::json jsonInfo = argInfo;
 			const std::string redisValue = jsonInfo.dump();
 
@@ -40,13 +37,13 @@ void RedisService::UpdateGatewayInfo(const RedisGatewayInfo& gatewayInfo)
 
 RedisActorRef RedisService::GetRedisActorRef()
 {
-	RedisActorRef pRedis = std::static_pointer_cast<RedisActor>(mActorManager.GetActorRef(mRedisActorId));
+	RedisActorRef pRedis = std::static_pointer_cast<RedisActor>(mpActorService->GetActorRef(mRedisActorId));
 	return pRedis;
 }
 
 void RedisService::SetStringAsync(std::string key, std::string value, SetStringCallback callback)
 {
-	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argService = shared_from_this()]()->void
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argService = shared_from_this()]()->void
 		{
 			const RedisActorRef pRedis = argService->GetRedisActorRef();
 			if (pRedis == nullptr)
@@ -62,7 +59,7 @@ void RedisService::SetStringAsync(std::string key, std::string value, SetStringC
 
 void RedisService::SetExpireStringAsync(std::string key, std::string value, const int64 ttlSeconds, SetStringCallback callback)
 {
-	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argTtlSeconds = ttlSeconds, argService = shared_from_this()]()->void
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argTtlSeconds = ttlSeconds, argService = shared_from_this()]()->void
 		{
 			const RedisActorRef pRedis = argService->GetRedisActorRef();
 			if (pRedis == nullptr)
@@ -78,12 +75,12 @@ void RedisService::SetExpireStringAsync(std::string key, std::string value, cons
 
 void RedisService::GetStringAsync(std::string key, GetStringCallback callback)
 {
-	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void
 		{
 			const RedisActorRef pRedis = argService->GetRedisActorRef();
 			if (pRedis == nullptr)
 			{
-				argCallback(std::nullopt); // 액터가 죽었으면 실패 처리
+				argCallback(std::nullopt);
 				return;
 			}
 
@@ -94,12 +91,12 @@ void RedisService::GetStringAsync(std::string key, GetStringCallback callback)
 
 void RedisService::DeleteKeyAsync(std::string key, DeleteKeyCallback callback)
 {
-	mActorDispatcher.Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void
 		{
 			const RedisActorRef pRedis = argService->GetRedisActorRef();
 			if (pRedis == nullptr)
 			{
-				argCallback(false); // 액터가 죽었으면 실패 처리
+				argCallback(false);
 				return;
 			}
 
