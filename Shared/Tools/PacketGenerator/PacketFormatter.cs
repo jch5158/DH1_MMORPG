@@ -2,7 +2,7 @@
 {
     internal static class PacketFormatter
     {
-        public static string NormalizeToCRLF(string content)
+        public static string NormalizeToCrlf(string content)
         {
             return content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
         }
