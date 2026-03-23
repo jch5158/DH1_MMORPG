@@ -8,6 +8,7 @@
 #include "ActorService.h"
 #include "GatewayService.h"
 #include "RedisActor.h"
+#include "JsonConfig.h"
 
 class GatewayService;
 
@@ -19,17 +20,23 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	NetworkSchedulerConfig netConfig;
-	netConfig.runningThreadCount = 0;
-	netConfig.tickIntervalMs = 16;
-	netConfig.waitTimeoutMs = 16;
+	const JsonConfig config = JsonConfig::LoadFromFile("config.json");
+	const JsonConfig serverConfig = config.GetSection("server");
+	const JsonConfig networkConfig = config.GetSection("network");
+	const JsonConfig actorConfig = config.GetSection("actor");
+	const JsonConfig redisConfig = config.GetSection("redis");
+
+	NetworkSchedulerConfig netSchedulerConfig;
+	netSchedulerConfig.runningThreadCount = 0;
+	netSchedulerConfig.tickIntervalMs = 16;
+	netSchedulerConfig.waitTimeoutMs = 16;
 
 	ServerServiceConfig serviceConfig;
-	serviceConfig.acceptCount = 50;
-	serviceConfig.maxSessionCount = 10000;
-	serviceConfig.netAddress = NetAddress("127.0.0.1", 9000);
-	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
-	serviceConfig.sessionTimeoutMs = 60000;
+	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
+	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
+	serviceConfig.netAddress = NetAddress(serverConfig.GetString("ip"), serverConfig.GetUInt16("port"));
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netSchedulerConfig);
+	serviceConfig.sessionTimeoutMs = serverConfig.GetInt64("sessionTimeoutMs");
 	serviceConfig.sessionFactory = []()->ClientSessionRef
 		{
 			return cpp_net_engine::MakeShared<ClientSession>(8192, 4096);
@@ -50,22 +57,23 @@ int main()
 	}
 	pActorService->Start();
 
-	RedisServiceRef pRedisService = cpp_net_engine::MakeShared<RedisService>("tcp://127.0.0.1:6379?pool_size=10", pActorService);
+	RedisServiceRef pRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), pActorService);
 
-	if (ISingleton<GatewayService>::GetInstance().Initialize(pService, pRedisService) ==false)
+	if (ISingleton<GatewayService>::GetInstance().Initialize(pService, pRedisService) == false)
 	{
 		CrashReporter::Crash();
 	}
 
 	if (pService->Start() == false)
 	{
-		NET_ENGINE_LOG_INFO("GameServer start is failed\n");
+		NET_ENGINE_LOG_INFO("GatewayServer start is failed\n");
 		CrashReporter::Crash();
 	}
 
-	for (int32 i = 0; i < 5; ++i)
+	const int32 networkThreadCount = networkConfig.GetInt32("dispatchThreadCount");
+	for (int32 i = 0; i < networkThreadCount; ++i)
 	{
-		ThreadManager::GetInstance().Launch("Network Dispatch",[pService]()->void
+		ThreadManager::GetInstance().Launch("Network Dispatch", [pService]()->void
 			{
 				while (true)
 				{
@@ -74,7 +82,8 @@ int main()
 			});
 	}
 
-	for (int32 i = 0; i < 5; ++i)
+	const int32 actorThreadCount = actorConfig.GetInt32("dispatchThreadCount");
+	for (int32 i = 0; i < actorThreadCount; ++i)
 	{
 		ThreadManager::GetInstance().Launch("Actor Dispatch", [pActorService]()->void
 			{
@@ -85,7 +94,7 @@ int main()
 			});
 	}
 
-	ThreadManager::GetInstance().Launch("Monitor",[pService]()->void
+	ThreadManager::GetInstance().Launch("Monitor", [pService]()->void
 		{
 			while (true)
 			{

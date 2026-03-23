@@ -1,10 +1,11 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #include "GameSession.h"
 #include "NetEngineInit.h"
 #include "NetworkScheduler.h"
 #include "NetService.h"
 #include "ThreadManager.h"
+#include "JsonConfig.h"
 
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
@@ -16,17 +17,21 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	NetworkSchedulerConfig netConfig;
-	netConfig.runningThreadCount = 0;
-	netConfig.tickIntervalMs = 16;
-	netConfig.waitTimeoutMs = 16;
+	const JsonConfig config = JsonConfig::LoadFromFile("config.json");
+	const JsonConfig serverConfig = config.GetSection("server");
+	const JsonConfig networkConfig = config.GetSection("network");
+
+	NetworkSchedulerConfig netSchedulerConfig;
+	netSchedulerConfig.runningThreadCount = 0;
+	netSchedulerConfig.tickIntervalMs = 16;
+	netSchedulerConfig.waitTimeoutMs = 16;
 
 	ServerServiceConfig serviceConfig{};
-	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);
-	serviceConfig.acceptCount = 50;
-	serviceConfig.maxSessionCount = 5000;
-	serviceConfig.sessionTimeoutMs = 20000;
-	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
+	serviceConfig.netAddress = NetAddress(serverConfig.GetString("ip"), serverConfig.GetUInt16("port"));
+	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
+	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
+	serviceConfig.sessionTimeoutMs = serverConfig.GetInt64("sessionTimeoutMs");
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netSchedulerConfig);
 	serviceConfig.sessionFactory = []()->GameSessionRef
 		{
 			return cpp_net_engine::MakeShared<GameSession>(8192, 4096);
@@ -40,9 +45,10 @@ int main()
 		CrashReporter::Crash();
 	}
 
-	for (int32 i = 0; i < 5; ++i)
-	{ 
-		ThreadManager::GetInstance().Launch("NetWorkerThread",[pService]()->void
+	const int32 networkThreadCount = networkConfig.GetInt32("dispatchThreadCount");
+	for (int32 i = 0; i < networkThreadCount; ++i)
+	{
+		ThreadManager::GetInstance().Launch("NetWorkerThread", [pService]()->void
 			{
 				while (true)
 				{
@@ -51,7 +57,7 @@ int main()
 			});
 	}
 
-	ThreadManager::GetInstance().Launch("MonitorThread",[pService]()->void
+	ThreadManager::GetInstance().Launch("MonitorThread", [pService]()->void
 		{
 			while (true)
 			{
@@ -63,4 +69,3 @@ int main()
 
 	ThreadManager::GetInstance().JoinWithClear();
 }
-

@@ -1,0 +1,18 @@
+{
+    "server": {
+        "ip": "127.0.0.1",
+        "port": 9000,
+        "acceptCount": 50,
+        "maxSessionCount": 10000,
+        "sessionTimeoutMs": 60000
+    },
+    "actor": {
+        "dispatchThreadCount": 5
+    },
+    "network": {
+        "dispatchThreadCount": 5
+    },
+    "redis": {
+        "connectionUri": "tcp://127.0.0.1:6379?pool_size=10"
+    }
+}

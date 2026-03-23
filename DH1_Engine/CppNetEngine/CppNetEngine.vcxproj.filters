@@ -219,6 +219,9 @@
     <ClInclude Include="SendBufferAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="JsonConfig.h">
+      <Filter>Core\Init</Filter>
+    </ClInclude>
     <ClInclude Include="NetEngineInit.h">
       <Filter>Core\Init</Filter>
     </ClInclude>
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="SendBufferAllocator.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonConfig.cpp">
+      <Filter>Core\Init</Filter>
     </ClCompile>
     <ClCompile Include="NetEngineInit.cpp">
       <Filter>Core\Init</Filter>
