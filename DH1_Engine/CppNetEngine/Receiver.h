@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "IocpEvent.h"
-#include "NetReceiveBuffer.h"
+
+class NetReceiveBuffer;
 
 class IocpReceiveEvent final : public IocpEvent
 {

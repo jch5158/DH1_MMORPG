@@ -1,11 +1,4 @@
 ﻿#pragma once
-#include "Disconnector.h"
-#include "NetAddress.h"
-#include "Receiver.h"
-#include "Sender.h"
-#include "SessionTimeoutTracker.h"
-#include "SocketIocpObject.h"
-#include "Types.h"
 
 enum class eSessionState : uint8
 {

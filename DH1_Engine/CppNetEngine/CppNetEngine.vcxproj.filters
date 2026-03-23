@@ -61,14 +61,26 @@
     <Filter Include="Core\Type">
       <UniqueIdentifier>{358449ee-ca16-4ed5-ae55-2275417ac547}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Init">
+      <UniqueIdentifier>{6a8435eb-4cdc-4df1-b441-6bb368298e39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Logger">
+      <UniqueIdentifier>{8ad4708d-f977-4a56-bd9f-3eb01c13d3ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Crash">
+      <UniqueIdentifier>{be2f6fcf-b133-43ea-8fc9-524cb75c00d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Macro">
+      <UniqueIdentifier>{14b2c5fb-2470-4b44-9898-be3b7ad90e75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Pch">
+      <UniqueIdentifier>{256aa214-8a58-4f10-b65e-ffb8a5ee7abd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\EngineHeader">
+      <UniqueIdentifier>{4a88ba0e-70c6-4b1d-81ef-68aef94dc527}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NetEngineInit.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="NetEngineMacro.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadManager.h">
       <Filter>Thread</Filter>
     </ClInclude>
@@ -92,9 +104,6 @@
     </ClInclude>
     <ClInclude Include="MemoryAllocator.h">
       <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="NetEngineLogger.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Session.h">
       <Filter>Network\Session</Filter>
@@ -144,9 +153,6 @@
     <ClInclude Include="SocketIocpObject.h">
       <Filter>Network\IOCP</Filter>
     </ClInclude>
-    <ClInclude Include="EnginePch.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Actor.h">
       <Filter>Actor\Core</Filter>
     </ClInclude>
@@ -180,17 +186,11 @@
     <ClInclude Include="TimingWheel.h">
       <Filter>Time</Filter>
     </ClInclude>
-    <ClInclude Include="CrashReporter.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="UniquePtrAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
     <ClInclude Include="SharedPtrAllocator.h">
       <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="StringUtils.h">
       <Filter>Core\Utils</Filter>
@@ -201,7 +201,7 @@
     <ClInclude Include="ActorEventEnum.h">
       <Filter>Actor\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionManager.h">
+    <ClInclude Include="ConnectionPool.h">
       <Filter>Network\Service</Filter>
     </ClInclude>
     <ClInclude Include="Types.h">
@@ -216,16 +216,31 @@
     <ClInclude Include="SendBufferAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="NetEngineInit.h">
+      <Filter>Core\Init</Filter>
+    </ClInclude>
+    <ClInclude Include="NetEngineLogger.h">
+      <Filter>Core\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashReporter.h">
+      <Filter>Core\Crash</Filter>
+    </ClInclude>
+    <ClInclude Include="NetEngineMacro.h">
+      <Filter>Core\Macro</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Core\Pch</Filter>
+    </ClInclude>
+    <ClInclude Include="EnginePch.h">
+      <Filter>Core\EngineHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineNetwork.h">
+      <Filter>Core\EngineHeader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NetEngineInit.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
       <Filter>Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="NetEngineLogger.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Session.cpp">
       <Filter>Network\Session</Filter>
@@ -308,23 +323,29 @@
     <ClCompile Include="TimingWheel.cpp">
       <Filter>Time</Filter>
     </ClCompile>
-    <ClCompile Include="CrashReporter.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="StringUtils.cpp">
       <Filter>Core\Utils</Filter>
     </ClCompile>
     <ClCompile Include="ActorMailbox.cpp">
       <Filter>Actor\Core</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectionManager.cpp">
+    <ClCompile Include="ConnectionPool.cpp">
       <Filter>Network\Service</Filter>
     </ClCompile>
     <ClCompile Include="SendBufferAllocator.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="NetEngineInit.cpp">
+      <Filter>Core\Init</Filter>
+    </ClCompile>
+    <ClCompile Include="NetEngineLogger.cpp">
+      <Filter>Core\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashReporter.cpp">
+      <Filter>Core\Crash</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Core\Pch</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

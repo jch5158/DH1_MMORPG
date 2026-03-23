@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "IocpCore.h"
 
 class SocketIocpObject : public IocpObject
 {

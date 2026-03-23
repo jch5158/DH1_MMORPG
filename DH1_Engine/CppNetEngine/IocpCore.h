@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "TimingWheel.h"
 
 class IocpObject : public std::enable_shared_from_this<IocpObject>
 {

@@ -13,7 +13,7 @@
 DECLARE_SMART_PTR(IocpObject);
 DECLARE_SMART_PTR(SocketIocpObject)
 DECLARE_SMART_PTR(Listener);
-DECLARE_SMART_PTR(ConnectionManager);
+DECLARE_SMART_PTR(ConnectionPool);
 DECLARE_SMART_PTR(Acceptor);
 DECLARE_SMART_PTR(Connector);
 DECLARE_SMART_PTR(Session);

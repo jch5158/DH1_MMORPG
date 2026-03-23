@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Types.h"
-
 class NetAddress
 {
 public:

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#ifndef ENGINE_PCH
+#define ENGINE_PCH
+
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -74,4 +77,8 @@
 #include "SharedPtrTypes.h"
 #include "SendBufferAllocator.h"
 
-#include "NetEngineInit.h"
+#include "TimingWheel.h"
+
+#include "ThreadManager.h"
+
+#endif

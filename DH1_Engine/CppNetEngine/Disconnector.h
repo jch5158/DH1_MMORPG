@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "IocpEvent.h"
 
 class NetService;
 
@@ -12,7 +11,6 @@ public:
 class Disconnector
 {
 public:
-
 	Disconnector(const Disconnector&) = delete;
 	Disconnector operator=(const Disconnector&) = delete;
 	Disconnector(Disconnector&&) = delete;
@@ -26,7 +24,6 @@ public:
 	void Process() const;
 
 private:
-
 	IocpDisconnectEvent mDisconnectEvent;
 	NetServiceRef mpService;
 };

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "SocketIocpObject.h"
 
 class ServerService;
 class IocpAcceptEvent;

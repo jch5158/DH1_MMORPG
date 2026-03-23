@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "NetService.h"
-#include "ConnectionManager.h"
+#include "ConnectionPool.h"
 #include "Listener.h"
 #include "NetworkScheduler.h"
 #include "Session.h"
@@ -101,7 +101,7 @@ bool ClientService::Initialize(const NetServiceConfig& config)
 	}
 
 	const auto* pClientConfig = static_cast<const ClientServiceConfig*>(&config);
-	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionManager>(pClientConfig->maxConnectionCount);
+	mpConnectionManager = cpp_net_engine::MakeShared<ConnectionPool>(pClientConfig->maxConnectionCount);
 	return true;
 }
 

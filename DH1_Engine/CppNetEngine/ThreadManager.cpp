@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
 #include "ThreadManager.h"
-#include "CrashReporter.h"
-#include "StringUtils.h"
 
 ThreadManager::ThreadManager()
 	: ISingleton<ThreadManager>()

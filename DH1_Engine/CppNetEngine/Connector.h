@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "IocpEvent.h"
 
 class NetService;
 
@@ -26,7 +25,7 @@ public:
 	explicit Connector(const int32 connectorIndex);
 	~Connector() = default;
 
-	[[nodiscard]] bool Initialize(const ConnectionManagerRef& pOwner, ClientServiceRef pService);
+	[[nodiscard]] bool Initialize(const ConnectionPoolRef& pOwner, ClientServiceRef pService);
 	bool Register();
 	void Process();
 

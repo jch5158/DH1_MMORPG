@@ -1,9 +1,7 @@
 ﻿#include "pch.h"
-#include "ConnectionManager.h"
-#include "Connector.h"
-#include "IocpEvent.h"
+#include "ConnectionPool.h"
 
-ConnectionManager::ConnectionManager(const int32 maxConnectionCount)
+ConnectionPool::ConnectionPool(const int32 maxConnectionCount)
 	:mMaxConnectionCount(maxConnectionCount)
 	, mCurrentConnectionCount(0)
 	, mFreeIndexStack(maxConnectionCount)
@@ -18,11 +16,11 @@ ConnectionManager::ConnectionManager(const int32 maxConnectionCount)
 	}
 }
 
-void ConnectionManager::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
+void ConnectionPool::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 {
 	if (iocpEvent.GetEventType() != eIocpEventType::Connect)
 	{
-		NET_ENGINE_LOG_FATAL("ConnectionManager::Dispatch - eIocpEventType is not Connect");
+		NET_ENGINE_LOG_FATAL("ConnectionPool::Dispatch - eIocpEventType is not Connect");
 		return;
 	}
 
@@ -31,17 +29,17 @@ void ConnectionManager::Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes)
 	(void)mFreeIndexStack.TryPush(pConnectionEvent->GetConnectorIndex());
 }
 
-ConnectionManagerRef ConnectionManager::GetConnectionManagerRef()
+ConnectionPoolRef ConnectionPool::GetConnectionManagerRef()
 {
-	return std::static_pointer_cast<ConnectionManager>(shared_from_this());
+	return std::static_pointer_cast<ConnectionPool>(shared_from_this());
 }
 
-int32 ConnectionManager::GetMaxConnectionCount() const
+int32 ConnectionPool::GetMaxConnectionCount() const
 {
 	return mMaxConnectionCount;
 }
 
-bool ConnectionManager::Connect(const ClientServiceRef& pService)
+bool ConnectionPool::Connect(const ClientServiceRef& pService)
 {
 	if (mCurrentConnectionCount.fetch_add(1) >= mMaxConnectionCount)
 	{
@@ -73,12 +71,12 @@ bool ConnectionManager::Connect(const ClientServiceRef& pService)
 	return true;
 }
 
-void ConnectionManager::Close()
+void ConnectionPool::Close()
 {
 	mConnectors.clear();
 }
 
-void ConnectionManager::FreeConnection()
+void ConnectionPool::FreeConnection()
 {
 	mCurrentConnectionCount.fetch_sub(1);
 }

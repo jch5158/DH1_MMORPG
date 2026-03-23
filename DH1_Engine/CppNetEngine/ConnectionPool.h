@@ -1,18 +1,16 @@
 ﻿#pragma once
-#include "LockFreeStack.h"
-#include "SocketIocpObject.h"
 
-class ConnectionManager final : public SocketIocpObject
+class ConnectionPool final : public SocketIocpObject
 {
 public:
 
 	using ErrorHandle = std::function<void(const uint32)>;
 
-	explicit ConnectionManager(const int32 maxConnectionCount);
-	virtual ~ConnectionManager() override = default;
+	explicit ConnectionPool(const int32 maxConnectionCount);
+	virtual ~ConnectionPool() override = default;
 	virtual void Dispatch(IocpEvent& iocpEvent, const uint32 numOfBytes) override;
 	
-	ConnectionManagerRef GetConnectionManagerRef();
+	ConnectionPoolRef GetConnectionManagerRef();
 
 	int32 GetMaxConnectionCount() const;
 	bool Connect(const ClientServiceRef& pService);

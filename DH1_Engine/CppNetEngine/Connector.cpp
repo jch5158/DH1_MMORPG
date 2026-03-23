@@ -3,7 +3,7 @@
 #include "NetService.h"
 #include "Session.h"
 #include "SocketUtils.h"
-#include "ConnectionManager.h"
+#include "ConnectionPool.h"
 
 IocpConnectEvent::IocpConnectEvent(const int32 connectorIndex)
 	:IocpEvent(eIocpEventType::Connect)
@@ -21,7 +21,7 @@ Connector::Connector(const int32 connectorIndex)
 {
 }
 
-bool Connector::Initialize(const ConnectionManagerRef& pOwner, ClientServiceRef pService)
+bool Connector::Initialize(const ConnectionPoolRef& pOwner, ClientServiceRef pService)
 {
 	if (pOwner == nullptr || pService == nullptr)
 	{

@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "NetAddress.h"
-#include "SessionManager.h"
 
 enum class eServiceType : uint8
 {
@@ -12,7 +10,7 @@ using SessionFactory = std::function<SessionRef()>;
 
 struct NetServiceConfig
 {
-	virtual ~NetServiceConfig() = default;;
+	virtual ~NetServiceConfig() = default;
 
 	int32 maxSessionCount;
 	NetAddress netAddress;
@@ -82,7 +80,7 @@ public:
 	SessionRef GetFirstSessionRef();
 
 private:
-	ConnectionManagerRef mpConnectionManager;
+	ConnectionPoolRef mpConnectionManager;
 };
 
 struct ServerServiceConfig : public NetServiceConfig
