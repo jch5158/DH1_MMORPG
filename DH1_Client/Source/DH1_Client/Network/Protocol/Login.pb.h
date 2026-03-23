@@ -486,6 +486,28 @@ class C2S_LOGIN_REQ final : public ::google::protobuf::Message
 
 // C2S_LOGIN_REQ
 
+// uint64 accountId = 1;
+inline void C2S_LOGIN_REQ::clear_accountid() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.accountid_ = ::uint64_t{0u};
+}
+inline ::uint64_t C2S_LOGIN_REQ::accountid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_LOGIN_REQ.accountId)
+  return _internal_accountid();
+}
+inline void C2S_LOGIN_REQ::set_accountid(::uint64_t value) {
+  _internal_set_accountid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C2S_LOGIN_REQ.accountId)
+}
+inline ::uint64_t C2S_LOGIN_REQ::_internal_accountid() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.accountid_;
+}
+inline void C2S_LOGIN_REQ::_internal_set_accountid(::uint64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.accountid_ = value;
+}
+
 // string ticket = 2;
 inline void C2S_LOGIN_REQ::clear_ticket() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
@@ -532,28 +554,6 @@ inline void C2S_LOGIN_REQ::set_allocated_ticket(std::string* value) {
     _impl_.ticket_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_LOGIN_REQ.ticket)
-}
-
-// uint64 accountId = 1;
-inline void C2S_LOGIN_REQ::clear_accountid() {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.accountid_ = ::uint64_t{0u};
-}
-inline ::uint64_t C2S_LOGIN_REQ::accountid() const {
-  // @@protoc_insertion_point(field_get:Protocol.C2S_LOGIN_REQ.accountId)
-  return _internal_accountid();
-}
-inline void C2S_LOGIN_REQ::set_accountid(::uint64_t value) {
-  _internal_set_accountid(value);
-  // @@protoc_insertion_point(field_set:Protocol.C2S_LOGIN_REQ.accountId)
-}
-inline ::uint64_t C2S_LOGIN_REQ::_internal_accountid() const {
-  ::google::protobuf::internal::TSanRead(&_impl_);
-  return _impl_.accountid_;
-}
-inline void C2S_LOGIN_REQ::_internal_set_accountid(::uint64_t value) {
-  ::google::protobuf::internal::TSanWrite(&_impl_);
-  _impl_.accountid_ = value;
 }
 
 // -------------------------------------------------------------------

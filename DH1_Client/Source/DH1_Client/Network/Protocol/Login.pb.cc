@@ -94,8 +94,8 @@ const ::uint32_t
         ~0u,  // no _inlined_string_donated_
         ~0u,  // no _split_
         ~0u,  // no sizeof(Split)
-        PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGIN_REQ, _impl_.ticket_),
         PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGIN_REQ, _impl_.accountid_),
+        PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGIN_REQ, _impl_.ticket_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::Protocol::S2C_LOGIN_RES, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -119,8 +119,8 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_Login_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
     "\n\013Login.proto\022\010Protocol\032\nEnum.proto\032\022Pac"
-    "ketOption.proto\"=\n\rC2S_LOGIN_REQ\022\016\n\006tick"
-    "et\030\002 \001(\t\022\021\n\taccountId\030\001 \001(\004:\t\240\265\030\001\252\265\030\001\004\"B"
+    "ketOption.proto\"=\n\rC2S_LOGIN_REQ\022\021\n\tacco"
+    "untId\030\001 \001(\004\022\016\n\006ticket\030\002 \001(\t:\t\240\265\030\001\252\265\030\001\004\"B"
     "\n\rS2C_LOGIN_RES\022&\n\006result\030\001 \001(\0162\026.Protoc"
     "ol.eLoginResult:\t\240\265\030\004\252\265\030\001\001B\032\210\265\030\002\222\265\030\022Logi"
     "nPacketHandlerb\006proto3"
