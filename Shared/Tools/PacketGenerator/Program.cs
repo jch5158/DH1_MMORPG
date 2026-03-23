@@ -13,7 +13,7 @@ if (args.Length >= 3)
 else
 {
     var baseDir = AppContext.BaseDirectory;
-    configPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\Config\PacketGeneratorConfig.json"));
+    configPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\Config\Tools\PacketGeneratorConfig.json"));
     protoPath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\Shared\Protocol\Proto"));
     prjBasePath = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\"));
 }
