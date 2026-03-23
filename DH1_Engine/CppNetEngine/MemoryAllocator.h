@@ -53,7 +53,14 @@ public:
 		}
 		else
 		{
-			pData = mi_malloc(size + sizeof(uint64));
+			void* pRaw = mi_malloc(sizeof(int64) + size + sizeof(uint64));
+			if (pRaw == nullptr)
+			{
+				return nullptr;
+			}
+
+			std::memcpy(pRaw, &size, sizeof(int64));
+			pData = static_cast<byte*>(pRaw) + sizeof(int64);
 			setChecksum(pData, size);
 		}
 
@@ -81,12 +88,23 @@ public:
 		}
 		else
 		{
-			if (!isValidChecksum(pData, size))
+			void* pRaw = static_cast<byte*>(pData) - sizeof(int64);
+			int64 storedSize = 0;
+			std::memcpy(&storedSize, pRaw, sizeof(int64));
+
+			if (storedSize != size)
 			{
+				NET_ENGINE_LOG_ERROR("MemoryAllocator::Free - Size mismatch. stored: {}, requested: {}", storedSize, size);
 				return;
 			}
 
-			mi_free(pData);
+			if (!isValidChecksum(pData, storedSize))
+			{
+				NET_ENGINE_LOG_ERROR("MemoryAllocator::Free - Invalid checksum for large allocation.");
+				return;
+			}
+
+			mi_free(pRaw);
 		}
 	}
 
