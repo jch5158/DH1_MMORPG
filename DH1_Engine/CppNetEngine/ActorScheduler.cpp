@@ -8,7 +8,6 @@ ActorScheduler::ActorScheduler(const ActorSchedulerConfig& config)
 	: IocpCore(config.runningThreadCount)
 	, mWaitTimeoutMs(config.waitTimeoutMs)
 	, mTimingWheel(config.tickIntervalMs)
-	, mOnHandleError(config.onHandleError)
 {
 }
 
@@ -48,12 +47,9 @@ void ActorScheduler::Dispatch()
 	if (gqcsRet == 0)
 	{
 		const uint32 errorCode = GetLastError();
-		if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
+		if (!SocketUtils::IsExpectedIocpError(errorCode))
 		{
-			if (mOnHandleError != nullptr)
-			{
-				mOnHandleError(errorCode);
-			}
+			NET_ENGINE_LOG_ERROR("ActorScheduler::Dispatch - GQCS failed, errorCode : {}", errorCode);
 		}
 	}
 

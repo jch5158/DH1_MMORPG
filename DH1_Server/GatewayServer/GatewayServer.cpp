@@ -23,7 +23,6 @@ int main()
 	netConfig.runningThreadCount = 0;
 	netConfig.tickIntervalMs = 16;
 	netConfig.waitTimeoutMs = 16;
-	netConfig.onHandleError = [](const uint32)->void {};
 
 	ServerServiceConfig serviceConfig;
 	serviceConfig.acceptCount = 50;
@@ -40,7 +39,6 @@ int main()
 	pService->Initialize(serviceConfig);
 
 	ActorServiceConfig actorServiceConfig;
-	actorServiceConfig.schedulerConfig.onHandleError = [](const uint32)->void {};
 	actorServiceConfig.schedulerConfig.runningThreadCount = 0;
 	actorServiceConfig.schedulerConfig.tickIntervalMs = 16;
 	actorServiceConfig.schedulerConfig.waitTimeoutMs = 16;

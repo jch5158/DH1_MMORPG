@@ -64,7 +64,7 @@ bool Connector::Register()
 		const int32 errorCode = WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
-			if (!SocketUtils::IsLoggingIgnorableIocpError(errorCode))
+			if (!SocketUtils::IsExpectedIocpError(errorCode))
 			{
 				pSession->OnError(errorCode);
 			}

@@ -20,9 +20,6 @@ int main()
 	netConfig.runningThreadCount = 0;
 	netConfig.tickIntervalMs = 16;
 	netConfig.waitTimeoutMs = 16;
-	netConfig.onHandleError = [](const uint32 errorCode)->void
-		{
-		};
 
 	ServerServiceConfig serviceConfig{};
 	serviceConfig.netAddress = NetAddress("127.0.0.1", 7777);

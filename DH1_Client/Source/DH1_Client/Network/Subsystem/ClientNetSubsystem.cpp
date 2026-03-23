@@ -59,7 +59,6 @@ bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 	SchedulerConfig.waitTimeoutMs = 16;
 	SchedulerConfig.tickIntervalMs = 16;
 	SchedulerConfig.runningThreadCount = 0;
-	SchedulerConfig.onHandleError = [](const uint32)->void {};
 	ClientConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(SchedulerConfig);
 
 	if (!ServiceRef->Initialize(ClientConfig) || !ServiceRef->Start())
