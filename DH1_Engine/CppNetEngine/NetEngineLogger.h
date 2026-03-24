@@ -1,11 +1,23 @@
-﻿#pragma once
+#pragma once
 
 enum class eNetLogLevel { Trace, Debug, Info, Warn, Error, Fatal };
+
+struct NetEngineLoggerConfig
+{
+	bool bIsUnrealClient = false;
+	bool bEnableConsole = true;
+	bool bEnableFile = true;
+	std::string logDirectory = "logs";
+	std::string logFileName = "NetEngine.log";
+	uint32 asyncQueueSize = 8192;
+	uint32 asyncThreadCount = 1;
+	uint32 flushIntervalSeconds = 3;
+};
 
 class NetEngineLogger
 {
 public:
-	template<typename Mutex> 
+	template<typename Mutex>
 	friend class UnrealCallbackSink;
 
 	using LogCallback = std::function<void(eNetLogLevel, const char*)>;
@@ -14,7 +26,7 @@ public:
 	~NetEngineLogger() = delete;
 
 	static void SetLogCallback(LogCallback callback);
-	static void Init(const bool bIsUnrealClient = false);
+	static void Init(const NetEngineLoggerConfig& config = {});
 	static std::shared_ptr<spdlog::logger> GetLogger();
 
 private:

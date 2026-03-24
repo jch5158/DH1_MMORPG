@@ -8,7 +8,9 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	NetEngineInit EnginInit(true);
+	NetEngineConfig engineConfig;
+	engineConfig.logger.bIsUnrealClient = true;
+	NetEngineInit EnginInit(engineConfig);
 
 	PacketServiceTypeHandler::Init();
 	

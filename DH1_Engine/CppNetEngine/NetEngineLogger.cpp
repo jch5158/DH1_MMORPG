@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "NetEngineLogger.h"
 
 template<typename Mutex>
@@ -44,19 +44,20 @@ void NetEngineLogger::SetLogCallback(LogCallback callback)
 	spLogCallback = std::move(callback);
 }
 
-void NetEngineLogger::Init(const bool bIsUnrealClient)
+void NetEngineLogger::Init(const NetEngineLoggerConfig& config)
 {
 	if (spLogger)
 	{
 		return;
 	}
 
-	// 비동기 로거 스레드 풀 초기화 보장
-	spdlog::init_thread_pool(8192, 1);
+	spdlog::init_thread_pool(config.asyncQueueSize, config.asyncThreadCount);
+
+	constexpr auto logPattern = "[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%s:%#] [%^%l%$] %v";
 
 	Vector<spdlog::sink_ptr> sinks;
 
-	if (bIsUnrealClient)
+	if (config.bIsUnrealClient)
 	{
 		const auto unrealSink = cpp_net_engine::MakeShared<UnrealCallbackSink<std::mutex>>();
 		unrealSink->set_pattern("%v");
@@ -64,15 +65,20 @@ void NetEngineLogger::Init(const bool bIsUnrealClient)
 	}
 	else
 	{
-		const auto fileSink = cpp_net_engine::MakeShared<spdlog::sinks::daily_file_sink_mt>("logs/NetEngine.log", 0, 0);
-		fileSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%s:%#] [%^%l%$] %v");
-		sinks.push_back(fileSink);
+		if (config.bEnableFile)
+		{
+			const std::string logPath = config.logDirectory + "/" + config.logFileName;
+			const auto fileSink = cpp_net_engine::MakeShared<spdlog::sinks::daily_file_sink_mt>(logPath, 0, 0);
+			fileSink->set_pattern(logPattern);
+			sinks.push_back(fileSink);
+		}
 
-#ifdef _DEBUG
-		const auto consoleSink = cpp_net_engine::MakeShared<spdlog::sinks::stdout_color_sink_mt>();
-		consoleSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%t] [%s:%#] [%^%l%$] %v");
-		sinks.push_back(consoleSink);
-#endif	
+		if (config.bEnableConsole)
+		{
+			const auto consoleSink = cpp_net_engine::MakeShared<spdlog::sinks::stdout_color_sink_mt>();
+			consoleSink->set_pattern(logPattern);
+			sinks.push_back(consoleSink);
+		}
 	}
 
 	spLogger = cpp_net_engine::MakeShared<spdlog::async_logger>(
@@ -80,7 +86,7 @@ void NetEngineLogger::Init(const bool bIsUnrealClient)
 		sinks.begin(),
 		sinks.end(),
 		spdlog::thread_pool(),
-		spdlog::async_overflow_policy::overrun_oldest // 서버 멈춤 방지
+		spdlog::async_overflow_policy::overrun_oldest
 	);
 
 #ifdef _DEBUG
@@ -94,7 +100,7 @@ void NetEngineLogger::Init(const bool bIsUnrealClient)
 	spdlog::register_logger(spLogger);
 	spdlog::set_default_logger(spLogger);
 
-	spdlog::flush_every(std::chrono::seconds(3));
+	spdlog::flush_every(std::chrono::seconds(config.flushIntervalSeconds));
 }
 
 std::shared_ptr<spdlog::logger> NetEngineLogger::GetLogger()

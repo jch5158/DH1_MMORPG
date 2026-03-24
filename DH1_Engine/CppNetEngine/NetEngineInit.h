@@ -1,4 +1,9 @@
-﻿#pragma once
+#pragma once
+
+struct NetEngineConfig
+{
+	NetEngineLoggerConfig logger;
+};
 
 class NetEngineInit final
 {
@@ -8,6 +13,6 @@ public:
 	NetEngineInit(NetEngineInit&&) = delete;
 	NetEngineInit& operator=(NetEngineInit&&) = delete;
 
-	explicit NetEngineInit(const bool isUnrealClient = false);
+	explicit NetEngineInit(const NetEngineConfig& config = {});
 	~NetEngineInit();
 };
