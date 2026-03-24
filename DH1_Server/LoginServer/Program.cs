@@ -1,15 +1,27 @@
-﻿using LoginServer.Data;
+using LoginServer.Data;
 using LoginServer.Services;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Fail-Fast: 연결 문자열이 없으면 서버 구동을 즉시 중단하고 명확한 에러를 띄움
-var connectionString = builder.Configuration.GetConnectionString("AccountDbConnection")
-                       ?? throw new InvalidOperationException("appsettings.json에 AccountDbConnection 설정이 없습니다.");
-var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection")
-                            ?? throw new InvalidOperationException("appsettings.json에 RedisConnection 설정이 없습니다.");
+// 환경변수 치환: ${ENV_VAR} 패턴을 실제 환경변수 값으로 대체
+string ResolveEnvVars(string value)
+{
+    return System.Text.RegularExpressions.Regex.Replace(value, @"\$\{(\w+)\}", match =>
+    {
+        var envVar = match.Groups[1].Value;
+        return Environment.GetEnvironmentVariable(envVar) ?? match.Value;
+    });
+}
+
+var connectionString = ResolveEnvVars(
+    builder.Configuration.GetConnectionString("AccountDbConnection")
+    ?? throw new InvalidOperationException("appsettings.json에 AccountDbConnection 설정이 없습니다."));
+
+var redisConnectionString = ResolveEnvVars(
+    builder.Configuration.GetConnectionString("RedisConnection")
+    ?? throw new InvalidOperationException("appsettings.json에 RedisConnection 설정이 없습니다."));
 
 builder.Services.AddDbContext<AccountDbContext>(options =>
 {
@@ -19,6 +31,8 @@ builder.Services.AddDbContext<AccountDbContext>(options =>
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
 builder.Services.AddHostedService<EmailBackgroundService>();
+builder.Services.AddScoped<GatewaySelector>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 

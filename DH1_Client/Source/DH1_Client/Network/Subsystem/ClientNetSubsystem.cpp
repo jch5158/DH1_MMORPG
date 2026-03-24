@@ -1,8 +1,12 @@
-﻿#include "ClientNetSubsystem.h"
+#include "ClientNetSubsystem.h"
 
+#include "HttpModule.h"
+#include "Interfaces/IHttpResponse.h"
 #include "NetEngineInit.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 
 void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -13,8 +17,13 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	NetEngineInit EnginInit(engineConfig);
 
 	PacketServiceTypeHandler::Init();
-	
+
 	ServiceRef = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
+
+	if (LoginServerURL.IsEmpty())
+	{
+		LoginServerURL = TEXT("https://localhost:5001");
+	}
 }
 
 void UClientNetSubsystem::Deinitialize()
@@ -40,6 +49,84 @@ TStatId UClientNetSubsystem::GetStatId() const
 bool UClientNetSubsystem::IsTickable() const
 {
 	return ServiceRef != nullptr;
+}
+
+void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Password)
+{
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	JsonObject->SetStringField(TEXT("Email"), Email);
+	JsonObject->SetStringField(TEXT("Password"), Password);
+
+	FString JsonString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	Request->SetURL(FString::Printf(TEXT("%s/api/auth/login"), *LoginServerURL));
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetContentAsString(JsonString);
+
+	Request->OnProcessRequestComplete().BindUObject(this, &UClientNetSubsystem::OnLoginResponseReceived);
+	Request->ProcessRequest();
+}
+
+void UClientNetSubsystem::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful)
+{
+	if (!bWasSuccessful || !Response.IsValid())
+	{
+		OnHttpLoginError.Broadcast(0, TEXT("서버와 연결할 수 없습니다."));
+		return;
+	}
+
+	const int32 ResponseCode = Response->GetResponseCode();
+	if (ResponseCode == 200)
+	{
+		FString Ticket;
+		int64 AccountId = 0;
+		FString GatewayIp;
+		int64 GatewayPort = 0;
+
+		const FString JsonString = Response->GetContentAsString();
+		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+		TSharedPtr<FJsonObject> JsonObject;
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			JsonObject->TryGetStringField(TEXT("ticket"), Ticket);
+			JsonObject->TryGetNumberField(TEXT("accountId"), AccountId);
+			JsonObject->TryGetStringField(TEXT("gatewayIp"), GatewayIp);
+			JsonObject->TryGetNumberField(TEXT("gatewayPort"), GatewayPort);
+		}
+
+		SetAuthData(Ticket, FString::Printf(TEXT("%lld"), AccountId));
+		ConnectToServer(GatewayIp, static_cast<int32>(GatewayPort));
+	}
+	else
+	{
+		FString Message = TEXT("서버 처리 중 오류가 발생했습니다.");
+		FString Code;
+		FString Email;
+
+		const FString JsonString = Response->GetContentAsString();
+		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+		TSharedPtr<FJsonObject> JsonObject;
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			JsonObject->TryGetStringField(TEXT("message"), Message);
+			JsonObject->TryGetStringField(TEXT("code"), Code);
+			JsonObject->TryGetStringField(TEXT("email"), Email);
+		}
+
+		if (ResponseCode == 403 && Code == TEXT("EMAIL_UNVERIFIED"))
+		{
+			OnEmailVerificationRequired.Broadcast(Message, Email);
+		}
+		else
+		{
+			OnHttpLoginError.Broadcast(ResponseCode, Message);
+		}
+	}
 }
 
 bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)

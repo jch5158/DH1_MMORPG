@@ -1,8 +1,7 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Interfaces/IHttpRequest.h"
 #include "LoginWidget.generated.h"
 
 class UEditableTextBox;
@@ -33,7 +32,6 @@ protected:
     virtual void NativeConstruct() override;
     virtual void NativeDestruct() override;
 
-    // 에러 메시지 출력용 텍스트 블록
     UPROPERTY(meta = (BindWidget))
     UTextBlock* StatusTextMessage;
 
@@ -64,9 +62,9 @@ protected:
     UFUNCTION()
     void OnResetPasswordButtonClicked();
 
-    void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful);
-
     void HandleGatewayLoginResult(int32 Result);
+    void HandleHttpLoginError(int32 StatusCode, const FString& Message);
+    void HandleEmailVerificationRequired(const FString& Message, const FString& Email);
 
     void SetLoading(bool bLoading);
 };
