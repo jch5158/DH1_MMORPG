@@ -6,6 +6,20 @@
 #include "ThreadManager.h"
 #include "JsonConfig.h"
 
+BOOL WINAPI EchoClientService::ConsoleCtrlHandler(const DWORD ctrlType)
+{
+	switch (ctrlType)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+	case CTRL_BREAK_EVENT:
+		GetInstance().Stop();
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
+
 bool EchoClientService::Initialize(const JsonConfig& config)
 {
 	const JsonConfig clientConfig = config.GetSection("client");
@@ -76,19 +90,16 @@ void EchoClientService::Run()
 		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 	}
 
+	NET_ENGINE_LOG_INFO("EchoClientService - Closing service...");
+	mpClientService->CloseService(mNetworkDispatchThreadCount);
+
 	ThreadManager::GetInstance().JoinWithClear();
+	NET_ENGINE_LOG_INFO("EchoClientService - Shutdown complete");
 }
 
 void EchoClientService::Stop()
 {
-	if (mbRunning.exchange(false) == false)
-	{
-		return;
-	}
-
-	NET_ENGINE_LOG_INFO("EchoClientService::Stop - Shutting down...");
-
-	mpClientService->CloseService(mNetworkDispatchThreadCount);
+	mbRunning.store(false);
 }
 
 ClientServiceRef EchoClientService::GetClientServiceRef() const

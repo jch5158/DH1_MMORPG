@@ -3,6 +3,9 @@
 #include "JsonConfig.h"
 #include "PacketServiceTypeHandler.h"
 
+#define STRINGIFY_IMPL(x) #x
+#define STRINGIFY(x) STRINGIFY_IMPL(x)
+
 int main()
 {
 	CrashReporter::Initialize("GatewayServer", "1.0.0", "");
@@ -11,7 +14,7 @@ int main()
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/Server/GatewayServerConfig.json");
+	const JsonConfig config = JsonConfig::LoadFromFile(std::string(STRINGIFY(SOLUTION_DIR_UNQUOTED)) + "/Shared/Config/Server/GatewayServerConfig.json");
 
 	auto& service = ISingleton<GatewayService>::GetInstance();
 

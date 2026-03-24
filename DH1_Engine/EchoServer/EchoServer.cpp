@@ -5,19 +5,8 @@
 
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
-BOOL WINAPI ConsoleCtrlHandler(const DWORD ctrlType)
-{
-	switch (ctrlType)
-	{
-	case CTRL_C_EVENT:
-	case CTRL_CLOSE_EVENT:
-	case CTRL_BREAK_EVENT:
-		ISingleton<EchoServerService>::GetInstance().Stop();
-		return TRUE;
-	default:
-		return FALSE;
-	}
-}
+#define STRINGIFY_IMPL(x) #x
+#define STRINGIFY(x) STRINGIFY_IMPL(x)
 
 int main()
 {
@@ -25,11 +14,11 @@ int main()
 
 	NetEngineInit netEngineInit;
 
-	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+	SetConsoleCtrlHandler(EchoServerService::ConsoleCtrlHandler, TRUE);
 
 	PacketServiceTypeHandler::Init();
 
-	const JsonConfig config = JsonConfig::LoadFromFile("../../Shared/Config/Server/EchoServerConfig.json");
+	const JsonConfig config = JsonConfig::LoadFromFile(std::string(STRINGIFY(SOLUTION_DIR_UNQUOTED)) + "/Shared/Config/Server/EchoServerConfig.json");
 
 	auto& service = ISingleton<EchoServerService>::GetInstance();
 
