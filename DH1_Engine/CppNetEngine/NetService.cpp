@@ -15,7 +15,7 @@ NetService::NetService(const eServiceType serviceType)
 	, mSessionManager()
 	, mpRedisConnection()
 	, mpSessionIdAllocator()
-	, mReusableSessionPool()
+	, mpReusableSessionPool()
 {
 }
 
@@ -30,6 +30,7 @@ bool NetService::Initialize(const NetServiceConfig& config)
 	mpNetworkScheduler = config.pNetworkScheduler;
 	mSessionFactory = config.sessionFactory;
 	mSessionManager.SetMaxSessionCount(config.maxSessionCount);
+	mpReusableSessionPool = cpp_net_engine::MakeUnique<LockFreeStack<SessionRef>>(config.maxSessionCount);
 
 	mpSessionIdAllocator = cpp_net_engine::MakeShared<SessionIdAllocator>();
 
@@ -64,7 +65,7 @@ SessionRef NetService::CreateSession()
 {
 	SessionRef pSession;
 
-	if (mReusableSessionPool.TryPop(pSession))
+	if (mpReusableSessionPool->TryPop(pSession))
 	{
 		if (pSession->Reset())
 		{
@@ -129,7 +130,7 @@ uint64 NetService::AllocateSessionId()
 void NetService::RecycleSession(const SessionRef& pSession)
 {
 	pSession->Stop();
-	mReusableSessionPool.TryPush(pSession);
+	mpReusableSessionPool->TryPush(pSession);
 }
 
 ClientService::ClientService(const eServiceType serviceType)

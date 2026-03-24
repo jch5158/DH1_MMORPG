@@ -61,7 +61,7 @@ protected:
 	SessionManager mSessionManager;
 	RedisConnectionRef mpRedisConnection;
 	SessionIdAllocatorRef mpSessionIdAllocator;
-	LockFreeStack<SessionRef> mReusableSessionPool;
+	UniquePtr<LockFreeStack<SessionRef>> mpReusableSessionPool;
 };
 
 struct ClientServiceConfig : public NetServiceConfig
