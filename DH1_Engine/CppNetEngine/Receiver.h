@@ -23,6 +23,7 @@ public:
 	~Receiver() = default;
 
 	[[nodiscard]] bool Initialize(const SessionRef& pOwner);
+	void Reset();
 	void Process(const uint32 numOfBytes);
 	void Register();
 	

@@ -15,6 +15,7 @@ public:
 	~SessionTimeoutTracker() = default;
 
 	void UpdateLastActivityMs();
+	void Reset();
 	[[nodiscard]] int64 GetLastActivityMs() const;
 
 private:

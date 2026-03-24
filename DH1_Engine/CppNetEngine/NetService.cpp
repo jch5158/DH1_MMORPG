@@ -15,6 +15,7 @@ NetService::NetService(const eServiceType serviceType)
 	, mSessionManager()
 	, mpRedisConnection()
 	, mpSessionIdAllocator()
+	, mReusableSessionPool()
 {
 }
 
@@ -61,15 +62,25 @@ void NetService::Dispatch()
 
 SessionRef NetService::CreateSession()
 {
-	SessionRef pSession = mSessionFactory();
+	SessionRef pSession;
+
+	if (mReusableSessionPool.TryDequeue(pSession))
+	{
+		if (pSession->Reset())
+		{
+			return pSession;
+		}
+	}
+
+	pSession = mSessionFactory();
 	if (pSession->Initialize(shared_from_this()) == false)
 	{
-		pSession = nullptr;
+		return nullptr;
 	}
 
 	if (mpNetworkScheduler->Register(pSession) == false)
 	{
-		pSession = nullptr;
+		return nullptr;
 	}
 
 	return pSession;
@@ -113,6 +124,12 @@ uint64 NetService::AllocateSessionId()
 	}
 
 	return mpSessionIdAllocator->Allocate();
+}
+
+void NetService::RecycleSession(const SessionRef& pSession)
+{
+	pSession->Stop();
+	mReusableSessionPool.TryEnqueue(pSession);
 }
 
 ClientService::ClientService(const eServiceType serviceType)
@@ -175,7 +192,7 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 {
 	mSessionManager.RemoveSession(pSession);
 
-	pSession->Stop();
+	RecycleSession(pSession);
 
 	mpConnectionManager->FreeConnection();
 
@@ -277,7 +294,7 @@ void ServerService::OnSessionDisconnected(const SessionRef& pSession)
 {
 	mSessionManager.RemoveSession(pSession);
 
-	pSession->Stop();
+	RecycleSession(pSession);
 }
 
 Vector<SessionRef> ServerService::GetActiveSessions()

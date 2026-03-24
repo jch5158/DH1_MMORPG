@@ -30,6 +30,16 @@ bool Sender::Initialize(const SessionRef& pOwner)
 	return true;
 }
 
+void Sender::Reset()
+{
+	mSendEvent.GetSendPendingBuffer().clear();
+
+	NetSendBufferRef discarded;
+	while (mSendQueue.TryDequeue(discarded)) {}
+
+	mbSendRegistered.store(false);
+}
+
 void Sender::Send(NetSendBufferRef pSendBuffer)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());

@@ -6,6 +6,11 @@ SessionTimeoutTracker::SessionTimeoutTracker()
 {
 }
 
+void SessionTimeoutTracker::Reset()
+{
+	mLastActivityMs.store(getNowTimeMs());
+}
+
 void SessionTimeoutTracker::UpdateLastActivityMs()
 {
 	const auto now = getNowTimeMs();

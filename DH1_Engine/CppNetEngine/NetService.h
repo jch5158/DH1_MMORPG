@@ -48,6 +48,7 @@ public:
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 	uint64 AllocateSessionId();
+	void RecycleSession(const SessionRef& pSession);
 
 private:
 	std::atomic<bool> mbInitialize;
@@ -60,6 +61,7 @@ protected:
 	SessionManager mSessionManager;
 	RedisConnectionRef mpRedisConnection;
 	SessionIdAllocatorRef mpSessionIdAllocator;
+	LockFreeQueue<SessionRef> mReusableSessionPool;
 };
 
 struct ClientServiceConfig : public NetServiceConfig

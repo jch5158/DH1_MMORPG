@@ -208,6 +208,26 @@ bool Session::Initialize(const NetServiceRef& pService)
 	return true;
 }
 
+bool Session::Reset()
+{
+	if (!setSessionInitialized())
+	{
+		return false;
+	}
+
+	mSessionId = mpService->AllocateSessionId();
+	if (mSessionId == 0)
+	{
+		return false;
+	}
+
+	mReceiver.Reset();
+	mSender.Reset();
+	mTimeoutTracker.Reset();
+
+	return true;
+}
+
 void Session::setNetAddress(const NetAddress& address)
 {
 	mNetAddress = address;

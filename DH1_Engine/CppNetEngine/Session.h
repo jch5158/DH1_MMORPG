@@ -87,6 +87,7 @@ private:
 	void processReceive(const uint32 numOfBytes);
 
 	bool Initialize(const NetServiceRef& pService);
+	bool Reset();
 	void setNetAddress(const NetAddress& address);
 	void startReceive();
 

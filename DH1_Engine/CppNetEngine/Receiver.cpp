@@ -24,6 +24,11 @@ bool Receiver::Initialize(const SessionRef& pOwner)
 	return true;
 }
 
+void Receiver::Reset()
+{
+	mNetReceiveBuffer.Clear();
+}
+
 void Receiver::Process(const uint32 numOfBytes)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
