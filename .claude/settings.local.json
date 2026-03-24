@@ -5,7 +5,14 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(ls:*)",
-      "Bash(netsh int:*)"
+      "Bash(netsh int:*)",
+      "Bash(reg add:*)",
+      "Bash(cmd.exe /c \"reg add HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters /v TcpTimedWaitDelay /t REG_DWORD /d 30 /f\")",
+      "Bash(cmd.exe /c \"reg query HKLM\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters /v TcpTimedWaitDelay\")",
+      "Bash(cmd.exe //c \"reg query HKLM\\\\\\\\SYSTEM\\\\\\\\CurrentControlSet\\\\\\\\Services\\\\\\\\Tcpip\\\\\\\\Parameters /v TcpTimedWaitDelay\" 2>&1)",
+      "Bash(reg.exe add:*)",
+      "Bash(powershell.exe -Command \"Set-ItemProperty -Path 'HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters' -Name 'TcpTimedWaitDelay' -Value 30 -Type DWord\")",
+      "Bash(powershell.exe -Command \"Get-ItemProperty -Path 'HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters' -Name 'TcpTimedWaitDelay' | Select-Object -ExpandProperty TcpTimedWaitDelay\")"
     ]
   }
 }
