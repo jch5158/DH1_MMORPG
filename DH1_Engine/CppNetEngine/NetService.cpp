@@ -173,9 +173,9 @@ void ClientService::OnSessionConnected(const SessionRef& pSession)
 
 void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 {
-	pSession->Stop();
-
 	mSessionManager.RemoveSession(pSession);
+
+	pSession->Stop();
 
 	mpConnectionManager->FreeConnection();
 
@@ -276,9 +276,9 @@ void ServerService::OnSessionConnected(const SessionRef& pSession)
 
 void ServerService::OnSessionDisconnected(const SessionRef& pSession)
 {
-	pSession->Stop();
-
 	mSessionManager.RemoveSession(pSession);
+
+	pSession->Stop();
 }
 
 Vector<SessionRef> ServerService::GetActiveSessions()
