@@ -47,7 +47,7 @@ public:
 	[[nodiscard]] NetworkSchedulerRef GetNetworkScheduler() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
-	uint64 AllocateSessionId();
+	uint64 AllocateSessionId() const;
 	void RecycleSession(const SessionRef& pSession) const;
 
 private:

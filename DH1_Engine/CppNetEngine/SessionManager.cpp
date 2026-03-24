@@ -3,7 +3,7 @@
 
 SessionManager::SessionManager()
 	: mMaxSessionCount(0)
-	, mSessions()
+	  , mSessions()
 {
 }
 
@@ -39,33 +39,19 @@ int32 SessionManager::GetMaxSessionCount() const
 
 int32 SessionManager::GetCurrentSessionCount()
 {
-	UniqueLock lock(mLock);
+	SharedLock lock(mLock);
 	return static_cast<int32>(mSessions.size());
 }
 
 SessionRef SessionManager::GetFirstSessionRef()
 {
-	UniqueLock lock(mLock);
+	SharedLock lock(mLock);
 	if (mSessions.begin() == mSessions.end())
 	{
 		return nullptr;
 	}
 
 	return mSessions.begin()->second;
-}
-
-Vector<SessionRef> SessionManager::GetActiveSessions()
-{
-	SharedLock lock(mLock);
-
-	Vector<SessionRef> sessions;
-	sessions.reserve(mSessions.size());
-	for (const auto& [sessionId, pSession] : mSessions)
-	{
-		sessions.emplace_back(pSession);
-	}
-
-	return sessions;
 }
 
 SessionRef SessionManager::GetSession(const uint64 sessionId)
@@ -78,4 +64,18 @@ SessionRef SessionManager::GetSession(const uint64 sessionId)
 	}
 
 	return iter->second;
+}
+
+Vector<SessionRef> SessionManager::GetActiveSessions()
+{
+	SharedLock lock(mLock);
+
+	Vector<SessionRef> sessions;
+	sessions.reserve(mSessions.size());
+	for (const auto& pSession : mSessions | std::views::values)
+	{
+		sessions.emplace_back(pSession);
+	}
+
+	return sessions;
 }

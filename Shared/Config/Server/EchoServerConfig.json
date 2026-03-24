@@ -1,7 +1,7 @@
 {
     "server": {
         "ip": "0.0.0.0",
-        "port": 7777,
+        "port": 8888,
         "acceptCount": 100,
         "maxSessionCount": 6000,
         "sessionTimeoutMs": 60000
