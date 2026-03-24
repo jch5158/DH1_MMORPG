@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "GameSession.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
@@ -9,17 +9,18 @@ GameSession::GameSession(const int32 receiveBufferSize, const int32 maxPacketSiz
 
 void GameSession::OnConnected()
 {
-	fmt::print(L"Client Connect\n");
 }
 
 void GameSession::OnDisconnecting(const eDisconnectReason reason)
 {
-	fmt::print(L"On Disconnecting : {}\n", static_cast<uint16>(reason));
+	if (reason != eDisconnectReason::Closed && reason != eDisconnectReason::Timeout)
+	{
+		NET_ENGINE_LOG_ERROR("[Server GameSession] Unexpected disconnect! sessionId: {}, reason: {}", GetSessionId(), static_cast<uint8>(reason));
+	}
 }
 
 void GameSession::OnDisconnected()
 {
-	fmt::print(L"Client Disconnect {}\n", GetSessionRef().use_count());
 }
 
 void GameSession::OnSend(const int32 len)
@@ -38,5 +39,5 @@ void GameSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 
 void GameSession::OnError(const int32 errorCode)
 {
-	fmt::print(L"OnError - errorCode : {}", errorCode);
+	NET_ENGINE_LOG_ERROR("[Server GameSession] OnError - sessionId: {}, errorCode: {}", GetSessionId(), errorCode);
 }

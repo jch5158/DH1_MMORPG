@@ -11,6 +11,7 @@ bool EchoClientService::Initialize(const JsonConfig& config)
 	const JsonConfig clientConfig = config.GetSection("client");
 	const JsonConfig sessionConfig = config.GetSection("session");
 	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");
+	const JsonConfig redisConfig = config.GetSection("redis");
 
 	// NetworkScheduler
 	NetworkSchedulerConfig netConfig;
@@ -34,6 +35,7 @@ bool EchoClientService::Initialize(const JsonConfig& config)
 		{
 			return cpp_net_engine::MakeShared<GameSession>(receiveBufferSize, sendBufferSize);
 		};
+	serviceConfig.redisConnectionUri = redisConfig.GetString("connectionUri");
 
 	mpClientService = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
 	if (mpClientService->Initialize(serviceConfig) == false)

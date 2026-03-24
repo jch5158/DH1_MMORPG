@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
 #include "GameSession.h"
 
@@ -8,19 +8,27 @@
 
 GameSession::GameSession(const int32 receiveBufferSize, const int32 maxPacketSize)
 	:PacketSession(receiveBufferSize, maxPacketSize)
+	, mbDisconnectRequested(false)
 {
 }
 
 void GameSession::OnConnected()
 {
+	mbDisconnectRequested.store(false);
+
 	Protocol::C2S_ECHO_REQ packet;
-	packet.set_echomsg("Hello World\n");
+	packet.set_echomsg(ECHO_TEST_MESSAGE);
 	const auto pSendBuffer = EchoPacketHandler::MakeSendBuffer(packet);
 	Send(pSendBuffer);
 }
 
 void GameSession::OnDisconnecting(const eDisconnectReason reason)
 {
+	if (!mbDisconnectRequested.load())
+	{
+		NET_ENGINE_LOG_FATAL("[GameSession] Unexpected disconnect! sessionId: {}, reason: {}", GetSessionId(), static_cast<uint8>(reason));
+		CrashReporter::Crash();
+	}
 }
 
 void GameSession::OnDisconnected()
@@ -43,4 +51,5 @@ void GameSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 
 void GameSession::OnError(const int32 errorCode)
 {
+	NET_ENGINE_LOG_ERROR("[GameSession] OnError - sessionId: {}, errorCode: {}", GetSessionId(), errorCode);
 }
