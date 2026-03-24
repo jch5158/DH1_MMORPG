@@ -17,6 +17,7 @@ public:
 	~SharedPtrAllocator() = default;
 
 	template <typename U>
+	// ReSharper disable once CppNonExplicitConvertingConstructor
 	SharedPtrAllocator(const SharedPtrAllocator<U>&) {}
 
 	template<typename U>
@@ -36,9 +37,7 @@ public:
 
 	static void deallocate(T* ptr, const uint64 size)
 	{
-        const uint64 objSize = sizeof(T) * size;
-
-        MemoryAllocator::GetInstance().Free(ptr, objSize);
+        MemoryAllocator::GetInstance().Free(ptr, sizeof(T) * size);
 	}
 };
 

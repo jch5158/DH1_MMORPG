@@ -184,7 +184,7 @@ private:
 		Chunk& operator=(Chunk&&) = delete;
 
 		explicit Chunk()
-			:mAllocCount(0)
+			:mAllocCount(CHUNK_SIZE)
 			, mFreeCount(0)
 			, mChunkDataArray()
 		{
@@ -227,8 +227,14 @@ private:
 
 		void ChunkReset()
 		{
-			mAllocCount = 0;
+			// mAllocCount는 리셋하지 않음 — stale TLS 포인터가 CHUNK_SIZE를 보고 nullptr 반환하도록 유지
+			// mAllocCount 리셋은 Alloc에서 ObjectPool로부터 chunk를 새로 받을 때 수행
 			mFreeCount.store(0);
+		}
+
+		void ResetAllocCount()
+		{
+			mAllocCount = 0;
 		}
 
 		static bool IsValidChecksum(const ChunkData& chunkData)
@@ -272,12 +278,14 @@ public:
 		if (spTlsChunk == nullptr)
 		{
 			spTlsChunk = mObjectPool.Alloc();
+			spTlsChunk->ResetAllocCount();
 		}
 
 		T* pRawMemory = spTlsChunk->GetData();
 		if (pRawMemory == nullptr)
 		{
 			spTlsChunk = mObjectPool.Alloc();
+			spTlsChunk->ResetAllocCount();
 			pRawMemory = spTlsChunk->GetData();
 		}
 
@@ -326,6 +334,7 @@ public:
 			}
 #endif
 			spTlsChunk->ChunkReset();
+			spTlsChunk->ResetAllocCount();
 			mObjectPool.Free(spTlsChunk);
 			spTlsChunk = nullptr;
 		}

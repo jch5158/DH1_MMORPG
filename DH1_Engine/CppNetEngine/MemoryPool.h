@@ -27,7 +27,7 @@ private:
 		Chunk& operator=(Chunk&&) = delete;
 
 		explicit Chunk()
-			: mAllocCount(0)
+			: mAllocCount(CHUNK_SIZE)
 			, mFreeCount(0)
 		{
 			for (int32 i = 0; i < CHUNK_SIZE; ++i)
@@ -66,8 +66,12 @@ private:
 
 		void ChunkReset()
 		{
-			mAllocCount = 0;
 			mFreeCount.store(0);
+		}
+
+		void ResetAllocCount()
+		{
+			mAllocCount = 0;
 		}
 
 		static bool IsValidChecksum(const ChunkData& chunkData)
@@ -102,18 +106,19 @@ public:
 
 	~MemoryPool() = default;
 
-	[[nodiscard]]
-	void* Alloc()
+	[[nodiscard]] void* Alloc()
 	{
 		if (spTlsChunk == nullptr)
 		{
 			spTlsChunk = mObjectPool.Alloc();
+			spTlsChunk->ResetAllocCount();
 		}
 
 		void* pRawMemory = spTlsChunk->GetData();
 		if (pRawMemory == nullptr)
 		{
 			spTlsChunk = mObjectPool.Alloc();
+			spTlsChunk->ResetAllocCount();
 			pRawMemory = spTlsChunk->GetData();
 		}
 
@@ -142,14 +147,12 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	int32 AllocCount() const
+	[[nodiscard]] int32 AllocCount() const
 	{
 		return mObjectPool.AllocCount();
 	}
 
-	[[nodiscard]]
-	int32 PoolingCount() const
+	[[nodiscard]] int32 PoolingCount() const
 	{
 		return mObjectPool.PoolingCount();
 	}
@@ -166,6 +169,7 @@ public:
 			}
 #endif
 			spTlsChunk->ChunkReset();
+			spTlsChunk->ResetAllocCount();
 			mObjectPool.Free(spTlsChunk);
 			spTlsChunk = nullptr;
 		}
