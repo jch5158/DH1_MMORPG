@@ -1,15 +1,31 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "EchoClientService.h"
 #include "JsonConfig.h"
 #include "NetEngineInit.h"
 
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
+BOOL WINAPI ConsoleCtrlHandler(const DWORD ctrlType)
+{
+	switch (ctrlType)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+	case CTRL_BREAK_EVENT:
+		ISingleton<EchoClientService>::GetInstance().Stop();
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
+
 int32 main()
 {
 	CrashReporter::Initialize("DummyClient", "1.0.0", "");
 
 	NetEngineInit netEngineInit;
+
+	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 
 	PacketServiceTypeHandler::Init();
 
@@ -29,5 +45,4 @@ int32 main()
 	}
 
 	service.Run();
-	service.Stop();
 }

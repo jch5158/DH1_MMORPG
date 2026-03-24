@@ -33,8 +33,14 @@ bool ActorService::Start()
 	return true;
 }
 
-void ActorService::CloseService()
+void ActorService::CloseService(const uint32 dispatchThreadCount)
 {
+	if (mpActorScheduler != nullptr)
+	{
+		mpActorScheduler->ShutdownScheduler(dispatchThreadCount);
+	}
+
+	NET_ENGINE_LOG_INFO("ActorService::CloseService - Shutdown complete");
 }
 
 void ActorService::Dispatch() const

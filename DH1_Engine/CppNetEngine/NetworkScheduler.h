@@ -22,8 +22,12 @@ public:
 	[[nodiscard]] virtual bool Register(const IocpObjectRef& pIocpObject) override;
 	virtual TimerHandle RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs) override;
 
+	void ShutdownScheduler(const uint32 dispatchThreadCount);
+	[[nodiscard]] bool IsStopped() const;
+
 private:
 	const uint32 mWaitTimeoutMs;
+	std::atomic<bool> mbStopped;
 	TimingWheel mTimingWheel;
 };
 

@@ -7,6 +7,7 @@
 ActorScheduler::ActorScheduler(const ActorSchedulerConfig& config)
 	: IocpCore(config.runningThreadCount)
 	, mWaitTimeoutMs(config.waitTimeoutMs)
+	, mbStopped(false)
 	, mTimingWheel(config.tickIntervalMs)
 {
 }
@@ -53,6 +54,13 @@ void ActorScheduler::Dispatch()
 		}
 	}
 
+	// Shutdown completion: GQCS 성공, pActorMessageEvent == nullptr
+	if (gqcsRet != 0 && pActorMessageEvent == nullptr && pCompletionKey == 0 && bytesTransferred == 0)
+	{
+		mbStopped.store(true);
+		return;
+	}
+
 	if (pActorMessageEvent != nullptr)
 	{
 		const IActorRef pActor = std::static_pointer_cast<IActor>(pActorMessageEvent->GetOwner());
@@ -63,4 +71,14 @@ void ActorScheduler::Dispatch()
 	}
 
 	mTimingWheel.Tick();
+}
+
+void ActorScheduler::ShutdownScheduler(const uint32 dispatchThreadCount)
+{
+	Shutdown(dispatchThreadCount);
+}
+
+bool ActorScheduler::IsStopped() const
+{
+	return mbStopped.load();
 }

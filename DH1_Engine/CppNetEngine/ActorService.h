@@ -24,7 +24,7 @@ public:
 	bool Initialize(const ActorServiceConfig& config);
 
 	virtual bool Start();
-	virtual void CloseService();
+	virtual void CloseService(const uint32 dispatchThreadCount);
 	void Dispatch() const;
 
 	bool RegisterActor(const ActorRef& pActor);

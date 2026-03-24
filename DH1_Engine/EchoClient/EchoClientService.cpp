@@ -55,11 +55,11 @@ bool EchoClientService::Start()
 
 	for (int32 iter = 0; iter < mNetworkDispatchThreadCount; ++iter)
 	{
-		ThreadManager::GetInstance().Launch("Network Dispatch", [pService = mpClientService]()->void
+		ThreadManager::GetInstance().Launch("Network Dispatch", [pScheduler = mpClientService->GetNetworkScheduler()]()->void
 			{
-				while (true)
+				while (!pScheduler->IsStopped())
 				{
-					pService->GetNetworkScheduler()->Dispatch();
+					pScheduler->Dispatch();
 				}
 			});
 	}
@@ -81,7 +81,14 @@ void EchoClientService::Run()
 
 void EchoClientService::Stop()
 {
-	mbRunning.store(false);
+	if (mbRunning.exchange(false) == false)
+	{
+		return;
+	}
+
+	NET_ENGINE_LOG_INFO("EchoClientService::Stop - Shutting down...");
+
+	mpClientService->CloseService(mNetworkDispatchThreadCount);
 }
 
 ClientServiceRef EchoClientService::GetClientServiceRef() const

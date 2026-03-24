@@ -8,6 +8,7 @@
 NetworkScheduler::NetworkScheduler(const NetworkSchedulerConfig& config)
 	: IocpCore(config.runningThreadCount)
 	, mWaitTimeoutMs(config.waitTimeoutMs)
+	, mbStopped(false)
 	, mTimingWheel(config.tickIntervalMs)
 {
 }
@@ -25,6 +26,13 @@ void NetworkScheduler::Dispatch()
 		{
 			NET_ENGINE_LOG_ERROR("NetworkScheduler::Dispatch - GQCS failed, errorCode : {}", errorCode);
 		}
+	}
+
+	// Shutdown completion: GQCS 성공, pIocpEvent == nullptr
+	if (gqcsRet != 0 && pIocpEvent == nullptr && key == 0 && numOfBytes == 0)
+	{
+		mbStopped.store(true);
+		return;
 	}
 
 	if (pIocpEvent != nullptr)
@@ -48,6 +56,16 @@ bool NetworkScheduler::Register(const IocpObjectRef& pIocpObject)
 	}
 
 	return true;
+}
+
+void NetworkScheduler::ShutdownScheduler(const uint32 dispatchThreadCount)
+{
+	Shutdown(dispatchThreadCount);
+}
+
+bool NetworkScheduler::IsStopped() const
+{
+	return mbStopped.load();
 }
 
 TimerHandle NetworkScheduler::RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs)
