@@ -13,6 +13,13 @@ namespace packet_id
 	};
 
 
+	enum eHeartbeatPacketId : uint16
+	{
+        C2S_HEARTBEAT_REQ = 1,
+        S2C_HEARTBEAT_RES = 2,
+	};
+
+
 	enum eLoginPacketId : uint16
 	{
         C2S_LOGIN_REQ = 1,

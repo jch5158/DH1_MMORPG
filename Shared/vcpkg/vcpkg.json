@@ -7,7 +7,9 @@
     "spdlog",
     "protobuf",
     "utfcpp",
-    "redis-plus-plus"
+    "redis-plus-plus",
+    "sqlpp11",
+    "sqlpp11-connector-mysql"
   ],
   "overrides": [
     {

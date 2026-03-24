@@ -7,6 +7,21 @@
 #include "ActorService.h"
 #include "ThreadManager.h"
 #include "JsonConfig.h"
+#include "MySqlService.h"
+
+BOOL WINAPI GatewayService::ConsoleCtrlHandler(const DWORD ctrlType)
+{
+	switch (ctrlType)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+	case CTRL_BREAK_EVENT:
+		GetInstance().Stop();
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
 
 bool GatewayService::Initialize(const JsonConfig& config)
 {
@@ -25,7 +40,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	const int32 receiveBufferSize = sessionConfig.GetInt32("receiveBufferSize");
 	const int32 sendBufferSize = sessionConfig.GetInt32("sendBufferSize");
 
-	// ServerService
+	// ServerService (2-phase init)
 	ServerServiceConfig serviceConfig;
 	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
 	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
@@ -38,10 +53,10 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		};
 	serviceConfig.redisConnectionUri = redisConfig.GetString("connectionUri");
 
-	mpServerService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
-	if (mpServerService == nullptr)
+	mpServerService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
+	if (mpServerService->Initialize(serviceConfig) == false)
 	{
-		NET_ENGINE_LOG_ERROR("GatewayService::Initialize - ServerService creation failed");
+		NET_ENGINE_LOG_ERROR("GatewayService::Initialize - ServerService initialization failed");
 		return false;
 	}
 
@@ -61,6 +76,20 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	// RedisService
 	mpRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), mpActorService);
 
+	// MySqlService
+	if (config.HasKey("mysql"))
+	{
+		const JsonConfig mysqlConfig = config.GetSection("mysql");
+		MySqlConfig dbConfig;
+		dbConfig.host = mysqlConfig.GetString("host");
+		dbConfig.port = mysqlConfig.GetUInt16("port");
+		dbConfig.user = mysqlConfig.GetString("user");
+		dbConfig.password = mysqlConfig.GetString("password");
+		dbConfig.database = mysqlConfig.GetString("database");
+
+		mpMySqlService = cpp_net_engine::MakeShared<MySqlService>(dbConfig, mpActorService);
+	}
+
 	// ClientSessionManager
 	mpClientSessionManager = cpp_net_engine::MakeShared<ClientSessionManager>(serviceConfig.maxSessionCount);
 
@@ -68,6 +97,15 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	mNetworkDispatchThreadCount = networkSchedulerConfig.GetInt32("dispatchThreadCount");
 	mActorDispatchThreadCount = actorSchedulerConfig.GetInt32("dispatchThreadCount");
 
+	// Gateway info
+	const JsonConfig gatewayConfig = config.GetSection("gateway");
+	mGatewayId = gatewayConfig.GetInt32("gatewayId");
+	mHeartbeatIntervalMs = gatewayConfig.GetInt64("heartbeatIntervalMs");
+	mRedisTtlSeconds = gatewayConfig.GetInt64("redisTtlSeconds");
+	mListenIp = serverConfig.GetString("ip");
+	mListenPort = serverConfig.GetUInt16("port");
+
+	NET_ENGINE_LOG_INFO("GatewayService::Initialize - Initialization complete, gatewayId: {}", mGatewayId);
 	return true;
 }
 
@@ -84,11 +122,11 @@ bool GatewayService::Start()
 	// Network dispatch threads
 	for (int32 iter = 0; iter < mNetworkDispatchThreadCount; ++iter)
 	{
-		ThreadManager::GetInstance().Launch("Network Dispatch", [pService = mpServerService]()->void
+		ThreadManager::GetInstance().Launch("Network Dispatch", [pScheduler = mpServerService->GetNetworkScheduler()]()->void
 			{
-				while (true)
+				while (!pScheduler->IsStopped())
 				{
-					pService->GetNetworkScheduler()->Dispatch();
+					pScheduler->Dispatch();
 				}
 			});
 	}
@@ -98,7 +136,8 @@ bool GatewayService::Start()
 	{
 		ThreadManager::GetInstance().Launch("Actor Dispatch", [pActorService = mpActorService]()->void
 			{
-				while (true)
+				const auto pScheduler = pActorService->GetActorScheduler();
+				while (!pScheduler->IsStopped())
 				{
 					pActorService->Dispatch();
 				}
@@ -106,18 +145,44 @@ bool GatewayService::Start()
 	}
 
 	mbRunning.store(true);
+
+	NET_ENGINE_LOG_INFO("GatewayService::Start - Server started");
 	return true;
 }
 
 void GatewayService::Run()
 {
+	updateGatewayRegistration(eGatewayStatus::Online);
+
+	auto lastHeartbeat = std::chrono::steady_clock::now();
+
 	while (mbRunning.load())
 	{
-		fmt::print("Current SessionCount : {}\n", mpServerService->GetCurrentSessionCount());
-		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+		const auto now = std::chrono::steady_clock::now();
+		const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeat).count();
+
+		if (elapsedMs >= mHeartbeatIntervalMs)
+		{
+			updateGatewayRegistration(eGatewayStatus::Online);
+			lastHeartbeat = now;
+
+			NET_ENGINE_LOG_INFO("GatewayService::Run - SessionCount: {}, GatewayId: {}", mpServerService->GetCurrentSessionCount(), mGatewayId);
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
+	updateGatewayRegistration(eGatewayStatus::ShuttingDown);
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+	NET_ENGINE_LOG_INFO("GatewayService - Closing service...");
+
+	mpServerService->CloseService(mNetworkDispatchThreadCount);
+	mpActorService->CloseService(mActorDispatchThreadCount);
+
 	ThreadManager::GetInstance().JoinWithClear();
+
+	NET_ENGINE_LOG_INFO("GatewayService - Shutdown complete");
 }
 
 void GatewayService::Stop()
@@ -143,4 +208,26 @@ ClientSessionManagerRef GatewayService::GetClientSessionManagerRef() const
 RedisServiceRef GatewayService::GetRedisServiceRef() const
 {
 	return mpRedisService;
+}
+
+MySqlServiceRef GatewayService::GetMySqlServiceRef() const
+{
+	return mpMySqlService;
+}
+
+void GatewayService::updateGatewayRegistration(const eGatewayStatus status)
+{
+	if (mpRedisService == nullptr)
+	{
+		return;
+	}
+
+	RedisGatewayInfo info;
+	info.gatewayId = mGatewayId;
+	info.ip = mListenIp;
+	info.port = mListenPort;
+	info.status = status;
+	info.currentSessionCount = mpServerService->GetCurrentSessionCount();
+
+	mpRedisService->UpdateGatewayInfo(info);
 }

@@ -30,5 +30,7 @@ private:
 
 	explicit JsonConfig(nlohmann::json json);
 
+	static std::string resolveEnvVars(const std::string& value);
+
 	nlohmann::json mJson;
 };

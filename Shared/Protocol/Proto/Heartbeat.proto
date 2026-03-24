@@ -1,0 +1,24 @@
+syntax = "proto3";
+package Protocol;
+
+import "PacketOption.proto";
+
+option (service_type) = SERVICE_TYPE_HEARTBEAT;
+option (handler_name) = "HeartbeatPacketHandler";
+
+message C2S_HEARTBEAT_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+
+    int64 clientTimestamp = 1;
+}
+
+message S2C_HEARTBEAT_RES
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    int64 clientTimestamp = 1;
+    int64 serverTimestamp = 2;
+}

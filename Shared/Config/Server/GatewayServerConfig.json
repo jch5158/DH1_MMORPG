@@ -23,6 +23,18 @@
         "dispatchThreadCount": 4
     },
     "redis": {
-        "connectionUri": "tcp://127.0.0.1:6379?pool_size=10"
+        "connectionUri": "tcp://${DH1_REDIS_HOST}:${DH1_REDIS_PORT}?pool_size=10"
+    },
+    "gateway": {
+        "gatewayId": 1,
+        "heartbeatIntervalMs": 5000,
+        "redisTtlSeconds": 10
+    },
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "password": "${DH1_MYSQL_PASSWORD}",
+        "database": "dh1_gateway_db"
     }
 }

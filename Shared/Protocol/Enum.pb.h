@@ -51,12 +51,13 @@ enum eServiceType : int {
   SERVICE_TYPE_NONE = 0,
   SERVICE_TYPE_ECHO = 1,
   SERVICE_TYPE_LOGIN = 2,
+  SERVICE_TYPE_HEARTBEAT = 3,
   eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool eServiceType_IsValid(int value);
 constexpr eServiceType eServiceType_MIN = SERVICE_TYPE_NONE;
-constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_LOGIN;
+constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_HEARTBEAT;
 constexpr int eServiceType_ARRAYSIZE = eServiceType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eServiceType_descriptor();
