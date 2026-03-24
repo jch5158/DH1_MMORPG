@@ -53,7 +53,7 @@ bool ConnectionPool::Connect(const ClientServiceRef& pService)
 	if (mFreeIndexStack.TryPop(index) == false)
 	{
 		mCurrentConnectionCount.fetch_sub(1);
-		NET_ENGINE_LOG_ERROR("ConnectionPool::Connect - No free connector index available");
+		NET_ENGINE_LOG_ERROR("ConnectionPool::Connect - No free connector index available, freeCount: {}, currentConn: {}", mFreeIndexStack.Count(), mCurrentConnectionCount.load());
 		return false;
 	}
 
