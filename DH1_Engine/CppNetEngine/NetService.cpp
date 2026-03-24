@@ -206,7 +206,6 @@ void ClientService::scheduleReconnect()
 				return;
 			}
 
-			NET_ENGINE_LOG_INFO("ClientService::scheduleReconnect - Attempting reconnect...");
 			pService->mpConnectionManager->Connect(pService);
 		}, mReconnectIntervalMs);
 }
