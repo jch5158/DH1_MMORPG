@@ -66,26 +66,27 @@ SessionRef NetService::CreateSession()
 	SessionRef pSession;
 	if (mpReusableSessionPool->TryPop(pSession))
 	{
-		if (pSession->Reset())
+		if (!pSession->Reset())
 		{
-			return std::move(pSession);
+			NET_ENGINE_LOG_ERROR("NetService::CreateSession - Session::Reset() failed, creating new session");
+			return nullptr;
+		}
+	}
+	else
+	{
+		pSession = mSessionFactory();
+		if (pSession == nullptr || pSession->Initialize(shared_from_this()) == false)
+		{
+			return nullptr;
 		}
 
-		NET_ENGINE_LOG_ERROR("NetService::CreateSession - Session::Reset() failed, creating new session");
+		if (mpNetworkScheduler->Register(pSession) == false)
+		{
+			return nullptr;
+		}
 	}
 
-	pSession = mSessionFactory();
-	if (pSession == nullptr || pSession->Initialize(shared_from_this()) == false)
-	{
-		return nullptr;
-	}
-
-	if (mpNetworkScheduler->Register(pSession) == false)
-	{
-		return nullptr;
-	}
-
-	return std::move(pSession);
+	return std::move(pSession);  // NOLINT(clang-diagnostic-pessimizing-move)
 }
 
 bool NetService::IsInitialized() const
