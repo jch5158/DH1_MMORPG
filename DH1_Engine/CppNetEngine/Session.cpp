@@ -5,7 +5,7 @@ Session::Session(const int32 receiveBufferSize)
 	: SocketIocpObject()
 	, mpService()
 	, mNetAddress()
-	, mSessionState(eSessionState::Disconnected)
+	, mSessionState(eSessionState::None)
 	, mTimeoutTracker()
 	, mDisconnector()
 	, mReceiver(receiveBufferSize)
@@ -48,7 +48,14 @@ void Session::Start()
 
 void Session::Stop()
 {
+	if (!IsDisconnected())
+	{
+		return;
+	}
+
 	OnDisconnected();
+
+	setSessionNone();
 }
 
 NetServiceRef Session::GetService() const
@@ -89,7 +96,8 @@ bool Session::IsDisconnected() const
 
 bool Session::IsDisconnectStarted() const
 {
-	return mSessionState.load() == eSessionState::Disconnecting || mSessionState.load() == eSessionState::Disconnected;
+	const auto state = mSessionState.load();
+	return state == eSessionState::Disconnecting || state == eSessionState::Disconnected;
 }
 
 bool Session::SetSessionInGame()
@@ -156,6 +164,11 @@ void Session::processReceive(const uint32 numOfBytes)
 
 bool Session::Initialize(const NetServiceRef& pService)
 {
+	if (!setSessionInitialized())
+	{
+		return false;
+	}
+
 	if (CreateSocket() == false)
 	{
 		return false;
@@ -168,7 +181,7 @@ bool Session::Initialize(const NetServiceRef& pService)
 	{
 		return false;
 	}
-	
+
 	if (mReceiver.Initialize(pSession) == false)
 	{
 		return false;
@@ -191,6 +204,12 @@ void Session::startReceive()
 {
 	updateLastActivityMs();
 	registerReceive();
+}
+
+bool Session::setSessionInitialized()
+{
+	auto expected = eSessionState::None;
+	return mSessionState.compare_exchange_strong(expected, eSessionState::Disconnected);
 }
 
 bool Session::setSessionConnected()
@@ -219,4 +238,9 @@ bool Session::setSessionDisconnected()
 {
 	auto expected = eSessionState::Disconnecting;
 	return mSessionState.compare_exchange_strong(expected, eSessionState::Disconnected);
+}
+
+void Session::setSessionNone()
+{
+	mSessionState.store(eSessionState::None);
 }

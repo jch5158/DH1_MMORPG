@@ -2,6 +2,7 @@
 
 enum class eSessionState : uint8
 {
+	None,
 	Connected,
 	InGame,
 	Disconnecting,
@@ -89,9 +90,11 @@ private:
 	void setNetAddress(const NetAddress& address);
 	void startReceive();
 
+	bool setSessionInitialized();
 	bool setSessionConnected();
 	bool setSessionDisconnecting();
 	bool setSessionDisconnected();
+	void setSessionNone();
 
 	NetServiceRef mpService;
 	NetAddress mNetAddress;

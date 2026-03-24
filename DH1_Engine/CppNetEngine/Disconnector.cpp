@@ -42,6 +42,8 @@ void Disconnector::Register()
 			{
 				pSession->OnError(errorCode);
 			}
+
+			Process();
 		}
 	}
 }

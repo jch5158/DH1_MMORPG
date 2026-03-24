@@ -101,13 +101,13 @@ void Acceptor::Process()
 		if (pSession->setSessionConnected() == false)
 		{
 			pSession->Disconnect(eDisconnectReason::StateError);
-			return;
+			break;
 		}
 
 		if (mpServerService == nullptr)
 		{
 			pSession->Disconnect(eDisconnectReason::ServiceError);
-			return;
+			break;
 		}
 
 		mpServerService->OnSessionConnected(pSession);
