@@ -48,7 +48,7 @@ public:
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 	uint64 AllocateSessionId();
-	void RecycleSession(const SessionRef& pSession);
+	void RecycleSession(const SessionRef& pSession) const;
 
 private:
 	std::atomic<bool> mbInitialize;
