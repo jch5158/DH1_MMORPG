@@ -79,6 +79,9 @@
     <Filter Include="Core\EngineHeader">
       <UniqueIdentifier>{4a88ba0e-70c6-4b1d-81ef-68aef94dc527}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Redis">
+      <UniqueIdentifier>{b2a1c3d4-5e6f-7890-abcd-ef1234567890}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThreadManager.h">
@@ -211,7 +214,7 @@
       <Filter>Network\Service</Filter>
     </ClInclude>
     <ClInclude Include="RedisConnection.h">
-      <Filter>Network\Service</Filter>
+      <Filter>Network\Redis</Filter>
     </ClInclude>
     <ClInclude Include="Types.h">
       <Filter>Core\Type</Filter>
@@ -250,9 +253,6 @@
       <Filter>Core\EngineHeader</Filter>
     </ClInclude>
     <ClInclude Include="EngineNetwork.h">
-      <Filter>Core\EngineHeader</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineActor.h">
       <Filter>Core\EngineHeader</Filter>
     </ClInclude>
   </ItemGroup>
@@ -357,7 +357,7 @@
       <Filter>Network\Service</Filter>
     </ClCompile>
     <ClCompile Include="RedisConnection.cpp">
-      <Filter>Network\Service</Filter>
+      <Filter>Network\Redis</Filter>
     </ClCompile>
     <ClCompile Include="SendBufferAllocator.cpp">
       <Filter>Memory</Filter>
