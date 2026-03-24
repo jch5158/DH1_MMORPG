@@ -33,6 +33,7 @@ void GameSession::OnDisconnecting(const eDisconnectReason reason)
 	{
 	case eDisconnectReason::Closed:
 	case eDisconnectReason::Timeout:
+	case eDisconnectReason::SocketError:
 		break;
 	default:
 		NET_ENGINE_LOG_FATAL("[GameSession] Unexpected disconnect! sessionId: {}, reason: {}", GetSessionId(), static_cast<uint8>(reason));
