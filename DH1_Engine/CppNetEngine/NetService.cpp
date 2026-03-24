@@ -85,7 +85,7 @@ SessionRef NetService::CreateSession()
 		return nullptr;
 	}
 
-	return pSession;
+	return std::move(pSession);
 }
 
 bool NetService::IsInitialized() const
