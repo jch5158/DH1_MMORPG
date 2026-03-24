@@ -64,7 +64,7 @@ SessionRef NetService::CreateSession()
 {
 	SessionRef pSession;
 
-	if (mReusableSessionPool.TryDequeue(pSession))
+	if (mReusableSessionPool.TryPop(pSession))
 	{
 		if (pSession->Reset())
 		{
@@ -129,7 +129,7 @@ uint64 NetService::AllocateSessionId()
 void NetService::RecycleSession(const SessionRef& pSession)
 {
 	pSession->Stop();
-	mReusableSessionPool.TryEnqueue(pSession);
+	mReusableSessionPool.TryPush(pSession);
 }
 
 ClientService::ClientService(const eServiceType serviceType)
