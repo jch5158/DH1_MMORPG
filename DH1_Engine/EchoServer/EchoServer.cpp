@@ -1,15 +1,31 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "EchoServerService.h"
 #include "JsonConfig.h"
 #include "NetEngineInit.h"
 
 #include "PacketHandler/PacketServiceTypeHandler.h"
 
+BOOL WINAPI ConsoleCtrlHandler(const DWORD ctrlType)
+{
+	switch (ctrlType)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+	case CTRL_BREAK_EVENT:
+		ISingleton<EchoServerService>::GetInstance().Stop();
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
+
 int main()
 {
 	CrashReporter::Initialize("GameServer", "1.0.0", "");
 
 	NetEngineInit netEngineInit;
+
+	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 
 	PacketServiceTypeHandler::Init();
 
@@ -28,5 +44,4 @@ int main()
 	}
 
 	service.Run();
-	service.Stop();
 }

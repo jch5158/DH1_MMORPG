@@ -180,8 +180,34 @@ bool ClientService::Start()
 	return true;
 }
 
-void ClientService::CloseService()
+void ClientService::CloseService(const uint32 dispatchThreadCount)
 {
+	// 재연결 방지
+	mbAutoReconnect = false;
+
+	// 활성 세션 전체 종료
+	const Vector<SessionRef> sessions = mSessionManager.GetActiveSessions();
+	for (const auto& pSession : sessions)
+	{
+		if (pSession != nullptr)
+		{
+			pSession->Disconnect(eDisconnectReason::ServerShutdown);
+		}
+	}
+
+	// ConnectionPool 정리
+	if (mpConnectionManager != nullptr)
+	{
+		mpConnectionManager->Close();
+	}
+
+	// IOCP 종료 시그널 전송
+	if (mpNetworkScheduler != nullptr)
+	{
+		mpNetworkScheduler->ShutdownScheduler(dispatchThreadCount);
+	}
+
+	NET_ENGINE_LOG_INFO("ClientService::CloseService - Shutdown complete");
 }
 
 void ClientService::OnSessionConnected(const SessionRef& pSession)
@@ -285,8 +311,31 @@ bool ServerService::Start()
 	return true;
 }
 
-void ServerService::CloseService()
+void ServerService::CloseService(const uint32 dispatchThreadCount)
 {
+	// Accept 중단
+	if (mpListener != nullptr)
+	{
+		mpListener->CloseAccept();
+	}
+
+	// 활성 세션 전체 종료
+	const Vector<SessionRef> sessions = mSessionManager.GetActiveSessions();
+	for (const auto& pSession : sessions)
+	{
+		if (pSession != nullptr)
+		{
+			pSession->Disconnect(eDisconnectReason::ServerShutdown);
+		}
+	}
+
+	// IOCP 종료 시그널 전송
+	if (mpNetworkScheduler != nullptr)
+	{
+		mpNetworkScheduler->ShutdownScheduler(dispatchThreadCount);
+	}
+
+	NET_ENGINE_LOG_INFO("ServerService::CloseService - Shutdown complete");
 }
 
 void ServerService::OnSessionConnected(const SessionRef& pSession)
