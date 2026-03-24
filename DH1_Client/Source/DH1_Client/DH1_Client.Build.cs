@@ -46,6 +46,8 @@ public class DH1_Client : ModuleRules
         var ConfigName = bIsDebug ? "Debug" : "Release";
         var ProtobufLibName = bIsDebug ? "libprotobufd.lib" : "libprotobuf.lib";
 
+        var HiredisLibName = bIsDebug ? "hiredisd.lib" : "hiredis.lib";
+
         PublicAdditionalLibraries.AddRange([
 	        Path.Combine(VcpkgLibPath, "vcpkg_crashpad_client.lib"),
             Path.Combine(VcpkgLibPath, "vcpkg_crashpad_util.lib"),
@@ -54,6 +56,8 @@ public class DH1_Client : ModuleRules
             Path.Combine(VcpkgLibPath, "mimalloc.lib"),
             Path.Combine(VcpkgLibPath, "fmt.lib"),
             Path.Combine(VcpkgLibPath, ProtobufLibName),
+            Path.Combine(VcpkgLibPath, "redis++_static.lib"),
+            Path.Combine(VcpkgLibPath, HiredisLibName),
             Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/CppNetEngine/{ConfigName}/CppNetEngine.lib")),
             Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/ProtoBridge/{ConfigName}/ProtoBridge.lib"))
         ]);
