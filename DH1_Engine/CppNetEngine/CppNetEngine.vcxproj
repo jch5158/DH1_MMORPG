@@ -264,6 +264,7 @@
     <ClInclude Include="Sender.h" />
     <ClInclude Include="NetService.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="SessionIdAllocator.h" />
     <ClInclude Include="SessionManager.h" />
     <ClInclude Include="SessionReaper.h" />
     <ClInclude Include="SessionTimeoutTracker.h" />
@@ -314,6 +315,7 @@
     <ClCompile Include="Sender.cpp" />
     <ClCompile Include="NetService.cpp" />
     <ClCompile Include="Session.cpp" />
+    <ClCompile Include="SessionIdAllocator.cpp" />
     <ClCompile Include="SessionManager.cpp" />
     <ClCompile Include="SessionReaper.cpp" />
     <ClCompile Include="SessionTimeoutTracker.cpp" />
