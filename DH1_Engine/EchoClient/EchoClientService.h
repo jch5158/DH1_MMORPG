@@ -16,6 +16,8 @@ public:
 
 	~EchoClientService() = default;
 
+	static BOOL WINAPI ConsoleCtrlHandler(DWORD ctrlType);
+
 	[[nodiscard]] bool Initialize(const JsonConfig& config);
 	[[nodiscard]] bool Start();
 	void Run();
