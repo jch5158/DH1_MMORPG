@@ -185,6 +185,7 @@ bool SocketUtils::IsExpectedIocpError(const uint32 errorCode)
 {
 	switch (errorCode)
 	{
+	case ERROR_DUP_NAME:               // 52
 	case ERROR_NETNAME_DELETED:        // 64
 	case WAIT_TIMEOUT:                 // 258
 	case ERROR_OPERATION_ABORTED:      // 995
