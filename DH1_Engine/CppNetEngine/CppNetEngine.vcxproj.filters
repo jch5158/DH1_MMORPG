@@ -183,6 +183,9 @@
     <ClInclude Include="SessionManager.h">
       <Filter>Network\Session</Filter>
     </ClInclude>
+    <ClInclude Include="SessionIdAllocator.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
     <ClInclude Include="SessionReaper.h">
       <Filter>Network\Session\Timeout</Filter>
     </ClInclude>
@@ -205,6 +208,9 @@
       <Filter>Actor\Core</Filter>
     </ClInclude>
     <ClInclude Include="ConnectionPool.h">
+      <Filter>Network\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisConnection.h">
       <Filter>Network\Service</Filter>
     </ClInclude>
     <ClInclude Include="Types.h">
@@ -332,6 +338,9 @@
     <ClCompile Include="SessionManager.cpp">
       <Filter>Network\Session</Filter>
     </ClCompile>
+    <ClCompile Include="SessionIdAllocator.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
     <ClCompile Include="SessionReaper.cpp">
       <Filter>Network\Session\Timeout</Filter>
     </ClCompile>
@@ -345,6 +354,9 @@
       <Filter>Actor\Core</Filter>
     </ClCompile>
     <ClCompile Include="ConnectionPool.cpp">
+      <Filter>Network\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisConnection.cpp">
       <Filter>Network\Service</Filter>
     </ClCompile>
     <ClCompile Include="SendBufferAllocator.cpp">
