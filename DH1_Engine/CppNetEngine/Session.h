@@ -61,7 +61,8 @@ public:
 	[[nodiscard]] NetServiceRef GetService() const;
 	[[nodiscard]] NetAddress& GetAddress();
 	[[nodiscard]] SessionRef GetSessionRef();
-	
+	[[nodiscard]] uint64 GetSessionId() const;
+
 	[[nodiscard]] bool IsInGame() const;
 	[[nodiscard]] bool IsConnected() const;
 	[[nodiscard]] bool IsDisconnecting() const;
@@ -96,6 +97,7 @@ private:
 	bool setSessionDisconnected();
 	void setSessionNone();
 
+	uint64 mSessionId;
 	NetServiceRef mpService;
 	NetAddress mNetAddress;
 	std::atomic<eSessionState> mSessionState;

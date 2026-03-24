@@ -3,6 +3,7 @@
 
 Session::Session(const int32 receiveBufferSize)
 	: SocketIocpObject()
+	, mSessionId(0)
 	, mpService()
 	, mNetAddress()
 	, mSessionState(eSessionState::None)
@@ -55,6 +56,7 @@ void Session::Stop()
 
 	OnDisconnected();
 
+	mSessionId = 0;
 	setSessionNone();
 }
 
@@ -72,6 +74,11 @@ NetAddress& Session::GetAddress()
 SessionRef Session::GetSessionRef()
 {
 	return std::static_pointer_cast<Session>(shared_from_this());
+}
+
+uint64 Session::GetSessionId() const
+{
+	return mSessionId;
 }
 
 bool Session::IsInGame() const
@@ -165,6 +172,12 @@ void Session::processReceive(const uint32 numOfBytes)
 bool Session::Initialize(const NetServiceRef& pService)
 {
 	if (!setSessionInitialized())
+	{
+		return false;
+	}
+
+	mSessionId = pService->AllocateSessionId();
+	if (mSessionId == 0)
 	{
 		return false;
 	}
