@@ -13,6 +13,8 @@ NetService::NetService(const eServiceType serviceType)
 	, mpNetworkScheduler()
 	, mSessionFactory()
 	, mSessionManager()
+	, mpRedisConnection()
+	, mpSessionIdAllocator()
 {
 }
 
@@ -27,6 +29,22 @@ bool NetService::Initialize(const NetServiceConfig& config)
 	mpNetworkScheduler = config.pNetworkScheduler;
 	mSessionFactory = config.sessionFactory;
 	mSessionManager.SetMaxSessionCount(config.maxSessionCount);
+
+	mpSessionIdAllocator = cpp_net_engine::MakeShared<SessionIdAllocator>();
+
+	if (!config.redisConnectionUri.empty())
+	{
+		mpRedisConnection = cpp_net_engine::MakeShared<RedisConnection>();
+		if (!mpRedisConnection->Initialize(config.redisConnectionUri))
+		{
+			return false;
+		}
+	}
+
+	if (!mpSessionIdAllocator->Initialize(mpRedisConnection.get()))
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -85,6 +103,16 @@ int32 NetService::GetCurrentSessionCount()
 int32 NetService::GetMaxSessionCount() const
 {
 	return mSessionManager.GetMaxSessionCount();
+}
+
+uint64 NetService::AllocateSessionId()
+{
+	if (mpSessionIdAllocator == nullptr)
+	{
+		return 0;
+	}
+
+	return mpSessionIdAllocator->Allocate();
 }
 
 ClientService::ClientService(const eServiceType serviceType)

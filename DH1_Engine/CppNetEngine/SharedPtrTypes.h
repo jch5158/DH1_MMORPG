@@ -26,6 +26,9 @@ DECLARE_SMART_PTR(Actor);
 DECLARE_SMART_PTR(ScopedActor);
 DECLARE_SMART_PTR(Message);
 
+DECLARE_SHARED_PTR(RedisConnection);
+DECLARE_SHARED_PTR(SessionIdAllocator);
+
 DECLARE_SMART_PTR(SessionReaper);
 DECLARE_SMART_PTR(SessionManager);
 DECLARE_SMART_PTR(WaitQueueManager);

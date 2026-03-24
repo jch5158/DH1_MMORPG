@@ -22,6 +22,8 @@
 #include "SessionTimeoutTracker.h"
 #include "Session.h"
 #include "SessionManager.h"
+#include "RedisConnection.h"
+#include "SessionIdAllocator.h"
 #include "PacketSession.h"
 
 #include "ConnectionPool.h"

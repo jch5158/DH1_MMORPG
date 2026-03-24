@@ -16,6 +16,7 @@ struct NetServiceConfig
 	NetAddress netAddress;
 	NetworkSchedulerRef pNetworkScheduler;
 	SessionFactory sessionFactory;
+	std::string redisConnectionUri;
 };
 
 class NetService : public std::enable_shared_from_this<NetService>
@@ -46,6 +47,7 @@ public:
 	[[nodiscard]] NetworkSchedulerRef GetNetworkScheduler() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] int32 GetMaxSessionCount() const;
+	uint64 AllocateSessionId();
 
 private:
 	std::atomic<bool> mbInitialize;
@@ -56,6 +58,8 @@ protected:
 	NetworkSchedulerRef mpNetworkScheduler;
 	SessionFactory mSessionFactory;
 	SessionManager mSessionManager;
+	RedisConnectionRef mpRedisConnection;
+	SessionIdAllocatorRef mpSessionIdAllocator;
 };
 
 struct ClientServiceConfig : public NetServiceConfig
