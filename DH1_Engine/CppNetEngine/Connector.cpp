@@ -50,7 +50,10 @@ bool Connector::Register()
 
 	if (SocketUtils::BindAnyAddress(pSession->GetSocket(), 0) == false)
 	{
-		return false;
+		if (WSAGetLastError() != WSAEINVAL)
+		{
+			return false;
+		}
 	}
 
 	mpSession = pSession;
