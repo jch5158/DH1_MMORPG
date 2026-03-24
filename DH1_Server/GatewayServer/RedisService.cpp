@@ -88,6 +88,22 @@ void RedisService::GetStringAsync(std::string key, GetStringCallback callback)
 		});
 }
 
+void RedisService::GetDelStringAsync(std::string key, GetStringCallback callback)
+{
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				argCallback(std::nullopt);
+				return;
+			}
+
+			const auto retValue = pRedis->GetDelString(argKey);
+			argCallback(retValue);
+		});
+}
+
 void RedisService::DeleteKeyAsync(std::string key, DeleteKeyCallback callback)
 {
 	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void

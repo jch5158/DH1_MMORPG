@@ -12,7 +12,31 @@
       "Bash(cmd.exe //c \"reg query HKLM\\\\\\\\SYSTEM\\\\\\\\CurrentControlSet\\\\\\\\Services\\\\\\\\Tcpip\\\\\\\\Parameters /v TcpTimedWaitDelay\" 2>&1)",
       "Bash(reg.exe add:*)",
       "Bash(powershell.exe -Command \"Set-ItemProperty -Path 'HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters' -Name 'TcpTimedWaitDelay' -Value 30 -Type DWord\")",
-      "Bash(powershell.exe -Command \"Get-ItemProperty -Path 'HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters' -Name 'TcpTimedWaitDelay' | Select-Object -ExpandProperty TcpTimedWaitDelay\")"
+      "Bash(powershell.exe -Command \"Get-ItemProperty -Path 'HKLM:\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters' -Name 'TcpTimedWaitDelay' | Select-Object -ExpandProperty TcpTimedWaitDelay\")",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__read_text_file",
+      "Bash(find e:ProjectsDH1_MMORPGDH1_ServerGatewayServer -type f -name *.slnx -o -name *.sln)",
+      "Bash(find e:ProjectsDH1_MMORPG -type f \\\\\\(-name *.csproj -o -name CMakeLists.txt -o -name *.vcxproj \\\\\\) ! -path */.claude/worktrees/* ! -path */node_modules/* ! -path */Intermediate/*)",
+      "Bash(find e:ProjectsDH1_MMORPGDH1_ServerLoginServer -type f -name *.cs ! -path */bin/* ! -path */obj/*)",
+      "Bash(find e:ProjectsDH1_MMORPGDH1_ClientPluginsUnrealClaudeSourceUnrealClaudePrivateTests -name *.cpp -o -name *.h)",
+      "Bash(find e:ProjectsDH1_MMORPG -type f -name *.uplugin)",
+      "Bash(find e:ProjectsDH1_MMORPGDH1_ClientPluginsUnrealClaudeResourcesmcp-bridge -type f -name *.test.js -o -name *.spec.js)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet list:*)",
+      "Bash(dotnet test:*)",
+      "Bash(find e:/Projects/DH1_MMORPG -path */redis-plus-plus* -name *.h)",
+      "Bash(find e:/Projects/DH1_MMORPG -path *vcpkg*installed* -name sw -type d)",
+      "Bash(find e:/Projects/DH1_MMORPG -path *vcpkg* -name redis++.h)",
+      "Bash(grep -o \"\"version[^\"\"]*\"\"[^,]* e:/Projects/DH1_MMORPG/Shared/vcpkg/vcpkg_installed/x64-windows-static-md/share/redis-plus-plus/vcpkg.spdx.json)",
+      "Bash(curl -s https://api.github.com/repos/microsoft/vcpkg/commits/6d332a018c433fad20822ff4b536e4ccdc3413bd)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "Bash(tasklist)",
+      "Bash(taskkill //PID 49396 //F)",
+      "mcp__unrealclaude__unreal_get_output_log"
     ]
   }
 }

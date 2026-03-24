@@ -42,6 +42,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UResetPasswordWidget* ResetPasswordWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Navigation")
+	FName LobbyLevelName = TEXT("LobbyLevel");
+
 private:
 	void HandleGoToSignUp() const;
 	void HandleLoginSuccess() const;

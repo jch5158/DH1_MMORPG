@@ -21,6 +21,7 @@ THIRD_PARTY_INCLUDES_START
 #include "PacketOption.pb.h"
 #include "Struct.pb.h"
 #include "Login.pb.h"
+#include "Heartbeat.pb.h"
 #include "Echo.pb.h"
 
 #pragma pop_macro("cast")

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using System.Security.Cryptography;
+using System.Text.Json;
 using LoginRequest = LoginServer.DTOs.Auth.LoginRequest;
 using RegisterRequest = LoginServer.DTOs.Auth.RegisterRequest;
 
@@ -17,8 +18,10 @@ namespace LoginServer.Controllers
     {
         private AccountDbContext DbContext { get; } = dbContext;
         private IConnectionMultiplexer RedisConnection { get; } = redisConnection;
-
         private IEmailQueue EmailQueue { get; } = emailQueue;
+
+        private const int MaxLoginFailCount = 5;
+        private const int LoginLockMinutes = 10;
 
         private async Task<IActionResult?> SendVerifyCodeAsync(string email)
         {
@@ -69,12 +72,33 @@ namespace LoginServer.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            var redisDb = RedisConnection.GetDatabase();
+            var lockKey = $"LoginLock_{request.Email}";
+            var failKey = $"LoginFail_{request.Email}";
+
+            if (await redisDb.KeyExistsAsync(lockKey))
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests,
+                    new { message = $"로그인 시도 횟수를 초과했습니다. {LoginLockMinutes}분 후 다시 시도해주세요." });
+            }
+
             // 성능 개선: 단순 읽기에는 AsNoTracking() 추가
             var account = await DbContext.Accounts.AsNoTracking()
                 .SingleOrDefaultAsync(a => a.Email == request.Email);
 
             if (account == null || !BCrypt.Net.BCrypt.Verify(request.Password, account.PasswordHash))
             {
+                var failCount = (int)await redisDb.StringIncrementAsync(failKey);
+                await redisDb.KeyExpireAsync(failKey, TimeSpan.FromMinutes(LoginLockMinutes));
+
+                if (failCount >= MaxLoginFailCount)
+                {
+                    await redisDb.StringSetAsync(lockKey, "1", TimeSpan.FromMinutes(LoginLockMinutes));
+                    await redisDb.KeyDeleteAsync(failKey);
+                    return StatusCode(StatusCodes.Status429TooManyRequests,
+                        new { message = $"로그인 시도 횟수를 초과했습니다. {LoginLockMinutes}분 후 다시 시도해주세요." });
+                }
+
                 return BadRequest(new { message = "회원 정보가 일치하지 않습니다." });
             }
 
@@ -114,10 +138,11 @@ namespace LoginServer.Controllers
                     break;
             }
 
+            await redisDb.KeyDeleteAsync(failKey);
+
             var tokenBytes = RandomNumberGenerator.GetBytes(32);
             var ticket = Convert.ToBase64String(tokenBytes);
 
-            var redisDb = RedisConnection.GetDatabase();
             var expiry = TimeSpan.FromSeconds(30);
             var ticketKey = $"ticket:{ticket}";
 
@@ -127,12 +152,21 @@ namespace LoginServer.Controllers
                 return StatusCode(500, new { message = "접속 티켓 발급 중 오류가 발생했습니다." });
             }
 
+            var bestGateway = await SelectBestGatewayAsync();
+            if (bestGateway == null)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                    new { message = "접속 가능한 게이트웨이 서버가 없습니다." });
+            }
+
+            var (gatewayIp, gatewayPort) = bestGateway.Value;
+
             return Ok(new
             {
                 ticket,
                 accountId = account.AccountId,
-                gatewayIp = "127.0.0.1",
-                gatewayPort = 9000
+                gatewayIp,
+                gatewayPort
             });
         }
 
@@ -282,6 +316,52 @@ namespace LoginServer.Controllers
                 email = request.Email,
                 message = "비밀번호가 성공적으로 변경되었습니다. 새로운 비밀번호로 로그인해주세요."
             });
+        }
+        private async Task<(string ip, int port)?> SelectBestGatewayAsync()
+        {
+            var redisDb = RedisConnection.GetDatabase();
+            var server = RedisConnection.GetServer(RedisConnection.GetEndPoints().First());
+
+            var gatewayKeys = server.Keys(pattern: "Gateway:*").ToArray();
+            if (gatewayKeys.Length == 0)
+            {
+                return null;
+            }
+
+            string? bestIp = null;
+            var bestPort = 0;
+            var lowestCount = int.MaxValue;
+
+            foreach (var key in gatewayKeys)
+            {
+                var value = await redisDb.StringGetAsync(key);
+                if (!value.HasValue)
+                {
+                    continue;
+                }
+
+                var info = JsonSerializer.Deserialize<JsonElement>(value.ToString());
+                var status = info.GetProperty("status").GetInt32();
+                if (status != 0)
+                {
+                    continue;
+                }
+
+                var sessionCount = info.GetProperty("currentSessionCount").GetInt32();
+                if (sessionCount < lowestCount)
+                {
+                    lowestCount = sessionCount;
+                    bestIp = info.GetProperty("ip").GetString();
+                    bestPort = info.GetProperty("port").GetInt32();
+                }
+            }
+
+            if (bestIp == null)
+            {
+                return null;
+            }
+
+            return (bestIp, bestPort);
         }
     }
 }

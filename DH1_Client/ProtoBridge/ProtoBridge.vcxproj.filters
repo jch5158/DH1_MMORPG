@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Heartbeat.pb.cc">
+      <Filter>Network\Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -53,6 +56,9 @@
     <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Heartbeat.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
@@ -68,6 +74,9 @@
       <Filter>Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Login.proto">
+      <Filter>Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Heartbeat.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>

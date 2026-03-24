@@ -8,6 +8,7 @@
 class UEditableTextBox;
 class UButton;
 class UTextBlock;
+class UWidget;
 
 DECLARE_MULTICAST_DELEGATE(FOnGoToSignUpDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnLoginSuccessDelegate);
@@ -30,6 +31,7 @@ public:
 
 protected:
     virtual void NativeConstruct() override;
+    virtual void NativeDestruct() override;
 
     // 에러 메시지 출력용 텍스트 블록
     UPROPERTY(meta = (BindWidget))
@@ -50,6 +52,9 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UButton* ResetPasswordButton;
 
+    UPROPERTY(meta = (BindWidgetOptional))
+    UWidget* LoadingOverlay;
+
     UFUNCTION()
     void OnLoginButtonClicked();
 
@@ -60,4 +65,8 @@ protected:
     void OnResetPasswordButtonClicked();
 
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful);
+
+    void HandleGatewayLoginResult(int32 Result);
+
+    void SetLoading(bool bLoading);
 };

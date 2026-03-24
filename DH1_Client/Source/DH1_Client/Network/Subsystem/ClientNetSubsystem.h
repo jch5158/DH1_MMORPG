@@ -6,6 +6,8 @@
 
 #include "ClientNetSubsystem.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGatewayLoginResultDelegate, int32 /*eLoginResult*/);
+
 UCLASS()
 class DH1_CLIENT_API UClientNetSubsystem : public UGameInstanceSubsystem, public FTickableGameObject
 {
@@ -52,6 +54,10 @@ public:
     void SetAuthData(const FString& ArgTicket, const FString& ArgAccountId);
 
     AuthData GetAuthData() const;
+
+    void NotifyLoginResult(int32 Result);
+
+    FOnGatewayLoginResultDelegate OnGatewayLoginResult;
 
 private:
     // 내부적으로 연결 상태를 관리할 변수

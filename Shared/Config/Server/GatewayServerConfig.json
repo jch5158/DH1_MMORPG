@@ -27,6 +27,7 @@
     },
     "gateway": {
         "gatewayId": 1,
+        "publicIp": "127.0.0.1",
         "heartbeatIntervalMs": 5000,
         "redisTtlSeconds": 10
     },

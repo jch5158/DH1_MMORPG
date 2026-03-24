@@ -104,6 +104,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	mRedisTtlSeconds = gatewayConfig.GetInt64("redisTtlSeconds");
 	mListenIp = serverConfig.GetString("ip");
 	mListenPort = serverConfig.GetUInt16("port");
+	mPublicIp = gatewayConfig.GetString("publicIp");
 
 	NET_ENGINE_LOG_INFO("GatewayService::Initialize - Initialization complete, gatewayId: {}", mGatewayId);
 	return true;
@@ -224,7 +225,7 @@ void GatewayService::updateGatewayRegistration(const eGatewayStatus status)
 
 	RedisGatewayInfo info;
 	info.gatewayId = mGatewayId;
-	info.ip = mListenIp;
+	info.ip = mPublicIp;
 	info.port = mListenPort;
 	info.status = status;
 	info.currentSessionCount = mpServerService->GetCurrentSessionCount();

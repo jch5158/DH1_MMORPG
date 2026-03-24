@@ -16,6 +16,7 @@ public:
 
 	void SetAccountId(const uint64 accountId) { mAccountId = accountId; }
 	[[nodiscard]] uint64 GetAccountId() const { return mAccountId; }
+	[[nodiscard]] bool IsLoggedIn() const { return mAccountId != 0; }
 
 private:
 	uint64 mAccountId = 0;

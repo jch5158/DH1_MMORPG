@@ -9,7 +9,8 @@ namespace LoginServer.DTOs.Auth
         public required string Email { get; set; }
 
         [Required(ErrorMessage = "인증 번호를 입력해주세요.")]
-        [StringLength(6, ErrorMessage = "인증번호가 올바르지 않습니다.")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "인증번호는 6자리여야 합니다.")]
+        [RegularExpression(@"^\d{6}$", ErrorMessage = "인증번호는 6자리 숫자여야 합니다.")]
         public required string VerifyCode { get; set; }
     }
 }

@@ -87,6 +87,29 @@ std::optional<std::string> RedisActor::GetString(const std::string& key) const
     }
 }
 
+std::optional<std::string> RedisActor::GetDelString(const std::string& key) const
+{
+    if (!mRedis)
+    {
+        return std::nullopt;
+    }
+
+    try
+    {
+        if (auto val = mRedis->command<sw::redis::OptionalString>("GETDEL", key))
+        {
+            return *val;
+        }
+
+        return std::nullopt;
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] GetDel Error : {}", e.what());
+        return std::nullopt;
+    }
+}
+
 bool RedisActor::DeleteKey(const std::string& key) const
 {
     if (!mRedis)

@@ -2,6 +2,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
+#include "Components/Widget.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 
@@ -54,6 +55,29 @@ void ULoginWidget::NativeConstruct()
 	{
 		ResetPasswordButton->OnClicked.AddDynamic(this, &ULoginWidget::OnResetPasswordButtonClicked);
 	}
+
+	if (const UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>())
+		{
+			NetSubsystem->OnGatewayLoginResult.AddUObject(this, &ULoginWidget::HandleGatewayLoginResult);
+		}
+	}
+
+	SetLoading(false);
+}
+
+void ULoginWidget::NativeDestruct()
+{
+	if (const UGameInstance* GameInstance = GetGameInstance())
+	{
+		if (UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>())
+		{
+			NetSubsystem->OnGatewayLoginResult.RemoveAll(this);
+		}
+	}
+
+	Super::NativeDestruct();
 }
 
 void ULoginWidget::OnLoginButtonClicked()
@@ -61,14 +85,20 @@ void ULoginWidget::OnLoginButtonClicked()
 	const FString Email = EmailInput->GetText().ToString();
 	const FString Password = PasswordInput->GetText().ToString();
 
-	// 유효성 검사
 	if (Email.IsEmpty() || Password.IsEmpty())
 	{
 		SetStatusTextMessage(TEXT("이메일과 비밀번호를 모두 입력해주세요."));
 		return;
 	}
-	
-	SetStatusTextMessage("");
+
+	if (!Email.Contains(TEXT("@")) || !Email.Contains(TEXT(".")))
+	{
+		SetStatusTextMessage(TEXT("유효한 이메일 형식이 아닙니다."));
+		return;
+	}
+
+	SetStatusTextMessage(TEXT(""));
+	SetLoading(true);
 
 	// HTTP 요청 생성
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -113,6 +143,7 @@ void ULoginWidget::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpRespons
 	if (!bWasSuccessful || !Response.IsValid())
 	{
 		SetStatusTextMessage(TEXT("서버와 연결할 수 없습니다."));
+		SetLoading(false);
 		return;
 	}
 
@@ -120,10 +151,10 @@ void ULoginWidget::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpRespons
 	const int32 ResponseCode = Response->GetResponseCode();
 	if (ResponseCode == 200)
 	{
-		FString Ticket = TEXT("");
-		FString AccountId = TEXT("");
-		FString GatewayIp = TEXT("");
-		FString Port = TEXT("");
+		FString Ticket;
+		int64 AccountId = 0;
+		FString GatewayIp;
+		int64 GatewayPort = 0;
 
 		const FString JsonString = Response->GetContentAsString();
 		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
@@ -131,26 +162,20 @@ void ULoginWidget::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpRespons
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
 			JsonObject->TryGetStringField(TEXT("ticket"), Ticket);
-			JsonObject->TryGetStringField(TEXT("accountId"), AccountId);
+			JsonObject->TryGetNumberField(TEXT("accountId"), AccountId);
 			JsonObject->TryGetStringField(TEXT("gatewayIp"), GatewayIp);
-			JsonObject->TryGetStringField(TEXT("gatewayPort"), Port);
+			JsonObject->TryGetNumberField(TEXT("gatewayPort"), GatewayPort);
 		}
 
 		if (const UGameInstance* GameInstance = GetGameInstance())
 		{
 			if (UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>())
 			{
-				NetSubsystem->SetAuthData(Ticket, AccountId);
-
-				const int32 ResPort = FCString::Atoi(*Port);
-				NetSubsystem->ConnectToServer(GatewayIp, ResPort);
+				NetSubsystem->SetAuthData(Ticket, FString::Printf(TEXT("%lld"), AccountId));
+				NetSubsystem->ConnectToServer(GatewayIp, static_cast<int32>(GatewayPort));
 			}
 		}
-
-		if (OnLoginSuccess.IsBound())
-		{
-			OnLoginSuccess.Broadcast();
-		}
+		// 로딩 유지: 게이트웨이 인증(S2C_LOGIN_RES) 완료 후 HandleGatewayLoginResult에서 처리
 	}
 	else
 	{
@@ -169,6 +194,7 @@ void ULoginWidget::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpRespons
 
 		if (ResponseCode == 403 && Code == TEXT("EMAIL_UNVERIFIED"))
 		{
+			SetLoading(false);
 			if (OnGoToEmailVerification.IsBound())
 			{
 				OnGoToEmailVerification.Broadcast(Message, Email);
@@ -176,7 +202,54 @@ void ULoginWidget::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpRespons
 		}
 		else
 		{
+			SetLoading(false);
 			SetStatusTextMessage(Message);
 		}
+	}
+}
+
+void ULoginWidget::HandleGatewayLoginResult(const int32 Result)
+{
+	// eLoginResult: 0=SUCCESS, 1=INVALID_TICKET, 2=SERVER_FULL, 3=MAINTENANCE, 4=INTERNAL_ERROR
+	if (Result == 0)
+	{
+		SetLoading(false);
+		if (OnLoginSuccess.IsBound())
+		{
+			OnLoginSuccess.Broadcast();
+		}
+	}
+	else
+	{
+		SetLoading(false);
+
+		switch (Result)
+		{
+		case 1:
+			SetStatusTextMessage(TEXT("인증 정보가 만료되었습니다. 다시 로그인해주세요."));
+			break;
+		case 2:
+			SetStatusTextMessage(TEXT("서버가 가득 찼습니다. 잠시 후 다시 시도해주세요."));
+			break;
+		case 3:
+			SetStatusTextMessage(TEXT("서버 점검 중입니다. 잠시 후 다시 시도해주세요."));
+			break;
+		default:
+			SetStatusTextMessage(TEXT("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."));
+			break;
+		}
+	}
+}
+
+void ULoginWidget::SetLoading(const bool bLoading)
+{
+	if (LoginButton)
+	{
+		LoginButton->SetIsEnabled(!bLoading);
+	}
+
+	if (LoadingOverlay)
+	{
+		LoadingOverlay->SetVisibility(bLoading ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }

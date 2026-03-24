@@ -62,6 +62,7 @@ private:
 	int64 mHeartbeatIntervalMs;
 	int64 mRedisTtlSeconds;
 	std::string mListenIp;
+	std::string mPublicIp;
 	uint16 mListenPort;
 
 	std::atomic<bool> mbRunning;

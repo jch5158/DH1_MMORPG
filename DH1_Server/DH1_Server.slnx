@@ -6,4 +6,5 @@
   </Configurations>
   <Project Path="GatewayServer/GatewayServer.vcxproj" Id="49e65f39-679a-4f45-b0cf-c6a124bb046a" />
   <Project Path="LoginServer/LoginServer.csproj" />
+  <Project Path="LoginServer.Tests/LoginServer.Tests.csproj" />
 </Solution>

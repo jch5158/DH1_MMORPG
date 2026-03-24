@@ -16,6 +16,12 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 {
 	NET_ENGINE_LOG_INFO("LoginPacketHandler::HANDLE_C2S_LOGIN_REQ - accountId: {}", packet.accountid());
 
+	if (packet.accountid() == 0)
+	{
+		NET_ENGINE_LOG_ERROR("LoginPacketHandler::HANDLE_C2S_LOGIN_REQ - Invalid accountId(0)");
+		return false;
+	}
+
 	RedisServiceRef pRedisService = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
 	if (pRedisService == nullptr)
 	{
@@ -23,8 +29,14 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 		return false;
 	}
 
-	pRedisService->GetStringAsync("ticket:" + packet.ticket(), [pSession, pRedisService, argTicket = "ticket:" + packet.ticket(), argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
+	// GetDelStringAsync: Redis GETDEL로 조회와 삭제를 원자적으로 수행 (티켓 재사용 방지)
+	pRedisService->GetDelStringAsync("ticket:" + packet.ticket(), [pSession, argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
 		{
+			if (!pSession->IsConnected())
+			{
+				return;
+			}
+
 			Protocol::S2C_LOGIN_RES retPacket;
 
 			auto sendResponse = [&retPacket, &pSession](const Protocol::eLoginResult result) {
@@ -34,7 +46,7 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 
 			if (!resultStr.has_value())
 			{
-				NET_ENGINE_LOG_ERROR("LoginPacketHandler - Ticket not found, accountId: {}", argAccountId);
+				NET_ENGINE_LOG_ERROR("LoginPacketHandler - Ticket not found or expired, accountId: {}", argAccountId);
 				sendResponse(Protocol::eLoginResult::LOGIN_FAIL_INVALID_TICKET);
 				return;
 			}
@@ -55,10 +67,10 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 				return;
 			}
 
-			if (const auto pClientSession = pManager->GetClientSession(argAccountId))
+			if (const auto pExistingSession = pManager->GetClientSession(argAccountId))
 			{
 				NET_ENGINE_LOG_INFO("LoginPacketHandler - Duplicate login, kicking accountId: {}", argAccountId);
-				pClientSession->Disconnect(eDisconnectReason::DuplicateLogin);
+				pExistingSession->Disconnect(eDisconnectReason::DuplicateLogin);
 				(void)pManager->RemoveClientSession(argAccountId);
 			}
 
@@ -71,8 +83,6 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 			}
 
 			pClientSession->SetAccountId(argAccountId);
-
-			pRedisService->DeleteKeyAsync(argTicket, [](bool) {});
 
 			NET_ENGINE_LOG_INFO("LoginPacketHandler - Login success, accountId: {}", argAccountId);
 			sendResponse(Protocol::eLoginResult::LOGIN_SUCCESS);

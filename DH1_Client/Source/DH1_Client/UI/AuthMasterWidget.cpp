@@ -1,5 +1,6 @@
 ﻿#include "AuthMasterWidget.h"
 #include "Components/WidgetSwitcher.h"
+#include "Kismet/GameplayStatics.h"
 #include "LoginWidget.h"
 #include "SignUpWidget.h"
 #include "EmailVerificationWidget.h"
@@ -50,8 +51,7 @@ void UAuthMasterWidget::HandleGoToSignUp() const
 
 void UAuthMasterWidget::HandleLoginSuccess() const
 {
-	// TODO : 로비로 이동 처리
-	UE_LOG(LogTemp, Log, TEXT("로그인 완료! 로비로 이동합니다."));
+	UGameplayStatics::OpenLevel(this, LobbyLevelName);
 }
 
 void UAuthMasterWidget::HandleGoToResetPassword() const

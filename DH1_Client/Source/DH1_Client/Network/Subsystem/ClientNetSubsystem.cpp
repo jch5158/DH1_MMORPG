@@ -109,3 +109,8 @@ AuthData UClientNetSubsystem::GetAuthData() const
 {
 	return ClientAuthData;
 }
+
+void UClientNetSubsystem::NotifyLoginResult(const int32 Result)
+{
+	OnGatewayLoginResult.Broadcast(Result);
+}

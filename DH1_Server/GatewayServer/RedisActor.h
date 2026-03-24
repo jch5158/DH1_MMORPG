@@ -18,6 +18,7 @@ public:
     bool SetString(const std::string& key, const std::string& value) const;
     bool SetExpireString(const std::string& key, const std::string& value, const int64 ttlSeconds) const;
     std::optional<std::string> GetString(const std::string& key) const;
+    std::optional<std::string> GetDelString(const std::string& key) const;
     bool DeleteKey(const std::string& key) const;
 
 private:
