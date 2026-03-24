@@ -16,14 +16,15 @@ bool SessionManager::AddSession(SessionRef pSession)
 		return false;
 	}
 
-	const int64 retVal = mSessions.emplace(std::move(pSession)).second;
+	const uint64 sessionId = pSession->GetSessionId();
+	const bool retVal = mSessions.try_emplace(sessionId, std::move(pSession)).second;
 	return retVal;
 }
 
 void SessionManager::RemoveSession(const SessionRef& pSession)
 {
 	UniqueLock lock(mLock);
-	mSessions.erase(pSession);
+	mSessions.erase(pSession->GetSessionId());
 }
 
 void SessionManager::SetMaxSessionCount(const int32 maxSessionCount)
@@ -50,11 +51,31 @@ SessionRef SessionManager::GetFirstSessionRef()
 		return nullptr;
 	}
 
-	return *mSessions.begin();
+	return mSessions.begin()->second;
 }
 
 Vector<SessionRef> SessionManager::GetActiveSessions()
 {
 	SharedLock lock(mLock);
-	return Vector<SessionRef>(mSessions.begin(), mSessions.end());
+
+	Vector<SessionRef> sessions;
+	sessions.reserve(mSessions.size());
+	for (const auto& [sessionId, pSession] : mSessions)
+	{
+		sessions.emplace_back(pSession);
+	}
+
+	return sessions;
+}
+
+SessionRef SessionManager::GetSession(const uint64 sessionId)
+{
+	SharedLock lock(mLock);
+	const auto iter = mSessions.find(sessionId);
+	if (iter == mSessions.end())
+	{
+		return nullptr;
+	}
+
+	return iter->second;
 }

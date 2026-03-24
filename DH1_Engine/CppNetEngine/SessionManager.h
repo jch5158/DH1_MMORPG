@@ -18,11 +18,12 @@ public:
 	[[nodiscard]] int32 GetMaxSessionCount() const;
 	[[nodiscard]] int32 GetCurrentSessionCount();
 	[[nodiscard]] SessionRef GetFirstSessionRef();
+	[[nodiscard]] SessionRef GetSession(const uint64 sessionId);
 	[[nodiscard]] Vector<SessionRef> GetActiveSessions();
 
 private:
 	int32 mMaxSessionCount;
 
 	SharedMutex mLock;
-	Set<SessionRef> mSessions;
+	HashMap<uint64, SessionRef> mSessions;
 };
