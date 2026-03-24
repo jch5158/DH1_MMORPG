@@ -132,7 +132,11 @@ uint64 NetService::AllocateSessionId() const
 void NetService::RecycleSession(const SessionRef& pSession) const
 {
 	pSession->Stop();
-	(void)mpReusableSessionPool->TryPush(pSession);
+
+	if (pSession->GetSocket() != INVALID_SOCKET)
+	{
+		(void)mpReusableSessionPool->TryPush(pSession);
+	}
 }
 
 ClientService::ClientService(const eServiceType serviceType)
