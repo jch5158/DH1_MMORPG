@@ -68,7 +68,7 @@ SessionRef NetService::CreateSession()
 	{
 		if (pSession->Reset())
 		{
-			return pSession;
+			return std::move(pSession);
 		}
 
 		NET_ENGINE_LOG_ERROR("NetService::CreateSession - Session::Reset() failed, creating new session");
