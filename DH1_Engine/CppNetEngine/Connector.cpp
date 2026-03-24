@@ -100,7 +100,10 @@ void Connector::Process()
 	int32 optLen = SIZE_OF_32(connectTime);
 	if (getsockopt(pSession->GetSocket(), SOL_SOCKET, SO_CONNECT_TIME, reinterpret_cast<char*>(&connectTime), &optLen) == SOCKET_ERROR || connectTime == -1)
 	{
-		pSession->Disconnect(eDisconnectReason::SocketError);
+		if (mpService != nullptr)
+		{
+			mpService->OnSessionDisconnected(pSession);
+		}
 		return;
 	}
 
