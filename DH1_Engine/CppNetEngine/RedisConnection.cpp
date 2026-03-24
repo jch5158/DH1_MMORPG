@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "RedisConnection.h"
 
 RedisConnection::RedisConnection()
@@ -27,7 +27,7 @@ bool RedisConnection::Initialize(const std::string& connectionUri)
 	}
 }
 
-int64 RedisConnection::IncrBy(const std::string& key, int64 amount)
+int64 RedisConnection::IncrBy(const std::string& key, int64 amount) const
 {
 	if (!mRedis)
 	{

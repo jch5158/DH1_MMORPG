@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <sw/redis++/redis++.h>
 
 class RedisConnection
@@ -13,7 +13,7 @@ public:
 	~RedisConnection() = default;
 
 	bool Initialize(const std::string& connectionUri);
-	int64 IncrBy(const std::string& key, int64 amount);
+	int64 IncrBy(const std::string& key, int64 amount) const;
 
 private:
 	std::unique_ptr<sw::redis::Redis> mRedis;
