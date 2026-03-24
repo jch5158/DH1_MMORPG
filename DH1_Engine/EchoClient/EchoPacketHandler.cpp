@@ -25,9 +25,9 @@ bool EchoPacketHandler::HANDLE_S2C_ECHO_RES(const Protocol::S2C_ECHO_RES& packet
 		CrashReporter::Crash();
 	}
 
-	// 1% 확률로 의도적 Disconnect 후 재연결 테스트
+	// 0.001% 확률로 의도적 Disconnect 후 재연결 테스트
 	thread_local std::mt19937 rng(std::random_device{}());
-	thread_local std::uniform_int_distribution<int32> dist(1, 100);
+	thread_local std::uniform_int_distribution<int32> dist(1, 100000);
 
 	if (dist(rng) == 1)
 	{
