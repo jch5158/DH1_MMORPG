@@ -38,20 +38,30 @@ bool Connector::Register()
 	}
 
 	const SessionRef pSession = mpService->CreateSession();
-	if (pSession == nullptr || !pSession->IsDisconnectStarted())
+	if (pSession == nullptr)
 	{
+		NET_ENGINE_LOG_ERROR("Connector::Register() - CreateSession returned nullptr");
+		return false;
+	}
+
+	if (!pSession->IsDisconnectStarted())
+	{
+		NET_ENGINE_LOG_ERROR("Connector::Register() - Session is not in disconnect state");
 		return false;
 	}
 
 	if (SocketUtils::SetReuseAddress(pSession->GetSocket(), true) == false)
 	{
+		NET_ENGINE_LOG_ERROR("Connector::Register() - SetReuseAddress failed, errorCode: {}", WSAGetLastError());
 		return false;
 	}
 
 	if (SocketUtils::BindAnyAddress(pSession->GetSocket(), 0) == false)
 	{
-		if (WSAGetLastError() != WSAEINVAL)
+		const int32 bindError = WSAGetLastError();
+		if (bindError != WSAEINVAL)
 		{
+			NET_ENGINE_LOG_ERROR("Connector::Register() - BindAnyAddress failed, errorCode: {}", bindError);
 			return false;
 		}
 	}
