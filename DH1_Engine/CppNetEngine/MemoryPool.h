@@ -10,7 +10,7 @@ private:
 	{
 	public:
 
-		static constexpr uint64 CHECKSUM_CODE = 0xDEADBEEFBEFFDEAD;
+		static constexpr uint64 CHECKSUM_CODE = 0xDEAD0002BEEF0002;
 
 		struct ChunkData
 		{

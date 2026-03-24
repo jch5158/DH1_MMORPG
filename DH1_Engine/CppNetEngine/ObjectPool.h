@@ -4,7 +4,7 @@ template <typename T>
 class ObjectPool final
 {
 private:
-	static constexpr uint64 CHECKSUM_CODE = 0xDEADBEEFBEFFDEAD;
+	static constexpr uint64 CHECKSUM_CODE = 0xDEAD0001BEEF0001;
 
 	struct Node
 	{
@@ -167,7 +167,7 @@ private:
 	{
 	public:
 
-		static constexpr uint64 CHECKSUM_CODE = 0xDEADBEEFBEFFDEAD;
+		static constexpr uint64 CHECKSUM_CODE = 0xDEAD0003BEEF0003;
 
 		struct ChunkData
 		{

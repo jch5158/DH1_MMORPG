@@ -11,7 +11,7 @@ private:
 	static constexpr int32 MAX_SIZE = 65536;
 	static constexpr int32 SMALL_POOL_COUNT = (THRESHOLD / SMALL_STRIDE) - 1;
 	static constexpr int32 LARGE_POOL_COUNT = (MAX_SIZE / LARGE_STRIDE);
-	static constexpr uint64 CHECKSUM_CODE = 0xDEADBEEFBEFFDEAD;
+	static constexpr uint64 CHECKSUM_CODE = 0xDEAD0004BEEF0004;
 
 public:
 
