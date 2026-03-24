@@ -49,7 +49,3 @@ void GameSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 	}
 }
 
-void GameSession::OnError(const int32 errorCode)
-{
-	NET_ENGINE_LOG_ERROR("[GameSession] OnError - sessionId: {}, errorCode: {}", GetSessionId(), errorCode);
-}

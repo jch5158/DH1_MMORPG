@@ -33,6 +33,3 @@ void ClientSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 	}
 }
 
-void ClientSession::OnError(const int32 errorCode)
-{
-}

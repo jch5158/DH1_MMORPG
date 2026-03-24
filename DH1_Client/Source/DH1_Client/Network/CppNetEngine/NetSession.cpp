@@ -36,10 +36,6 @@ void NetSession::OnSend(const int32 len)
 {
 }
 
-void NetSession::OnError(const int32 errorCode)
-{
-}
-
 void NetSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 {
 	PacketSessionRef pSession = GetPacketSessionRef();

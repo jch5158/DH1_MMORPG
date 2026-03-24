@@ -13,6 +13,5 @@ public:
 	virtual void OnDisconnected() override;
 	virtual void OnSend(const int32 len) override;
 	virtual void OnReceivePacket(const byte* pBuffer,const int32 len) override;
-	virtual void OnError(const int32 errorCode) override;
 };
 

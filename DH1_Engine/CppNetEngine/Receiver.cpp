@@ -93,7 +93,7 @@ void Receiver::Register()
 		{
 			if (!SocketUtils::IsExpectedIocpError(errorCode))
 			{
-				pOwner->OnError(errorCode);
+				NET_ENGINE_LOG_ERROR("Receiver::Register() - WsaReceive failed, errorCode: {}", errorCode);
 			}
 			pOwner->Disconnect(eDisconnectReason::SocketError);
 		}

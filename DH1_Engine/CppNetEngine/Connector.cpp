@@ -62,7 +62,7 @@ bool Connector::Register()
 		{
 			if (!SocketUtils::IsExpectedIocpError(errorCode))
 			{
-				pSession->OnError(errorCode);
+				NET_ENGINE_LOG_ERROR("Connector::Register() - ConnectEx failed, errorCode: {}", errorCode);
 			}
 
 			pSession->Disconnect(eDisconnectReason::SocketError);

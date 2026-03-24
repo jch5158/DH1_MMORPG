@@ -53,7 +53,6 @@ public:
 	virtual void OnDisconnected() = 0;
 	virtual void OnSend(const int32 len) = 0;
 	virtual int32 OnReceive(const byte* pBuffer, const int32 len) = 0;
-	virtual void OnError(const int32 errorCode) = 0;
 
 	void Start();
 	void Stop();

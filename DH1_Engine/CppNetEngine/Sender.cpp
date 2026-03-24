@@ -123,7 +123,7 @@ void Sender::Register()
 			{
 				if (!SocketUtils::IsExpectedIocpError(errorCode))
 				{
-					pOwner->OnError(errorCode);
+					NET_ENGINE_LOG_ERROR("Sender::Register() - WsaSend failed, errorCode: {}", errorCode);
 				}
 				pOwner->Disconnect(eDisconnectReason::SocketError);
 			}

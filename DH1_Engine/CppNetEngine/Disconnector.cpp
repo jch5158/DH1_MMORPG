@@ -40,7 +40,7 @@ void Disconnector::Register()
 		{
 			if (!SocketUtils::IsExpectedIocpError(errorCode))
 			{
-				pSession->OnError(errorCode);
+				NET_ENGINE_LOG_ERROR("Disconnector::Register() - DisconnectEx failed, errorCode: {}", errorCode);
 			}
 
 			Process();
