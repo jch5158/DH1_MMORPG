@@ -199,6 +199,9 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 
 	mpConnectionManager->FreeConnection();
 
+	NET_ENGINE_LOG_INFO("ClientService::OnSessionDisconnected - sessionId: {}, currentCount: {}, autoReconnect: {}",
+		pSession->GetSessionId(), mSessionManager.GetCurrentSessionCount(), mbAutoReconnect);
+
 	if (mbAutoReconnect)
 	{
 		scheduleReconnect();
