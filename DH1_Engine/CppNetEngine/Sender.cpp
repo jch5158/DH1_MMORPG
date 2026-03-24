@@ -64,7 +64,7 @@ void Sender::Process(const uint32 numOfBytes)
 {
 	mSendEvent.GetSendPendingBuffer().clear();
 	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
+	if (pOwner == nullptr || !(pOwner->IsConnected() || pOwner->IsInGame()))
 	{
 		return;
 	}

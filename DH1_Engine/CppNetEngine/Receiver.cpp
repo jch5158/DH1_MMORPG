@@ -32,7 +32,7 @@ void Receiver::Reset()
 void Receiver::Process(const uint32 numOfBytes)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
+	if (pOwner == nullptr || !(pOwner->IsConnected() || pOwner->IsInGame()))
 	{
 		return;
 	}
@@ -63,7 +63,7 @@ void Receiver::Process(const uint32 numOfBytes)
 void Receiver::Register()
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mReceiveEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
+	if (pOwner == nullptr || !(pOwner->IsConnected() || pOwner->IsInGame()))
 	{
 		return;
 	}
