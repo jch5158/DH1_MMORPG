@@ -2,6 +2,7 @@
 #include "JsonConfig.h"
 
 #include <fstream>
+#include <regex>
 
 JsonConfig JsonConfig::LoadFromFile(const std::string& filePath)
 {
@@ -18,7 +19,7 @@ JsonConfig JsonConfig::LoadFromFile(const std::string& filePath)
 
 std::string JsonConfig::GetString(const std::string& key) const
 {
-	return mJson.at(key).get<std::string>();
+	return resolveEnvVars(mJson.at(key).get<std::string>());
 }
 
 std::string JsonConfig::GetString(const std::string& key, const std::string& defaultValue) const
@@ -28,7 +29,7 @@ std::string JsonConfig::GetString(const std::string& key, const std::string& def
 		return defaultValue;
 	}
 
-	return mJson[key].get<std::string>();
+	return resolveEnvVars(mJson[key].get<std::string>());
 }
 
 int32 JsonConfig::GetInt32(const std::string& key) const
@@ -119,4 +120,32 @@ bool JsonConfig::HasKey(const std::string& key) const
 JsonConfig::JsonConfig(nlohmann::json json)
 	: mJson(std::move(json))
 {
+}
+
+std::string JsonConfig::resolveEnvVars(const std::string& value)
+{
+	static const std::regex envPattern(R"(\$\{(\w+)\})");
+	std::string result = value;
+	std::smatch match;
+
+	while (std::regex_search(result, match, envPattern))
+	{
+		const std::string envName = match[1].str();
+		char* envValue = nullptr;
+		size_t envLen = 0;
+		const errno_t err = _dupenv_s(&envValue, &envLen, envName.c_str());
+
+		if (err == 0 && envValue != nullptr)
+		{
+			result = match.prefix().str() + envValue + match.suffix().str();
+			free(envValue);
+		}
+		else
+		{
+			NET_ENGINE_LOG_ERROR("JsonConfig::resolveEnvVars - Environment variable '{}' not found", envName);
+			result = match.prefix().str() + match.suffix().str();
+		}
+	}
+
+	return result;
 }

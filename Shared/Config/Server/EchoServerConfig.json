@@ -17,6 +17,6 @@
         "dispatchThreadCount": 8
     },
     "redis": {
-        "connectionUri": "tcp://127.0.0.1:6379?pool_size=10"
+        "connectionUri": "tcp://${DH1_REDIS_HOST}:${DH1_REDIS_PORT}?pool_size=10"
     }
 }
