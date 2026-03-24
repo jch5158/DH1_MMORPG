@@ -35,7 +35,9 @@ void Sender::Reset()
 	mSendEvent.GetSendPendingBuffer().clear();
 
 	NetSendBufferRef discarded;
-	while (mSendQueue.TryDequeue(discarded)) {}
+	while (mSendQueue.TryDequeue(discarded))
+	{
+	}
 
 	mbSendRegistered.store(false);
 }
