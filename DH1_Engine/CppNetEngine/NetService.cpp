@@ -8,14 +8,14 @@
 
 NetService::NetService(const eServiceType serviceType)
 	: mbInitialize(false)
-	, mServiceType(serviceType)
-	, mNetAddress()
-	, mpNetworkScheduler()
-	, mSessionFactory()
-	, mSessionManager()
-	, mpRedisConnection()
-	, mpSessionIdAllocator()
-	, mpReusableSessionPool()
+	  , mServiceType(serviceType)
+	  , mNetAddress()
+	  , mpNetworkScheduler()
+	  , mSessionFactory()
+	  , mSessionManager()
+	  , mpRedisConnection()
+	  , mpSessionIdAllocator()
+	  , mpReusableSessionPool()
 {
 }
 
@@ -64,17 +64,18 @@ void NetService::Dispatch()
 SessionRef NetService::CreateSession()
 {
 	SessionRef pSession;
-
 	if (mpReusableSessionPool->TryPop(pSession))
 	{
 		if (pSession->Reset())
 		{
 			return pSession;
 		}
+
+		NET_ENGINE_LOG_ERROR("NetService::CreateSession - Session::Reset() failed, creating new session");
 	}
 
 	pSession = mSessionFactory();
-	if (pSession->Initialize(shared_from_this()) == false)
+	if (pSession == nullptr || pSession->Initialize(shared_from_this()) == false)
 	{
 		return nullptr;
 	}
@@ -117,7 +118,7 @@ int32 NetService::GetMaxSessionCount() const
 	return mSessionManager.GetMaxSessionCount();
 }
 
-uint64 NetService::AllocateSessionId()
+uint64 NetService::AllocateSessionId() const
 {
 	if (mpSessionIdAllocator == nullptr)
 	{
@@ -127,19 +128,19 @@ uint64 NetService::AllocateSessionId()
 	return mpSessionIdAllocator->Allocate();
 }
 
-void NetService::RecycleSession(const SessionRef& pSession)
+void NetService::RecycleSession(const SessionRef& pSession) const
 {
 	pSession->Stop();
-	mpReusableSessionPool->TryPush(pSession);
+	(void)mpReusableSessionPool->TryPush(pSession);
 }
 
 ClientService::ClientService(const eServiceType serviceType)
 	: NetService(eServiceType::Client)
-	, mpConnectionManager()
-	, mbAutoReconnect(false)
-	, mReconnectIntervalMs(0)
-	, mMaxReconnectCount(0)
-	, mReconnectAttemptCount(0)
+	  , mpConnectionManager()
+	  , mbAutoReconnect(false)
+	  , mReconnectIntervalMs(0)
+	  , mMaxReconnectCount(0)
+	  , mReconnectAttemptCount(0)
 {
 }
 
@@ -203,6 +204,11 @@ void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 	}
 }
 
+SessionRef ClientService::GetFirstSessionRef()
+{
+	return mSessionManager.GetFirstSessionRef();
+}
+
 void ClientService::scheduleReconnect()
 {
 	if (mMaxReconnectCount > 0)
@@ -217,26 +223,21 @@ void ClientService::scheduleReconnect()
 
 	ClientServiceWeak pWeak = std::static_pointer_cast<ClientService>(shared_from_this());
 	mpNetworkScheduler->RegisterDelay([pWeak]()->void
+	{
+		const ClientServiceRef pService = pWeak.lock();
+		if (pService == nullptr)
 		{
-			const ClientServiceRef pService = pWeak.lock();
-			if (pService == nullptr)
-			{
-				return;
-			}
+			return;
+		}
 
-			pService->mpConnectionManager->Connect(pService);
-		}, mReconnectIntervalMs);
-}
-
-SessionRef ClientService::GetFirstSessionRef()
-{
-	return mSessionManager.GetFirstSessionRef();
+		pService->mpConnectionManager->Connect(pService);
+	}, mReconnectIntervalMs);
 }
 
 ServerService::ServerService(const eServiceType serviceType)
 	:NetService(serviceType)
-	, mpListener()
-	, mpSessionReaper()
+	 , mpListener()
+	 , mpSessionReaper()
 {
 }
 
@@ -307,16 +308,16 @@ void ServerService::registerReaperSweep()
 {
 	ServerServiceWeak pWeak = std::static_pointer_cast<ServerService>(shared_from_this());
 	mpNetworkScheduler->RegisterDelay([pWeak]()->void
+	{
+		const ServerServiceRef pService = pWeak.lock();
+		if (pService == nullptr)
 		{
-			const ServerServiceRef pService = pWeak.lock();
-			if (pService == nullptr)
-			{
-				return;
-			}
+			return;
+		}
 
-			pService->mpSessionReaper->Sweep(pWeak);
-			pService->mpSessionReaper->SweepAbort();
+		pService->mpSessionReaper->Sweep(pWeak);
+		pService->mpSessionReaper->SweepAbort();
 
-			pService->registerReaperSweep();
-		}, SessionReaper::GetSweepIntervalMs());
+		pService->registerReaperSweep();
+	}, SessionReaper::GetSweepIntervalMs());
 }
