@@ -8,16 +8,16 @@ public:
 
     using value_type = T;
 
-	explicit SharedPtrAllocator() = default;
-	explicit SharedPtrAllocator(const SharedPtrAllocator&) = default;
-	explicit SharedPtrAllocator(SharedPtrAllocator&&) = default;
+	SharedPtrAllocator() = default;
+	SharedPtrAllocator(const SharedPtrAllocator&) = default;
+	SharedPtrAllocator(SharedPtrAllocator&&) = default;
 	SharedPtrAllocator& operator=(const SharedPtrAllocator&) = default;
 	SharedPtrAllocator& operator=(SharedPtrAllocator&&) = default;
-	
+
 	~SharedPtrAllocator() = default;
-    
+
 	template <typename U>
-	explicit SharedPtrAllocator(const SharedPtrAllocator<U>&) {}
+	SharedPtrAllocator(const SharedPtrAllocator<U>&) {}
 
 	template<typename U>
 	bool operator==(const SharedPtrAllocator<U>&) const { return true; }
