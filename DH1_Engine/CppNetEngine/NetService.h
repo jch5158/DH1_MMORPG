@@ -34,7 +34,7 @@ public:
 	virtual bool Initialize(const NetServiceConfig& config);
 
 	virtual bool Start() = 0;
-	virtual void CloseService() = 0;
+	virtual void CloseService(const uint32 dispatchThreadCount) = 0;
 	virtual void OnSessionConnected(const SessionRef&) = 0;
 	virtual void OnSessionDisconnected(const SessionRef&) = 0;
 	virtual void Dispatch();
@@ -82,7 +82,7 @@ public:
 	virtual bool Initialize(const NetServiceConfig& config) override;
 
 	virtual bool Start() override;
-	virtual void CloseService() override;
+	virtual void CloseService(const uint32 dispatchThreadCount) override;
 	virtual void OnSessionConnected(const SessionRef& pSession) override;
 	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
 
@@ -115,7 +115,7 @@ public:
 	virtual bool Initialize(const NetServiceConfig& config) override;
 
 	virtual bool Start() override;
-	virtual void CloseService() override;	
+	virtual void CloseService(const uint32 dispatchThreadCount) override;
 	virtual void OnSessionConnected(const SessionRef& pSession) override;
 	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
 

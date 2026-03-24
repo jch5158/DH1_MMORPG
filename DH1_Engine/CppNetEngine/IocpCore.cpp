@@ -37,6 +37,14 @@ bool IocpCore::Register(IocpEvent& iocpEvent)
 	return true;
 }
 
+void IocpCore::Shutdown(const uint32 dispatchThreadCount)
+{
+	for (uint32 iter = 0; iter < dispatchThreadCount; ++iter)
+	{
+		PostQueuedCompletionStatus(mIocpHandle, 0, 0, nullptr);
+	}
+}
+
 uint32 IocpCore::GetRunningThreadCount() const
 {
 	return mRunningThreadCount;

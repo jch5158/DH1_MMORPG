@@ -32,6 +32,8 @@ public:
 	[[nodiscard]] virtual bool Register(IocpEvent& iocpEvent);
 	virtual TimerHandle RegisterDelay(std::function<void()> delayFunction, const uint64 delayMs) = 0;
 	
+	void Shutdown(const uint32 dispatchThreadCount);
+
 	[[nodiscard]] uint32 GetRunningThreadCount() const;
 
 protected:
