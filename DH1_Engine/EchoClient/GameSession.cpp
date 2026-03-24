@@ -24,10 +24,20 @@ void GameSession::OnConnected()
 
 void GameSession::OnDisconnecting(const eDisconnectReason reason)
 {
-	if (!mbDisconnectRequested.load())
+	if (mbDisconnectRequested.load())
 	{
+		return;
+	}
+
+	switch (reason)
+	{
+	case eDisconnectReason::Closed:
+	case eDisconnectReason::Timeout:
+		break;
+	default:
 		NET_ENGINE_LOG_FATAL("[GameSession] Unexpected disconnect! sessionId: {}, reason: {}", GetSessionId(), static_cast<uint8>(reason));
 		CrashReporter::Crash();
+		break;
 	}
 }
 
