@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GatewayService.h"
 #include "JsonConfig.h"
+#include "NetEngineInit.h"
 #include "PacketServiceTypeHandler.h"
 
 #define STRINGIFY_IMPL(x) #x
@@ -11,6 +12,8 @@ int main()
 	CrashReporter::Initialize("GatewayServer", "1.0.0", "");
 
 	NetEngineInit netEngineInit;
+
+	SetConsoleCtrlHandler(GatewayService::ConsoleCtrlHandler, TRUE);
 
 	PacketServiceTypeHandler::Init();
 
@@ -29,5 +32,4 @@ int main()
 	}
 
 	service.Run();
-	service.Stop();
 }
