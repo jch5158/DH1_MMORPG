@@ -45,7 +45,7 @@ void Sender::Reset()
 void Sender::Send(NetSendBufferRef pSendBuffer)
 {
 	const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
-	if (pOwner == nullptr || pOwner->IsDisconnectStarted())
+	if (pOwner == nullptr || !(pOwner->IsConnected() || pOwner->IsInGame()))
 	{
 		return;
 	}
@@ -90,7 +90,7 @@ void Sender::Register()
 	while (true)
 	{
 		const SessionRef pOwner = static_pointer_cast<Session>(mSendEvent.GetOwner());
-		if (pOwner == nullptr || pOwner->IsDisconnectStarted())
+		if (pOwner == nullptr || !(pOwner->IsConnected() || pOwner->IsInGame()))
 		{
 			return;
 		}
@@ -108,6 +108,12 @@ void Sender::Register()
 			if (mSendQueue.TryDequeue(pSendBuffer) == false)
 			{
 				break;
+			}
+
+			if (pSendBuffer == nullptr)
+			{
+				--sendCount;
+				continue;
 			}
 
 			mSendEvent.GetSendPendingBuffer().emplace_back(pSendBuffer);
