@@ -62,7 +62,7 @@ bool SocketUtils::CreateTcpSocket(SOCKET& outSocket)
 
 void SocketUtils::Close(SOCKET& socket)
 {
-	if (INVALID_SOCKET == socket)
+	if (INVALID_SOCKET != socket)
 	{
 		closesocket(socket);
 	}

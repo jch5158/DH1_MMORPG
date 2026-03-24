@@ -78,7 +78,8 @@ bool Connector::Register()
 				NET_ENGINE_LOG_ERROR("Connector::Register() - ConnectEx failed, errorCode: {}", errorCode);
 			}
 
-			pSession->Disconnect(eDisconnectReason::SocketError);
+			pSession->ForceCloseSocket();
+			mpSession.reset();
 			return false;
 		}
 	}
