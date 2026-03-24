@@ -36,6 +36,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		{
 			return cpp_net_engine::MakeShared<ClientSession>(receiveBufferSize, sendBufferSize);
 		};
+	serviceConfig.redisConnectionUri = redisConfig.GetString("connectionUri");
 
 	mpServerService = cpp_net_engine::MakeShared<ServerService>(serviceConfig);
 	if (mpServerService == nullptr)
