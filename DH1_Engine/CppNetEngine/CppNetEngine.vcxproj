@@ -258,6 +258,7 @@
     <ClInclude Include="NetReceiveBuffer.h" />
     <ClInclude Include="NetSendBuffer.h" />
     <ClInclude Include="Receiver.h" />
+    <ClInclude Include="RedisConnection.h" />
     <ClInclude Include="ScopedActor.h" />
     <ClInclude Include="SendBufferAllocator.h" />
     <ClInclude Include="Sender.h" />
@@ -307,6 +308,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Receiver.cpp" />
+    <ClCompile Include="RedisConnection.cpp" />
     <ClCompile Include="ScopedActor.cpp" />
     <ClCompile Include="SendBufferAllocator.cpp" />
     <ClCompile Include="Sender.cpp" />
