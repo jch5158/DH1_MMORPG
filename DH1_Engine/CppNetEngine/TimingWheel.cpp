@@ -96,7 +96,7 @@ void TimingWheel::Tick()
 	const uint64 tickCount = elapsedMs / mTickIntervalMs;
 	mLastTickTime += std::chrono::milliseconds(tickCount * mTickIntervalMs);
 
-	List<TimingNode> executeList;
+	Vector<TimingNode> executeList;
 	{
 		UniqueLock lock(mLock);
 		for (uint32 i = 0; i < tickCount; ++i)
@@ -126,7 +126,7 @@ uint64 TimingWheel::GetMaxDelayMs() const
 	return mTickIntervalMs * LEVEL0_SIZE * LEVEL1_SIZE * LEVEL2_SIZE;
 }
 
-void TimingWheel::processTick(List<TimingNode>& outExecuteList)
+void TimingWheel::processTick(Vector<TimingNode>& outExecuteList)
 {
 	const uint32 depth0 = mCurrentTick & LEVEL0_MASK;
 
@@ -142,7 +142,11 @@ void TimingWheel::processTick(List<TimingNode>& outExecuteList)
 		}
 	}
 
-	outExecuteList.splice(outExecuteList.end(), mWheel0[depth0]);
+	for (auto& node : mWheel0[depth0])
+	{
+		outExecuteList.emplace_back(std::move(node));
+	}
+	mWheel0[depth0].clear();
 }
 
 void TimingWheel::addNode(TimingNode&& node)

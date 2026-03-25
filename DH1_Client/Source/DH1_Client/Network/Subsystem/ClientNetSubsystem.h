@@ -65,5 +65,11 @@ private:
     AuthData ClientAuthData;
 
     UPROPERTY(Config)
-    FString LoginServerURL;
+    FString LoginServerHost;
+
+    UPROPERTY(Config)
+    int32 LoginServerPort = 5001;
+
+    UPROPERTY(Config)
+    bool bUseHttps = true;
 };

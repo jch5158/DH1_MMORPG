@@ -20,9 +20,9 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	ServiceRef = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
 
-	if (LoginServerURL.IsEmpty())
+	if (LoginServerHost.IsEmpty())
 	{
-		LoginServerURL = TEXT("https://localhost:5001");
+		LoginServerHost = TEXT("localhost");
 	}
 }
 
@@ -63,7 +63,11 @@ void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Pass
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-	Request->SetURL(FString::Printf(TEXT("%s/api/auth/login"), *LoginServerURL));
+	const FString Scheme = bUseHttps ? TEXT("https") : TEXT("http");
+	const FString URL = FString::Printf(TEXT("%s://%s:%d/api/auth/login"), *Scheme, *LoginServerHost, LoginServerPort);
+	UE_LOG(LogTemp, Log, TEXT("[ClientNetSubsystem] RequestLogin URL: %s"), *URL);
+
+	Request->SetURL(URL);
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	Request->SetContentAsString(JsonString);
@@ -74,8 +78,13 @@ void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Pass
 
 void UClientNetSubsystem::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful)
 {
+	UE_LOG(LogTemp, Log, TEXT("[ClientNetSubsystem] OnLoginResponseReceived - bWasSuccessful: %d, Response Valid: %d"),
+		bWasSuccessful, Response.IsValid());
+
 	if (!bWasSuccessful || !Response.IsValid())
 	{
+		UE_LOG(LogTemp, Error, TEXT("[ClientNetSubsystem] HTTP request failed - URL: %s, Status: %d"),
+			*Request->GetURL(), static_cast<int32>(Request->GetStatus()));
 		OnHttpLoginError.Broadcast(0, TEXT("서버와 연결할 수 없습니다."));
 		return;
 	}

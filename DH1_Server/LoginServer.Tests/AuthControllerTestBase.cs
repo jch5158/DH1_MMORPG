@@ -5,6 +5,7 @@ using LoginServer.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using StackExchange.Redis;
 using System.Net;
@@ -48,7 +49,9 @@ public abstract class AuthControllerTestBase : IDisposable
 
     protected AuthController CreateController()
     {
-        var controller = new AuthController(DbContext, MockRedisConnection.Object, MockEmailQueue.Object);
+        var gatewaySelector = new GatewaySelector(MockRedisConnection.Object, new Mock<ILogger<GatewaySelector>>().Object);
+        var authService = new AuthService(DbContext, MockRedisConnection.Object, MockEmailQueue.Object, gatewaySelector, new Mock<ILogger<AuthService>>().Object);
+        var controller = new AuthController(authService);
         controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()

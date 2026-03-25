@@ -75,7 +75,7 @@ public:
 
 private:
 
-	void processTick(List<TimingNode>& outExecuteList);
+	void processTick(Vector<TimingNode>& outExecuteList);
 	void addNode(TimingNode&& node);
 	void addNodeList(List<TimingNode>& bucket);
 	void cascade(List<TimingNode>& bucket);
