@@ -71,3 +71,14 @@ void ClientSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 		pSession->Disconnect(eDisconnectReason::Kicked);
 	}
 }
+
+void ClientSession::UpdateHeartbeat()
+{
+	mLastHeartbeatMs.store(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count(), std::memory_order_release);
+}
+
+int64 ClientSession::GetLastHeartbeatMs() const
+{
+	return mLastHeartbeatMs.load(std::memory_order_acquire);
+}

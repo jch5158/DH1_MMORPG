@@ -9,6 +9,7 @@
 #include "ThreadManager.h"
 #include "JsonConfig.h"
 #include "PacketHandler/ServerHeartbeatPacketHandler.h"
+#include "Enum.pb.h"
 
 BOOL WINAPI WorldService::ConsoleCtrlHandler(const DWORD ctrlType)
 {
@@ -122,6 +123,8 @@ bool WorldService::Initialize(const JsonConfig& config)
 	mWorldName = worldServerConfig.GetString("worldName");
 	mMaxPlayers = worldServerConfig.GetInt32("maxPlayers");
 	mHeartbeatIntervalMs = worldServerConfig.GetInt64("heartbeatIntervalMs");
+	mGatewayHeartbeatTimeoutMs = worldServerConfig.GetInt64("gatewayHeartbeatTimeoutMs");
+	mRealmHeartbeatTimeoutMs = worldServerConfig.GetInt64("realmHeartbeatTimeoutMs");
 	mRedisTtlSeconds = worldServerConfig.GetInt64("redisTtlSeconds");
 
 	NET_ENGINE_LOG_INFO("WorldService::Initialize - Initialization complete, worldServerId: {}", mWorldServerId);
@@ -202,6 +205,9 @@ void WorldService::Run()
 		{
 			updateWorldRegistration(eWorldServerStatus::Online);
 			sendHeartbeatToRealm();
+			sendHeartbeatToGateways();
+			checkGatewayHeartbeats();
+			checkRealmHeartbeat();
 			lastHeartbeat = now;
 
 			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, WorldServerId: {}", mpServerService->GetCurrentSessionCount(), mWorldServerId);
@@ -280,6 +286,93 @@ void WorldService::sendHeartbeatToRealm()
 	packet.set_status(static_cast<int32>(eWorldServerStatus::Online));
 
 	pSession->Send(ServerHeartbeatPacketHandler::MakeSendBuffer(packet));
+}
+
+void WorldService::sendHeartbeatToGateways()
+{
+	const Vector<SessionRef> sessions = mpServerService->GetActiveSessions();
+
+	Protocol::S2S_HEARTBEAT_NOT packet;
+	packet.set_servertype(static_cast<int32>(Protocol::eRole::WORLD_SERVER));
+	packet.set_serverid(mWorldServerId);
+	packet.set_timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count());
+	packet.set_sessioncount(mpServerService->GetCurrentSessionCount());
+	packet.set_status(static_cast<int32>(eWorldServerStatus::Online));
+
+	const auto sendBuffer = ServerHeartbeatPacketHandler::MakeSendBuffer(packet);
+
+	for (const auto& pSession : sessions)
+	{
+		pSession->Send(sendBuffer);
+	}
+}
+
+void WorldService::checkGatewayHeartbeats()
+{
+	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	const Vector<SessionRef> sessions = mpServerService->GetActiveSessions();
+
+	for (const auto& pSession : sessions)
+	{
+		const auto pGatewaySession = std::static_pointer_cast<GatewaySession>(pSession);
+		if (pGatewaySession == nullptr)
+		{
+			continue;
+		}
+
+		const int64 lastHeartbeatMs = pGatewaySession->GetLastHeartbeatMs();
+		if (lastHeartbeatMs == 0)
+		{
+			continue;
+		}
+
+		const int64 elapsedMs = nowMs - lastHeartbeatMs;
+		if (elapsedMs > mGatewayHeartbeatTimeoutMs)
+		{
+			NET_ENGINE_LOG_WARN("WorldService::checkGatewayHeartbeats - GatewayServer heartbeat timeout, "
+				"gatewayServerId: {}, elapsedMs: {}", pGatewaySession->GetGatewayServerId(), elapsedMs);
+			pGatewaySession->Disconnect(eDisconnectReason::Timeout);
+		}
+	}
+}
+
+void WorldService::checkRealmHeartbeat()
+{
+	if (mpRealmClientService == nullptr)
+	{
+		return;
+	}
+
+	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	const SessionRef pSession = mpRealmClientService->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	const auto pRealmSession = std::static_pointer_cast<RealmSession>(pSession);
+	if (pRealmSession == nullptr)
+	{
+		return;
+	}
+
+	const int64 lastHeartbeatMs = pRealmSession->GetLastHeartbeatMs();
+	if (lastHeartbeatMs == 0)
+	{
+		return;
+	}
+
+	const int64 elapsedMs = nowMs - lastHeartbeatMs;
+	if (elapsedMs > mRealmHeartbeatTimeoutMs)
+	{
+		NET_ENGINE_LOG_WARN("WorldService::checkRealmHeartbeat - RealmServer heartbeat timeout, elapsedMs: {}", elapsedMs);
+		pRealmSession->Disconnect(eDisconnectReason::Timeout);
+	}
 }
 
 void WorldService::updateWorldRegistration(const eWorldServerStatus status)

@@ -9,6 +9,7 @@
 #include "ThreadManager.h"
 #include "JsonConfig.h"
 #include "MySqlService.h"
+#include "PacketHandler/ServerHeartbeatPacketHandler.h"
 
 BOOL WINAPI GatewayService::ConsoleCtrlHandler(const DWORD ctrlType)
 {
@@ -147,6 +148,8 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	const JsonConfig gatewayConfig = config.GetSection("gateway");
 	mGatewayId = gatewayConfig.GetInt32("gatewayId");
 	mHeartbeatIntervalMs = gatewayConfig.GetInt64("heartbeatIntervalMs");
+	mClientHeartbeatTimeoutMs = gatewayConfig.GetInt64("clientHeartbeatTimeoutMs");
+	mWorldHeartbeatTimeoutMs = gatewayConfig.GetInt64("worldHeartbeatTimeoutMs");
 	mRedisTtlSeconds = gatewayConfig.GetInt64("redisTtlSeconds");
 	mListenIp = serverConfig.GetString("ip");
 	mListenPort = serverConfig.GetUInt16("port");
@@ -229,6 +232,9 @@ void GatewayService::Run()
 		if (elapsedMs >= mHeartbeatIntervalMs)
 		{
 			updateGatewayRegistration(eGatewayStatus::Online);
+			sendHeartbeatToWorld();
+			checkClientHeartbeats();
+			checkWorldHeartbeats();
 			lastHeartbeat = now;
 
 			NET_ENGINE_LOG_INFO("GatewayService::Run - SessionCount: {}, GatewayId: {}", mpServerService->GetCurrentSessionCount(), mGatewayId);
@@ -293,6 +299,102 @@ MySqlServiceRef GatewayService::GetMySqlServiceRef() const
 MySqlServiceRef GatewayService::GetAccountMySqlServiceRef() const
 {
 	return mpAccountMySqlService;
+}
+
+int32 GatewayService::GetGatewayId() const
+{
+	return mGatewayId;
+}
+
+void GatewayService::checkClientHeartbeats()
+{
+	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	const Vector<SessionRef> sessions = mpServerService->GetActiveSessions();
+
+	for (const auto& pSession : sessions)
+	{
+		const auto pClientSession = std::static_pointer_cast<ClientSession>(pSession);
+		if (pClientSession == nullptr || !pClientSession->IsLoggedIn())
+		{
+			continue;
+		}
+
+		const int64 lastHeartbeatMs = pClientSession->GetLastHeartbeatMs();
+		if (lastHeartbeatMs == 0)
+		{
+			continue;
+		}
+
+		const int64 elapsedMs = nowMs - lastHeartbeatMs;
+		if (elapsedMs > mClientHeartbeatTimeoutMs)
+		{
+			NET_ENGINE_LOG_WARN("GatewayService::checkClientHeartbeats - Client heartbeat timeout, "
+				"sessionId: {}, accountId: {}, elapsedMs: {}", pClientSession->GetSessionId(), pClientSession->GetAccountId(), elapsedMs);
+			pClientSession->Disconnect(eDisconnectReason::Timeout);
+		}
+	}
+}
+
+void GatewayService::checkWorldHeartbeats()
+{
+	if (mpWorldClientService == nullptr)
+	{
+		return;
+	}
+
+	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	const SessionRef pSession = mpWorldClientService->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	const auto pWorldSession = std::static_pointer_cast<WorldSession>(pSession);
+	if (pWorldSession == nullptr)
+	{
+		return;
+	}
+
+	const int64 lastHeartbeatMs = pWorldSession->GetLastHeartbeatMs();
+	if (lastHeartbeatMs == 0)
+	{
+		return;
+	}
+
+	const int64 elapsedMs = nowMs - lastHeartbeatMs;
+	if (elapsedMs > mWorldHeartbeatTimeoutMs)
+	{
+		NET_ENGINE_LOG_WARN("GatewayService::checkWorldHeartbeats - WorldServer heartbeat timeout, elapsedMs: {}", elapsedMs);
+		pWorldSession->Disconnect(eDisconnectReason::Timeout);
+	}
+}
+
+void GatewayService::sendHeartbeatToWorld()
+{
+	if (mpWorldClientService == nullptr)
+	{
+		return;
+	}
+
+	const SessionRef pSession = mpWorldClientService->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	Protocol::S2S_HEARTBEAT_NOT packet;
+	packet.set_servertype(static_cast<int32>(Protocol::eRole::GATEWAY_SERVER));
+	packet.set_serverid(mGatewayId);
+	packet.set_timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count());
+	packet.set_sessioncount(mpServerService->GetCurrentSessionCount());
+	packet.set_status(static_cast<int32>(eGatewayStatus::Online));
+
+	pSession->Send(ServerHeartbeatPacketHandler::MakeSendBuffer(packet));
 }
 
 void GatewayService::updateGatewayRegistration(const eGatewayStatus status)

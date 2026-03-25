@@ -48,6 +48,8 @@ private:
 		, mActorDispatchThreadCount(0)
 		, mWorldServerId(0)
 		, mHeartbeatIntervalMs(5000)
+		, mGatewayHeartbeatTimeoutMs(15000)
+		, mRealmHeartbeatTimeoutMs(15000)
 		, mRedisTtlSeconds(10)
 		, mMaxPlayers(1000)
 		, mListenPort(0)
@@ -56,6 +58,9 @@ private:
 
 	void updateWorldRegistration(eWorldServerStatus status);
 	void sendHeartbeatToRealm();
+	void sendHeartbeatToGateways();
+	void checkGatewayHeartbeats();
+	void checkRealmHeartbeat();
 
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpRealmClientService;
@@ -68,6 +73,8 @@ private:
 	int32 mWorldServerId;
 	std::string mWorldName;
 	int64 mHeartbeatIntervalMs;
+	int64 mGatewayHeartbeatTimeoutMs;
+	int64 mRealmHeartbeatTimeoutMs;
 	int64 mRedisTtlSeconds;
 	int32 mMaxPlayers;
 	std::string mListenIp;

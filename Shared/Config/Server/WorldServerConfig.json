@@ -10,6 +10,8 @@
         "worldName": "World-1",
         "maxPlayers": 1000,
         "heartbeatIntervalMs": 5000,
+        "gatewayHeartbeatTimeoutMs": 15000,
+        "realmHeartbeatTimeoutMs": 15000,
         "redisTtlSeconds": 10
     },
     "realmServer": {

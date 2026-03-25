@@ -20,20 +20,16 @@ bool HeartbeatPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const u
 	return false;
 }
 
-bool HeartbeatPacketHandler::HANDLE_C2S_HEARTBEAT_REQ(const Protocol::C2S_HEARTBEAT_REQ& packet, const PacketSessionRef& pSession)
+bool HeartbeatPacketHandler::HANDLE_C2S_HEARTBEAT_NOT(const Protocol::C2S_HEARTBEAT_NOT& packet, const PacketSessionRef& pSession)
 {
 	const auto pClientSession = std::static_pointer_cast<ClientSession>(pSession);
-	if (!pClientSession->IsLoggedIn())
+	if (pClientSession == nullptr)
 	{
-		NET_ENGINE_LOG_WARN("HeartbeatPacketHandler - Heartbeat from unauthenticated session, disconnecting");
 		return false;
 	}
 
-	Protocol::S2C_HEARTBEAT_RES retPacket;
-	retPacket.set_clienttimestamp(packet.clienttimestamp());
-	retPacket.set_servertimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::system_clock::now().time_since_epoch()).count());
+	pClientSession->UpdateHeartbeat();
 
-	pSession->Send(MakeSendBuffer(retPacket));
+	NET_ENGINE_LOG_TRACE("C2S_HEARTBEAT_NOT - sessionId: {}, accountId: {}", pSession->GetSessionId(), pClientSession->GetAccountId());
 	return true;
 }
