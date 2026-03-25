@@ -2,19 +2,44 @@
 
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
-#include "NetEngineInit.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
+
 void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+	NetEngineLogger::SetLogCallback([](const eNetLogLevel Level, const char* Message)
+	{
+		const FString Msg = UTF8_TO_TCHAR(Message);
+		switch (Level)
+		{
+		case eNetLogLevel::Trace:
+		case eNetLogLevel::Debug:
+			UE_LOG(LogNetEngine, Verbose, TEXT("%s"), *Msg);
+			break;
+		case eNetLogLevel::Info:
+			UE_LOG(LogNetEngine, Log, TEXT("%s"), *Msg);
+			break;
+		case eNetLogLevel::Warn:
+			UE_LOG(LogNetEngine, Warning, TEXT("%s"), *Msg);
+			break;
+		case eNetLogLevel::Error:
+			UE_LOG(LogNetEngine, Error, TEXT("%s"), *Msg);
+			break;
+		case eNetLogLevel::Fatal:
+			UE_LOG(LogNetEngine, Fatal, TEXT("%s"), *Msg);
+			break;
+		}
+	});
+
 	NetEngineConfig engineConfig;
 	engineConfig.logger.bIsUnrealClient = true;
-	NetEngineInit EnginInit(engineConfig);
+	EngineInit = MakeUnique<NetEngineInit>(engineConfig);
 
 	PacketServiceTypeHandler::Init();
 
@@ -28,6 +53,8 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UClientNetSubsystem::Deinitialize()
 {
+	ServiceRef.reset();
+	EngineInit.Reset();
 	Super::Deinitialize();
 }
 
@@ -65,7 +92,7 @@ void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Pass
 
 	const FString Scheme = bUseHttps ? TEXT("https") : TEXT("http");
 	const FString URL = FString::Printf(TEXT("%s://%s:%d/api/auth/login"), *Scheme, *LoginServerHost, LoginServerPort);
-	UE_LOG(LogTemp, Log, TEXT("[ClientNetSubsystem] RequestLogin URL: %s"), *URL);
+	NET_ENGINE_LOG_INFO("[ClientNetSubsystem] RequestLogin URL: {}", TCHAR_TO_UTF8(*URL));
 
 	Request->SetURL(URL);
 	Request->SetVerb(TEXT("POST"));
@@ -78,13 +105,13 @@ void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Pass
 
 void UClientNetSubsystem::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful)
 {
-	UE_LOG(LogTemp, Log, TEXT("[ClientNetSubsystem] OnLoginResponseReceived - bWasSuccessful: %d, Response Valid: %d"),
+	NET_ENGINE_LOG_INFO("[ClientNetSubsystem] OnLoginResponseReceived - bWasSuccessful: {}, Response Valid: {}",
 		bWasSuccessful, Response.IsValid());
 
 	if (!bWasSuccessful || !Response.IsValid())
 	{
-		UE_LOG(LogTemp, Error, TEXT("[ClientNetSubsystem] HTTP request failed - URL: %s, Status: %d"),
-			*Request->GetURL(), static_cast<int32>(Request->GetStatus()));
+		NET_ENGINE_LOG_ERROR("[ClientNetSubsystem] HTTP request failed - URL: {}, Status: {}",
+			TCHAR_TO_UTF8(*Request->GetURL()), static_cast<int32>(Request->GetStatus()));
 		OnHttpLoginError.Broadcast(0, TEXT("서버와 연결할 수 없습니다."));
 		return;
 	}

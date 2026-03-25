@@ -1,0 +1,19 @@
+{
+    "server": {
+        "gatewayIp": "127.0.0.1",
+        "gatewayPort": 9000
+    },
+    "worldServer": {
+        "worldServerId": 1
+    },
+    "networkScheduler": {
+        "waitTimeoutMs": 10,
+        "runningThreadCount": 2,
+        "tickIntervalMs": 16
+    },
+    "actorScheduler": {
+        "waitTimeoutMs": 10,
+        "runningThreadCount": 2,
+        "tickIntervalMs": 16
+    }
+}

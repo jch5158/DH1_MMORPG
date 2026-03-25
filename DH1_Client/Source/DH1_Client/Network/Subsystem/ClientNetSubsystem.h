@@ -5,6 +5,8 @@
 #include "Network/CppNetEngine/NetEngineWrapper.h"
 #include "Network/CppNetEngine/NetSession.h"
 
+#include "NetEngineInit.h"
+
 #include "ClientNetSubsystem.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGatewayLoginResultDelegate, int32 /*eLoginResult*/);
@@ -61,6 +63,7 @@ private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
     bool bIsConnected = false;
+    TUniquePtr<NetEngineInit> EngineInit;
     ClientServiceRef ServiceRef;
     AuthData ClientAuthData;
 

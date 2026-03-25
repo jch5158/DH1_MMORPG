@@ -5,6 +5,7 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="GatewayServer/GatewayServer.vcxproj" Id="49e65f39-679a-4f45-b0cf-c6a124bb046a" />
+  <Project Path="WorldServer/WorldServer.vcxproj" Id="8a2b4c5d-6e7f-8901-abcd-ef0123456789" />
   <Project Path="LoginServer/LoginServer.csproj" />
   <Project Path="LoginServer.Tests/LoginServer.Tests.csproj" />
 </Solution>
