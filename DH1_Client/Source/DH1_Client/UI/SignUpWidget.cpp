@@ -1,5 +1,6 @@
 ﻿#include "UI/SignUpWidget.h"
 
+#include "AuthWidgetStyle.h"
 #include "EmailVerificationWidget.h"
 #include "HttpModule.h"
 #include "Components/Button.h"
@@ -55,6 +56,20 @@ void USignUpWidget::NativeConstruct()
     {
         BackLoginButton->OnClicked.AddDynamic(this, &USignUpWidget::OnBackLoginButtonClicked);
     }
+
+    if (PasswordInput)
+    {
+        PasswordInput->SetIsPassword(true);
+    }
+
+    if (PasswordConfirmInput)
+    {
+        PasswordConfirmInput->SetIsPassword(true);
+    }
+
+    AuthWidgetStyle::ApplyPrimaryButtonStyle(SignUpButton);
+    AuthWidgetStyle::ApplySecondaryButtonStyle(BackLoginButton);
+    AuthWidgetStyle::ApplyStatusTextStyle(StatusTextMessage);
 }
 
 void USignUpWidget::OnSignUpButtonClicked()

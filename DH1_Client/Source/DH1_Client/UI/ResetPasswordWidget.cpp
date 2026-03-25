@@ -1,4 +1,5 @@
 ﻿#include "ResetPasswordWidget.h"
+#include "AuthWidgetStyle.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
@@ -65,6 +66,21 @@ void UResetPasswordWidget::NativeConstruct()
     {
         BackToLoginButton->OnClicked.AddDynamic(this, &UResetPasswordWidget::OnBackToLoginButtonClicked);
     }
+
+    if (PasswordInput)
+    {
+        PasswordInput->SetIsPassword(true);
+    }
+
+    if (PasswordConfirmInput)
+    {
+        PasswordConfirmInput->SetIsPassword(true);
+    }
+
+    AuthWidgetStyle::ApplySecondaryButtonStyle(SendVerifyCodeButton);
+    AuthWidgetStyle::ApplyPrimaryButtonStyle(PasswordConfirmButton);
+    AuthWidgetStyle::ApplySecondaryButtonStyle(BackToLoginButton);
+    AuthWidgetStyle::ApplyStatusTextStyle(StatusTextMessage);
 }
 
 void UResetPasswordWidget::OnSendVerifyCodeButtonClicked()

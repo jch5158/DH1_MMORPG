@@ -1,4 +1,5 @@
 ﻿#include "EmailVerificationWidget.h"
+#include "AuthWidgetStyle.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
@@ -51,6 +52,11 @@ void UEmailVerificationWidget::NativeConstruct()
 	{
 		BackToLoginButton->OnClicked.AddDynamic(this, &UEmailVerificationWidget::OnBackToLoginButtonClicked);
 	}
+
+	AuthWidgetStyle::ApplyPrimaryButtonStyle(VerifyButton);
+	AuthWidgetStyle::ApplySecondaryButtonStyle(ResendButton);
+	AuthWidgetStyle::ApplySecondaryButtonStyle(BackToLoginButton);
+	AuthWidgetStyle::ApplyStatusTextStyle(StatusTextMessage);
 }
 
 void UEmailVerificationWidget::OnVerifyButtonClicked()

@@ -1,4 +1,5 @@
 #include "LoginWidget.h"
+#include "AuthWidgetStyle.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
@@ -63,6 +64,11 @@ void ULoginWidget::NativeConstruct()
 	{
 		PasswordInput->SetIsPassword(true);
 	}
+
+	AuthWidgetStyle::ApplyPrimaryButtonStyle(LoginButton);
+	AuthWidgetStyle::ApplySecondaryButtonStyle(SignUpButton);
+	AuthWidgetStyle::ApplySecondaryButtonStyle(ResetPasswordButton);
+	AuthWidgetStyle::ApplyStatusTextStyle(StatusTextMessage);
 
 	if (const UGameInstance* GameInstance = GetGameInstance())
 	{

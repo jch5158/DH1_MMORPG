@@ -7,6 +7,7 @@ enum eServiceType
     SERVICE_TYPE_ECHO = 1;
     SERVICE_TYPE_LOGIN = 2;
     SERVICE_TYPE_HEARTBEAT = 3;
+    SERVICE_TYPE_SERVER_HEARTBEAT = 4;
 }
 
 enum eRole 
