@@ -269,7 +269,8 @@
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto" />
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto" />
-<None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
+    <None Include="..\..\Shared\Protocol\Proto\ServerHeartbeat.proto" />
+    <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

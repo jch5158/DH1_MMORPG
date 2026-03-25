@@ -57,6 +57,9 @@
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\ServerHeartbeat.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -80,6 +83,9 @@
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
       <Filter>Core\Network\Protocol\PacketId</Filter>
     </ClInclude>
@@ -89,6 +95,9 @@
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\ServerHeartbeat.proto">
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
