@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RealmSession.h"
 #include "WorldService.h"
+#include "PacketHandler/PacketServiceTypeHandler.h"
 #include "PacketHandler/ServerHeartbeatPacketHandler.h"
 
 RealmSession::RealmSession(const int32 receiveBufferSize, const int32 maxPacketSize)
@@ -41,5 +42,16 @@ void RealmSession::OnSend(const int32 len)
 
 void RealmSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 {
-	// TODO: PacketServiceTypeHandler
+	PacketServiceTypeHandler::HandlePacketServiceType(static_cast<uint16>(len), pBuffer, GetPacketSessionRef());
+}
+
+void RealmSession::UpdateHeartbeat()
+{
+	mLastHeartbeatMs.store(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count(), std::memory_order_release);
+}
+
+int64 RealmSession::GetLastHeartbeatMs() const
+{
+	return mLastHeartbeatMs.load(std::memory_order_acquire);
 }

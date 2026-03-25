@@ -6,6 +6,7 @@
 #include "ActorService.h"
 #include "ThreadManager.h"
 #include "JsonConfig.h"
+#include "PacketHandler/ServerHeartbeatPacketHandler.h"
 
 BOOL WINAPI RealmService::ConsoleCtrlHandler(const DWORD ctrlType)
 {
@@ -80,6 +81,7 @@ bool RealmService::Initialize(const JsonConfig& config)
 	mRealmServerId = realmServerConfig.GetInt32("realmServerId");
 	mHeartbeatTimeoutMs = realmServerConfig.GetInt64("heartbeatTimeoutMs");
 	mHeartbeatCheckIntervalMs = realmServerConfig.GetInt64("heartbeatCheckIntervalMs");
+	mHeartbeatIntervalMs = realmServerConfig.GetInt64("heartbeatIntervalMs");
 
 	NET_ENGINE_LOG_INFO("RealmService::Initialize - Initialization complete, realmServerId: {}", mRealmServerId);
 	return true;
@@ -137,6 +139,7 @@ void RealmService::Run()
 
 		if (elapsedMs >= mHeartbeatCheckIntervalMs)
 		{
+			sendHeartbeatToWorldServers();
 			checkWorldServerHeartbeats();
 			lastHeartbeatCheck = now;
 		}
@@ -167,6 +170,26 @@ ServerServiceRef RealmService::GetServerServiceRef() const
 ActorServiceRef RealmService::GetActorServiceRef() const
 {
 	return mpActorService;
+}
+
+void RealmService::sendHeartbeatToWorldServers()
+{
+	const Vector<SessionRef> sessions = mpServerService->GetActiveSessions();
+
+	Protocol::S2S_HEARTBEAT_NOT packet;
+	packet.set_servertype(static_cast<int32>(Protocol::eRole::REALM_SERVER));
+	packet.set_serverid(mRealmServerId);
+	packet.set_timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count());
+	packet.set_sessioncount(static_cast<int32>(sessions.size()));
+	packet.set_status(static_cast<int32>(eRealmServerStatus::Online));
+
+	const auto sendBuffer = ServerHeartbeatPacketHandler::MakeSendBuffer(packet);
+
+	for (const auto& pSession : sessions)
+	{
+		pSession->Send(sendBuffer);
+	}
 }
 
 void RealmService::checkWorldServerHeartbeats()

@@ -19,7 +19,7 @@ void GatewaySession::OnDisconnecting(const eDisconnectReason reason)
 
 void GatewaySession::OnDisconnected()
 {
-	NET_ENGINE_LOG_INFO("GatewaySession::OnDisconnected - GatewayServer disconnected, sessionId: {}", GetSessionId());
+	NET_ENGINE_LOG_WARN("GatewaySession::OnDisconnected - GatewayServer disconnected, sessionId: {}, gatewayServerId: {}", GetSessionId(), mGatewayServerId);
 }
 
 void GatewaySession::OnSend(const int32 len)
@@ -29,4 +29,21 @@ void GatewaySession::OnSend(const int32 len)
 void GatewaySession::OnReceivePacket(const byte* pBuffer, const int32 len)
 {
 	PacketServiceTypeHandler::HandlePacketServiceType(static_cast<uint16>(len), pBuffer, GetPacketSessionRef());
+}
+
+void GatewaySession::UpdateHeartbeat(const int32 serverId)
+{
+	mGatewayServerId = serverId;
+	mLastHeartbeatMs.store(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count(), std::memory_order_release);
+}
+
+int64 GatewaySession::GetLastHeartbeatMs() const
+{
+	return mLastHeartbeatMs.load(std::memory_order_acquire);
+}
+
+int32 GatewaySession::GetGatewayServerId() const
+{
+	return mGatewayServerId;
 }

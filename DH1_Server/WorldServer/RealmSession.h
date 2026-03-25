@@ -13,4 +13,11 @@ public:
 	virtual void OnDisconnected() override;
 	virtual void OnSend(const int32 len) override;
 	virtual void OnReceivePacket(const byte* pBuffer, const int32 len) override;
+
+	void UpdateHeartbeat();
+	[[nodiscard]] int64 GetLastHeartbeatMs() const;
+
+private:
+
+	std::atomic<int64> mLastHeartbeatMs{0};
 };

@@ -37,6 +37,8 @@
         "gatewayId": 1,
         "publicIp": "127.0.0.1",
         "heartbeatIntervalMs": 5000,
+        "clientHeartbeatTimeoutMs": 15000,
+        "worldHeartbeatTimeoutMs": 15000,
         "redisTtlSeconds": 10
     },
     "mysql": {

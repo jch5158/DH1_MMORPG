@@ -32,6 +32,7 @@ public:
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 	[[nodiscard]] MySqlServiceRef GetMySqlServiceRef() const;
 	[[nodiscard]] MySqlServiceRef GetAccountMySqlServiceRef() const;
+	[[nodiscard]] int32 GetGatewayId() const;
 
 private:
 
@@ -45,12 +46,17 @@ private:
 		, mActorDispatchThreadCount(0)
 		, mGatewayId(0)
 		, mHeartbeatIntervalMs(5000)
+		, mClientHeartbeatTimeoutMs(15000)
+		, mWorldHeartbeatTimeoutMs(15000)
 		, mRedisTtlSeconds(10)
 		, mListenPort(0)
 		, mbRunning(false)
 	{}
 
 	void updateGatewayRegistration(eGatewayStatus status);
+	void checkClientHeartbeats();
+	void checkWorldHeartbeats();
+	void sendHeartbeatToWorld();
 
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpWorldClientService;
@@ -65,6 +71,8 @@ private:
 
 	int32 mGatewayId;
 	int64 mHeartbeatIntervalMs;
+	int64 mClientHeartbeatTimeoutMs;
+	int64 mWorldHeartbeatTimeoutMs;
 	int64 mRedisTtlSeconds;
 	std::string mListenIp;
 	std::string mPublicIp;
