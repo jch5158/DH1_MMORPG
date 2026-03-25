@@ -78,6 +78,8 @@ bool RealmService::Initialize(const JsonConfig& config)
 
 	// RealmServer info
 	mRealmServerId = realmServerConfig.GetInt32("realmServerId");
+	mHeartbeatTimeoutMs = realmServerConfig.GetInt64("heartbeatTimeoutMs");
+	mHeartbeatCheckIntervalMs = realmServerConfig.GetInt64("heartbeatCheckIntervalMs");
 
 	NET_ENGINE_LOG_INFO("RealmService::Initialize - Initialization complete, realmServerId: {}", mRealmServerId);
 	return true;
@@ -126,8 +128,19 @@ bool RealmService::Start()
 
 void RealmService::Run()
 {
+	auto lastHeartbeatCheck = std::chrono::steady_clock::now();
+
 	while (mbRunning.load())
 	{
+		const auto now = std::chrono::steady_clock::now();
+		const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeatCheck).count();
+
+		if (elapsedMs >= mHeartbeatCheckIntervalMs)
+		{
+			checkWorldServerHeartbeats();
+			lastHeartbeatCheck = now;
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
@@ -154,4 +167,35 @@ ServerServiceRef RealmService::GetServerServiceRef() const
 ActorServiceRef RealmService::GetActorServiceRef() const
 {
 	return mpActorService;
+}
+
+void RealmService::checkWorldServerHeartbeats()
+{
+	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	const Vector<SessionRef> sessions = mpServerService->GetActiveSessions();
+
+	for (const auto& pSession : sessions)
+	{
+		const auto pWorldServerSession = std::static_pointer_cast<WorldServerSession>(pSession);
+		if (pWorldServerSession == nullptr)
+		{
+			continue;
+		}
+
+		const int64 lastHeartbeatMs = pWorldServerSession->GetLastHeartbeatMs();
+		if (lastHeartbeatMs == 0)
+		{
+			continue;
+		}
+
+		const int64 elapsedMs = nowMs - lastHeartbeatMs;
+		if (elapsedMs > mHeartbeatTimeoutMs)
+		{
+			NET_ENGINE_LOG_WARN("RealmService::checkWorldServerHeartbeats - WorldServer heartbeat timeout, "
+				"worldServerId: {}, elapsedMs: {}", pWorldServerSession->GetWorldServerId(), elapsedMs);
+			pWorldServerSession->Disconnect(eDisconnectReason::Timeout);
+		}
+	}
 }
