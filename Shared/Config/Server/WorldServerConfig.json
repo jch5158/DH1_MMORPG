@@ -3,7 +3,8 @@
         "ip": "0.0.0.0",
         "port": 9100,
         "acceptCount": 10,
-        "maxSessionCount": 100
+        "maxSessionCount": 100,
+        "sessionTimeoutMs": 120000
     },
     "worldServer": {
         "worldServerId": 1,

@@ -50,6 +50,7 @@ bool WorldService::Initialize(const JsonConfig& config)
 	serviceConfig.netAddress = NetAddress(mListenIp, mListenPort);
 	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
 	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
+	serviceConfig.sessionTimeoutMs = serverConfig.GetInt64("sessionTimeoutMs");
 	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
 	serviceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> GatewaySessionRef
 		{

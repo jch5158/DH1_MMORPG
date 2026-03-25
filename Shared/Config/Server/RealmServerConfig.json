@@ -3,7 +3,8 @@
         "ip": "0.0.0.0",
         "port": 9200,
         "acceptCount": 10,
-        "maxSessionCount": 100
+        "maxSessionCount": 100,
+        "sessionTimeoutMs": 120000
     },
     "realmServer": {
         "realmServerId": 1,
