@@ -5,6 +5,9 @@
 #include "SignUpWidget.h"
 #include "EmailVerificationWidget.h"
 #include "ResetPasswordWidget.h"
+#include "WorldSelectWidget.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/Engine.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
 
 void UAuthMasterWidget::NativeConstruct()
@@ -50,7 +53,7 @@ void UAuthMasterWidget::HandleGoToSignUp() const
 	SwitchWidget(EAuthWidgetType::SignUp, "", "");
 }
 
-void UAuthMasterWidget::HandleLoginSuccess() const
+void UAuthMasterWidget::HandleLoginSuccess()
 {
 	UGameInstance* GameInstance = GetGameInstance();
 	if (GameInstance == nullptr)
@@ -69,17 +72,24 @@ void UAuthMasterWidget::HandleLoginSuccess() const
 		{
 			if (Result == 0)
 			{
+				if (WorldSelectWidgetRef.IsValid() && GEngine && GEngine->GameViewport)
+				{
+					GEngine->GameViewport->RemoveViewportWidgetContent(WorldSelectWidgetRef.ToSharedRef());
+					WorldSelectWidgetRef.Reset();
+				}
+
 				UGameplayStatics::OpenLevel(GameInstance, LobbyLevelName);
 			}
 		});
 
-	// 월드 목록 수신 시 첫 번째 월드 자동 선택 (테스트용)
-	NetSubsystem->OnWorldListReceived.AddLambda([NetSubsystem](const TArray<FWorldServerInfo>& WorldList)
+	// 월드 목록 수신 시 WorldSelectWidget 표시
+	NetSubsystem->OnWorldListReceived.AddLambda([this](const TArray<FWorldServerInfo>& WorldList)
 		{
-			if (WorldList.Num() > 0)
-			{
-				NetSubsystem->RequestWorldSelect(WorldList[0].WorldId);
-			}
+			SetVisibility(ESlateVisibility::Collapsed);
+
+			TSharedRef<SWorldSelectWidget> SelectWidget = SNew(SWorldSelectWidget).WorldList(WorldList);
+			WorldSelectWidgetRef = SelectWidget;
+			GEngine->GameViewport->AddViewportWidgetContent(SelectWidget);
 		});
 
 	// 월드 목록 요청
