@@ -26,4 +26,11 @@ namespace packet_id
         S2C_LOGIN_RES = 2,
 	};
 
+
+	enum eServerHeartbeatPacketId : uint16
+	{
+        S2S_HEARTBEAT_REQ = 1,
+        S2S_HEARTBEAT_RES = 2,
+	};
+
 }

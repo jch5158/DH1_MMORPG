@@ -24,38 +24,44 @@ class LoginPacketHandler
 {
 public:
 
-    using PacketHandle = std::function<bool(const uint16, const byte*, const PacketSessionRef&)>;
+	using PacketHandle = std::function<bool(const uint16, const byte*, const PacketSessionRef&)>;
 
-    static constexpr uint32 MAKE_PACKET_HEADER_ID(const uint16 serviceType, const uint16 packetId)
-    {
-        return (static_cast<uint32>(serviceType) << 16) | static_cast<uint32>(packetId);
-    }
+	static constexpr uint32 MAKE_PACKET_HEADER_ID(const uint16 serviceType, const uint16 packetId)
+	{
+		return (static_cast<uint32>(serviceType) << 16) | static_cast<uint32>(packetId);
+	}
 
-    static void Init()
-    {
-        sPacketHandleMap[packet_id::eLoginPacketId::C2S_LOGIN_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession)->bool
-			{
-				return HandlePacket<Protocol::C2S_LOGIN_REQ>(size, pBuffer, pSession, HANDLE_C2S_LOGIN_REQ);
-			};
+	static void Init()
+	{
+		sPacketHandleMap[packet_id::eLoginPacketId::C2S_LOGIN_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return HandlePacket<Protocol::C2S_LOGIN_REQ>(size, pBuffer, pSession, HANDLE_C2S_LOGIN_REQ);
+		};
 
-    }
+	}
 
 	static bool HandlePacket(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession)
 	{
 		const auto iter = sPacketHandleMap.find(packetId);
 		if (iter != sPacketHandleMap.end())
 		{
+			if (!Validate(pSession))
+			{
+				return false;
+			}
+
 			return iter->second(size, pBuffer, pSession);
 		}
 
 		return HANDLE_PACKET_ID_INVALID(size, packetId, pBuffer, pSession);
 	}
 
+	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
-    static bool HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& packet, const PacketSessionRef& pSession);
 
-    
-    static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_LOGIN_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_LOGIN_RES); }
+
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_LOGIN_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_LOGIN_RES); }
 
 
 private:
@@ -72,17 +78,17 @@ private:
 		return handlePacket(packet, pSession);
 	}
 
-    template<typename T>
+	template<typename T>
 	static NetSendBufferRef MakeSendBuffer(const T& packet, const uint16 packetId)
 	{
 		const uint16 dataSize = static_cast<uint16>(packet.ByteSizeLong());
 		const uint32 rawPacketSize = static_cast<uint32>(dataSize) + sizeof(PacketHeader);
 
-	    if (rawPacketSize > std::numeric_limits<uint16>::max())
-	    {
-		    NET_ENGINE_LOG_FATAL("MakeSendBuffer Size Overflow, packetId : {}, packetSize : {}", packetId, rawPacketSize);
-		    CrashReporter::Crash();
-	    }
+		if (rawPacketSize > std::numeric_limits<uint16>::max())
+		{
+			NET_ENGINE_LOG_FATAL("MakeSendBuffer Size Overflow, packetId : {}, packetSize : {}", packetId, rawPacketSize);
+			CrashReporter::Crash();
+		}
 
 		const uint16 packetSize = static_cast<uint16>(rawPacketSize);
 
@@ -102,11 +108,11 @@ private:
 		{
 			NET_ENGINE_LOG_FATAL("Login::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
-	    }
-		
-        sendBuffer->Commit(packetSize);
-		
-        return sendBuffer;
+		}
+
+		sendBuffer->Commit(packetSize);
+
+		return sendBuffer;
 	}
 
 	inline static HashMap<uint16, PacketHandle> sPacketHandleMap;

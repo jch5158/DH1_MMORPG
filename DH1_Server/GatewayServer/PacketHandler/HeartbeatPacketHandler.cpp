@@ -2,6 +2,17 @@
 #include "HeartbeatPacketHandler.h"
 #include "ClientSession.h"
 
+bool HeartbeatPacketHandler::Validate(const PacketSessionRef& pSession)
+{
+	const auto pClientSession = std::static_pointer_cast<ClientSession>(pSession);
+	if (!pClientSession->IsLoggedIn())
+	{
+		return false;
+	}
+
+	return true;
+}
+
 bool HeartbeatPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
                                                       const PacketSessionRef& pSession)
 {

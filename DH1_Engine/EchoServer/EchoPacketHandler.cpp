@@ -2,6 +2,11 @@
 #include "PacketHandler/EchoPacketHandler.h"
 #include "GameSession.h"
 
+bool EchoPacketHandler::Validate(const PacketSessionRef& pSession)
+{
+	return true;
+}
+
 bool EchoPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession)
 {
 	NET_ENGINE_LOG_ERROR("EchoPacketHandler::HANDLE_PACKET_ID_INVALID\n");

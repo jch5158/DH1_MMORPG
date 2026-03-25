@@ -15,6 +15,10 @@
     {
       "name": "DH1_Server\\GatewayServer",
       "role": "GATEWAY_SERVER"
+    },
+    {
+      "name": "DH1_Server\\WorldServer",
+      "role": "WORLD_SERVER"
     }
   ]
 }

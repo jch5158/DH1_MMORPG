@@ -7,6 +7,12 @@
 #include "GatewayService.h"
 #include "AccountTable.h"
 
+bool LoginPacketHandler::Validate(const PacketSessionRef& pSession)
+{
+	// 로그인 패킷은 인증 전이므로 항상 통과
+	return true;
+}
+
 bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
                                                   const PacketSessionRef& pSession)
 {

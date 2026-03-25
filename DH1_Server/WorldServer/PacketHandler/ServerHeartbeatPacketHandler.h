@@ -16,11 +16,11 @@
 #include "Struct.pb.h"
 #include "PacketOption.pb.h"
 #include "PacketId.h"
-#include "Login.pb.h"
+#include "ServerHeartbeat.pb.h"
 
 #endif
 
-class LoginPacketHandler
+class ServerHeartbeatPacketHandler
 {
 public:
 
@@ -33,9 +33,9 @@ public:
 
 	static void Init()
 	{
-		sPacketHandleMap[packet_id::eLoginPacketId::S2C_LOGIN_RES] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		sPacketHandleMap[packet_id::eServerHeartbeatPacketId::S2S_HEARTBEAT_RES] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
-			return HandlePacket<Protocol::S2C_LOGIN_RES>(size, pBuffer, pSession, HANDLE_S2C_LOGIN_RES);
+			return HandlePacket<Protocol::S2S_HEARTBEAT_RES>(size, pBuffer, pSession, HANDLE_S2S_HEARTBEAT_RES);
 		};
 
 	}
@@ -58,10 +58,10 @@ public:
 
 	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
-	static bool HANDLE_S2C_LOGIN_RES(const Protocol::S2C_LOGIN_RES& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_S2S_HEARTBEAT_RES(const Protocol::S2S_HEARTBEAT_RES& packet, const PacketSessionRef& pSession);
 
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGIN_REQ); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_HEARTBEAT_REQ& packet) { return MakeSendBuffer(packet, packet_id::S2S_HEARTBEAT_REQ); }
 
 
 private:
@@ -103,10 +103,10 @@ private:
 
 		auto* header = reinterpret_cast<PacketHeader*>(pBuffer);
 		header->size = packetSize;
-		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_LOGIN, packetId);
+		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_SERVER_HEARTBEAT, packetId);
 		if (!packet.SerializeToArray(&header[1], dataSize))
 		{
-			NET_ENGINE_LOG_FATAL("Login::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
+			NET_ENGINE_LOG_FATAL("ServerHeartbeat::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
 		}
 

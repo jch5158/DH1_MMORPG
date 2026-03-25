@@ -29,21 +29,22 @@ static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nEnum.proto\022\010Protocol*p\n\014eServiceType\022\025"
-  "\n\021SERVICE_TYPE_NONE\020\000\022\025\n\021SERVICE_TYPE_EC"
-  "HO\020\001\022\026\n\022SERVICE_TYPE_LOGIN\020\002\022\032\n\026SERVICE_"
-  "TYPE_HEARTBEAT\020\003*}\n\005eRole\022\r\n\tROLE_NONE\020\000"
-  "\022\n\n\006CLIENT\020\001\022\017\n\013ECHO_CLIENT\020\002\022\017\n\013ECHO_SE"
-  "RVER\020\003\022\022\n\016GATEWAY_SERVER\020\004\022\020\n\014WORLD_SERV"
-  "ER\020\005\022\021\n\rCENTER_SERVER\020\006*\227\001\n\014eLoginResult"
-  "\022\021\n\rLOGIN_SUCCESS\020\000\022\035\n\031LOGIN_FAIL_INVALI"
-  "D_TICKET\020\001\022\032\n\026LOGIN_FAIL_SERVER_FULL\020\002\022\032"
-  "\n\026LOGIN_FAIL_MAINTENANCE\020\003\022\035\n\031LOGIN_FAIL"
-  "_INTERNAL_ERROR\020\004b\006proto3"
+  "\n\nEnum.proto\022\010Protocol*\223\001\n\014eServiceType\022"
+  "\025\n\021SERVICE_TYPE_NONE\020\000\022\025\n\021SERVICE_TYPE_E"
+  "CHO\020\001\022\026\n\022SERVICE_TYPE_LOGIN\020\002\022\032\n\026SERVICE"
+  "_TYPE_HEARTBEAT\020\003\022!\n\035SERVICE_TYPE_SERVER"
+  "_HEARTBEAT\020\004*}\n\005eRole\022\r\n\tROLE_NONE\020\000\022\n\n\006"
+  "CLIENT\020\001\022\017\n\013ECHO_CLIENT\020\002\022\017\n\013ECHO_SERVER"
+  "\020\003\022\022\n\016GATEWAY_SERVER\020\004\022\020\n\014WORLD_SERVER\020\005"
+  "\022\021\n\rCENTER_SERVER\020\006*\227\001\n\014eLoginResult\022\021\n\r"
+  "LOGIN_SUCCESS\020\000\022\035\n\031LOGIN_FAIL_INVALID_TI"
+  "CKET\020\001\022\032\n\026LOGIN_FAIL_SERVER_FULL\020\002\022\032\n\026LO"
+  "GIN_FAIL_MAINTENANCE\020\003\022\035\n\031LOGIN_FAIL_INT"
+  "ERNAL_ERROR\020\004b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 425, descriptor_table_protodef_Enum_2eproto,
+    false, false, 461, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -67,6 +68,7 @@ bool eServiceType_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
       return true;
     default:
       return false;

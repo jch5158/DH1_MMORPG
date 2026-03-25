@@ -3,6 +3,11 @@
 #include "Engine/Engine.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
 
+bool LoginPacketHandler::Validate(const PacketSessionRef& pSession)
+{
+	return true;
+}
+
 bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
 	const PacketSessionRef& pSession)
 {
