@@ -33,9 +33,9 @@ public:
 
 	static void Init()
 	{
-		sPacketHandleMap[packet_id::eServerHeartbeatPacketId::S2S_HEARTBEAT_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		sPacketHandleMap[packet_id::eServerHeartbeatPacketId::S2S_HEARTBEAT_NOT] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
-			return HandlePacket<Protocol::S2S_HEARTBEAT_REQ>(size, pBuffer, pSession, HANDLE_S2S_HEARTBEAT_REQ);
+			return HandlePacket<Protocol::S2S_HEARTBEAT_NOT>(size, pBuffer, pSession, HANDLE_S2S_HEARTBEAT_NOT);
 		};
 
 	}
@@ -58,10 +58,10 @@ public:
 
 	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
-	static bool HANDLE_S2S_HEARTBEAT_REQ(const Protocol::S2S_HEARTBEAT_REQ& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_S2S_HEARTBEAT_NOT(const Protocol::S2S_HEARTBEAT_NOT& packet, const PacketSessionRef& pSession);
 
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_HEARTBEAT_RES& packet) { return MakeSendBuffer(packet, packet_id::S2S_HEARTBEAT_RES); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_HEARTBEAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2S_HEARTBEAT_NOT); }
 
 
 private:

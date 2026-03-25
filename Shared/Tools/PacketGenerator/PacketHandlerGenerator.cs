@@ -21,6 +21,26 @@ namespace PacketGenerator
         public List<PacketInfo> Packets { get; set; } = [];
     }
 
+    public static class RoleHelper
+    {
+        private const string ServerRole = "SERVER";
+
+        private static readonly HashSet<string> NonServerRoles = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "CLIENT", "ECHO_CLIENT", "ECHO_SERVER", "ROLE_NONE"
+        };
+
+        public static bool IsMatchRole(string packetRole, string targetRole)
+        {
+            if (packetRole.Equals(ServerRole, StringComparison.OrdinalIgnoreCase))
+            {
+                return !NonServerRoles.Contains(targetRole);
+            }
+
+            return packetRole.Equals(targetRole, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
     public static class Parser
     {
         public static List<HandlerInfo> ParseHandlersFromDesc(string protocolDirPath)
@@ -257,7 +277,7 @@ namespace PacketGenerator
 
                 foreach (var packet in handler.Packets)
                 {
-                    if (packet.Receivers.Any(r => r.Equals(targetRole, StringComparison.OrdinalIgnoreCase)))
+                    if (packet.Receivers.Any(r => RoleHelper.IsMatchRole(r, targetRole)))
                     {
                         handleInitBuilder.AppendFormat(PacketFormatter.RECEIVE_HANDLE_INIT_FORMAT,
                             handler.ProtoFileName, // {0}
@@ -267,7 +287,7 @@ namespace PacketGenerator
                             packet.MessageName); // {0}
                     }
 
-                    if (packet.Sender.Equals(targetRole, StringComparison.OrdinalIgnoreCase))
+                    if (RoleHelper.IsMatchRole(packet.Sender, targetRole))
                     {
                         makeSendBufferBuilder.AppendFormat(PacketFormatter.SEND_MAKE_SEND_BUFFER_FORMAT,
                             packet.MessageName, // {0}

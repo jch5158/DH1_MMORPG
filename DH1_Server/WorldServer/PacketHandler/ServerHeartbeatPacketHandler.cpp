@@ -12,8 +12,10 @@ bool ServerHeartbeatPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, c
 	return false;
 }
 
-bool ServerHeartbeatPacketHandler::HANDLE_S2S_HEARTBEAT_RES(const Protocol::S2S_HEARTBEAT_RES& packet, const PacketSessionRef& pSession)
+bool ServerHeartbeatPacketHandler::HANDLE_S2S_HEARTBEAT_NOT(const Protocol::S2S_HEARTBEAT_NOT& packet, const PacketSessionRef& pSession)
 {
-	NET_ENGINE_LOG_TRACE("S2S_HEARTBEAT_RES - timestamp: {}, accepted: {}", packet.timestamp(), packet.accepted());
+	NET_ENGINE_LOG_TRACE("S2S_HEARTBEAT_NOT - serverType: {}, serverId: {}, sessionCount: {}, status: {}",
+		packet.servertype(), packet.serverid(), packet.sessioncount(), packet.status());
+
 	return true;
 }

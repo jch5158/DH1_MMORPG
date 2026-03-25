@@ -6,22 +6,14 @@ import "PacketOption.proto";
 option (service_type) = SERVICE_TYPE_SERVER_HEARTBEAT;
 option (handler_name) = "ServerHeartbeatPacketHandler";
 
-message S2S_HEARTBEAT_REQ
+message S2S_HEARTBEAT_NOT
 {
-    option (sender) = WORLD_SERVER;
-    option (receiver) = GATEWAY_SERVER;
+    option (sender) = SERVER;
+    option (receiver) = SERVER;
 
-    int32 serverId = 1;
-    int64 timestamp = 2;
-    int32 sessionCount = 3;
-    int32 status = 4;
-}
-
-message S2S_HEARTBEAT_RES
-{
-    option (sender) = GATEWAY_SERVER;
-    option (receiver) = WORLD_SERVER;
-
-    int64 timestamp = 1;
-    bool accepted = 2;
+    int32 serverType = 1;
+    int32 serverId = 2;
+    int64 timestamp = 3;
+    int32 sessionCount = 4;
+    int32 status = 5;
 }

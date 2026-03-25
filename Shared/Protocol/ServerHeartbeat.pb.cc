@@ -21,88 +21,65 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace Protocol {
-PROTOBUF_CONSTEXPR S2S_HEARTBEAT_REQ::S2S_HEARTBEAT_REQ(
+PROTOBUF_CONSTEXPR S2S_HEARTBEAT_NOT::S2S_HEARTBEAT_NOT(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.timestamp_)*/int64_t{0}
+    /*decltype(_impl_.servertype_)*/0
   , /*decltype(_impl_.serverid_)*/0
+  , /*decltype(_impl_.timestamp_)*/int64_t{0}
   , /*decltype(_impl_.sessioncount_)*/0
   , /*decltype(_impl_.status_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
-struct S2S_HEARTBEAT_REQDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR S2S_HEARTBEAT_REQDefaultTypeInternal()
+struct S2S_HEARTBEAT_NOTDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR S2S_HEARTBEAT_NOTDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
-  ~S2S_HEARTBEAT_REQDefaultTypeInternal() {}
+  ~S2S_HEARTBEAT_NOTDefaultTypeInternal() {}
   union {
-    S2S_HEARTBEAT_REQ _instance;
+    S2S_HEARTBEAT_NOT _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S2S_HEARTBEAT_REQDefaultTypeInternal _S2S_HEARTBEAT_REQ_default_instance_;
-PROTOBUF_CONSTEXPR S2S_HEARTBEAT_RES::S2S_HEARTBEAT_RES(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.timestamp_)*/int64_t{0}
-  , /*decltype(_impl_.accepted_)*/false
-  , /*decltype(_impl_._cached_size_)*/{}} {}
-struct S2S_HEARTBEAT_RESDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR S2S_HEARTBEAT_RESDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~S2S_HEARTBEAT_RESDefaultTypeInternal() {}
-  union {
-    S2S_HEARTBEAT_RES _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S2S_HEARTBEAT_RESDefaultTypeInternal _S2S_HEARTBEAT_RES_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S2S_HEARTBEAT_NOTDefaultTypeInternal _S2S_HEARTBEAT_NOT_default_instance_;
 }  // namespace Protocol
-static ::_pb::Metadata file_level_metadata_ServerHeartbeat_2eproto[2];
+static ::_pb::Metadata file_level_metadata_ServerHeartbeat_2eproto[1];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_ServerHeartbeat_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_ServerHeartbeat_2eproto = nullptr;
 
 const uint32_t TableStruct_ServerHeartbeat_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_REQ, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_NOT, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_REQ, _impl_.serverid_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_REQ, _impl_.timestamp_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_REQ, _impl_.sessioncount_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_REQ, _impl_.status_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_RES, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_RES, _impl_.timestamp_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_RES, _impl_.accepted_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_NOT, _impl_.servertype_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_NOT, _impl_.serverid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_NOT, _impl_.timestamp_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_NOT, _impl_.sessioncount_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_HEARTBEAT_NOT, _impl_.status_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::Protocol::S2S_HEARTBEAT_REQ)},
-  { 10, -1, -1, sizeof(::Protocol::S2S_HEARTBEAT_RES)},
+  { 0, -1, -1, sizeof(::Protocol::S2S_HEARTBEAT_NOT)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::Protocol::_S2S_HEARTBEAT_REQ_default_instance_._instance,
-  &::Protocol::_S2S_HEARTBEAT_RES_default_instance_._instance,
+  &::Protocol::_S2S_HEARTBEAT_NOT_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_ServerHeartbeat_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\025ServerHeartbeat.proto\022\010Protocol\032\022Packe"
-  "tOption.proto\"h\n\021S2S_HEARTBEAT_REQ\022\020\n\010se"
-  "rverId\030\001 \001(\005\022\021\n\ttimestamp\030\002 \001(\003\022\024\n\014sessi"
-  "onCount\030\003 \001(\005\022\016\n\006status\030\004 \001(\005:\010\240\265\030\005\250\265\030\004\""
-  "B\n\021S2S_HEARTBEAT_RES\022\021\n\ttimestamp\030\001 \001(\003\022"
-  "\020\n\010accepted\030\002 \001(\010:\010\240\265\030\004\250\265\030\005B$\210\265\030\004\222\265\030\034Ser"
-  "verHeartbeatPacketHandlerb\006proto3"
+  "tOption.proto\"|\n\021S2S_HEARTBEAT_NOT\022\022\n\nse"
+  "rverType\030\001 \001(\005\022\020\n\010serverId\030\002 \001(\005\022\021\n\ttime"
+  "stamp\030\003 \001(\003\022\024\n\014sessionCount\030\004 \001(\005\022\016\n\006sta"
+  "tus\030\005 \001(\005:\010\240\265\030\007\250\265\030\007B$\210\265\030\004\222\265\030\034ServerHeart"
+  "beatPacketHandlerb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_ServerHeartbeat_2eproto_deps[1] = {
   &::descriptor_table_PacketOption_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_ServerHeartbeat_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_ServerHeartbeat_2eproto = {
-    false, false, 273, descriptor_table_protodef_ServerHeartbeat_2eproto,
+    false, false, 225, descriptor_table_protodef_ServerHeartbeat_2eproto,
     "ServerHeartbeat.proto",
-    &descriptor_table_ServerHeartbeat_2eproto_once, descriptor_table_ServerHeartbeat_2eproto_deps, 1, 2,
+    &descriptor_table_ServerHeartbeat_2eproto_once, descriptor_table_ServerHeartbeat_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_ServerHeartbeat_2eproto::offsets,
     file_level_metadata_ServerHeartbeat_2eproto, file_level_enum_descriptors_ServerHeartbeat_2eproto,
     file_level_service_descriptors_ServerHeartbeat_2eproto,
@@ -117,48 +94,50 @@ namespace Protocol {
 
 // ===================================================================
 
-class S2S_HEARTBEAT_REQ::_Internal {
+class S2S_HEARTBEAT_NOT::_Internal {
  public:
 };
 
-S2S_HEARTBEAT_REQ::S2S_HEARTBEAT_REQ(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+S2S_HEARTBEAT_NOT::S2S_HEARTBEAT_NOT(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:Protocol.S2S_HEARTBEAT_REQ)
+  // @@protoc_insertion_point(arena_constructor:Protocol.S2S_HEARTBEAT_NOT)
 }
-S2S_HEARTBEAT_REQ::S2S_HEARTBEAT_REQ(const S2S_HEARTBEAT_REQ& from)
+S2S_HEARTBEAT_NOT::S2S_HEARTBEAT_NOT(const S2S_HEARTBEAT_NOT& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
-  S2S_HEARTBEAT_REQ* const _this = this; (void)_this;
+  S2S_HEARTBEAT_NOT* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.timestamp_){}
+      decltype(_impl_.servertype_){}
     , decltype(_impl_.serverid_){}
+    , decltype(_impl_.timestamp_){}
     , decltype(_impl_.sessioncount_){}
     , decltype(_impl_.status_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.timestamp_, &from._impl_.timestamp_,
+  ::memcpy(&_impl_.servertype_, &from._impl_.servertype_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.status_) -
-    reinterpret_cast<char*>(&_impl_.timestamp_)) + sizeof(_impl_.status_));
-  // @@protoc_insertion_point(copy_constructor:Protocol.S2S_HEARTBEAT_REQ)
+    reinterpret_cast<char*>(&_impl_.servertype_)) + sizeof(_impl_.status_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.S2S_HEARTBEAT_NOT)
 }
 
-inline void S2S_HEARTBEAT_REQ::SharedCtor(
+inline void S2S_HEARTBEAT_NOT::SharedCtor(
     ::_pb::Arena* arena, bool is_message_owned) {
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.timestamp_){int64_t{0}}
+      decltype(_impl_.servertype_){0}
     , decltype(_impl_.serverid_){0}
+    , decltype(_impl_.timestamp_){int64_t{0}}
     , decltype(_impl_.sessioncount_){0}
     , decltype(_impl_.status_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
 
-S2S_HEARTBEAT_REQ::~S2S_HEARTBEAT_REQ() {
-  // @@protoc_insertion_point(destructor:Protocol.S2S_HEARTBEAT_REQ)
+S2S_HEARTBEAT_NOT::~S2S_HEARTBEAT_NOT() {
+  // @@protoc_insertion_point(destructor:Protocol.S2S_HEARTBEAT_NOT)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -166,59 +145,67 @@ S2S_HEARTBEAT_REQ::~S2S_HEARTBEAT_REQ() {
   SharedDtor();
 }
 
-inline void S2S_HEARTBEAT_REQ::SharedDtor() {
+inline void S2S_HEARTBEAT_NOT::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
 }
 
-void S2S_HEARTBEAT_REQ::SetCachedSize(int size) const {
+void S2S_HEARTBEAT_NOT::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void S2S_HEARTBEAT_REQ::Clear() {
-// @@protoc_insertion_point(message_clear_start:Protocol.S2S_HEARTBEAT_REQ)
+void S2S_HEARTBEAT_NOT::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.S2S_HEARTBEAT_NOT)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&_impl_.timestamp_, 0, static_cast<size_t>(
+  ::memset(&_impl_.servertype_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&_impl_.status_) -
-      reinterpret_cast<char*>(&_impl_.timestamp_)) + sizeof(_impl_.status_));
+      reinterpret_cast<char*>(&_impl_.servertype_)) + sizeof(_impl_.status_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* S2S_HEARTBEAT_REQ::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+const char* S2S_HEARTBEAT_NOT::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // int32 serverId = 1;
+      // int32 serverType = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.servertype_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 serverId = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _impl_.serverid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // int64 timestamp = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+      // int64 timestamp = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _impl_.timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // int32 sessionCount = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+      // int32 sessionCount = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _impl_.sessioncount_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // int32 status = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+      // int32 status = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _impl_.status_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
@@ -247,68 +234,79 @@ failure:
 #undef CHK_
 }
 
-uint8_t* S2S_HEARTBEAT_REQ::_InternalSerialize(
+uint8_t* S2S_HEARTBEAT_NOT::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Protocol.S2S_HEARTBEAT_REQ)
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.S2S_HEARTBEAT_NOT)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 serverId = 1;
+  // int32 serverType = 1;
+  if (this->_internal_servertype() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_servertype(), target);
+  }
+
+  // int32 serverId = 2;
   if (this->_internal_serverid() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_serverid(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(2, this->_internal_serverid(), target);
   }
 
-  // int64 timestamp = 2;
+  // int64 timestamp = 3;
   if (this->_internal_timestamp() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt64ToArray(2, this->_internal_timestamp(), target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(3, this->_internal_timestamp(), target);
   }
 
-  // int32 sessionCount = 3;
+  // int32 sessionCount = 4;
   if (this->_internal_sessioncount() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(3, this->_internal_sessioncount(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(4, this->_internal_sessioncount(), target);
   }
 
-  // int32 status = 4;
+  // int32 status = 5;
   if (this->_internal_status() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(4, this->_internal_status(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(5, this->_internal_status(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:Protocol.S2S_HEARTBEAT_REQ)
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.S2S_HEARTBEAT_NOT)
   return target;
 }
 
-size_t S2S_HEARTBEAT_REQ::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Protocol.S2S_HEARTBEAT_REQ)
+size_t S2S_HEARTBEAT_NOT::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.S2S_HEARTBEAT_NOT)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // int64 timestamp = 2;
-  if (this->_internal_timestamp() != 0) {
-    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_timestamp());
+  // int32 serverType = 1;
+  if (this->_internal_servertype() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_servertype());
   }
 
-  // int32 serverId = 1;
+  // int32 serverId = 2;
   if (this->_internal_serverid() != 0) {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_serverid());
   }
 
-  // int32 sessionCount = 3;
+  // int64 timestamp = 3;
+  if (this->_internal_timestamp() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_timestamp());
+  }
+
+  // int32 sessionCount = 4;
   if (this->_internal_sessioncount() != 0) {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_sessioncount());
   }
 
-  // int32 status = 4;
+  // int32 status = 5;
   if (this->_internal_status() != 0) {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_status());
   }
@@ -316,26 +314,29 @@ size_t S2S_HEARTBEAT_REQ::ByteSizeLong() const {
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S2S_HEARTBEAT_REQ::_class_data_ = {
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S2S_HEARTBEAT_NOT::_class_data_ = {
     ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    S2S_HEARTBEAT_REQ::MergeImpl
+    S2S_HEARTBEAT_NOT::MergeImpl
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S2S_HEARTBEAT_REQ::GetClassData() const { return &_class_data_; }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S2S_HEARTBEAT_NOT::GetClassData() const { return &_class_data_; }
 
 
-void S2S_HEARTBEAT_REQ::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
-  auto* const _this = static_cast<S2S_HEARTBEAT_REQ*>(&to_msg);
-  auto& from = static_cast<const S2S_HEARTBEAT_REQ&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.S2S_HEARTBEAT_REQ)
+void S2S_HEARTBEAT_NOT::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<S2S_HEARTBEAT_NOT*>(&to_msg);
+  auto& from = static_cast<const S2S_HEARTBEAT_NOT&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.S2S_HEARTBEAT_NOT)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_timestamp() != 0) {
-    _this->_internal_set_timestamp(from._internal_timestamp());
+  if (from._internal_servertype() != 0) {
+    _this->_internal_set_servertype(from._internal_servertype());
   }
   if (from._internal_serverid() != 0) {
     _this->_internal_set_serverid(from._internal_serverid());
+  }
+  if (from._internal_timestamp() != 0) {
+    _this->_internal_set_timestamp(from._internal_timestamp());
   }
   if (from._internal_sessioncount() != 0) {
     _this->_internal_set_sessioncount(from._internal_sessioncount());
@@ -346,255 +347,40 @@ void S2S_HEARTBEAT_REQ::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
-void S2S_HEARTBEAT_REQ::CopyFrom(const S2S_HEARTBEAT_REQ& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.S2S_HEARTBEAT_REQ)
+void S2S_HEARTBEAT_NOT::CopyFrom(const S2S_HEARTBEAT_NOT& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.S2S_HEARTBEAT_NOT)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool S2S_HEARTBEAT_REQ::IsInitialized() const {
+bool S2S_HEARTBEAT_NOT::IsInitialized() const {
   return true;
 }
 
-void S2S_HEARTBEAT_REQ::InternalSwap(S2S_HEARTBEAT_REQ* other) {
+void S2S_HEARTBEAT_NOT::InternalSwap(S2S_HEARTBEAT_NOT* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(S2S_HEARTBEAT_REQ, _impl_.status_)
-      + sizeof(S2S_HEARTBEAT_REQ::_impl_.status_)
-      - PROTOBUF_FIELD_OFFSET(S2S_HEARTBEAT_REQ, _impl_.timestamp_)>(
-          reinterpret_cast<char*>(&_impl_.timestamp_),
-          reinterpret_cast<char*>(&other->_impl_.timestamp_));
+      PROTOBUF_FIELD_OFFSET(S2S_HEARTBEAT_NOT, _impl_.status_)
+      + sizeof(S2S_HEARTBEAT_NOT::_impl_.status_)
+      - PROTOBUF_FIELD_OFFSET(S2S_HEARTBEAT_NOT, _impl_.servertype_)>(
+          reinterpret_cast<char*>(&_impl_.servertype_),
+          reinterpret_cast<char*>(&other->_impl_.servertype_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata S2S_HEARTBEAT_REQ::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata S2S_HEARTBEAT_NOT::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_ServerHeartbeat_2eproto_getter, &descriptor_table_ServerHeartbeat_2eproto_once,
       file_level_metadata_ServerHeartbeat_2eproto[0]);
 }
 
-// ===================================================================
-
-class S2S_HEARTBEAT_RES::_Internal {
- public:
-};
-
-S2S_HEARTBEAT_RES::S2S_HEARTBEAT_RES(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:Protocol.S2S_HEARTBEAT_RES)
-}
-S2S_HEARTBEAT_RES::S2S_HEARTBEAT_RES(const S2S_HEARTBEAT_RES& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  S2S_HEARTBEAT_RES* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_.timestamp_){}
-    , decltype(_impl_.accepted_){}
-    , /*decltype(_impl_._cached_size_)*/{}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.timestamp_, &from._impl_.timestamp_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.accepted_) -
-    reinterpret_cast<char*>(&_impl_.timestamp_)) + sizeof(_impl_.accepted_));
-  // @@protoc_insertion_point(copy_constructor:Protocol.S2S_HEARTBEAT_RES)
-}
-
-inline void S2S_HEARTBEAT_RES::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_.timestamp_){int64_t{0}}
-    , decltype(_impl_.accepted_){false}
-    , /*decltype(_impl_._cached_size_)*/{}
-  };
-}
-
-S2S_HEARTBEAT_RES::~S2S_HEARTBEAT_RES() {
-  // @@protoc_insertion_point(destructor:Protocol.S2S_HEARTBEAT_RES)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
-  SharedDtor();
-}
-
-inline void S2S_HEARTBEAT_RES::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-}
-
-void S2S_HEARTBEAT_RES::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void S2S_HEARTBEAT_RES::Clear() {
-// @@protoc_insertion_point(message_clear_start:Protocol.S2S_HEARTBEAT_RES)
-  uint32_t cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  ::memset(&_impl_.timestamp_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.accepted_) -
-      reinterpret_cast<char*>(&_impl_.timestamp_)) + sizeof(_impl_.accepted_));
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
-}
-
-const char* S2S_HEARTBEAT_RES::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // int64 timestamp = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _impl_.timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // bool accepted = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _impl_.accepted_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
-}
-
-uint8_t* S2S_HEARTBEAT_RES::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Protocol.S2S_HEARTBEAT_RES)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int64 timestamp = 1;
-  if (this->_internal_timestamp() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt64ToArray(1, this->_internal_timestamp(), target);
-  }
-
-  // bool accepted = 2;
-  if (this->_internal_accepted() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(2, this->_internal_accepted(), target);
-  }
-
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:Protocol.S2S_HEARTBEAT_RES)
-  return target;
-}
-
-size_t S2S_HEARTBEAT_RES::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Protocol.S2S_HEARTBEAT_RES)
-  size_t total_size = 0;
-
-  uint32_t cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // int64 timestamp = 1;
-  if (this->_internal_timestamp() != 0) {
-    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_timestamp());
-  }
-
-  // bool accepted = 2;
-  if (this->_internal_accepted() != 0) {
-    total_size += 1 + 1;
-  }
-
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
-}
-
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S2S_HEARTBEAT_RES::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    S2S_HEARTBEAT_RES::MergeImpl
-};
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S2S_HEARTBEAT_RES::GetClassData() const { return &_class_data_; }
-
-
-void S2S_HEARTBEAT_RES::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
-  auto* const _this = static_cast<S2S_HEARTBEAT_RES*>(&to_msg);
-  auto& from = static_cast<const S2S_HEARTBEAT_RES&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.S2S_HEARTBEAT_RES)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from._internal_timestamp() != 0) {
-    _this->_internal_set_timestamp(from._internal_timestamp());
-  }
-  if (from._internal_accepted() != 0) {
-    _this->_internal_set_accepted(from._internal_accepted());
-  }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-}
-
-void S2S_HEARTBEAT_RES::CopyFrom(const S2S_HEARTBEAT_RES& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.S2S_HEARTBEAT_RES)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool S2S_HEARTBEAT_RES::IsInitialized() const {
-  return true;
-}
-
-void S2S_HEARTBEAT_RES::InternalSwap(S2S_HEARTBEAT_RES* other) {
-  using std::swap;
-  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(S2S_HEARTBEAT_RES, _impl_.accepted_)
-      + sizeof(S2S_HEARTBEAT_RES::_impl_.accepted_)
-      - PROTOBUF_FIELD_OFFSET(S2S_HEARTBEAT_RES, _impl_.timestamp_)>(
-          reinterpret_cast<char*>(&_impl_.timestamp_),
-          reinterpret_cast<char*>(&other->_impl_.timestamp_));
-}
-
-::PROTOBUF_NAMESPACE_ID::Metadata S2S_HEARTBEAT_RES::GetMetadata() const {
-  return ::_pbi::AssignDescriptors(
-      &descriptor_table_ServerHeartbeat_2eproto_getter, &descriptor_table_ServerHeartbeat_2eproto_once,
-      file_level_metadata_ServerHeartbeat_2eproto[1]);
-}
-
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::Protocol::S2S_HEARTBEAT_REQ*
-Arena::CreateMaybeMessage< ::Protocol::S2S_HEARTBEAT_REQ >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::Protocol::S2S_HEARTBEAT_REQ >(arena);
-}
-template<> PROTOBUF_NOINLINE ::Protocol::S2S_HEARTBEAT_RES*
-Arena::CreateMaybeMessage< ::Protocol::S2S_HEARTBEAT_RES >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::Protocol::S2S_HEARTBEAT_RES >(arena);
+template<> PROTOBUF_NOINLINE ::Protocol::S2S_HEARTBEAT_NOT*
+Arena::CreateMaybeMessage< ::Protocol::S2S_HEARTBEAT_NOT >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::S2S_HEARTBEAT_NOT >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

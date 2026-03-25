@@ -83,12 +83,13 @@ enum eRole : int {
   GATEWAY_SERVER = 4,
   WORLD_SERVER = 5,
   CENTER_SERVER = 6,
+  SERVER = 7,
   eRole_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eRole_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool eRole_IsValid(int value);
 constexpr eRole eRole_MIN = ROLE_NONE;
-constexpr eRole eRole_MAX = CENTER_SERVER;
+constexpr eRole eRole_MAX = SERVER;
 constexpr int eRole_ARRAYSIZE = eRole_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eRole_descriptor();
