@@ -26,6 +26,7 @@ public:
 	void Stop();
 
 	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
+	[[nodiscard]] ClientServiceRef GetWorldClientServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 	[[nodiscard]] ClientSessionManagerRef GetClientSessionManagerRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
@@ -36,6 +37,7 @@ private:
 
 	GatewayService()
 		: mpServerService()
+		, mpWorldClientService()
 		, mpActorService()
 		, mpRedisService()
 		, mpClientSessionManager()
@@ -51,6 +53,7 @@ private:
 	void updateGatewayRegistration(eGatewayStatus status);
 
 	ServerServiceRef mpServerService;
+	ClientServiceRef mpWorldClientService;
 	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
 	MySqlServiceRef mpMySqlService;

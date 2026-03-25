@@ -7,3 +7,4 @@ DECLARE_SMART_PTR(MySqlActor);
 DECLARE_SMART_PTR(MySqlService)
 DECLARE_SMART_PTR(ClientSession)
 DECLARE_SMART_PTR(ClientSessionManager)
+DECLARE_SMART_PTR(WorldSession)

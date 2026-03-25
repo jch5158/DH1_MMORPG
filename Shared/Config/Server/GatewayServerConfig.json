@@ -22,6 +22,14 @@
         "tickIntervalMs": 16,
         "dispatchThreadCount": 4
     },
+    "worldServer": {
+        "ip": "127.0.0.1",
+        "port": 9100,
+        "runningThreadCount": 1,
+        "waitTimeoutMs": 10,
+        "tickIntervalMs": 16,
+        "reconnectIntervalMs": 3000
+    },
     "redis": {
         "connectionUri": "tcp://${DH1_REDIS_HOST}:${DH1_REDIS_PORT}?pool_size=10"
     },

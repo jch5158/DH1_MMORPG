@@ -35,26 +35,27 @@ bool WorldService::Initialize(const JsonConfig& config)
 	netConfig.waitTimeoutMs = networkSchedulerConfig.GetUInt32("waitTimeoutMs");
 	netConfig.tickIntervalMs = networkSchedulerConfig.GetUInt32("tickIntervalMs");
 
-	// ClientService (connects TO GatewayServer)
-	ClientServiceConfig serviceConfig;
-	serviceConfig.netAddress = NetAddress(serverConfig.GetString("gatewayIp"), serverConfig.GetUInt16("gatewayPort"));
-	serviceConfig.maxSessionCount = 1;
-	serviceConfig.maxConnectionCount = 1;
-	serviceConfig.bAutoReconnect = true;
-	serviceConfig.reconnectIntervalMs = 3000;
-	serviceConfig.maxReconnectCount = 0;
-	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
+	// ServerService (Listen for GatewayServer connections)
+	mListenIp = serverConfig.GetString("ip");
+	mListenPort = serverConfig.GetUInt16("port");
+
 	const int32 receiveBufferSize = sessionConfig.GetInt32("receiveBufferSize");
 	const int32 sendBufferSize = sessionConfig.GetInt32("sendBufferSize");
+
+	ServerServiceConfig serviceConfig;
+	serviceConfig.netAddress = NetAddress(mListenIp, mListenPort);
+	serviceConfig.maxSessionCount = serverConfig.GetInt32("maxSessionCount");
+	serviceConfig.acceptCount = serverConfig.GetInt32("acceptCount");
+	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
 	serviceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> GatewaySessionRef
 		{
 			return cpp_net_engine::MakeShared<GatewaySession>(receiveBufferSize, sendBufferSize);
 		};
 
-	mpClientService = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
-	if (mpClientService->Initialize(serviceConfig) == false)
+	mpServerService = cpp_net_engine::MakeShared<ServerService>(eServiceType::Server);
+	if (mpServerService->Initialize(serviceConfig) == false)
 	{
-		NET_ENGINE_LOG_ERROR("WorldService::Initialize - ClientService initialization failed");
+		NET_ENGINE_LOG_ERROR("WorldService::Initialize - ServerService initialization failed");
 		return false;
 	}
 
@@ -86,16 +87,16 @@ bool WorldService::Start()
 {
 	mpActorService->Start();
 
-	if (mpClientService->Start() == false)
+	if (mpServerService->Start() == false)
 	{
-		NET_ENGINE_LOG_ERROR("WorldService::Start - ClientService start failed");
+		NET_ENGINE_LOG_ERROR("WorldService::Start - ServerService start failed");
 		return false;
 	}
 
 	// Network dispatch threads
 	for (int32 iter = 0; iter < mNetworkDispatchThreadCount; ++iter)
 	{
-		ThreadManager::GetInstance().Launch("Network Dispatch", [pScheduler = mpClientService->GetNetworkScheduler()]() -> void
+		ThreadManager::GetInstance().Launch("Network Dispatch", [pScheduler = mpServerService->GetNetworkScheduler()]() -> void
 			{
 				while (!pScheduler->IsStopped())
 				{
@@ -119,7 +120,7 @@ bool WorldService::Start()
 
 	mbRunning.store(true);
 
-	NET_ENGINE_LOG_INFO("WorldService::Start - WorldServer started, worldServerId: {}", mWorldServerId);
+	NET_ENGINE_LOG_INFO("WorldService::Start - Server started, worldServerId: {}, port: {}", mWorldServerId, mListenPort);
 	return true;
 }
 
@@ -132,7 +133,7 @@ void WorldService::Run()
 
 	NET_ENGINE_LOG_INFO("WorldService::Run - Closing service...");
 
-	mpClientService->CloseService(mNetworkDispatchThreadCount);
+	mpServerService->CloseService(mNetworkDispatchThreadCount);
 	mpActorService->CloseService(mActorDispatchThreadCount);
 
 	ThreadManager::GetInstance().JoinWithClear();
@@ -145,9 +146,9 @@ void WorldService::Stop()
 	mbRunning.store(false);
 }
 
-ClientServiceRef WorldService::GetClientServiceRef() const
+ServerServiceRef WorldService::GetServerServiceRef() const
 {
-	return mpClientService;
+	return mpServerService;
 }
 
 ActorServiceRef WorldService::GetActorServiceRef() const

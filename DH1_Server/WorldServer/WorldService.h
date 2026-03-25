@@ -31,27 +31,30 @@ public:
 	void Run();
 	void Stop();
 
-	[[nodiscard]] ClientServiceRef GetClientServiceRef() const;
+	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 
 private:
 
 	WorldService()
-		: mpClientService()
+		: mpServerService()
 		, mpActorService()
 		, mNetworkDispatchThreadCount(0)
 		, mActorDispatchThreadCount(0)
 		, mWorldServerId(0)
+		, mListenPort(0)
 		, mbRunning(false)
 	{}
 
-	ClientServiceRef mpClientService;
+	ServerServiceRef mpServerService;
 	ActorServiceRef mpActorService;
 
 	int32 mNetworkDispatchThreadCount;
 	int32 mActorDispatchThreadCount;
 
 	int32 mWorldServerId;
+	std::string mListenIp;
+	uint16 mListenPort;
 
 	std::atomic<bool> mbRunning;
 };

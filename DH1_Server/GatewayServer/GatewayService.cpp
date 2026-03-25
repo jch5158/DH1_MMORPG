@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GatewayService.h"
 #include "ClientSession.h"
+#include "WorldSession.h"
 #include "ClientSessionManager.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
@@ -73,6 +74,37 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		return false;
 	}
 
+	// WorldServer ClientService
+	if (config.HasKey("worldServer"))
+	{
+		const JsonConfig worldServerConfig = config.GetSection("worldServer");
+
+		NetworkSchedulerConfig worldNetConfig;
+		worldNetConfig.runningThreadCount = worldServerConfig.GetUInt32("runningThreadCount");
+		worldNetConfig.waitTimeoutMs = worldServerConfig.GetUInt32("waitTimeoutMs");
+		worldNetConfig.tickIntervalMs = worldServerConfig.GetUInt32("tickIntervalMs");
+
+		ClientServiceConfig worldServiceConfig;
+		worldServiceConfig.netAddress = NetAddress(worldServerConfig.GetString("ip"), worldServerConfig.GetUInt16("port"));
+		worldServiceConfig.maxSessionCount = 1;
+		worldServiceConfig.maxConnectionCount = 1;
+		worldServiceConfig.bAutoReconnect = true;
+		worldServiceConfig.reconnectIntervalMs = worldServerConfig.GetInt64("reconnectIntervalMs");
+		worldServiceConfig.maxReconnectCount = 0;
+		worldServiceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(worldNetConfig);
+		worldServiceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> WorldSessionRef
+			{
+				return cpp_net_engine::MakeShared<WorldSession>(receiveBufferSize, sendBufferSize);
+			};
+
+		mpWorldClientService = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
+		if (mpWorldClientService->Initialize(worldServiceConfig) == false)
+		{
+			NET_ENGINE_LOG_ERROR("GatewayService::Initialize - WorldServer ClientService initialization failed");
+			return false;
+		}
+	}
+
 	// RedisService
 	mpRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), mpActorService);
 
@@ -134,6 +166,24 @@ bool GatewayService::Start()
 		return false;
 	}
 
+	// WorldServer connection
+	if (mpWorldClientService != nullptr)
+	{
+		if (mpWorldClientService->Start() == false)
+		{
+			NET_ENGINE_LOG_ERROR("GatewayService::Start - WorldServer ClientService start failed");
+			return false;
+		}
+
+		ThreadManager::GetInstance().Launch("World Network Dispatch", [pScheduler = mpWorldClientService->GetNetworkScheduler()]() -> void
+			{
+				while (!pScheduler->IsStopped())
+				{
+					pScheduler->Dispatch();
+				}
+			});
+	}
+
 	// Network dispatch threads
 	for (int32 iter = 0; iter < mNetworkDispatchThreadCount; ++iter)
 	{
@@ -192,6 +242,11 @@ void GatewayService::Run()
 
 	NET_ENGINE_LOG_INFO("GatewayService - Closing service...");
 
+	if (mpWorldClientService != nullptr)
+	{
+		mpWorldClientService->CloseService(1);
+	}
+
 	mpServerService->CloseService(mNetworkDispatchThreadCount);
 	mpActorService->CloseService(mActorDispatchThreadCount);
 
@@ -208,6 +263,11 @@ void GatewayService::Stop()
 ServerServiceRef GatewayService::GetServerServiceRef() const
 {
 	return mpServerService;
+}
+
+ClientServiceRef GatewayService::GetWorldClientServiceRef() const
+{
+	return mpWorldClientService;
 }
 
 ActorServiceRef GatewayService::GetActorServiceRef() const

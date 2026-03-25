@@ -258,9 +258,17 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="GatewayService.cpp" />
+    <ClCompile Include="WorldSession.cpp" />
     <ClCompile Include="MySqlActor.cpp" />
     <ClCompile Include="MySqlService.cpp" />
+    <ClCompile Include="..\..\Shared\Protocol\ServerHeartbeat.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="PacketHandler\HeartbeatPacketHandler.cpp" />
+    <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\LoginPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp" />
     <ClCompile Include="pch.cpp">
@@ -288,9 +296,12 @@
     <ClInclude Include="ClientSession.h" />
     <ClInclude Include="ClientSessionManager.h" />
     <ClInclude Include="GatewayService.h" />
+    <ClInclude Include="WorldSession.h" />
     <ClInclude Include="MySqlActor.h" />
     <ClInclude Include="MySqlService.h" />
+    <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h" />
     <ClInclude Include="PacketHandler\HeartbeatPacketHandler.h" />
+    <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
     <ClInclude Include="PacketHandler\LoginPacketHandler.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="pch.h" />
