@@ -13,7 +13,7 @@ public class DH1_Client : ModuleRules
         PublicDependencyModuleNames.AddRange([
 	        "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
             "AIModule", "NavigationSystem", "StateTreeModule", "GameplayStateTreeModule",
-            "Niagara", "UMG", "Slate", "HTTP", "Json", "JsonUtilities", "ImageDownload"
+            "Niagara", "UMG", "Slate", "SlateCore", "HTTP", "Json", "JsonUtilities", "ImageDownload"
         ]);
 
         PrivateDependencyModuleNames.AddRange([]);
