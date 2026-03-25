@@ -3,7 +3,9 @@
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
 #include "RedisService.h"
+#include "MySqlService.h"
 #include "GatewayService.h"
+#include "AccountTable.h"
 
 bool LoginPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer,
                                                   const PacketSessionRef& pSession)
@@ -83,6 +85,26 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 			}
 
 			pClientSession->SetAccountId(argAccountId);
+
+			// DB: is_online = true, last_login = now
+			MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetMySqlServiceRef();
+			if (pMySqlService != nullptr)
+			{
+				pMySqlService->ExecuteAsync([argAccountId](sqlpp::mysql::connection& db)
+					{
+						try
+						{
+							const db::Account account{};
+							db(sqlpp::update(account)
+								.set(account.isOnline = true, account.lastLogin = std::chrono::system_clock::now())
+								.where(account.accountId == static_cast<int64>(argAccountId)));
+						}
+						catch (const sqlpp::exception& e)
+						{
+							NET_ENGINE_LOG_ERROR("LoginPacketHandler - DB update failed, accountId: {}, error: {}", argAccountId, e.what());
+						}
+					});
+			}
 
 			NET_ENGINE_LOG_INFO("LoginPacketHandler - Login success, accountId: {}", argAccountId);
 			sendResponse(Protocol::eLoginResult::LOGIN_SUCCESS);

@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
+#include "MySqlService.h"
 #include "GatewayService.h"
 #include "PacketServiceTypeHandler.h"
+#include "AccountTable.h"
 
 ClientSession::ClientSession(const int32 receiveBufferSize, const int32 maxPacketSize)
 	:PacketSession(receiveBufferSize, maxPacketSize)
@@ -29,6 +31,27 @@ void ClientSession::OnDisconnected()
 		if (pManager != nullptr)
 		{
 			(void)pManager->RemoveClientSession(mAccountId);
+		}
+
+		// DB: is_online = false, last_logout = now
+		MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetMySqlServiceRef();
+		if (pMySqlService != nullptr)
+		{
+			const uint64 accountId = mAccountId;
+			pMySqlService->ExecuteAsync([accountId](sqlpp::mysql::connection& db)
+				{
+					try
+					{
+						const db::Account account{};
+						db(sqlpp::update(account)
+							.set(account.isOnline = false, account.lastLogout = std::chrono::system_clock::now())
+							.where(account.accountId == static_cast<int64>(accountId)));
+					}
+					catch (const sqlpp::exception& e)
+					{
+						NET_ENGINE_LOG_ERROR("ClientSession::OnDisconnected - DB update failed, accountId: {}, error: {}", accountId, e.what());
+					}
+				});
 		}
 
 		mAccountId = 0;
