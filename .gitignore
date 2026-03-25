@@ -115,6 +115,7 @@ DH1_Server/**/obj/
 # CppNetEngine.lib, ProtoBridge.lib은 커밋 대상
 !Shared/Libraries/**/*.lib
 !Shared/Libraries/**/*.pdb
+Shared/Libraries/**/*.idb
 
 # =============================================================================
 # vcpkg
