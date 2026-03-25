@@ -61,13 +61,13 @@ void ULoginWidget::NativeConstruct()
 
 	if (EmailInput)
 	{
-		EmailInput->OnTextCommitted.AddDynamic(this, &ULoginWidget::OnEmailInputCommitted);
+		EmailInput->OnTextCommitted.AddUObject(this, &ULoginWidget::OnEmailInputCommitted);
 	}
 
 	if (PasswordInput)
 	{
 		PasswordInput->SetIsPassword(true);
-		PasswordInput->OnTextCommitted.AddDynamic(this, &ULoginWidget::OnPasswordInputCommitted);
+		PasswordInput->OnTextCommitted.AddUObject(this, &ULoginWidget::OnPasswordInputCommitted);
 	}
 
 	if (const UGameInstance* GameInstance = GetGameInstance())

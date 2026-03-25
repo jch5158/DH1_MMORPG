@@ -63,10 +63,7 @@ protected:
     UFUNCTION()
     void OnResetPasswordButtonClicked();
 
-    UFUNCTION()
     void OnEmailInputCommitted(const FText& Text, ETextCommit::Type CommitMethod);
-
-    UFUNCTION()
     void OnPasswordInputCommitted(const FText& Text, ETextCommit::Type CommitMethod);
 
     void HandleGatewayLoginResult(int32 Result);
