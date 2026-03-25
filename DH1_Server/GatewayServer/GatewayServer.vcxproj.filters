@@ -106,6 +106,15 @@
     <ClCompile Include="ClientSessionManager.cpp">
       <Filter>Core\Network\Session</Filter>
     </ClCompile>
+    <ClCompile Include="WorldSession.cpp">
+      <Filter>Core\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\WorldPacketHandler.cpp">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
@@ -144,9 +153,6 @@
     <ClInclude Include="MySqlService.h">
       <Filter>Contents\Service</Filter>
     </ClInclude>
-    <ClInclude Include="AccountTable.h">
-      <Filter>Contents\Database</Filter>
-    </ClInclude>
     <ClInclude Include="RedisService.h">
       <Filter>Contents\Service</Filter>
     </ClInclude>
@@ -176,6 +182,15 @@
     </ClInclude>
     <ClInclude Include="ClientSessionManager.h">
       <Filter>Core\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldSession.h">
+      <Filter>Core\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\WorldPacketHandler.h">
+      <Filter>Core\Network\PacketHandler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

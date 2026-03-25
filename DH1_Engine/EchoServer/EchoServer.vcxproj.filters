@@ -50,6 +50,9 @@
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="EchoServerService.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
     <ClCompile Include="EchoServer.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -84,6 +87,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
       <Filter>Protocol\PacketId</Filter>
+    </ClInclude>
+    <ClInclude Include="EchoServerService.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
