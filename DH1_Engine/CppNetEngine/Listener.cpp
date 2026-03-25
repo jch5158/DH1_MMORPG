@@ -29,7 +29,14 @@ void Listener::Dispatch(class IocpEvent& iocpEvent, uint32 numOfBytes)
 	}
 
 	const auto* pAcceptEvent = static_cast<IocpAcceptEvent*>(&iocpEvent);
-	mAcceptors[pAcceptEvent->GetAcceptorIndex()]->Process();
+	const int32 acceptorIndex = pAcceptEvent->GetAcceptorIndex();
+
+	if (acceptorIndex < 0 || acceptorIndex >= static_cast<int32>(mAcceptors.size()))
+	{
+		return;
+	}
+
+	mAcceptors[acceptorIndex]->Process();
 }
 
 ListenerRef Listener::GetListenerRef()
