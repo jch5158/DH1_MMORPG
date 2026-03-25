@@ -88,6 +88,12 @@
     <ClCompile Include="..\..\Shared\Protocol\Heartbeat.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\ServerHeartbeat.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\World.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Core\Pch</Filter>
     </ClCompile>
@@ -150,6 +156,12 @@
     <ClInclude Include="..\..\Shared\Protocol\Heartbeat.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\World.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
     <ClInclude Include="PointerType.h">
       <Filter>Core\Type</Filter>
     </ClInclude>
@@ -183,6 +195,12 @@
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Heartbeat.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\ServerHeartbeat.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\World.proto">
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>
