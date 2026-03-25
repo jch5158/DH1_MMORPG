@@ -25,6 +25,7 @@ bool WorldService::Initialize(const JsonConfig& config)
 {
 	const JsonConfig serverConfig = config.GetSection("server");
 	const JsonConfig worldServerConfig = config.GetSection("worldServer");
+	const JsonConfig sessionConfig = config.GetSection("session");
 	const JsonConfig networkSchedulerConfig = config.GetSection("networkScheduler");
 	const JsonConfig actorSchedulerConfig = config.GetSection("actorScheduler");
 
@@ -43,9 +44,11 @@ bool WorldService::Initialize(const JsonConfig& config)
 	serviceConfig.reconnectIntervalMs = 3000;
 	serviceConfig.maxReconnectCount = 0;
 	serviceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(netConfig);
-	serviceConfig.sessionFactory = []() -> GatewaySessionRef
+	const int32 receiveBufferSize = sessionConfig.GetInt32("receiveBufferSize");
+	const int32 sendBufferSize = sessionConfig.GetInt32("sendBufferSize");
+	serviceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> GatewaySessionRef
 		{
-			return cpp_net_engine::MakeShared<GatewaySession>(4096, 4096);
+			return cpp_net_engine::MakeShared<GatewaySession>(receiveBufferSize, sendBufferSize);
 		};
 
 	mpClientService = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);

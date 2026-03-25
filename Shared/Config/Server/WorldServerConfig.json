@@ -6,14 +6,18 @@
     "worldServer": {
         "worldServerId": 1
     },
+    "session": {
+        "receiveBufferSize": 16384,
+        "sendBufferSize": 16384
+    },
     "networkScheduler": {
-        "waitTimeoutMs": 10,
         "runningThreadCount": 2,
+        "waitTimeoutMs": 10,
         "tickIntervalMs": 16
     },
     "actorScheduler": {
-        "waitTimeoutMs": 10,
         "runningThreadCount": 2,
+        "waitTimeoutMs": 10,
         "tickIntervalMs": 16
     }
 }
