@@ -22,29 +22,34 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[3];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[4];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nEnum.proto\022\010Protocol*\223\001\n\014eServiceType\022"
+  "\n\nEnum.proto\022\010Protocol*\253\001\n\014eServiceType\022"
   "\025\n\021SERVICE_TYPE_NONE\020\000\022\025\n\021SERVICE_TYPE_E"
   "CHO\020\001\022\026\n\022SERVICE_TYPE_LOGIN\020\002\022\032\n\026SERVICE"
   "_TYPE_HEARTBEAT\020\003\022!\n\035SERVICE_TYPE_SERVER"
-  "_HEARTBEAT\020\004*\211\001\n\005eRole\022\r\n\tROLE_NONE\020\000\022\n\n"
-  "\006CLIENT\020\001\022\017\n\013ECHO_CLIENT\020\002\022\017\n\013ECHO_SERVE"
-  "R\020\003\022\022\n\016GATEWAY_SERVER\020\004\022\020\n\014WORLD_SERVER\020"
-  "\005\022\021\n\rCENTER_SERVER\020\006\022\n\n\006SERVER\020\007*\227\001\n\014eLo"
-  "ginResult\022\021\n\rLOGIN_SUCCESS\020\000\022\035\n\031LOGIN_FA"
-  "IL_INVALID_TICKET\020\001\022\032\n\026LOGIN_FAIL_SERVER"
-  "_FULL\020\002\022\032\n\026LOGIN_FAIL_MAINTENANCE\020\003\022\035\n\031L"
-  "OGIN_FAIL_INTERNAL_ERROR\020\004b\006proto3"
+  "_HEARTBEAT\020\004\022\026\n\022SERVICE_TYPE_WORLD\020\005*\233\001\n"
+  "\005eRole\022\r\n\tROLE_NONE\020\000\022\n\n\006CLIENT\020\001\022\017\n\013ECH"
+  "O_CLIENT\020\002\022\017\n\013ECHO_SERVER\020\003\022\022\n\016GATEWAY_S"
+  "ERVER\020\004\022\020\n\014WORLD_SERVER\020\005\022\021\n\rCENTER_SERV"
+  "ER\020\006\022\n\n\006SERVER\020\007\022\020\n\014REALM_SERVER\020\010*\227\001\n\014e"
+  "LoginResult\022\021\n\rLOGIN_SUCCESS\020\000\022\035\n\031LOGIN_"
+  "FAIL_INVALID_TICKET\020\001\022\032\n\026LOGIN_FAIL_SERV"
+  "ER_FULL\020\002\022\032\n\026LOGIN_FAIL_MAINTENANCE\020\003\022\035\n"
+  "\031LOGIN_FAIL_INTERNAL_ERROR\020\004*\216\001\n\022eWorldS"
+  "electResult\022\030\n\024WORLD_SELECT_SUCCESS\020\000\022\037\n"
+  "\033WORLD_SELECT_FAIL_NOT_FOUND\020\001\022\032\n\026WORLD_"
+  "SELECT_FAIL_FULL\020\002\022!\n\035WORLD_SELECT_FAIL_"
+  "MAINTENANCE\020\003b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 474, descriptor_table_protodef_Enum_2eproto,
+    false, false, 661, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -69,6 +74,7 @@ bool eServiceType_IsValid(int value) {
     case 2:
     case 3:
     case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -89,6 +95,7 @@ bool eRole_IsValid(int value) {
     case 5:
     case 6:
     case 7:
+    case 8:
       return true;
     default:
       return false;
@@ -106,6 +113,22 @@ bool eLoginResult_IsValid(int value) {
     case 2:
     case 3:
     case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eWorldSelectResult_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[3];
+}
+bool eWorldSelectResult_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
       return true;
     default:
       return false;

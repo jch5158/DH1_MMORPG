@@ -20,6 +20,7 @@ public:
     std::optional<std::string> GetString(const std::string& key) const;
     std::optional<std::string> GetDelString(const std::string& key) const;
     bool DeleteKey(const std::string& key) const;
+    Vector<std::string> Keys(const std::string& pattern) const;
 
 private:
 

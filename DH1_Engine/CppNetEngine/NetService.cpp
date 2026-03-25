@@ -143,6 +143,7 @@ ClientService::ClientService(const eServiceType serviceType)
 	: NetService(eServiceType::Client)
 	  , mpConnectionManager()
 	  , mbAutoReconnect(false)
+	  , mbClosing(false)
 	  , mReconnectIntervalMs(0)
 	  , mMaxReconnectCount(0)
 	  , mReconnectAttemptCount(0)
@@ -182,6 +183,8 @@ bool ClientService::Start()
 
 void ClientService::CloseService(const uint32 dispatchThreadCount)
 {
+	mbClosing.store(true);
+
 	// 재연결 방지
 	mbAutoReconnect = false;
 
@@ -223,6 +226,11 @@ void ClientService::OnSessionConnected(const SessionRef& pSession)
 
 void ClientService::OnSessionDisconnected(const SessionRef& pSession)
 {
+	if (mbClosing.load())
+	{
+		return;
+	}
+
 	mSessionManager.RemoveSession(pSession);
 
 	RecycleSession(pSession);

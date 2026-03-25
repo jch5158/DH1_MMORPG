@@ -1,0 +1,25 @@
+{
+    "server": {
+        "ip": "0.0.0.0",
+        "port": 9200,
+        "acceptCount": 10,
+        "maxSessionCount": 100
+    },
+    "realmServer": {
+        "realmServerId": 1
+    },
+    "session": {
+        "receiveBufferSize": 16384,
+        "sendBufferSize": 16384
+    },
+    "networkScheduler": {
+        "runningThreadCount": 2,
+        "waitTimeoutMs": 10,
+        "tickIntervalMs": 16
+    },
+    "actorScheduler": {
+        "runningThreadCount": 2,
+        "waitTimeoutMs": 10,
+        "tickIntervalMs": 16
+    }
+}

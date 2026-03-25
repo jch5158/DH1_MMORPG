@@ -53,12 +53,13 @@ enum eServiceType : int {
   SERVICE_TYPE_LOGIN = 2,
   SERVICE_TYPE_HEARTBEAT = 3,
   SERVICE_TYPE_SERVER_HEARTBEAT = 4,
+  SERVICE_TYPE_WORLD = 5,
   eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool eServiceType_IsValid(int value);
 constexpr eServiceType eServiceType_MIN = SERVICE_TYPE_NONE;
-constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_SERVER_HEARTBEAT;
+constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_WORLD;
 constexpr int eServiceType_ARRAYSIZE = eServiceType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eServiceType_descriptor();
@@ -84,12 +85,13 @@ enum eRole : int {
   WORLD_SERVER = 5,
   CENTER_SERVER = 6,
   SERVER = 7,
+  REALM_SERVER = 8,
   eRole_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eRole_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool eRole_IsValid(int value);
 constexpr eRole eRole_MIN = ROLE_NONE;
-constexpr eRole eRole_MAX = SERVER;
+constexpr eRole eRole_MAX = REALM_SERVER;
 constexpr int eRole_ARRAYSIZE = eRole_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eRole_descriptor();
@@ -134,6 +136,33 @@ inline bool eLoginResult_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eLoginResult>(
     eLoginResult_descriptor(), name, value);
 }
+enum eWorldSelectResult : int {
+  WORLD_SELECT_SUCCESS = 0,
+  WORLD_SELECT_FAIL_NOT_FOUND = 1,
+  WORLD_SELECT_FAIL_FULL = 2,
+  WORLD_SELECT_FAIL_MAINTENANCE = 3,
+  eWorldSelectResult_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  eWorldSelectResult_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool eWorldSelectResult_IsValid(int value);
+constexpr eWorldSelectResult eWorldSelectResult_MIN = WORLD_SELECT_SUCCESS;
+constexpr eWorldSelectResult eWorldSelectResult_MAX = WORLD_SELECT_FAIL_MAINTENANCE;
+constexpr int eWorldSelectResult_ARRAYSIZE = eWorldSelectResult_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eWorldSelectResult_descriptor();
+template<typename T>
+inline const std::string& eWorldSelectResult_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, eWorldSelectResult>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function eWorldSelectResult_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    eWorldSelectResult_descriptor(), enum_t_value);
+}
+inline bool eWorldSelectResult_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, eWorldSelectResult* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eWorldSelectResult>(
+    eWorldSelectResult_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -170,6 +199,11 @@ template <> struct is_proto_enum< ::Protocol::eLoginResult> : ::std::true_type {
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eLoginResult>() {
   return ::Protocol::eLoginResult_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::eWorldSelectResult> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eWorldSelectResult>() {
+  return ::Protocol::eWorldSelectResult_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

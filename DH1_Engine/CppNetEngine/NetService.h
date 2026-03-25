@@ -94,6 +94,7 @@ private:
 
 	ConnectionPoolRef mpConnectionManager;
 	bool mbAutoReconnect;
+	std::atomic<bool> mbClosing;
 	int64 mReconnectIntervalMs;
 	int32 mMaxReconnectCount;
 	std::atomic<int32> mReconnectAttemptCount;

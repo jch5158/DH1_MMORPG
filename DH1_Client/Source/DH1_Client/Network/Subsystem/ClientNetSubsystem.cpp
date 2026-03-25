@@ -4,6 +4,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
+#include "Network/PacketHandler/WorldPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
@@ -236,4 +237,49 @@ AuthData UClientNetSubsystem::GetAuthData() const
 void UClientNetSubsystem::NotifyLoginResult(const int32 Result)
 {
 	OnGatewayLoginResult.Broadcast(Result);
+}
+
+void UClientNetSubsystem::NotifyWorldList(const TArray<FWorldServerInfo>& WorldList)
+{
+	OnWorldListReceived.Broadcast(WorldList);
+}
+
+void UClientNetSubsystem::NotifyWorldSelectResult(const int32 Result)
+{
+	OnWorldSelectResult.Broadcast(Result);
+}
+
+void UClientNetSubsystem::RequestWorldList()
+{
+	if (ServiceRef == nullptr)
+	{
+		return;
+	}
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	Protocol::C2S_WORLD_LIST_REQ packet;
+	pSession->Send(WorldPacketHandler::MakeSendBuffer(packet));
+}
+
+void UClientNetSubsystem::RequestWorldSelect(const int32 WorldId)
+{
+	if (ServiceRef == nullptr)
+	{
+		return;
+	}
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	Protocol::C2S_WORLD_SELECT_REQ packet;
+	packet.set_worldid(WorldId);
+	pSession->Send(WorldPacketHandler::MakeSendBuffer(packet));
 }

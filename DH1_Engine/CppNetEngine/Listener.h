@@ -28,6 +28,7 @@ public:
 
 private:
 
+	std::atomic<bool> mbClosed;
 	const int32 mAcceptCount;
 	Vector<AcceptorRef> mAcceptors;
 };

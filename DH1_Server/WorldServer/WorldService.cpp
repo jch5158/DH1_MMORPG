@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "WorldService.h"
 #include "GatewaySession.h"
+#include "RealmSession.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -72,6 +73,37 @@ bool WorldService::Initialize(const JsonConfig& config)
 		return false;
 	}
 
+	// RealmServer ClientService
+	if (config.HasKey("realmServer"))
+	{
+		const JsonConfig realmServerConfig = config.GetSection("realmServer");
+
+		NetworkSchedulerConfig realmNetConfig;
+		realmNetConfig.runningThreadCount = realmServerConfig.GetUInt32("runningThreadCount");
+		realmNetConfig.waitTimeoutMs = realmServerConfig.GetUInt32("waitTimeoutMs");
+		realmNetConfig.tickIntervalMs = realmServerConfig.GetUInt32("tickIntervalMs");
+
+		ClientServiceConfig realmServiceConfig;
+		realmServiceConfig.netAddress = NetAddress(realmServerConfig.GetString("ip"), realmServerConfig.GetUInt16("port"));
+		realmServiceConfig.maxSessionCount = 1;
+		realmServiceConfig.maxConnectionCount = 1;
+		realmServiceConfig.bAutoReconnect = true;
+		realmServiceConfig.reconnectIntervalMs = realmServerConfig.GetInt64("reconnectIntervalMs");
+		realmServiceConfig.maxReconnectCount = 0;
+		realmServiceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(realmNetConfig);
+		realmServiceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> RealmSessionRef
+			{
+				return cpp_net_engine::MakeShared<RealmSession>(receiveBufferSize, sendBufferSize);
+			};
+
+		mpRealmClientService = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
+		if (mpRealmClientService->Initialize(realmServiceConfig) == false)
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - RealmServer ClientService initialization failed");
+			return false;
+		}
+	}
+
 	// Thread counts
 	mNetworkDispatchThreadCount = networkSchedulerConfig.GetInt32("runningThreadCount");
 	mActorDispatchThreadCount = actorSchedulerConfig.GetInt32("runningThreadCount");
@@ -91,6 +123,24 @@ bool WorldService::Start()
 	{
 		NET_ENGINE_LOG_ERROR("WorldService::Start - ServerService start failed");
 		return false;
+	}
+
+	// RealmServer connection
+	if (mpRealmClientService != nullptr)
+	{
+		if (mpRealmClientService->Start() == false)
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Start - RealmServer ClientService start failed");
+			return false;
+		}
+
+		ThreadManager::GetInstance().Launch("Realm Network Dispatch", [pScheduler = mpRealmClientService->GetNetworkScheduler()]() -> void
+			{
+				while (!pScheduler->IsStopped())
+				{
+					pScheduler->Dispatch();
+				}
+			});
 	}
 
 	// Network dispatch threads
@@ -133,6 +183,11 @@ void WorldService::Run()
 
 	NET_ENGINE_LOG_INFO("WorldService::Run - Closing service...");
 
+	if (mpRealmClientService != nullptr)
+	{
+		mpRealmClientService->CloseService(1);
+	}
+
 	mpServerService->CloseService(mNetworkDispatchThreadCount);
 	mpActorService->CloseService(mActorDispatchThreadCount);
 
@@ -149,6 +204,11 @@ void WorldService::Stop()
 ServerServiceRef WorldService::GetServerServiceRef() const
 {
 	return mpServerService;
+}
+
+ClientServiceRef WorldService::GetRealmClientServiceRef() const
+{
+	return mpRealmClientService;
 }
 
 ActorServiceRef WorldService::GetActorServiceRef() const

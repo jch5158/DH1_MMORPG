@@ -110,6 +110,26 @@ std::optional<std::string> RedisActor::GetDelString(const std::string& key) cons
     }
 }
 
+Vector<std::string> RedisActor::Keys(const std::string& pattern) const
+{
+    Vector<std::string> result;
+    if (!mRedis)
+    {
+        return result;
+    }
+
+    try
+    {
+        mRedis->keys(pattern, std::back_inserter(result));
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] Keys Error : {}", e.what());
+    }
+
+    return result;
+}
+
 bool RedisActor::DeleteKey(const std::string& key) const
 {
     if (!mRedis)

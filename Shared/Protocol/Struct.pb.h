@@ -26,8 +26,10 @@
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata_lite.h>
 #include <google/protobuf/generated_message_reflection.h>
+#include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_Struct_2eproto
@@ -42,12 +44,213 @@ struct TableStruct_Struct_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Struct_2eproto;
+namespace Protocol {
+class WorldServerInfo;
+struct WorldServerInfoDefaultTypeInternal;
+extern WorldServerInfoDefaultTypeInternal _WorldServerInfo_default_instance_;
+}  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
+template<> ::Protocol::WorldServerInfo* Arena::CreateMaybeMessage<::Protocol::WorldServerInfo>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
+namespace Protocol {
 
 // ===================================================================
 
+class WorldServerInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.WorldServerInfo) */ {
+ public:
+  inline WorldServerInfo() : WorldServerInfo(nullptr) {}
+  ~WorldServerInfo() override;
+  explicit PROTOBUF_CONSTEXPR WorldServerInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
+  WorldServerInfo(const WorldServerInfo& from);
+  WorldServerInfo(WorldServerInfo&& from) noexcept
+    : WorldServerInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline WorldServerInfo& operator=(const WorldServerInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline WorldServerInfo& operator=(WorldServerInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const WorldServerInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const WorldServerInfo* internal_default_instance() {
+    return reinterpret_cast<const WorldServerInfo*>(
+               &_WorldServerInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(WorldServerInfo& a, WorldServerInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(WorldServerInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(WorldServerInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  WorldServerInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<WorldServerInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const WorldServerInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const WorldServerInfo& from) {
+    WorldServerInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorldServerInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.WorldServerInfo";
+  }
+  protected:
+  explicit WorldServerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kWorldNameFieldNumber = 2,
+    kWorldIdFieldNumber = 1,
+    kCurrentPlayersFieldNumber = 3,
+    kMaxPlayersFieldNumber = 4,
+    kStatusFieldNumber = 5,
+  };
+  // string worldName = 2;
+  void clear_worldname();
+  const std::string& worldname() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_worldname(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_worldname();
+  PROTOBUF_NODISCARD std::string* release_worldname();
+  void set_allocated_worldname(std::string* worldname);
+  private:
+  const std::string& _internal_worldname() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_worldname(const std::string& value);
+  std::string* _internal_mutable_worldname();
+  public:
+
+  // int32 worldId = 1;
+  void clear_worldid();
+  int32_t worldid() const;
+  void set_worldid(int32_t value);
+  private:
+  int32_t _internal_worldid() const;
+  void _internal_set_worldid(int32_t value);
+  public:
+
+  // int32 currentPlayers = 3;
+  void clear_currentplayers();
+  int32_t currentplayers() const;
+  void set_currentplayers(int32_t value);
+  private:
+  int32_t _internal_currentplayers() const;
+  void _internal_set_currentplayers(int32_t value);
+  public:
+
+  // int32 maxPlayers = 4;
+  void clear_maxplayers();
+  int32_t maxplayers() const;
+  void set_maxplayers(int32_t value);
+  private:
+  int32_t _internal_maxplayers() const;
+  void _internal_set_maxplayers(int32_t value);
+  public:
+
+  // int32 status = 5;
+  void clear_status();
+  int32_t status() const;
+  void set_status(int32_t value);
+  private:
+  int32_t _internal_status() const;
+  void _internal_set_status(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.WorldServerInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr worldname_;
+    int32_t worldid_;
+    int32_t currentplayers_;
+    int32_t maxplayers_;
+    int32_t status_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
 // ===================================================================
 
 
@@ -57,12 +260,145 @@ PROTOBUF_NAMESPACE_CLOSE
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// WorldServerInfo
+
+// int32 worldId = 1;
+inline void WorldServerInfo::clear_worldid() {
+  _impl_.worldid_ = 0;
+}
+inline int32_t WorldServerInfo::_internal_worldid() const {
+  return _impl_.worldid_;
+}
+inline int32_t WorldServerInfo::worldid() const {
+  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.worldId)
+  return _internal_worldid();
+}
+inline void WorldServerInfo::_internal_set_worldid(int32_t value) {
+  
+  _impl_.worldid_ = value;
+}
+inline void WorldServerInfo::set_worldid(int32_t value) {
+  _internal_set_worldid(value);
+  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.worldId)
+}
+
+// string worldName = 2;
+inline void WorldServerInfo::clear_worldname() {
+  _impl_.worldname_.ClearToEmpty();
+}
+inline const std::string& WorldServerInfo::worldname() const {
+  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.worldName)
+  return _internal_worldname();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void WorldServerInfo::set_worldname(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.worldname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.worldName)
+}
+inline std::string* WorldServerInfo::mutable_worldname() {
+  std::string* _s = _internal_mutable_worldname();
+  // @@protoc_insertion_point(field_mutable:Protocol.WorldServerInfo.worldName)
+  return _s;
+}
+inline const std::string& WorldServerInfo::_internal_worldname() const {
+  return _impl_.worldname_.Get();
+}
+inline void WorldServerInfo::_internal_set_worldname(const std::string& value) {
+  
+  _impl_.worldname_.Set(value, GetArenaForAllocation());
+}
+inline std::string* WorldServerInfo::_internal_mutable_worldname() {
+  
+  return _impl_.worldname_.Mutable(GetArenaForAllocation());
+}
+inline std::string* WorldServerInfo::release_worldname() {
+  // @@protoc_insertion_point(field_release:Protocol.WorldServerInfo.worldName)
+  return _impl_.worldname_.Release();
+}
+inline void WorldServerInfo::set_allocated_worldname(std::string* worldname) {
+  if (worldname != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.worldname_.SetAllocated(worldname, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.worldname_.IsDefault()) {
+    _impl_.worldname_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.WorldServerInfo.worldName)
+}
+
+// int32 currentPlayers = 3;
+inline void WorldServerInfo::clear_currentplayers() {
+  _impl_.currentplayers_ = 0;
+}
+inline int32_t WorldServerInfo::_internal_currentplayers() const {
+  return _impl_.currentplayers_;
+}
+inline int32_t WorldServerInfo::currentplayers() const {
+  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.currentPlayers)
+  return _internal_currentplayers();
+}
+inline void WorldServerInfo::_internal_set_currentplayers(int32_t value) {
+  
+  _impl_.currentplayers_ = value;
+}
+inline void WorldServerInfo::set_currentplayers(int32_t value) {
+  _internal_set_currentplayers(value);
+  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.currentPlayers)
+}
+
+// int32 maxPlayers = 4;
+inline void WorldServerInfo::clear_maxplayers() {
+  _impl_.maxplayers_ = 0;
+}
+inline int32_t WorldServerInfo::_internal_maxplayers() const {
+  return _impl_.maxplayers_;
+}
+inline int32_t WorldServerInfo::maxplayers() const {
+  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.maxPlayers)
+  return _internal_maxplayers();
+}
+inline void WorldServerInfo::_internal_set_maxplayers(int32_t value) {
+  
+  _impl_.maxplayers_ = value;
+}
+inline void WorldServerInfo::set_maxplayers(int32_t value) {
+  _internal_set_maxplayers(value);
+  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.maxPlayers)
+}
+
+// int32 status = 5;
+inline void WorldServerInfo::clear_status() {
+  _impl_.status_ = 0;
+}
+inline int32_t WorldServerInfo::_internal_status() const {
+  return _impl_.status_;
+}
+inline int32_t WorldServerInfo::status() const {
+  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.status)
+  return _internal_status();
+}
+inline void WorldServerInfo::_internal_set_status(int32_t value) {
+  
+  _impl_.status_ = value;
+}
+inline void WorldServerInfo::set_status(int32_t value) {
+  _internal_set_status(value);
+  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.status)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
 
 // @@protoc_insertion_point(namespace_scope)
 
+}  // namespace Protocol
 
 // @@protoc_insertion_point(global_scope)
 

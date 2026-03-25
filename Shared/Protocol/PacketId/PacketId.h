@@ -32,4 +32,13 @@ namespace packet_id
         S2S_HEARTBEAT_NOT = 1,
 	};
 
+
+	enum eWorldPacketId : uint16
+	{
+        C2S_WORLD_LIST_REQ = 1,
+        S2C_WORLD_LIST_RES = 2,
+        C2S_WORLD_SELECT_REQ = 3,
+        S2C_WORLD_SELECT_RES = 4,
+	};
+
 }

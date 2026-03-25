@@ -5,7 +5,9 @@
 #pragma once
 #include "HeartbeatPacketHandler.h"
 #include "LoginPacketHandler.h"
+#include "WorldPacketHandler.h"
 
+#include "SessionValidator.h"
 
 class PacketServiceTypeHandler
 {
@@ -18,18 +20,24 @@ public:
 
 	static void Init()
 	{
-        HeartbeatPacketHandler::Init();
-LoginPacketHandler::Init();
+		HeartbeatPacketHandler::Init();
+		LoginPacketHandler::Init();
+		WorldPacketHandler::Init();
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_HEARTBEAT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
-            {
-                return HeartbeatPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
-            };
+		{
+			return HeartbeatPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
 
-sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_LOGIN] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
-            {
-                return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
-            };
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_LOGIN] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
+
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_WORLD] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return WorldPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
 
 
 	}
@@ -37,13 +45,18 @@ sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_LOGIN] = [](const uin
 	static bool HandlePacketServiceType(const uint16 len, const byte* pBuffer, const PacketSessionRef& pSession)
 	{
 		const auto [packetSize, headerId] = *(reinterpret_cast<const PacketHeader*>(pBuffer));
-		
+
 		const uint16 serviceType = GET_SERVICE_TYPE(headerId);
 		const uint16 packetId = GET_PACKET_ID(headerId);
 
 		const auto iter = sPacketServiceTypeMap.find(serviceType);
 		if (iter != sPacketServiceTypeMap.end())
 		{
+			if (!SessionValidator::Validate(pSession))
+			{
+				return false;
+			}
+
 			return iter->second(packetSize, packetId, pBuffer, pSession);
 		}
 

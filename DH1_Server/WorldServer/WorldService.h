@@ -32,12 +32,14 @@ public:
 	void Stop();
 
 	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
+	[[nodiscard]] ClientServiceRef GetRealmClientServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 
 private:
 
 	WorldService()
 		: mpServerService()
+		, mpRealmClientService()
 		, mpActorService()
 		, mNetworkDispatchThreadCount(0)
 		, mActorDispatchThreadCount(0)
@@ -47,6 +49,7 @@ private:
 	{}
 
 	ServerServiceRef mpServerService;
+	ClientServiceRef mpRealmClientService;
 	ActorServiceRef mpActorService;
 
 	int32 mNetworkDispatchThreadCount;

@@ -15,6 +15,18 @@ struct RedisGatewayInfo
 	int32 currentSessionCount;
 };
 
+struct RedisWorldServerInfo
+{
+	int32 worldId;
+	std::string worldName;
+	int32 currentPlayers;
+	int32 maxPlayers;
+	int32 status;
+};
+
+using GetWorldServerListCallback = std::function<void(const Vector<RedisWorldServerInfo>&)>;
+using GetWorldServerInfoCallback = std::function<void(const bool, const RedisWorldServerInfo&)>;
+
 class RedisService final : public std::enable_shared_from_this<RedisService>
 {
 public:
@@ -30,6 +42,9 @@ public:
 	void GetStringAsync(std::string key, GetStringCallback callback);
 	void GetDelStringAsync(std::string key, GetStringCallback callback);
 	void DeleteKeyAsync(std::string key, DeleteKeyCallback callback);
+
+	void GetWorldServerListAsync(GetWorldServerListCallback callback);
+	void GetWorldServerInfoAsync(const int32 worldId, GetWorldServerInfoCallback callback);
 
 private:
 	uint64 mRedisActorId;

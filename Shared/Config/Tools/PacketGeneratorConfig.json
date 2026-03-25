@@ -19,6 +19,10 @@
     {
       "name": "DH1_Server\\WorldServer",
       "role": "WORLD_SERVER"
+    },
+    {
+      "name": "DH1_Server\\RealmServer",
+      "role": "REALM_SERVER"
     }
   ]
 }

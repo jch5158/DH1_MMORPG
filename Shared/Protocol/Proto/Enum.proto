@@ -8,6 +8,7 @@ enum eServiceType
     SERVICE_TYPE_LOGIN = 2;
     SERVICE_TYPE_HEARTBEAT = 3;
     SERVICE_TYPE_SERVER_HEARTBEAT = 4;
+    SERVICE_TYPE_WORLD = 5;
 }
 
 enum eRole
@@ -20,6 +21,7 @@ enum eRole
     WORLD_SERVER = 5;
     CENTER_SERVER = 6;
     SERVER = 7;
+    REALM_SERVER = 8;
 }
 
 enum eLoginResult
@@ -29,4 +31,12 @@ enum eLoginResult
     LOGIN_FAIL_SERVER_FULL = 2;     // 게이트웨이 수용 인원 초과 (아까 만든 상태값 연동)
     LOGIN_FAIL_MAINTENANCE = 3;     // 서버 점검 중
     LOGIN_FAIL_INTERNAL_ERROR = 4;  // Redis 조회 실패 등 서버 내부 에러
+}
+
+enum eWorldSelectResult
+{
+    WORLD_SELECT_SUCCESS = 0;
+    WORLD_SELECT_FAIL_NOT_FOUND = 1;
+    WORLD_SELECT_FAIL_FULL = 2;
+    WORLD_SELECT_FAIL_MAINTENANCE = 3;
 }

@@ -21,6 +21,12 @@ bool SessionManager::AddSession(SessionRef pSession)
 	return retVal;
 }
 
+bool SessionManager::Contains(const SessionRef& pSession)
+{
+	SharedLock lock(mLock);
+	return mSessions.contains(pSession->GetSessionId());
+}
+
 void SessionManager::RemoveSession(const SessionRef& pSession)
 {
 	UniqueLock lock(mLock);

@@ -8,6 +8,14 @@
     "worldServer": {
         "worldServerId": 1
     },
+    "realmServer": {
+        "ip": "127.0.0.1",
+        "port": 9200,
+        "runningThreadCount": 1,
+        "waitTimeoutMs": 10,
+        "tickIntervalMs": 16,
+        "reconnectIntervalMs": 3000
+    },
     "session": {
         "receiveBufferSize": 16384,
         "sendBufferSize": 16384

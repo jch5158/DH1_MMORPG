@@ -12,6 +12,7 @@ public:
 	~SessionManager() = default;
 
 	[[nodiscard]] bool AddSession(SessionRef pSession);
+	[[nodiscard]] bool Contains(const SessionRef& pSession);
 	void RemoveSession(const SessionRef& pSession);
 	
 	void SetMaxSessionCount(const int32 maxSessionCount);

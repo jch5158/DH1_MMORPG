@@ -1,3 +1,11 @@
 
-
-Struct.proto
+Ì
+Struct.protoProtocol"©
+WorldServerInfo
+worldId (RworldId
+	worldName (	R	worldName&
+currentPlayers (RcurrentPlayers
+
+maxPlayers (R
+maxPlayers
+status (Rstatusbproto3

@@ -10,6 +10,7 @@
 
 Listener::Listener(const int32 acceptCount)
 	: SocketIocpObject()
+	, mbClosed(false)
 	, mAcceptCount(acceptCount)
 	, mAcceptors()
 {
@@ -22,6 +23,11 @@ Listener::~Listener()
 
 void Listener::Dispatch(class IocpEvent& iocpEvent, uint32 numOfBytes)
 {
+	if (mbClosed.load())
+	{
+		return;
+	}
+
 	if (iocpEvent.GetEventType() != eIocpEventType::Accept)
 	{
 		NET_ENGINE_LOG_FATAL("Listener::Dispatch - eIocpEventType is not Accept");
@@ -113,6 +119,7 @@ bool Listener::StartAccept(const ServerServiceRef& pServerService)
 
 void Listener::CloseAccept()
 {
+	mbClosed.store(true);
 	ForceCloseSocket();
 	mAcceptors.clear();
 }

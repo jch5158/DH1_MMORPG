@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{a1b2c3d4-e5f6-7890-abcd-ef0123456789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Pch">
+      <UniqueIdentifier>{b2c3d4e5-f6a7-8901-bcde-f01234567890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Type">
+      <UniqueIdentifier>{c3d4e5f6-a7b8-9012-cdef-012345678901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Network">
+      <UniqueIdentifier>{d4e5f6a7-b8c9-0123-defa-123456789012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Network\Session">
+      <UniqueIdentifier>{e5f6a7b8-c9d0-1234-efab-234567890123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Network\Protocol">
+      <UniqueIdentifier>{f6a7b8c9-d0e1-2345-fabc-345678901234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Network\Protocol\Proto">
+      <UniqueIdentifier>{a7b8c9d0-e1f2-3456-abcd-456789012345}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Network\Protocol\PacketId">
+      <UniqueIdentifier>{b8c9d0e1-f2a3-4567-bcde-567890123456}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents">
+      <UniqueIdentifier>{c9d0e1f2-a3b4-5678-cdef-678901234567}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\Service">
+      <UniqueIdentifier>{d0e1f2a3-b4c5-6789-defa-789012345678}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RealmServer.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Core\Pch</Filter>
+    </ClCompile>
+    <ClCompile Include="RealmService.cpp">
+      <Filter>Contents\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldServerSession.cpp">
+      <Filter>Core\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Core\Pch</Filter>
+    </ClInclude>
+    <ClInclude Include="PointerType.h">
+      <Filter>Core\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="RealmService.h">
+      <Filter>Contents\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldServerSession.h">
+      <Filter>Core\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
+      <Filter>Core\Network\Protocol\PacketId</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Shared\Protocol\Proto\Enum.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+  </ItemGroup>
+</Project>

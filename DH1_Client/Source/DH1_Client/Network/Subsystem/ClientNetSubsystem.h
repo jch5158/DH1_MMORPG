@@ -12,6 +12,29 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGatewayLoginResultDelegate, int32 /*eLoginResult*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHttpLoginErrorDelegate, int32 /*HttpStatusCode*/, const FString& /*Message*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEmailVerificationRequiredDelegate, const FString& /*Message*/, const FString& /*Email*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorldListReceivedDelegate, const TArray<FWorldServerInfo>& /*WorldList*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorldSelectResultDelegate, int32 /*eWorldSelectResult*/);
+
+USTRUCT(BlueprintType)
+struct FWorldServerInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 WorldId = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString WorldName;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentPlayers = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 MaxPlayers = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 Status = 0;
+};
 
 UCLASS(Config = Game)
 class DH1_CLIENT_API UClientNetSubsystem : public UGameInstanceSubsystem, public FTickableGameObject
@@ -53,11 +76,18 @@ public:
     void SetAuthData(const FString& ArgTicket, const FString& ArgAccountId);
     AuthData GetAuthData() const;
     void NotifyLoginResult(int32 Result);
+    void NotifyWorldList(const TArray<FWorldServerInfo>& WorldList);
+    void NotifyWorldSelectResult(int32 Result);
+
+    void RequestWorldList();
+    void RequestWorldSelect(int32 WorldId);
 
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;
     FOnEmailVerificationRequiredDelegate OnEmailVerificationRequired;
+    FOnWorldListReceivedDelegate OnWorldListReceived;
+    FOnWorldSelectResultDelegate OnWorldSelectResult;
 
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
