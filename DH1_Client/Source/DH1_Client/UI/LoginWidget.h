@@ -63,8 +63,7 @@ protected:
     UFUNCTION()
     void OnResetPasswordButtonClicked();
 
-    void OnEmailInputCommitted(const FText& Text, ETextCommit::Type CommitMethod);
-    void OnPasswordInputCommitted(const FText& Text, ETextCommit::Type CommitMethod);
+    virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
     void HandleGatewayLoginResult(int32 Result);
     void HandleHttpLoginError(int32 StatusCode, const FString& Message);

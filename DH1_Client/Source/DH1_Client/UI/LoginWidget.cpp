@@ -59,15 +59,9 @@ void ULoginWidget::NativeConstruct()
 		ResetPasswordButton->OnClicked.AddDynamic(this, &ULoginWidget::OnResetPasswordButtonClicked);
 	}
 
-	if (EmailInput)
-	{
-		EmailInput->OnTextCommitted.AddUObject(this, &ULoginWidget::OnEmailInputCommitted);
-	}
-
 	if (PasswordInput)
 	{
 		PasswordInput->SetIsPassword(true);
-		PasswordInput->OnTextCommitted.AddUObject(this, &ULoginWidget::OnPasswordInputCommitted);
 	}
 
 	if (const UGameInstance* GameInstance = GetGameInstance())
@@ -201,20 +195,24 @@ void ULoginWidget::HandleEmailVerificationRequired(const FString& Message, const
 	}
 }
 
-void ULoginWidget::OnEmailInputCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+FReply ULoginWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (CommitMethod == ETextCommit::OnEnter && PasswordInput)
+	if (InKeyEvent.GetKey() == EKeys::Enter || InKeyEvent.GetKey() == EKeys::Virtual_Accept)
 	{
-		PasswordInput->SetKeyboardFocus();
-	}
-}
+		if (EmailInput && EmailInput->HasKeyboardFocus() && PasswordInput)
+		{
+			PasswordInput->SetKeyboardFocus();
+			return FReply::Handled();
+		}
 
-void ULoginWidget::OnPasswordInputCommitted(const FText& Text, ETextCommit::Type CommitMethod)
-{
-	if (CommitMethod == ETextCommit::OnEnter)
-	{
-		OnLoginButtonClicked();
+		if (PasswordInput && PasswordInput->HasKeyboardFocus())
+		{
+			OnLoginButtonClicked();
+			return FReply::Handled();
+		}
 	}
+
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
 void ULoginWidget::SetLoading(const bool bLoading)
