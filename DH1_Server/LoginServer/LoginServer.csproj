@@ -5,8 +5,8 @@
 	<Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>882eebbc-1691-42c5-90dd-6d3987fab115</UserSecretsId>
-    <BaseOutputPath>$(SolutionDir)Binaries\$(Configuration)\LoginServer</BaseOutputPath>
-    <OutputPath>$(SolutionDir)Binaries\$(Configuration)\LoginServer</OutputPath>
+    <BaseOutputPath>$(SolutionDir)..\Binaries\Server\$(Configuration)\LoginServer</BaseOutputPath>
+    <OutputPath>$(SolutionDir)..\Binaries\Server\$(Configuration)\LoginServer</OutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>

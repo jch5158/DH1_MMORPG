@@ -1,5 +1,6 @@
 #include "ClientNetSubsystem.h"
 
+#include "Async/Async.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Network/CppNetEngine/NetSession.h"
@@ -236,17 +237,32 @@ AuthData UClientNetSubsystem::GetAuthData() const
 
 void UClientNetSubsystem::NotifyLoginResult(const int32 Result)
 {
-	OnGatewayLoginResult.Broadcast(Result);
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyLoginResult: %d"), Result);
+	AsyncTask(ENamedThreads::GameThread, [this, Result]()
+		{
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting LoginResult: %d, Bound: %d"), Result, OnGatewayLoginResult.IsBound());
+			OnGatewayLoginResult.Broadcast(Result);
+		});
 }
 
 void UClientNetSubsystem::NotifyWorldList(const TArray<FWorldServerInfo>& WorldList)
 {
-	OnWorldListReceived.Broadcast(WorldList);
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyWorldList: count=%d"), WorldList.Num());
+	AsyncTask(ENamedThreads::GameThread, [this, WorldList]()
+		{
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting WorldList: count=%d, Bound: %d"), WorldList.Num(), OnWorldListReceived.IsBound());
+			OnWorldListReceived.Broadcast(WorldList);
+		});
 }
 
 void UClientNetSubsystem::NotifyWorldSelectResult(const int32 Result)
 {
-	OnWorldSelectResult.Broadcast(Result);
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyWorldSelectResult: %d"), Result);
+	AsyncTask(ENamedThreads::GameThread, [this, Result]()
+		{
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting WorldSelectResult: %d, Bound: %d"), Result, OnWorldSelectResult.IsBound());
+			OnWorldSelectResult.Broadcast(Result);
+		});
 }
 
 void UClientNetSubsystem::RequestWorldList()

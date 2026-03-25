@@ -40,7 +40,7 @@ bool WorldPacketHandler::HANDLE_S2C_WORLD_LIST_RES(const Protocol::S2C_WORLD_LIS
 			const auto& world = packet.worlds(i);
 			FWorldServerInfo Info;
 			Info.WorldId = world.worldid();
-			Info.WorldName = UTF8_TO_TCHAR(world.worldname().c_str());
+			Info.WorldName = FString(UTF8_TO_TCHAR(world.worldname().c_str()));
 			Info.CurrentPlayers = world.currentplayers();
 			Info.MaxPlayers = world.maxplayers();
 			Info.Status = world.status();

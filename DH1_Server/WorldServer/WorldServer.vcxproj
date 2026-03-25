@@ -80,22 +80,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)WorldServer;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\WorldServer\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\WorldServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)WorldServer;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\WorldServer\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\WorldServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)WorldServer;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\WorldServer\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\WorldServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)WorldServer;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\WorldServer\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\WorldServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -234,6 +234,8 @@
     </ClCompile>
     <ClCompile Include="GatewaySession.cpp" />
     <ClCompile Include="RealmSession.cpp" />
+    <ClCompile Include="RedisActor.cpp" />
+    <ClCompile Include="RedisService.cpp" />
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp" />
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="WorldServer.cpp">
@@ -262,6 +264,8 @@
     <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h" />
     <ClInclude Include="GatewaySession.h" />
     <ClInclude Include="RealmSession.h" />
+    <ClInclude Include="RedisActor.h" />
+    <ClInclude Include="RedisService.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
     <ClInclude Include="PointerType.h" />

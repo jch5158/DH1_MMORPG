@@ -5,6 +5,7 @@
 #include "SignUpWidget.h"
 #include "EmailVerificationWidget.h"
 #include "ResetPasswordWidget.h"
+#include "Network/Subsystem/ClientNetSubsystem.h"
 
 void UAuthMasterWidget::NativeConstruct()
 {
@@ -51,7 +52,38 @@ void UAuthMasterWidget::HandleGoToSignUp() const
 
 void UAuthMasterWidget::HandleLoginSuccess() const
 {
-	UGameplayStatics::OpenLevel(this, LobbyLevelName);
+	UGameInstance* GameInstance = GetGameInstance();
+	if (GameInstance == nullptr)
+	{
+		return;
+	}
+
+	UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>();
+	if (NetSubsystem == nullptr)
+	{
+		return;
+	}
+
+	// 월드 선택 결과 수신 시 LobbyLevel 진입
+	NetSubsystem->OnWorldSelectResult.AddLambda([this, GameInstance](const int32 Result)
+		{
+			if (Result == 0)
+			{
+				UGameplayStatics::OpenLevel(GameInstance, LobbyLevelName);
+			}
+		});
+
+	// 월드 목록 수신 시 첫 번째 월드 자동 선택 (테스트용)
+	NetSubsystem->OnWorldListReceived.AddLambda([NetSubsystem](const TArray<FWorldServerInfo>& WorldList)
+		{
+			if (WorldList.Num() > 0)
+			{
+				NetSubsystem->RequestWorldSelect(WorldList[0].WorldId);
+			}
+		});
+
+	// 월드 목록 요청
+	NetSubsystem->RequestWorldList();
 }
 
 void UAuthMasterWidget::HandleGoToResetPassword() const

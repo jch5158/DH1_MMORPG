@@ -34,6 +34,7 @@ public:
 	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
 	[[nodiscard]] ClientServiceRef GetRealmClientServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
+	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 
 private:
 
@@ -41,21 +42,32 @@ private:
 		: mpServerService()
 		, mpRealmClientService()
 		, mpActorService()
+		, mpRedisService()
 		, mNetworkDispatchThreadCount(0)
 		, mActorDispatchThreadCount(0)
 		, mWorldServerId(0)
+		, mHeartbeatIntervalMs(5000)
+		, mRedisTtlSeconds(10)
+		, mMaxPlayers(1000)
 		, mListenPort(0)
 		, mbRunning(false)
 	{}
 
+	void updateWorldRegistration(eWorldServerStatus status);
+
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpRealmClientService;
 	ActorServiceRef mpActorService;
+	RedisServiceRef mpRedisService;
 
 	int32 mNetworkDispatchThreadCount;
 	int32 mActorDispatchThreadCount;
 
 	int32 mWorldServerId;
+	std::string mWorldName;
+	int64 mHeartbeatIntervalMs;
+	int64 mRedisTtlSeconds;
+	int32 mMaxPlayers;
 	std::string mListenIp;
 	uint16 mListenPort;
 

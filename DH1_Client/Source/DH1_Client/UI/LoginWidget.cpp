@@ -203,7 +203,7 @@ void ULoginWidget::HandleEmailVerificationRequired(const FString& Message, const
 
 FReply ULoginWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (InKeyEvent.GetKey() == EKeys::Enter || InKeyEvent.GetKey() == EKeys::Virtual_Accept)
+	if (InKeyEvent.GetKey() == EKeys::Enter || InKeyEvent.GetKey() == EKeys::Virtual_Gamepad_Accept.GetVirtualKey())
 	{
 		if (EmailInput && EmailInput->HasKeyboardFocus() && PasswordInput)
 		{

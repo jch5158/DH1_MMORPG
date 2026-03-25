@@ -2,6 +2,7 @@
 #include "WorldService.h"
 #include "GatewaySession.h"
 #include "RealmSession.h"
+#include "RedisService.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -73,6 +74,13 @@ bool WorldService::Initialize(const JsonConfig& config)
 		return false;
 	}
 
+	// RedisService
+	if (config.HasKey("redis"))
+	{
+		const JsonConfig redisConfig = config.GetSection("redis");
+		mpRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), mpActorService);
+	}
+
 	// RealmServer ClientService
 	if (config.HasKey("realmServer"))
 	{
@@ -110,6 +118,10 @@ bool WorldService::Initialize(const JsonConfig& config)
 
 	// WorldServer info
 	mWorldServerId = worldServerConfig.GetInt32("worldServerId");
+	mWorldName = worldServerConfig.GetString("worldName");
+	mMaxPlayers = worldServerConfig.GetInt32("maxPlayers");
+	mHeartbeatIntervalMs = worldServerConfig.GetInt64("heartbeatIntervalMs");
+	mRedisTtlSeconds = worldServerConfig.GetInt64("redisTtlSeconds");
 
 	NET_ENGINE_LOG_INFO("WorldService::Initialize - Initialization complete, worldServerId: {}", mWorldServerId);
 	return true;
@@ -176,10 +188,28 @@ bool WorldService::Start()
 
 void WorldService::Run()
 {
+	updateWorldRegistration(eWorldServerStatus::Online);
+
+	auto lastHeartbeat = std::chrono::steady_clock::now();
+
 	while (mbRunning.load())
 	{
+		const auto now = std::chrono::steady_clock::now();
+		const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeat).count();
+
+		if (elapsedMs >= mHeartbeatIntervalMs)
+		{
+			updateWorldRegistration(eWorldServerStatus::Online);
+			lastHeartbeat = now;
+
+			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, WorldServerId: {}", mpServerService->GetCurrentSessionCount(), mWorldServerId);
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
+
+	updateWorldRegistration(eWorldServerStatus::ShuttingDown);
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	NET_ENGINE_LOG_INFO("WorldService::Run - Closing service...");
 
@@ -214,4 +244,26 @@ ClientServiceRef WorldService::GetRealmClientServiceRef() const
 ActorServiceRef WorldService::GetActorServiceRef() const
 {
 	return mpActorService;
+}
+
+RedisServiceRef WorldService::GetRedisServiceRef() const
+{
+	return mpRedisService;
+}
+
+void WorldService::updateWorldRegistration(const eWorldServerStatus status)
+{
+	if (mpRedisService == nullptr)
+	{
+		return;
+	}
+
+	RedisWorldRegistration info;
+	info.worldId = mWorldServerId;
+	info.worldName = mWorldName;
+	info.currentPlayers = mpServerService->GetCurrentSessionCount();
+	info.maxPlayers = mMaxPlayers;
+	info.status = static_cast<int32>(status);
+
+	mpRedisService->UpdateWorldServerInfo(info, mRedisTtlSeconds);
 }

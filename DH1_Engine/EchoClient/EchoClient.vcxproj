@@ -78,28 +78,28 @@
     <ProjectRootDir>$([System.String]::Copy('$(SolutionDir)..').Replace('\','/'))</ProjectRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoClient\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoClient\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoClient\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoClient\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>

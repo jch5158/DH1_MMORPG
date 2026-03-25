@@ -142,11 +142,13 @@ void TimingWheel::processTick(Vector<TimingNode>& outExecuteList)
 		}
 	}
 
-	for (auto& node : mWheel0[depth0])
+	List<TimingNode> expired;
+	expired.swap(mWheel0[depth0]);
+
+	for (auto& node : expired)
 	{
 		outExecuteList.emplace_back(std::move(node));
 	}
-	mWheel0[depth0].clear();
 }
 
 void TimingWheel::addNode(TimingNode&& node)
@@ -167,36 +169,24 @@ void TimingWheel::addNode(TimingNode&& node)
 	}
 }
 
-void TimingWheel::addNodeList(List<TimingNode>& bucket)
+void TimingWheel::addNodeList(Vector<TimingNode>& nodes)
 {
-	auto it = bucket.begin();
-	while (it != bucket.end())
+	for (auto& node : nodes)
 	{
-		const uint64 delay = it->GetExpiredTick() - mCurrentTick;
-
-		if (delay < LEVEL0_SIZE)
-		{
-			const uint32 index = it->GetExpiredTick() & LEVEL0_MASK;
-			mWheel0[index].splice(mWheel0[index].end(), bucket, it++);
-		}
-		else if (delay < (LEVEL0_SIZE << LEVEL1_BITS))
-		{
-			const uint32 index = (it->GetExpiredTick() >> LEVEL0_BITS) & LEVEL1_MASK;
-			mWheel1[index].splice(mWheel1[index].end(), bucket, it++);
-		}
-		else
-		{
-			const uint32 index = (it->GetExpiredTick() >> (LEVEL0_BITS + LEVEL1_BITS)) & LEVEL2_MASK;
-			mWheel2[index].splice(mWheel2[index].end(), bucket, it++);
-		}
+		addNode(std::move(node));
 	}
 }
 
 void TimingWheel::cascade(List<TimingNode>& bucket)
 {
-	List<TimingNode> tempBucket;
+	Vector<TimingNode> nodes;
+	nodes.reserve(bucket.size());
 
-	tempBucket.splice(tempBucket.end(), bucket);
+	for (auto& node : bucket)
+	{
+		nodes.emplace_back(std::move(node));
+	}
+	bucket.clear();
 
-	addNodeList(tempBucket);
+	addNodeList(nodes);
 }

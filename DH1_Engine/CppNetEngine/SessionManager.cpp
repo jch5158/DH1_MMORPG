@@ -29,8 +29,15 @@ bool SessionManager::Contains(const SessionRef& pSession)
 
 void SessionManager::RemoveSession(const SessionRef& pSession)
 {
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	const uint64 sessionId = pSession->GetSessionId();
+
 	UniqueLock lock(mLock);
-	mSessions.erase(pSession->GetSessionId());
+	mSessions.erase(sessionId);
 }
 
 void SessionManager::SetMaxSessionCount(const int32 maxSessionCount)
@@ -74,7 +81,7 @@ SessionRef SessionManager::GetSession(const uint64 sessionId)
 
 Vector<SessionRef> SessionManager::GetActiveSessions()
 {
-	SharedLock lock(mLock);
+	UniqueLock lock(mLock);
 
 	Vector<SessionRef> sessions;
 	sessions.reserve(mSessions.size());

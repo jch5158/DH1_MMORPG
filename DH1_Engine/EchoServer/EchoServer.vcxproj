@@ -80,28 +80,28 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoServer\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoServer\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoServer\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)CppNetEngine\;$(SolutionDir)..\Shared\Protocol\;$(SolutionDir)..\Shared\Protocol\PacketId;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration)\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)Binaries\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\Binaries\EchoTest\$(Configuration)\EchoServer\</OutDir>
     <ExternalIncludePath>
     </ExternalIncludePath>
   </PropertyGroup>

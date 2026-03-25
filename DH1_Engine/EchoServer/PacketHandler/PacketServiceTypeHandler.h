@@ -5,6 +5,7 @@
 #pragma once
 #include "EchoPacketHandler.h"
 
+#include "SessionValidator.h"
 
 class PacketServiceTypeHandler
 {
@@ -17,12 +18,12 @@ public:
 
 	static void Init()
 	{
-        EchoPacketHandler::Init();
+		EchoPacketHandler::Init();
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_ECHO] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
-            {
-                return EchoPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
-            };
+		{
+			return EchoPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
 
 
 	}
@@ -30,13 +31,18 @@ public:
 	static bool HandlePacketServiceType(const uint16 len, const byte* pBuffer, const PacketSessionRef& pSession)
 	{
 		const auto [packetSize, headerId] = *(reinterpret_cast<const PacketHeader*>(pBuffer));
-		
+
 		const uint16 serviceType = GET_SERVICE_TYPE(headerId);
 		const uint16 packetId = GET_PACKET_ID(headerId);
 
 		const auto iter = sPacketServiceTypeMap.find(serviceType);
 		if (iter != sPacketServiceTypeMap.end())
 		{
+			if (!SessionValidator::Validate(pSession))
+			{
+				return false;
+			}
+
 			return iter->second(packetSize, packetId, pBuffer, pSession);
 		}
 

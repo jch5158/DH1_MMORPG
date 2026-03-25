@@ -43,7 +43,7 @@ protected:
 	UResetPasswordWidget* ResetPasswordWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Navigation")
-	FName LobbyLevelName = TEXT("LobbyLevel");
+	FName LobbyLevelName = TEXT("/Game/Levels/L_Lobby");
 
 private:
 	void HandleGoToSignUp() const;

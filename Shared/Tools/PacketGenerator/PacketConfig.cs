@@ -16,6 +16,8 @@ namespace PacketGenerator
     public class PacketProjectsConfig
     {
         public List<ProjectConfig> Projects { get; set; } = [];
+        public string ProtoBridgePath { get; set; } = string.Empty;
+        public string ClientProtocolPath { get; set; } = string.Empty;
     }
 
     internal class PacketConfig

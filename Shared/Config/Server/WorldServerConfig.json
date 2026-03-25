@@ -6,7 +6,11 @@
         "maxSessionCount": 100
     },
     "worldServer": {
-        "worldServerId": 1
+        "worldServerId": 1,
+        "worldName": "World-1",
+        "maxPlayers": 1000,
+        "heartbeatIntervalMs": 5000,
+        "redisTtlSeconds": 10
     },
     "realmServer": {
         "ip": "127.0.0.1",
@@ -15,6 +19,9 @@
         "waitTimeoutMs": 10,
         "tickIntervalMs": 16,
         "reconnectIntervalMs": 3000
+    },
+    "redis": {
+        "connectionUri": "tcp://${DH1_REDIS_HOST}:${DH1_REDIS_PORT}?pool_size=5"
     },
     "session": {
         "receiveBufferSize": 16384,
