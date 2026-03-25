@@ -245,6 +245,7 @@
   <ImportGroup Label="ExtensionTargets"></ImportGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup />
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Heartbeat.proto" />

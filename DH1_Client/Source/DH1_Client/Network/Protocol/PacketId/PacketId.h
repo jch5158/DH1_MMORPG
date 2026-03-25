@@ -15,8 +15,7 @@ namespace packet_id
 
 	enum eHeartbeatPacketId : uint16
 	{
-        C2S_HEARTBEAT_REQ = 1,
-        S2C_HEARTBEAT_RES = 2,
+        C2S_HEARTBEAT_NOT = 1,
 	};
 
 
