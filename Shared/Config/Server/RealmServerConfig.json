@@ -6,7 +6,9 @@
         "maxSessionCount": 100
     },
     "realmServer": {
-        "realmServerId": 1
+        "realmServerId": 1,
+        "heartbeatTimeoutMs": 15000,
+        "heartbeatCheckIntervalMs": 5000
     },
     "session": {
         "receiveBufferSize": 16384,

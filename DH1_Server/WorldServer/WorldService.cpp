@@ -8,6 +8,7 @@
 #include "ActorService.h"
 #include "ThreadManager.h"
 #include "JsonConfig.h"
+#include "PacketHandler/ServerHeartbeatPacketHandler.h"
 
 BOOL WINAPI WorldService::ConsoleCtrlHandler(const DWORD ctrlType)
 {
@@ -200,6 +201,7 @@ void WorldService::Run()
 		if (elapsedMs >= mHeartbeatIntervalMs)
 		{
 			updateWorldRegistration(eWorldServerStatus::Online);
+			sendHeartbeatToRealm();
 			lastHeartbeat = now;
 
 			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, WorldServerId: {}", mpServerService->GetCurrentSessionCount(), mWorldServerId);
@@ -249,6 +251,35 @@ ActorServiceRef WorldService::GetActorServiceRef() const
 RedisServiceRef WorldService::GetRedisServiceRef() const
 {
 	return mpRedisService;
+}
+
+int32 WorldService::GetWorldServerId() const
+{
+	return mWorldServerId;
+}
+
+void WorldService::sendHeartbeatToRealm()
+{
+	if (mpRealmClientService == nullptr)
+	{
+		return;
+	}
+
+	const SessionRef pSession = mpRealmClientService->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	Protocol::S2S_HEARTBEAT_NOT packet;
+	packet.set_servertype(static_cast<int32>(Protocol::eRole::WORLD_SERVER));
+	packet.set_serverid(mWorldServerId);
+	packet.set_timestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count());
+	packet.set_sessioncount(mpServerService->GetCurrentSessionCount());
+	packet.set_status(static_cast<int32>(eWorldServerStatus::Online));
+
+	pSession->Send(ServerHeartbeatPacketHandler::MakeSendBuffer(packet));
 }
 
 void WorldService::updateWorldRegistration(const eWorldServerStatus status)

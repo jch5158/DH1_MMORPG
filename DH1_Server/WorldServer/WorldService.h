@@ -35,6 +35,7 @@ public:
 	[[nodiscard]] ClientServiceRef GetRealmClientServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
+	[[nodiscard]] int32 GetWorldServerId() const;
 
 private:
 
@@ -54,6 +55,7 @@ private:
 	{}
 
 	void updateWorldRegistration(eWorldServerStatus status);
+	void sendHeartbeatToRealm();
 
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpRealmClientService;

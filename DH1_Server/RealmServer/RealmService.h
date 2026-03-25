@@ -41,9 +41,13 @@ private:
 		, mNetworkDispatchThreadCount(0)
 		, mActorDispatchThreadCount(0)
 		, mRealmServerId(0)
+		, mHeartbeatTimeoutMs(15000)
+		, mHeartbeatCheckIntervalMs(5000)
 		, mListenPort(0)
 		, mbRunning(false)
 	{}
+
+	void checkWorldServerHeartbeats();
 
 	ServerServiceRef mpServerService;
 	ActorServiceRef mpActorService;
@@ -52,6 +56,8 @@ private:
 	int32 mActorDispatchThreadCount;
 
 	int32 mRealmServerId;
+	int64 mHeartbeatTimeoutMs;
+	int64 mHeartbeatCheckIntervalMs;
 	std::string mListenIp;
 	uint16 mListenPort;
 
