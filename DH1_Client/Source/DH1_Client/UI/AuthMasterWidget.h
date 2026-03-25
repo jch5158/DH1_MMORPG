@@ -47,11 +47,13 @@ protected:
 
 private:
 	void HandleGoToSignUp() const;
-	void HandleLoginSuccess() const;
+	void HandleLoginSuccess();
 	void HandleGoToResetPassword() const;
 
 	void HandleGoToLogin(const FString& StatusText, const FString& Email) const;
 	void HandleGoToEmailVerification(const FString& StatusText, const FString& Email) const;
 
 	void SwitchWidget(const EAuthWidgetType WidgetType, const FString& StatusText, const FString& Email) const;
+
+	TSharedPtr<SWidget> WorldSelectWidgetRef;
 };
