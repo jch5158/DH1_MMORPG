@@ -30,6 +30,7 @@ public:
 	[[nodiscard]] ClientSessionManagerRef GetClientSessionManagerRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 	[[nodiscard]] MySqlServiceRef GetMySqlServiceRef() const;
+	[[nodiscard]] MySqlServiceRef GetAccountMySqlServiceRef() const;
 
 private:
 
@@ -53,6 +54,7 @@ private:
 	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
 	MySqlServiceRef mpMySqlService;
+	MySqlServiceRef mpAccountMySqlService;
 	ClientSessionManagerRef mpClientSessionManager;
 
 	int32 mNetworkDispatchThreadCount;

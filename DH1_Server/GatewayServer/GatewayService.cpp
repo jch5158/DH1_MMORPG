@@ -90,6 +90,20 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		mpMySqlService = cpp_net_engine::MakeShared<MySqlService>(dbConfig, mpActorService);
 	}
 
+	// AccountMySqlService (dh1_account_db)
+	if (config.HasKey("accountMysql"))
+	{
+		const JsonConfig accountMysqlConfig = config.GetSection("accountMysql");
+		MySqlConfig accountDbConfig;
+		accountDbConfig.host = accountMysqlConfig.GetString("host");
+		accountDbConfig.port = accountMysqlConfig.GetUInt16("port");
+		accountDbConfig.user = accountMysqlConfig.GetString("user");
+		accountDbConfig.password = accountMysqlConfig.GetString("password");
+		accountDbConfig.database = accountMysqlConfig.GetString("database");
+
+		mpAccountMySqlService = cpp_net_engine::MakeShared<MySqlService>(accountDbConfig, mpActorService);
+	}
+
 	// ClientSessionManager
 	mpClientSessionManager = cpp_net_engine::MakeShared<ClientSessionManager>(serviceConfig.maxSessionCount);
 
@@ -214,6 +228,11 @@ RedisServiceRef GatewayService::GetRedisServiceRef() const
 MySqlServiceRef GatewayService::GetMySqlServiceRef() const
 {
 	return mpMySqlService;
+}
+
+MySqlServiceRef GatewayService::GetAccountMySqlServiceRef() const
+{
+	return mpAccountMySqlService;
 }
 
 void GatewayService::updateGatewayRegistration(const eGatewayStatus status)

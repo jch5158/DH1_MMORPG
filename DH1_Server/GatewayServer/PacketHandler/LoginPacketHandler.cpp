@@ -87,7 +87,7 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 			pClientSession->SetAccountId(argAccountId);
 
 			// DB: is_online = true, last_login = now
-			MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetMySqlServiceRef();
+			MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetAccountMySqlServiceRef();
 			if (pMySqlService != nullptr)
 			{
 				pMySqlService->ExecuteAsync([argAccountId](sqlpp::mysql::connection& db)

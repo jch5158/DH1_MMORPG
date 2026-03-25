@@ -34,7 +34,7 @@ void ClientSession::OnDisconnected()
 		}
 
 		// DB: is_online = false, last_logout = now
-		MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetMySqlServiceRef();
+		MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetAccountMySqlServiceRef();
 		if (pMySqlService != nullptr)
 		{
 			const uint64 accountId = mAccountId;

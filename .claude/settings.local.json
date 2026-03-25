@@ -36,7 +36,21 @@
       "WebSearch",
       "Bash(tasklist)",
       "Bash(taskkill //PID 49396 //F)",
-      "mcp__unrealclaude__unreal_get_output_log"
+      "mcp__unrealclaude__unreal_get_output_log",
+      "mcp__unrealclaude__unreal_status",
+      "mcp__unrealclaude__unreal_open_level",
+      "mcp__unrealclaude__unreal_spawn_actor",
+      "mcp__unrealclaude__unreal_set_property",
+      "mcp__unrealclaude__unreal_blueprint_query",
+      "mcp__unrealclaude__unreal_get_level_actors",
+      "mcp__unrealclaude__unreal_ue",
+      "mcp__unrealclaude__unreal_delete_actors",
+      "mcp__unrealclaude__unreal_asset_search",
+      "Bash(find e:/Projects/DH1_MMORPG/DH1_Client/Intermediate/Build/Win64 -name *.log -newer e:/Projects/DH1_MMORPG/DH1_Client/Saved/Logs/DH1_Client.log)",
+      "Bash(find e:/Projects/DH1_MMORPG/DH1_Client/Saved -name *.log -newer e:/Projects/DH1_MMORPG/DH1_Client/Saved/Logs/DH1_Client.log)",
+      "Bash(find e:/Projects/DH1_MMORPG/DH1_Client -name UBT* -newer e:/Projects/DH1_MMORPG/DH1_Client/Saved/Logs/DH1_Client.log)",
+      "Bash(find e:/Projects/DH1_MMORPG/DH1_Client -name BuildOutput* -o -name *build*.log)",
+      "Bash(sort -t '-' -k2)"
     ]
   }
 }
