@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RealmService.h"
+#include "PacketHandler/PacketServiceTypeHandler.h"
 #include "JsonConfig.h"
 #include "NetEngineInit.h"
 
@@ -15,6 +16,8 @@ int main()
 	SetConsoleCtrlHandler(RealmService::ConsoleCtrlHandler, TRUE);
 
 	const JsonConfig config = JsonConfig::LoadFromFile(std::string(STRINGIFY(SOLUTION_DIR_UNQUOTED)) + "/Shared/Config/Server/RealmServerConfig.json");
+
+	PacketServiceTypeHandler::Init();
 
 	auto& service = ISingleton<RealmService>::GetInstance();
 
