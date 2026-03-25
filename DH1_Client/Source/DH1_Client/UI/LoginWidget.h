@@ -8,6 +8,7 @@ class UEditableTextBox;
 class UButton;
 class UTextBlock;
 class UWidget;
+class UWidgetSwitcher;
 
 DECLARE_MULTICAST_DELEGATE(FOnGoToSignUpDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnLoginSuccessDelegate);
@@ -62,9 +63,16 @@ protected:
     UFUNCTION()
     void OnResetPasswordButtonClicked();
 
+    UFUNCTION()
+    void OnEmailInputCommitted(const FText& Text, ETextCommit::Type CommitMethod);
+
+    UFUNCTION()
+    void OnPasswordInputCommitted(const FText& Text, ETextCommit::Type CommitMethod);
+
     void HandleGatewayLoginResult(int32 Result);
     void HandleHttpLoginError(int32 StatusCode, const FString& Message);
     void HandleEmailVerificationRequired(const FString& Message, const FString& Email);
 
     void SetLoading(bool bLoading);
+    void SetStatusColor(const FLinearColor& Color) const;
 };

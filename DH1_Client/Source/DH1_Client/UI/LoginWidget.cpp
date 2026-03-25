@@ -32,6 +32,14 @@ void ULoginWidget::SetStatusTextMessage(const FString& StatusText) const
 	}
 }
 
+void ULoginWidget::SetStatusColor(const FLinearColor& Color) const
+{
+	if (StatusTextMessage)
+	{
+		StatusTextMessage->SetColorAndOpacity(FSlateColor(Color));
+	}
+}
+
 void ULoginWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -51,6 +59,17 @@ void ULoginWidget::NativeConstruct()
 		ResetPasswordButton->OnClicked.AddDynamic(this, &ULoginWidget::OnResetPasswordButtonClicked);
 	}
 
+	if (EmailInput)
+	{
+		EmailInput->OnTextCommitted.AddDynamic(this, &ULoginWidget::OnEmailInputCommitted);
+	}
+
+	if (PasswordInput)
+	{
+		PasswordInput->SetIsPassword(true);
+		PasswordInput->OnTextCommitted.AddDynamic(this, &ULoginWidget::OnPasswordInputCommitted);
+	}
+
 	if (const UGameInstance* GameInstance = GetGameInstance())
 	{
 		if (UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>())
@@ -62,6 +81,11 @@ void ULoginWidget::NativeConstruct()
 	}
 
 	SetLoading(false);
+
+	if (EmailInput)
+	{
+		EmailInput->SetKeyboardFocus();
+	}
 }
 
 void ULoginWidget::NativeDestruct()
@@ -86,17 +110,20 @@ void ULoginWidget::OnLoginButtonClicked()
 
 	if (Email.IsEmpty() || Password.IsEmpty())
 	{
+		SetStatusColor(FLinearColor::Red);
 		SetStatusTextMessage(TEXT("이메일과 비밀번호를 모두 입력해주세요."));
 		return;
 	}
 
 	if (!Email.Contains(TEXT("@")) || !Email.Contains(TEXT(".")))
 	{
+		SetStatusColor(FLinearColor::Red);
 		SetStatusTextMessage(TEXT("유효한 이메일 형식이 아닙니다."));
 		return;
 	}
 
-	SetStatusTextMessage(TEXT(""));
+	SetStatusColor(FLinearColor::White);
+	SetStatusTextMessage(TEXT("로그인 중..."));
 	SetLoading(true);
 
 	if (const UGameInstance* GameInstance = GetGameInstance())
@@ -138,6 +165,8 @@ void ULoginWidget::HandleGatewayLoginResult(const int32 Result)
 	}
 	else
 	{
+		SetStatusColor(FLinearColor::Red);
+
 		switch (Result)
 		{
 		case 1:
@@ -159,6 +188,7 @@ void ULoginWidget::HandleGatewayLoginResult(const int32 Result)
 void ULoginWidget::HandleHttpLoginError(const int32 StatusCode, const FString& Message)
 {
 	SetLoading(false);
+	SetStatusColor(FLinearColor::Red);
 	SetStatusTextMessage(Message);
 }
 
@@ -168,6 +198,22 @@ void ULoginWidget::HandleEmailVerificationRequired(const FString& Message, const
 	if (OnGoToEmailVerification.IsBound())
 	{
 		OnGoToEmailVerification.Broadcast(Message, Email);
+	}
+}
+
+void ULoginWidget::OnEmailInputCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	if (CommitMethod == ETextCommit::OnEnter && PasswordInput)
+	{
+		PasswordInput->SetKeyboardFocus();
+	}
+}
+
+void ULoginWidget::OnPasswordInputCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	if (CommitMethod == ETextCommit::OnEnter)
+	{
+		OnLoginButtonClicked();
 	}
 }
 
