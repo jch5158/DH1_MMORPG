@@ -3,11 +3,12 @@
 #include "GatewaySession.h"
 #include "RealmSession.h"
 #include "RedisService.h"
+#include "MySqlService.h"
 #include "GameSessionManager.h"
 #include "GridManager.h"
 #include "GameTickProcessor.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
-#include "Contents/GameObject.h"
+#include "GameObject.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -15,6 +16,8 @@
 #include "JsonConfig.h"
 #include "PacketHandler/ServerHeartbeatPacketHandler.h"
 #include "Enum.pb.h"
+#include "Table/PlayerCharacterTable.h"
+#include "PlayerObject.h"
 
 BOOL WINAPI WorldService::ConsoleCtrlHandler(const DWORD ctrlType)
 {
@@ -87,6 +90,20 @@ bool WorldService::Initialize(const JsonConfig& config)
 	{
 		const JsonConfig redisConfig = config.GetSection("redis");
 		mpRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), mpActorService);
+	}
+
+	// MySqlService
+	if (config.HasKey("mysql"))
+	{
+		const JsonConfig mysqlConfig = config.GetSection("mysql");
+		MySqlConfig dbConfig;
+		dbConfig.host = mysqlConfig.GetString("host");
+		dbConfig.port = mysqlConfig.GetUInt16("port");
+		dbConfig.user = mysqlConfig.GetString("user");
+		dbConfig.password = mysqlConfig.GetString("password");
+		dbConfig.database = mysqlConfig.GetString("database");
+
+		mpMySqlService = cpp_net_engine::MakeShared<MySqlService>(dbConfig, mpActorService);
 	}
 
 	// RealmServer ClientService
@@ -221,6 +238,8 @@ void WorldService::Run()
 
 	auto lastHeartbeat = std::chrono::steady_clock::now();
 	auto lastGameTick = std::chrono::steady_clock::now();
+	auto lastPositionSave = std::chrono::steady_clock::now();
+	constexpr int64 positionSaveIntervalMs = 30000;
 
 	while (mbRunning.load())
 	{
@@ -248,6 +267,14 @@ void WorldService::Run()
 
 			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, PlayerCount: {}, WorldServerId: {}",
 				mpServerService->GetCurrentSessionCount(), mpGridManager->GetObjectCount(), mWorldServerId);
+		}
+
+		// 주기적 위치 저장 (30초)
+		const auto positionSaveElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPositionSave).count();
+		if (positionSaveElapsedMs >= positionSaveIntervalMs)
+		{
+			saveAllPlayerPositions();
+			lastPositionSave = now;
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -294,6 +321,11 @@ ActorServiceRef WorldService::GetActorServiceRef() const
 RedisServiceRef WorldService::GetRedisServiceRef() const
 {
 	return mpRedisService;
+}
+
+MySqlServiceRef WorldService::GetMySqlServiceRef() const
+{
+	return mpMySqlService;
 }
 
 int32 WorldService::GetWorldServerId() const
@@ -447,6 +479,68 @@ void WorldService::updateWorldRegistration(const eWorldServerStatus status)
 	info.status = static_cast<int32>(status);
 
 	mpRedisService->UpdateWorldServerInfo(info, mRedisTtlSeconds);
+}
+
+void WorldService::saveAllPlayerPositions()
+{
+	if (mpMySqlService == nullptr || !mpMySqlService->IsInitialized())
+	{
+		return;
+	}
+
+	const Vector<GameObjectRef> objects = mpGridManager->GetAllObjects();
+	if (objects.empty())
+	{
+		return;
+	}
+
+	const int32 worldServerId = mWorldServerId;
+
+	for (const auto& pObject : objects)
+	{
+		if (pObject->GetObjectType() != eGameObjectType::Player)
+		{
+			continue;
+		}
+
+		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
+		if (pPlayer == nullptr)
+		{
+			continue;
+		}
+
+		const uint64 accountId = pPlayer->GetAccountId();
+		const float posX = pPlayer->GetPositionX();
+		const float posY = pPlayer->GetPositionY();
+		const float posZ = pPlayer->GetPositionZ();
+		const float rotYaw = pPlayer->GetRotationYaw();
+
+		mpMySqlService->ExecuteAsync([accountId, posX, posY, posZ, rotYaw, worldServerId](sqlpp::mysql::connection& db) -> void
+			{
+				try
+				{
+					const db::PlayerCharacter table{};
+
+					db(sqlpp::update(table)
+						.set(
+							table.positionX = posX,
+							table.positionY = posY,
+							table.positionZ = posZ,
+							table.rotationYaw = rotYaw,
+							table.worldId = worldServerId,
+							table.lastPlayedAt = std::chrono::system_clock::now()
+						)
+						.where(table.accountId == static_cast<int64>(accountId)));
+				}
+				catch (const sqlpp::exception& e)
+				{
+					NET_ENGINE_LOG_ERROR("WorldService::saveAllPlayerPositions - Failed to save position for accountId: {}, error: {}",
+						accountId, e.what());
+				}
+			});
+	}
+
+	NET_ENGINE_LOG_INFO("WorldService::saveAllPlayerPositions - Saved positions for {} players", objects.size());
 }
 
 void WorldService::cleanupPendingSessions()

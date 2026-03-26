@@ -99,6 +99,12 @@
     <ClCompile Include="RedisService.cpp">
       <Filter>Contents\Service</Filter>
     </ClCompile>
+    <ClCompile Include="MySqlActor.cpp">
+      <Filter>Contents\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="MySqlService.cpp">
+      <Filter>Contents\Service</Filter>
+    </ClCompile>
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
@@ -175,6 +181,15 @@
     </ClInclude>
     <ClInclude Include="RedisService.h">
       <Filter>Contents\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="MySqlActor.h">
+      <Filter>Contents\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="MySqlService.h">
+      <Filter>Contents\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Table\PlayerCharacterTable.h">
+      <Filter>Contents\Database</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>

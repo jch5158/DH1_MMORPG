@@ -35,6 +35,7 @@ public:
 	[[nodiscard]] ClientServiceRef GetRealmClientServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
+	[[nodiscard]] MySqlServiceRef GetMySqlServiceRef() const;
 	[[nodiscard]] int32 GetWorldServerId() const;
 	[[nodiscard]] GameSessionManagerRef GetGameSessionManagerRef() const;
 	[[nodiscard]] GridManagerRef GetGridManagerRef() const;
@@ -69,12 +70,14 @@ private:
 	void sendHeartbeatToGateways();
 	void checkGatewayHeartbeats();
 	void checkRealmHeartbeat();
+	void saveAllPlayerPositions();
 	void cleanupPendingSessions();
 
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpRealmClientService;
 	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
+	MySqlServiceRef mpMySqlService;
 	GameSessionManagerRef mpGameSessionManager;
 	GridManagerRef mpGridManager;
 	GameTickProcessorRef mpGameTickProcessor;

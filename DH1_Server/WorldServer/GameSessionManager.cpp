@@ -101,7 +101,7 @@ bool GameSessionManager::SetSessionPending(const uint64 accountId)
 		return false;
 	}
 
-	iter->second.mState = eSessionState::Pending;
+	iter->second.mState = eGameSessionState::Pending;
 	iter->second.mPendingStartMs = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now().time_since_epoch()).count();
 
@@ -119,7 +119,7 @@ Vector<uint64> GameSessionManager::GetExpiredPendingSessions(const int64 timeout
 
 	for (const auto& [accountId, sessionInfo] : mGameSessions)
 	{
-		if (sessionInfo.mState == eSessionState::Pending && sessionInfo.mPendingStartMs > 0)
+		if (sessionInfo.mState == eGameSessionState::Pending && sessionInfo.mPendingStartMs > 0)
 		{
 			if (nowMs - sessionInfo.mPendingStartMs > timeoutMs)
 			{

@@ -242,6 +242,8 @@
     <ClCompile Include="RealmSession.cpp" />
     <ClCompile Include="RedisActor.cpp" />
     <ClCompile Include="RedisService.cpp" />
+    <ClCompile Include="MySqlActor.cpp" />
+    <ClCompile Include="MySqlService.cpp" />
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp" />
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
@@ -295,6 +297,9 @@
     <ClInclude Include="RealmSession.h" />
     <ClInclude Include="RedisActor.h" />
     <ClInclude Include="RedisService.h" />
+    <ClInclude Include="MySqlActor.h" />
+    <ClInclude Include="MySqlService.h" />
+    <ClInclude Include="Table\PlayerCharacterTable.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h" />
