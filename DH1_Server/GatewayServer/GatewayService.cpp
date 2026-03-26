@@ -306,6 +306,28 @@ int32 GatewayService::GetGatewayId() const
 	return mGatewayId;
 }
 
+int32 GatewayService::GetWorldServerId() const
+{
+	if (mpWorldClientService == nullptr)
+	{
+		return 0;
+	}
+
+	const SessionRef pSession = mpWorldClientService->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return 0;
+	}
+
+	const auto pWorldSession = std::static_pointer_cast<WorldSession>(pSession);
+	if (pWorldSession == nullptr)
+	{
+		return 0;
+	}
+
+	return pWorldSession->GetWorldServerId();
+}
+
 void GatewayService::checkClientHeartbeats()
 {
 	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RealmService.h"
 #include "WorldServerSession.h"
+#include "RealmSessionRegistry.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -83,6 +84,9 @@ bool RealmService::Initialize(const JsonConfig& config)
 	mHeartbeatTimeoutMs = realmServerConfig.GetInt64("heartbeatTimeoutMs");
 	mHeartbeatCheckIntervalMs = realmServerConfig.GetInt64("heartbeatCheckIntervalMs");
 	mHeartbeatIntervalMs = realmServerConfig.GetInt64("heartbeatIntervalMs");
+
+	// RealmSessionRegistry
+	mpSessionRegistry = cpp_net_engine::MakeShared<RealmSessionRegistry>(1000);
 
 	NET_ENGINE_LOG_INFO("RealmService::Initialize - Initialization complete, realmServerId: {}", mRealmServerId);
 	return true;
@@ -171,6 +175,11 @@ ServerServiceRef RealmService::GetServerServiceRef() const
 ActorServiceRef RealmService::GetActorServiceRef() const
 {
 	return mpActorService;
+}
+
+RealmSessionRegistryRef RealmService::GetSessionRegistryRef() const
+{
+	return mpSessionRegistry;
 }
 
 void RealmService::sendHeartbeatToWorldServers()

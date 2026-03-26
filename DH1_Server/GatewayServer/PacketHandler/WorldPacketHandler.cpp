@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "WorldPacketHandler.h"
+#include "GameSessionPacketHandler.h"
 #include "ClientSession.h"
 #include "GatewayService.h"
 #include "RedisService.h"
@@ -61,30 +62,68 @@ bool WorldPacketHandler::HANDLE_C2S_WORLD_SELECT_REQ(const Protocol::C2S_WORLD_S
 		return false;
 	}
 
-	pRedisService->GetWorldServerInfoAsync(worldId, [pSession, worldId](const bool bFound, const RedisWorldServerInfo& info) -> void
-		{
-			Protocol::S2C_WORLD_SELECT_RES response;
+	const auto pClientSession = std::static_pointer_cast<ClientSession>(pSession);
+	const uint64 accountId = pClientSession->GetAccountId();
+	const uint64 gatewaySessionId = pClientSession->GetSessionId();
 
+	pRedisService->GetWorldServerInfoAsync(worldId, [pSession, pClientSession, worldId, accountId, gatewaySessionId](const bool bFound, const RedisWorldServerInfo& info) -> void
+		{
+			// Redis 검증 실패 시 바로 클라이언트에 응답
 			if (!bFound)
 			{
+				Protocol::S2C_WORLD_SELECT_RES response;
 				response.set_result(Protocol::WORLD_SELECT_FAIL_NOT_FOUND);
+				pSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+				NET_ENGINE_LOG_INFO("WorldPacketHandler - WORLD_SELECT_RES sent (not found), worldId: {}", worldId);
+				return;
 			}
-			else if (info.status == 1)
+
+			if (info.status == 1)
 			{
+				Protocol::S2C_WORLD_SELECT_RES response;
 				response.set_result(Protocol::WORLD_SELECT_FAIL_MAINTENANCE);
+				pSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+				NET_ENGINE_LOG_INFO("WorldPacketHandler - WORLD_SELECT_RES sent (maintenance), worldId: {}", worldId);
+				return;
 			}
-			else if (info.status == 2 || info.currentPlayers >= info.maxPlayers)
+
+			if (info.status == 2 || info.currentPlayers >= info.maxPlayers)
 			{
+				Protocol::S2C_WORLD_SELECT_RES response;
 				response.set_result(Protocol::WORLD_SELECT_FAIL_FULL);
+				pSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+				NET_ENGINE_LOG_INFO("WorldPacketHandler - WORLD_SELECT_RES sent (full), worldId: {}", worldId);
+				return;
 			}
-			else
+
+			// Redis 검증 통과 → WorldServer에 세션 진입 요청
+			auto& gatewayService = ISingleton<GatewayService>::GetInstance();
+			const auto pWorldClientService = gatewayService.GetWorldClientServiceRef();
+			if (pWorldClientService == nullptr)
 			{
-				response.set_result(Protocol::WORLD_SELECT_SUCCESS);
+				Protocol::S2C_WORLD_SELECT_RES response;
+				response.set_result(Protocol::WORLD_SELECT_FAIL_NOT_FOUND);
+				pSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+				return;
 			}
 
-			pSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+			const auto pWorldSession = pWorldClientService->GetFirstSessionRef();
+			if (pWorldSession == nullptr)
+			{
+				Protocol::S2C_WORLD_SELECT_RES response;
+				response.set_result(Protocol::WORLD_SELECT_FAIL_NOT_FOUND);
+				pSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+				return;
+			}
 
-			NET_ENGINE_LOG_INFO("WorldPacketHandler - WORLD_SELECT_RES sent, worldId: {}, result: {}", worldId, static_cast<int32>(response.result()));
+			Protocol::S2S_GAME_SESSION_ENTER_NOT enterPacket;
+			enterPacket.set_accountid(accountId);
+			enterPacket.set_gatewaysessionid(gatewaySessionId);
+			enterPacket.set_gatewayserverid(gatewayService.GetGatewayId());
+
+			pWorldSession->Send(GameSessionPacketHandler::MakeSendBuffer(enterPacket));
+
+			NET_ENGINE_LOG_INFO("WorldPacketHandler - GAME_SESSION_ENTER_NOT sent, worldId: {}, accountId: {}", worldId, accountId);
 		});
 
 	return true;

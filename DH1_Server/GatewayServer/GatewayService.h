@@ -33,6 +33,7 @@ public:
 	[[nodiscard]] MySqlServiceRef GetMySqlServiceRef() const;
 	[[nodiscard]] MySqlServiceRef GetAccountMySqlServiceRef() const;
 	[[nodiscard]] int32 GetGatewayId() const;
+	[[nodiscard]] int32 GetWorldServerId() const;
 
 private:
 

@@ -9,3 +9,10 @@ message WorldServerInfo
     int32 maxPlayers = 4;
     int32 status = 5;
 }
+
+message GameSessionInfo
+{
+    uint64 accountId = 1;
+    uint64 gatewaySessionId = 2;
+    int32 gatewayServerId = 3;
+}

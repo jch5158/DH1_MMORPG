@@ -37,6 +37,9 @@
     <Filter Include="Core\Network\PacketHandler">
       <UniqueIdentifier>{e1f2a3b4-c5d6-7890-efab-890123456789}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Contents\Core">
+      <UniqueIdentifier>{b4c5d6e7-f8a9-0123-bcde-123456789012}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RealmServer.cpp">
@@ -63,11 +66,20 @@
     <ClCompile Include="..\..\Shared\Protocol\ServerHeartbeat.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\GameSession.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="RealmSessionRegistry.cpp">
+      <Filter>Contents\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +107,9 @@
     <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\GameSession.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
       <Filter>Core\Network\Protocol\PacketId</Filter>
     </ClInclude>
@@ -103,6 +118,12 @@
     </ClInclude>
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\GameSessionPacketHandler.h">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="RealmSessionRegistry.h">
+      <Filter>Contents\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +137,9 @@
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\GameSession.proto">
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>

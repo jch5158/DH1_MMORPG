@@ -5,6 +5,7 @@
 #include "GatewayService.h"
 #include "PacketServiceTypeHandler.h"
 #include "AccountTable.h"
+#include "PacketHandler/GameSessionPacketHandler.h"
 
 ClientSession::ClientSession(const int32 receiveBufferSize, const int32 maxPacketSize)
 	:PacketSession(receiveBufferSize, maxPacketSize)
@@ -27,6 +28,28 @@ void ClientSession::OnDisconnected()
 
 	if (mAccountId != 0)
 	{
+		// 월드에 진입한 상태라면 WorldServer에 이탈 통보
+		if (mWorldServerId != 0)
+		{
+			const auto pWorldClientService = ISingleton<GatewayService>::GetInstance().GetWorldClientServiceRef();
+			if (pWorldClientService != nullptr)
+			{
+				const auto pWorldSession = pWorldClientService->GetFirstSessionRef();
+				if (pWorldSession != nullptr)
+				{
+					Protocol::S2S_GAME_SESSION_LEAVE_NOT leavePacket;
+					leavePacket.set_accountid(mAccountId);
+					leavePacket.set_gatewaysessionid(GetSessionId());
+
+					pWorldSession->Send(GameSessionPacketHandler::MakeSendBuffer(leavePacket));
+
+					NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - LEAVE_NOT sent, accountId: {}, worldServerId: {}", mAccountId, mWorldServerId);
+				}
+			}
+
+			mWorldServerId = 0;
+		}
+
 		const auto pManager = ISingleton<GatewayService>::GetInstance().GetClientSessionManagerRef();
 		if (pManager != nullptr)
 		{

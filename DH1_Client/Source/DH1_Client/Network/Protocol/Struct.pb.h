@@ -45,11 +45,15 @@ struct TableStruct_Struct_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Struct_2eproto;
 namespace Protocol {
+class GameSessionInfo;
+struct GameSessionInfoDefaultTypeInternal;
+extern GameSessionInfoDefaultTypeInternal _GameSessionInfo_default_instance_;
 class WorldServerInfo;
 struct WorldServerInfoDefaultTypeInternal;
 extern WorldServerInfoDefaultTypeInternal _WorldServerInfo_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
+template<> ::Protocol::GameSessionInfo* Arena::CreateMaybeMessage<::Protocol::GameSessionInfo>(Arena*);
 template<> ::Protocol::WorldServerInfo* Arena::CreateMaybeMessage<::Protocol::WorldServerInfo>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
@@ -251,6 +255,176 @@ class WorldServerInfo final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Struct_2eproto;
 };
+// -------------------------------------------------------------------
+
+class GameSessionInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.GameSessionInfo) */ {
+ public:
+  inline GameSessionInfo() : GameSessionInfo(nullptr) {}
+  ~GameSessionInfo() override;
+  explicit PROTOBUF_CONSTEXPR GameSessionInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  GameSessionInfo(const GameSessionInfo& from);
+  GameSessionInfo(GameSessionInfo&& from) noexcept
+    : GameSessionInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline GameSessionInfo& operator=(const GameSessionInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GameSessionInfo& operator=(GameSessionInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const GameSessionInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const GameSessionInfo* internal_default_instance() {
+    return reinterpret_cast<const GameSessionInfo*>(
+               &_GameSessionInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(GameSessionInfo& a, GameSessionInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(GameSessionInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GameSessionInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  GameSessionInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<GameSessionInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const GameSessionInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const GameSessionInfo& from) {
+    GameSessionInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GameSessionInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.GameSessionInfo";
+  }
+  protected:
+  explicit GameSessionInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kAccountIdFieldNumber = 1,
+    kGatewaySessionIdFieldNumber = 2,
+    kGatewayServerIdFieldNumber = 3,
+  };
+  // uint64 accountId = 1;
+  void clear_accountid();
+  uint64_t accountid() const;
+  void set_accountid(uint64_t value);
+  private:
+  uint64_t _internal_accountid() const;
+  void _internal_set_accountid(uint64_t value);
+  public:
+
+  // uint64 gatewaySessionId = 2;
+  void clear_gatewaysessionid();
+  uint64_t gatewaysessionid() const;
+  void set_gatewaysessionid(uint64_t value);
+  private:
+  uint64_t _internal_gatewaysessionid() const;
+  void _internal_set_gatewaysessionid(uint64_t value);
+  public:
+
+  // int32 gatewayServerId = 3;
+  void clear_gatewayserverid();
+  int32_t gatewayserverid() const;
+  void set_gatewayserverid(int32_t value);
+  private:
+  int32_t _internal_gatewayserverid() const;
+  void _internal_set_gatewayserverid(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.GameSessionInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    uint64_t accountid_;
+    uint64_t gatewaysessionid_;
+    int32_t gatewayserverid_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
 // ===================================================================
 
 
@@ -392,9 +566,75 @@ inline void WorldServerInfo::set_status(int32_t value) {
   // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.status)
 }
 
+// -------------------------------------------------------------------
+
+// GameSessionInfo
+
+// uint64 accountId = 1;
+inline void GameSessionInfo::clear_accountid() {
+  _impl_.accountid_ = uint64_t{0u};
+}
+inline uint64_t GameSessionInfo::_internal_accountid() const {
+  return _impl_.accountid_;
+}
+inline uint64_t GameSessionInfo::accountid() const {
+  // @@protoc_insertion_point(field_get:Protocol.GameSessionInfo.accountId)
+  return _internal_accountid();
+}
+inline void GameSessionInfo::_internal_set_accountid(uint64_t value) {
+  
+  _impl_.accountid_ = value;
+}
+inline void GameSessionInfo::set_accountid(uint64_t value) {
+  _internal_set_accountid(value);
+  // @@protoc_insertion_point(field_set:Protocol.GameSessionInfo.accountId)
+}
+
+// uint64 gatewaySessionId = 2;
+inline void GameSessionInfo::clear_gatewaysessionid() {
+  _impl_.gatewaysessionid_ = uint64_t{0u};
+}
+inline uint64_t GameSessionInfo::_internal_gatewaysessionid() const {
+  return _impl_.gatewaysessionid_;
+}
+inline uint64_t GameSessionInfo::gatewaysessionid() const {
+  // @@protoc_insertion_point(field_get:Protocol.GameSessionInfo.gatewaySessionId)
+  return _internal_gatewaysessionid();
+}
+inline void GameSessionInfo::_internal_set_gatewaysessionid(uint64_t value) {
+  
+  _impl_.gatewaysessionid_ = value;
+}
+inline void GameSessionInfo::set_gatewaysessionid(uint64_t value) {
+  _internal_set_gatewaysessionid(value);
+  // @@protoc_insertion_point(field_set:Protocol.GameSessionInfo.gatewaySessionId)
+}
+
+// int32 gatewayServerId = 3;
+inline void GameSessionInfo::clear_gatewayserverid() {
+  _impl_.gatewayserverid_ = 0;
+}
+inline int32_t GameSessionInfo::_internal_gatewayserverid() const {
+  return _impl_.gatewayserverid_;
+}
+inline int32_t GameSessionInfo::gatewayserverid() const {
+  // @@protoc_insertion_point(field_get:Protocol.GameSessionInfo.gatewayServerId)
+  return _internal_gatewayserverid();
+}
+inline void GameSessionInfo::_internal_set_gatewayserverid(int32_t value) {
+  
+  _impl_.gatewayserverid_ = value;
+}
+inline void GameSessionInfo::set_gatewayserverid(int32_t value) {
+  _internal_set_gatewayserverid(value);
+  // @@protoc_insertion_point(field_set:Protocol.GameSessionInfo.gatewayServerId)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

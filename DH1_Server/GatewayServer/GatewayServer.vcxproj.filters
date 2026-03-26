@@ -58,6 +58,9 @@
     <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\GameSession.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
     <ClCompile Include="ClientSession.cpp">
       <Filter>Core\Network\Session</Filter>
     </ClCompile>
@@ -115,6 +118,9 @@
     <ClCompile Include="PacketHandler\WorldPacketHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
+    <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h">
@@ -127,6 +133,9 @@
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\GameSession.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
@@ -192,6 +201,9 @@
     <ClInclude Include="PacketHandler\WorldPacketHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>
     </ClInclude>
+    <ClInclude Include="PacketHandler\GameSessionPacketHandler.h">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Echo.proto">
@@ -216,6 +228,9 @@
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\World.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\GameSession.proto">
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>
