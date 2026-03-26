@@ -2,7 +2,9 @@
 #include "GatewaySession.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
+#include "GridManager.h"
 #include "GameSessionManager.h"
+#include "PlayerObject.h"
 #include "RealmSession.h"
 #include "WorldService.h"
 
@@ -25,20 +27,33 @@ void GatewaySession::OnDisconnected()
 {
 	NET_ENGINE_LOG_WARN("GatewaySession::OnDisconnected - GatewayServer disconnected, sessionId: {}, gatewayServerId: {}", GetSessionId(), mGatewayServerId);
 
-	// GatewayServer 끊김 시 해당 게이트웨이에 속한 모든 게임 세션 제거
+	// GatewayServer 끊김 시 해당 게이트웨이에 속한 모든 오브젝트 + 세션 제거
 	if (mGatewayServerId != 0)
 	{
 		auto& worldService = ISingleton<WorldService>::GetInstance();
+
+		// GridManager에서 해당 게이트웨이의 오브젝트 벌크 제거
+		const auto pGridManager = worldService.GetGridManagerRef();
+		if (pGridManager != nullptr)
+		{
+			Vector<uint64> removedAccountIds;
+			pGridManager->RemoveObjectsByGateway(mGatewayServerId, removedAccountIds);
+
+			if (!removedAccountIds.empty())
+			{
+				NET_ENGINE_LOG_INFO("GatewaySession::OnDisconnected - Removed {} objects for gatewayServerId: {}", removedAccountIds.size(), mGatewayServerId);
+			}
+		}
+
+		// GameSessionManager에서도 벌크 제거
 		const auto pGameSessionManager = worldService.GetGameSessionManagerRef();
 		if (pGameSessionManager != nullptr)
 		{
 			const Vector<uint64> removedAccountIds = pGameSessionManager->RemoveSessionsByGateway(mGatewayServerId);
 
+			// RealmServer에 이탈 동기화
 			if (!removedAccountIds.empty())
 			{
-				NET_ENGINE_LOG_INFO("GatewaySession::OnDisconnected - Removed {} sessions for gatewayServerId: {}", removedAccountIds.size(), mGatewayServerId);
-
-				// RealmServer에 이탈 동기화
 				const auto pRealmClientService = worldService.GetRealmClientServiceRef();
 				if (pRealmClientService != nullptr)
 				{

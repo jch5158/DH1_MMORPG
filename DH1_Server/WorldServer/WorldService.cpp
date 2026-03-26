@@ -4,6 +4,8 @@
 #include "RealmSession.h"
 #include "RedisService.h"
 #include "GameSessionManager.h"
+#include "GridManager.h"
+#include "GameTickProcessor.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -129,10 +131,26 @@ bool WorldService::Initialize(const JsonConfig& config)
 	mRealmHeartbeatTimeoutMs = worldServerConfig.GetInt64("realmHeartbeatTimeoutMs");
 	mRedisTtlSeconds = worldServerConfig.GetInt64("redisTtlSeconds");
 
+	// GameTick config
+	if (config.HasKey("gameTick"))
+	{
+		const JsonConfig gameTickConfig = config.GetSection("gameTick");
+		mGameTickIntervalMs = gameTickConfig.GetInt64("tickIntervalMs");
+		mDefaultMoveSpeed = static_cast<float>(gameTickConfig.GetInt32("moveSpeed"));
+		mAoiCellSize = static_cast<float>(gameTickConfig.GetInt32("aoiCellSize"));
+		mAoiRange = gameTickConfig.GetInt32("aoiRange");
+	}
+
 	// GameSessionManager
 	mpGameSessionManager = cpp_net_engine::MakeShared<GameSessionManager>(mMaxPlayers);
 
-	NET_ENGINE_LOG_INFO("WorldService::Initialize - Initialization complete, worldServerId: {}", mWorldServerId);
+	// GridManager
+	mpGridManager = cpp_net_engine::MakeShared<GridManager>(mAoiCellSize, mAoiRange);
+
+	// GameTickProcessor
+	mpGameTickProcessor = cpp_net_engine::MakeShared<GameTickProcessor>(mpGridManager, mDefaultMoveSpeed);
+
+	NET_ENGINE_LOG_INFO("WorldService::Initialize - Initialization complete, worldServerId: {}, tickIntervalMs: {}", mWorldServerId, mGameTickIntervalMs);
 	return true;
 }
 
@@ -200,13 +218,23 @@ void WorldService::Run()
 	updateWorldRegistration(eWorldServerStatus::Online);
 
 	auto lastHeartbeat = std::chrono::steady_clock::now();
+	auto lastGameTick = std::chrono::steady_clock::now();
 
 	while (mbRunning.load())
 	{
 		const auto now = std::chrono::steady_clock::now();
-		const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeat).count();
 
-		if (elapsedMs >= mHeartbeatIntervalMs)
+		// 게임 틱 (20Hz, 50ms)
+		const auto gameTickElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastGameTick).count();
+		if (gameTickElapsedMs >= mGameTickIntervalMs)
+		{
+			mpGameTickProcessor->ProcessTick(gameTickElapsedMs);
+			lastGameTick = now;
+		}
+
+		// 하트비트 (5000ms)
+		const auto heartbeatElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeat).count();
+		if (heartbeatElapsedMs >= mHeartbeatIntervalMs)
 		{
 			updateWorldRegistration(eWorldServerStatus::Online);
 			sendHeartbeatToRealm();
@@ -215,10 +243,11 @@ void WorldService::Run()
 			checkRealmHeartbeat();
 			lastHeartbeat = now;
 
-			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, WorldServerId: {}", mpServerService->GetCurrentSessionCount(), mWorldServerId);
+			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, PlayerCount: {}, WorldServerId: {}",
+				mpServerService->GetCurrentSessionCount(), mpGridManager->GetObjectCount(), mWorldServerId);
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 
 	updateWorldRegistration(eWorldServerStatus::ShuttingDown);
@@ -272,6 +301,21 @@ int32 WorldService::GetWorldServerId() const
 GameSessionManagerRef WorldService::GetGameSessionManagerRef() const
 {
 	return mpGameSessionManager;
+}
+
+GridManagerRef WorldService::GetGridManagerRef() const
+{
+	return mpGridManager;
+}
+
+GameTickProcessorRef WorldService::GetGameTickProcessorRef() const
+{
+	return mpGameTickProcessor;
+}
+
+float WorldService::GetDefaultMoveSpeed() const
+{
+	return mDefaultMoveSpeed;
 }
 
 void WorldService::sendHeartbeatToRealm()

@@ -12,20 +12,13 @@ public class DH1_Client : ModuleRules
 
         PublicDependencyModuleNames.AddRange([
 	        "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-            "AIModule", "NavigationSystem", "StateTreeModule", "GameplayStateTreeModule",
-            "Niagara", "UMG", "Slate", "SlateCore", "HTTP", "Json", "JsonUtilities", "ImageDownload"
+            "UMG", "Slate", "SlateCore", "HTTP", "Json", "JsonUtilities", "ImageDownload"
         ]);
 
         PrivateDependencyModuleNames.AddRange([]);
 
         PublicIncludePaths.AddRange([
 	        "DH1_Client",
-            "DH1_Client/Variant_Strategy",
-            "DH1_Client/Variant_Strategy/UI",
-            "DH1_Client/Variant_TwinStick",
-            "DH1_Client/Variant_TwinStick/AI",
-            "DH1_Client/Variant_TwinStick/Gameplay",
-            "DH1_Client/Variant_TwinStick/UI",
             Path.Combine(ModuleDirectory, "Network/Protocol")
         ]);
 

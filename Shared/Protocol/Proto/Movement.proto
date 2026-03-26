@@ -1,0 +1,63 @@
+syntax = "proto3";
+package Protocol;
+
+import "Enum.proto";
+import "Struct.proto";
+import "PacketOption.proto";
+
+option (service_type) = SERVICE_TYPE_MOVEMENT;
+option (handler_name) = "MovementPacketHandler";
+
+// Client -> Gateway -> World: 이동 입력 전송
+message C2S_MOVE_INPUT_NOT
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    uint32 sequenceId = 1;
+    Vector3 direction = 2;
+    float rotationYaw = 3;
+    int64 clientTimestamp = 4;
+}
+
+// Gateway -> Client: 서버 이동 결과 (본인)
+message S2C_MOVE_RESULT_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    uint32 sequenceId = 1;
+    Vector3 position = 2;
+    Vector3 velocity = 3;
+    float rotationYaw = 4;
+    int64 serverTimestamp = 5;
+}
+
+// Gateway -> Client: 주변 엔티티 위치 스냅샷
+message S2C_ENTITY_SNAPSHOT_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    repeated EntityState entities = 1;
+    int64 serverTimestamp = 2;
+}
+
+// Gateway -> Client: 엔티티 등장
+message S2C_ENTITY_ENTER_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    repeated EntityState entities = 1;
+}
+
+// Gateway -> Client: 엔티티 퇴장
+message S2C_ENTITY_LEAVE_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    repeated uint64 entityIds = 1;
+}

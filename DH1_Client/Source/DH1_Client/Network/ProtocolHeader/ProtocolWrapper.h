@@ -23,6 +23,7 @@ THIRD_PARTY_INCLUDES_START
 #include "Login.pb.h"
 #include "Heartbeat.pb.h"
 #include "World.pb.h"
+#include "Movement.pb.h"
 #include "Echo.pb.h"
 
 #pragma pop_macro("cast")

@@ -121,6 +121,7 @@ public:
 	virtual void OnSessionDisconnected(const SessionRef& pSession) override;
 
 	[[nodiscard]] Vector<SessionRef> GetActiveSessions();
+	[[nodiscard]] SessionRef GetSessionBySessionId(const uint64 sessionId);
 
 private:
 

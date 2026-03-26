@@ -11,7 +11,7 @@
  *  Sets the default gameplay framework classes
  *  Check the Blueprint derived class for the set values
  */
-UCLASS(abstract)
+UCLASS()
 class ADH1_ClientGameMode : public AGameModeBase
 {
 	GENERATED_BODY()

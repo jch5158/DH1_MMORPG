@@ -206,6 +206,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Movement.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -235,6 +241,7 @@
     <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\Heartbeat.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\Login.pb.h" />
+    <ClInclude Include="..\..\Shared\Protocol\Movement.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\World.pb.h" />
@@ -246,10 +253,15 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
   <ItemGroup>
     <None Include="..\..\Shared\Protocol\Proto\Enum.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Heartbeat.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Login.proto" />
+    <None Include="..\..\Shared\Protocol\Proto\Movement.proto" />
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
     <None Include="..\..\Shared\Protocol\Proto\World.proto" />

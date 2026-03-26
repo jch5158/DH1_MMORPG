@@ -16,3 +16,19 @@ message GameSessionInfo
     uint64 gatewaySessionId = 2;
     int32 gatewayServerId = 3;
 }
+
+message Vector3
+{
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message EntityState
+{
+    uint64 entityId = 1;
+    Vector3 position = 2;
+    Vector3 velocity = 3;
+    float rotationYaw = 4;
+    int64 timestamp = 5;
+}

@@ -6,6 +6,7 @@
 #include "GameSessionPacketHandler.h"
 #include "HeartbeatPacketHandler.h"
 #include "LoginPacketHandler.h"
+#include "MovementPacketHandler.h"
 #include "ServerHeartbeatPacketHandler.h"
 #include "WorldPacketHandler.h"
 
@@ -25,6 +26,7 @@ public:
 		GameSessionPacketHandler::Init();
 		HeartbeatPacketHandler::Init();
 		LoginPacketHandler::Init();
+		MovementPacketHandler::Init();
 		ServerHeartbeatPacketHandler::Init();
 		WorldPacketHandler::Init();
 
@@ -41,6 +43,11 @@ public:
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_LOGIN] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
 			return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
+
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_MOVEMENT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return MovementPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_SERVER_HEARTBEAT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool

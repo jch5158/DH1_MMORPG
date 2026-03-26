@@ -59,10 +59,24 @@ if (!string.IsNullOrEmpty(resultConfig.ProtoBridgePath))
     ProtoBridgeUpdater.UpdateVcxproj(protoBridgeFullPath, handlers, "CLIENT");
 }
 
-// 클라이언트 프로토콜 헤더 복사 (.pb.h만)
+// 클라이언트 프로토콜 헤더 복사 (.pb.h + PacketId.h)
 if (!string.IsNullOrEmpty(resultConfig.ClientProtocolPath))
 {
     var protoSourceDir = Path.Combine(prjBasePath, @"Shared\Protocol");
     var clientProtocolDir = Path.Combine(prjBasePath, resultConfig.ClientProtocolPath);
     ProtoBridgeUpdater.CopyClientProtocolHeaders(protoSourceDir, clientProtocolDir, handlers, "CLIENT");
+
+    // PacketId.h도 클라이언트에 복사
+    var packetIdSource = Path.Combine(prjBasePath, @"Shared\Protocol\PacketId\PacketId.h");
+    var packetIdDestDir = Path.Combine(clientProtocolDir, "PacketId");
+    if (!Directory.Exists(packetIdDestDir))
+    {
+        Directory.CreateDirectory(packetIdDestDir);
+    }
+
+    if (File.Exists(packetIdSource))
+    {
+        File.Copy(packetIdSource, Path.Combine(packetIdDestDir, "PacketId.h"), true);
+        Console.WriteLine($"[ClientProtocol] Copied PacketId.h to: {packetIdDestDir}");
+    }
 }

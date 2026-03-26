@@ -82,6 +82,10 @@ public:
     void RequestWorldList();
     void RequestWorldSelect(int32 WorldId);
 
+    // 이동 패킷 전송
+    void SendMoveInput(const FVector& Direction, float RotationYaw);
+    void SendMoveStop();
+
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;
@@ -92,6 +96,7 @@ public:
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
+    uint32 MoveSequenceId = 0;
     bool bIsConnected = false;
     TUniquePtr<NetEngineInit> EngineInit;
     ClientServiceRef ServiceRef;

@@ -15,6 +15,12 @@
         "realmHeartbeatTimeoutMs": 15000,
         "redisTtlSeconds": 10
     },
+    "gameTick": {
+        "tickIntervalMs": 50,
+        "moveSpeed": 600,
+        "aoiCellSize": 2000,
+        "aoiRange": 1
+    },
     "realmServer": {
         "ip": "127.0.0.1",
         "port": 9200,

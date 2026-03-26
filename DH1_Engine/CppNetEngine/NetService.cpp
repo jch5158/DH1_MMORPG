@@ -369,6 +369,11 @@ Vector<SessionRef> ServerService::GetActiveSessions()
 	return mSessionManager.GetActiveSessions();
 }
 
+SessionRef ServerService::GetSessionBySessionId(const uint64 sessionId)
+{
+	return mSessionManager.GetSession(sessionId);
+}
+
 void ServerService::registerReaperSweep()
 {
 	ServerServiceWeak pWeak = std::static_pointer_cast<ServerService>(shared_from_this());

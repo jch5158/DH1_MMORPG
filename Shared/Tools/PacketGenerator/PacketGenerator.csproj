@@ -22,7 +22,7 @@
     <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(SolutionDir)' != '' AND '$(SolutionDir)' != '*Undefined*'">
     <Exec Command="call &quot;$(SolutionDir)..\..\BuildScripts\Protoc.bat&quot;" />
   </Target>
 

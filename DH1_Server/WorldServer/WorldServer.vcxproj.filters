@@ -72,6 +72,24 @@
     <ClCompile Include="..\..\Shared\Protocol\GameSession.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Movement.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerObject.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCell.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GridManager.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTickProcessor.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
     <ClCompile Include="RealmSession.cpp">
       <Filter>Core\Network\Session</Filter>
     </ClCompile>
@@ -88,6 +106,9 @@
       <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\MovementPacketHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
     <ClCompile Include="GameSessionManager.cpp">
@@ -122,6 +143,30 @@
     <ClInclude Include="..\..\Shared\Protocol\GameSession.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Movement.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectType.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerObject.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCell.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GridManager.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveInputEntry.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTickProcessor.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
     <ClInclude Include="RealmSession.h">
       <Filter>Core\Network\Session</Filter>
     </ClInclude>
@@ -139,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\MovementPacketHandler.h">
+      <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="RelayContext.h">
+      <Filter>Contents\Core</Filter>
     </ClInclude>
     <ClInclude Include="GameSessionInfo.h">
       <Filter>Contents\Core</Filter>

@@ -1,5 +1,5 @@
 
-Ô
+Ó
 Struct.protoProtocol"©
 WorldServerInfo
 worldId (RworldId
@@ -12,4 +12,14 @@ maxPlayers
 GameSessionInfo
 	accountId (R	accountId*
 gatewaySessionId (RgatewaySessionId(
-gatewayServerId (RgatewayServerIdbproto3
+gatewayServerId (RgatewayServerId"3
+Vector3
+x (Rx
+y (Ry
+z (Rz"Ç
+EntityState
+entityId (RentityId-
+position (2.Protocol.Vector3Rposition-
+velocity (2.Protocol.Vector3Rvelocity 
+rotationYaw (RrotationYaw
+	timestamp (R	timestampbproto3

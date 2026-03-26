@@ -70,9 +70,34 @@ bool GameSessionPacketHandler::HANDLE_S2S_RELAY_TO_CLIENT_NOT(const Protocol::S2
 		return true;
 	}
 
-	// TODO: gatewaySessionId로 클라이언트 세션을 조회하여 payload 전달 (확장 포인트)
-	NET_ENGINE_LOG_TRACE("GameSessionPacketHandler - Relay to client, gatewaySessionId: {}, payloadSize: {}",
-		gatewaySessionId, payload.size());
+	auto& gatewayService = ISingleton<GatewayService>::GetInstance();
+	const auto pServerService = gatewayService.GetServerServiceRef();
+	if (pServerService == nullptr)
+	{
+		return false;
+	}
+
+	const auto pClientSessionRef = pServerService->GetSessionBySessionId(gatewaySessionId);
+	if (pClientSessionRef == nullptr)
+	{
+		NET_ENGINE_LOG_WARN("GameSessionPacketHandler - Client session not found for relay, gatewaySessionId: {}", gatewaySessionId);
+		return true;
+	}
+
+	// payload를 그대로 SendBuffer에 담아 클라이언트에 전송
+	const auto payloadSize = static_cast<uint16>(payload.size());
+	auto sendBuffer = cpp_net_engine::MakeSendBuffer(payloadSize);
+
+	byte* pBuffer = sendBuffer->Reserve(payloadSize);
+	if (pBuffer == nullptr)
+	{
+		return false;
+	}
+
+	std::memcpy(pBuffer, payload.data(), payloadSize);
+	sendBuffer->Commit(payloadSize);
+
+	pClientSessionRef->Send(sendBuffer);
 
 	return true;
 }

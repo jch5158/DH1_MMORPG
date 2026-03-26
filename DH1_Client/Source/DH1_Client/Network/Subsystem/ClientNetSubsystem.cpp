@@ -6,6 +6,7 @@
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Network/PacketHandler/WorldPacketHandler.h"
+#include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
@@ -298,4 +299,43 @@ void UClientNetSubsystem::RequestWorldSelect(const int32 WorldId)
 	Protocol::C2S_WORLD_SELECT_REQ packet;
 	packet.set_worldid(WorldId);
 	pSession->Send(WorldPacketHandler::MakeSendBuffer(packet));
+}
+
+void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float RotationYaw)
+{
+	if (ServiceRef == nullptr)
+	{
+		UE_LOG(LogNetEngine, Warning, TEXT("SendMoveInput - ServiceRef is NULL"));
+		return;
+	}
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		UE_LOG(LogNetEngine, Warning, TEXT("SendMoveInput - Session is NULL (not connected)"));
+		return;
+	}
+
+	++MoveSequenceId;
+
+	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	Protocol::C2S_MOVE_INPUT_NOT packet;
+	packet.set_sequenceid(MoveSequenceId);
+	packet.mutable_direction()->set_x(static_cast<float>(Direction.X));
+	packet.mutable_direction()->set_y(static_cast<float>(Direction.Y));
+	packet.mutable_direction()->set_z(static_cast<float>(Direction.Z));
+	packet.set_rotationyaw(RotationYaw);
+	packet.set_clienttimestamp(nowMs);
+
+	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
+
+	UE_LOG(LogNetEngine, Warning, TEXT("SendMoveInput - seq: %u, dir: (%.1f, %.1f, %.1f), yaw: %.1f"),
+		MoveSequenceId, Direction.X, Direction.Y, Direction.Z, RotationYaw);
+}
+
+void UClientNetSubsystem::SendMoveStop()
+{
+	SendMoveInput(FVector::ZeroVector, 0.0f);
 }

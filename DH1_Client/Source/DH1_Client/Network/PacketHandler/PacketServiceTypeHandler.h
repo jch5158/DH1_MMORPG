@@ -5,6 +5,7 @@
 #pragma once
 #include "HeartbeatPacketHandler.h"
 #include "LoginPacketHandler.h"
+#include "MovementPacketHandler.h"
 #include "WorldPacketHandler.h"
 
 #include "SessionValidator.h"
@@ -22,6 +23,7 @@ public:
 	{
 		HeartbeatPacketHandler::Init();
 		LoginPacketHandler::Init();
+		MovementPacketHandler::Init();
 		WorldPacketHandler::Init();
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_HEARTBEAT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
@@ -32,6 +34,11 @@ public:
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_LOGIN] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
 			return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
+
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_MOVEMENT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return MovementPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_WORLD] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool

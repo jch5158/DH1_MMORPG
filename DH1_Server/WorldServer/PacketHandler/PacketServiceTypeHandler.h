@@ -4,6 +4,7 @@
 // =============================================================================
 #pragma once
 #include "GameSessionPacketHandler.h"
+#include "MovementPacketHandler.h"
 #include "ServerHeartbeatPacketHandler.h"
 
 #include "SessionValidator.h"
@@ -20,11 +21,17 @@ public:
 	static void Init()
 	{
 		GameSessionPacketHandler::Init();
+		MovementPacketHandler::Init();
 		ServerHeartbeatPacketHandler::Init();
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_GAME_SESSION] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
 			return GameSessionPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
+
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_MOVEMENT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return MovementPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_SERVER_HEARTBEAT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool

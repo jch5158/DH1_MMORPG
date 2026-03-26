@@ -37,6 +37,9 @@ public:
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 	[[nodiscard]] int32 GetWorldServerId() const;
 	[[nodiscard]] GameSessionManagerRef GetGameSessionManagerRef() const;
+	[[nodiscard]] GridManagerRef GetGridManagerRef() const;
+	[[nodiscard]] GameTickProcessorRef GetGameTickProcessorRef() const;
+	[[nodiscard]] float GetDefaultMoveSpeed() const;
 
 private:
 
@@ -53,6 +56,10 @@ private:
 		, mRealmHeartbeatTimeoutMs(15000)
 		, mRedisTtlSeconds(10)
 		, mMaxPlayers(1000)
+		, mGameTickIntervalMs(50)
+		, mDefaultMoveSpeed(600.0f)
+		, mAoiCellSize(10000.0f)
+		, mAoiRange(1)
 		, mListenPort(0)
 		, mbRunning(false)
 	{}
@@ -68,6 +75,8 @@ private:
 	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
 	GameSessionManagerRef mpGameSessionManager;
+	GridManagerRef mpGridManager;
+	GameTickProcessorRef mpGameTickProcessor;
 
 	int32 mNetworkDispatchThreadCount;
 	int32 mActorDispatchThreadCount;
@@ -79,6 +88,10 @@ private:
 	int64 mRealmHeartbeatTimeoutMs;
 	int64 mRedisTtlSeconds;
 	int32 mMaxPlayers;
+	int64 mGameTickIntervalMs;
+	float mDefaultMoveSpeed;
+	float mAoiCellSize;
+	int32 mAoiRange;
 	std::string mListenIp;
 	uint16 mListenPort;
 

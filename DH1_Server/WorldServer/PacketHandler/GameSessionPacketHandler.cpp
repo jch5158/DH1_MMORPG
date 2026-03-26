@@ -3,7 +3,12 @@
 #include "GatewaySession.h"
 #include "RealmSession.h"
 #include "GameSessionManager.h"
+#include "GridManager.h"
+#include "PlayerObject.h"
 #include "WorldService.h"
+#include "PacketHandler/PacketServiceTypeHandler.h"
+#include "PacketHandler/MovementPacketHandler.h"
+#include "RelayContext.h"
 
 bool GameSessionPacketHandler::Validate(const PacketSessionRef& pSession)
 {
@@ -70,9 +75,23 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 	// Gateway에 결과 응답
 	pSession->Send(GameSessionPacketHandler::MakeSendBuffer(response));
 
-	// 성공 시 RealmServer에 동기화
+	// 성공 시 PlayerObject 생성 + RealmServer에 동기화
 	if (response.result() == Protocol::GAME_SESSION_SUCCESS)
 	{
+		// PlayerObject 생성 (스폰 위치 0,0,0)
+		const auto pGridManager = worldService.GetGridManagerRef();
+		if (pGridManager != nullptr)
+		{
+			auto pPlayerObject = cpp_net_engine::MakeShared<PlayerObject>(accountId, gatewaySessionId, gatewayServerId);
+			pPlayerObject->SetMoveSpeed(worldService.GetDefaultMoveSpeed());
+
+			const int32 spawnCellX = pGridManager->ComputeCellX(0.0f);
+			const int32 spawnCellY = pGridManager->ComputeCellY(0.0f);
+			pGridManager->AddObject(pPlayerObject, spawnCellX, spawnCellY);
+
+			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - PlayerObject created, accountId: {}, actorId: {}", accountId, pPlayerObject->GetId());
+		}
+
 		const auto pRealmClientService = worldService.GetRealmClientServiceRef();
 		if (pRealmClientService != nullptr)
 		{
@@ -101,6 +120,17 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 	if (pGameSessionManager == nullptr)
 	{
 		return false;
+	}
+
+	// PlayerObject 제거
+	const auto pGridManager = worldService.GetGridManagerRef();
+	if (pGridManager != nullptr)
+	{
+		const auto pObject = pGridManager->GetObjectByAccountId(accountId);
+		if (pObject != nullptr)
+		{
+			pGridManager->RemoveObject(pObject->GetId());
+		}
 	}
 
 	if (pGameSessionManager->RemoveSession(accountId))
@@ -147,9 +177,33 @@ bool GameSessionPacketHandler::HANDLE_S2S_RELAY_TO_WORLD_NOT(const Protocol::S2S
 		return true;
 	}
 
-	// TODO: payload에서 패킷을 추출하여 게임 로직 처리 (확장 포인트)
-	NET_ENGINE_LOG_TRACE("GameSessionPacketHandler - Relay to world received, accountId: {}, payloadSize: {}",
-		accountId, packet.payload().size());
+	const auto& payload = packet.payload();
+	if (payload.size() < sizeof(PacketHeader))
+	{
+		NET_ENGINE_LOG_WARN("GameSessionPacketHandler - Relay payload too small, accountId: {}", accountId);
+		return true;
+	}
+
+	const auto* pHeader = reinterpret_cast<const PacketHeader*>(payload.data());
+	const uint16 serviceType = PacketServiceTypeHandler::GET_SERVICE_TYPE(pHeader->id);
+	const uint16 packetId = PacketServiceTypeHandler::GET_PACKET_ID(pHeader->id);
+	const uint16 payloadSize = static_cast<uint16>(payload.size());
+
+	// RelayContext에 accountId 설정 후 자동 생성된 핸들러 호출
+	RelayContext::SetAccountId(accountId);
+
+	switch (serviceType)
+	{
+	case static_cast<uint16>(Protocol::eServiceType::SERVICE_TYPE_MOVEMENT):
+		MovementPacketHandler::HandlePacket(payloadSize, packetId,
+			reinterpret_cast<const byte*>(payload.data()), pSession);
+		break;
+	default:
+		NET_ENGINE_LOG_WARN("GameSessionPacketHandler - Unknown relay service type: {}, accountId: {}", serviceType, accountId);
+		break;
+	}
+
+	RelayContext::Clear();
 
 	return true;
 }

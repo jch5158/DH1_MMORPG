@@ -38,6 +38,16 @@ namespace packet_id
 	};
 
 
+	enum eMovementPacketId : uint16
+	{
+        C2S_MOVE_INPUT_NOT = 1,
+        S2C_MOVE_RESULT_NOT = 2,
+        S2C_ENTITY_SNAPSHOT_NOT = 3,
+        S2C_ENTITY_ENTER_NOT = 4,
+        S2C_ENTITY_LEAVE_NOT = 5,
+	};
+
+
 	enum eServerHeartbeatPacketId : uint16
 	{
         S2S_HEARTBEAT_NOT = 1,
