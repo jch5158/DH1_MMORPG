@@ -35,6 +35,15 @@ void ALobbyGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
+	if (NewPlayer)
+	{
+		// UI Only에서 Game+UI로 전환
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		NewPlayer->SetInputMode(InputMode);
+		NewPlayer->bShowMouseCursor = true;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("LobbyGameMode - HandleStartingNewPlayer, Pawn: %s"),
 		NewPlayer->GetPawn() ? *NewPlayer->GetPawn()->GetName() : TEXT("None"));
 }

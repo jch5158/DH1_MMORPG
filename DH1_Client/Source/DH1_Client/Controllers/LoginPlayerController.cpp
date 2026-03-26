@@ -1,24 +1,31 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Controllers/LoginPlayerController.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/SAuthMasterWidget.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 
 void ALoginPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-    if (AuthMasterWidgetClass) // 에디터에서 WBP_AuthMaster 할당
-    {
-	    if (UUserWidget* AuthWidget = CreateWidget<UUserWidget>(this, AuthMasterWidgetClass))
-        {
-            AuthWidget->AddToViewport();
+	if (GEngine && GEngine->GameViewport)
+	{
+		AuthWidget = SNew(SAuthMasterWidget);
+		GEngine->GameViewport->AddViewportWidgetContent(AuthWidget.ToSharedRef());
 
-            // UI 입력 모드 설정
-            FInputModeUIOnly InputModeData;
-            InputModeData.SetWidgetToFocus(AuthWidget->TakeWidget());
-            SetInputMode(InputModeData);
-            bShowMouseCursor = true;
-        }
-    }
+		FInputModeUIOnly InputModeData;
+		InputModeData.SetWidgetToFocus(AuthWidget);
+		SetInputMode(InputModeData);
+		bShowMouseCursor = true;
+	}
+}
+
+void ALoginPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (AuthWidget.IsValid() && GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->RemoveViewportWidgetContent(AuthWidget.ToSharedRef());
+		AuthWidget.Reset();
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
