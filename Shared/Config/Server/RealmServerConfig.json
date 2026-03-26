@@ -6,8 +6,14 @@
         "maxSessionCount": 100,
         "sessionTimeoutMs": 120000
     },
+    "redis": {
+        "connectionUri": "tcp://${DH1_REDIS_HOST}:${DH1_REDIS_PORT}?pool_size=5"
+    },
     "realmServer": {
         "realmServerId": 1,
+        "realmName": "아스달리온",
+        "maxPlayers": 5000,
+        "redisTtlSeconds": 10,
         "heartbeatTimeoutMs": 15000,
         "heartbeatCheckIntervalMs": 5000,
         "heartbeatIntervalMs": 5000

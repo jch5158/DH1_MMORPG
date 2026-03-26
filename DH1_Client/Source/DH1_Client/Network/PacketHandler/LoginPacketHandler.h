@@ -59,10 +59,10 @@ public:
 	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
 	static bool HANDLE_S2C_LOGIN_RES(const Protocol::S2C_LOGIN_RES& packet, const PacketSessionRef& pSession);
-
+	
 
 	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGIN_REQ); }
-
+	
 
 private:
 

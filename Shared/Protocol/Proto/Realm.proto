@@ -1,0 +1,43 @@
+syntax = "proto3";
+package Protocol;
+
+import "Enum.proto";
+import "Struct.proto";
+import "PacketOption.proto";
+
+option (service_type) = SERVICE_TYPE_REALM;
+option (handler_name) = "RealmPacketHandler";
+
+// Client -> Gateway: 렐름 목록 요청
+message C2S_REALM_LIST_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+}
+
+// Gateway -> Client: 렐름 목록 응답
+message S2C_REALM_LIST_RES
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    repeated RealmServerInfo realms = 1;
+}
+
+// Client -> Gateway: 렐름 선택 요청
+message C2S_REALM_SELECT_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+
+    int32 realmId = 1;
+}
+
+// Gateway -> Client: 렐름 선택 결과
+message S2C_REALM_SELECT_RES
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    eRealmSelectResult result = 1;
+}

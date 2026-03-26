@@ -273,7 +273,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\World.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Realm.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -281,7 +281,7 @@
     </ClCompile>
     <ClCompile Include="PacketHandler\HeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
-    <ClCompile Include="PacketHandler\WorldPacketHandler.cpp" />
+    <ClCompile Include="PacketHandler\RealmPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\MovementPacketHandler.cpp" />
     <ClCompile Include="..\..\Shared\Protocol\Movement.pb.cc">
@@ -324,10 +324,10 @@
     <ClInclude Include="MySqlActor.h" />
     <ClInclude Include="MySqlService.h" />
     <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\World.pb.h" />
+    <ClInclude Include="..\..\Shared\Protocol\Realm.pb.h" />
     <ClInclude Include="PacketHandler\HeartbeatPacketHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
-    <ClInclude Include="PacketHandler\WorldPacketHandler.h" />
+    <ClInclude Include="PacketHandler\RealmPacketHandler.h" />
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h" />
     <ClInclude Include="PacketHandler\LoginPacketHandler.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
@@ -344,7 +344,7 @@
     <None Include="..\..\Shared\Protocol\Proto\Heartbeat.proto" />
     <None Include="..\..\Shared\Protocol\Proto\ServerHeartbeat.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\World.proto" />
+    <None Include="..\..\Shared\Protocol\Proto\Realm.proto" />
     <None Include="..\..\Shared\Protocol\Proto\GameSession.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

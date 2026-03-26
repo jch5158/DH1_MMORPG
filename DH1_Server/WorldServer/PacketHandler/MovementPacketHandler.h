@@ -59,7 +59,7 @@ public:
 	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_MOVE_INPUT_NOT(const Protocol::C2S_MOVE_INPUT_NOT& packet, const PacketSessionRef& pSession);
-
+	
 
 	
 

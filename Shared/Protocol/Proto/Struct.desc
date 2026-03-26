@@ -1,9 +1,9 @@
 
 Ó
 Struct.protoProtocol"©
-WorldServerInfo
-worldId (RworldId
-	worldName (	R	worldName&
+RealmServerInfo
+realmId (RrealmId
+	realmName (	R	realmName&
 currentPlayers (RcurrentPlayers
 
 maxPlayers (R

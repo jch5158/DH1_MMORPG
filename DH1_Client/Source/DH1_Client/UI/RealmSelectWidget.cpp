@@ -1,4 +1,4 @@
-#include "WorldSelectWidget.h"
+#include "RealmSelectWidget.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Text/STextBlock.h"
@@ -7,17 +7,17 @@
 #include "Engine/Engine.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
 
-void SWorldSelectWidget::Construct(const FArguments& InArgs)
+void SRealmSelectWidget::Construct(const FArguments& InArgs)
 {
-	WorldList = InArgs._WorldList;
+	RealmList = InArgs._RealmList;
 
 	TSharedRef<SVerticalBox> ListBox = SNew(SVerticalBox);
 
-	for (const auto& World : WorldList)
+	for (const auto& Realm : RealmList)
 	{
 		FString StatusStr;
 		FLinearColor StatusColor;
-		switch (World.Status)
+		switch (Realm.Status)
 		{
 		case 0: StatusStr = TEXT("Online"); StatusColor = FLinearColor::Green; break;
 		case 1: StatusStr = TEXT("Maintenance"); StatusColor = FLinearColor::Yellow; break;
@@ -25,16 +25,16 @@ void SWorldSelectWidget::Construct(const FArguments& InArgs)
 		default: StatusStr = TEXT("Unknown"); StatusColor = FLinearColor::Gray; break;
 		}
 
-		const int32 CapturedWorldId = World.WorldId;
+		const int32 CapturedRealmId = Realm.RealmId;
 
 		ListBox->AddSlot()
 		.AutoHeight()
 		.Padding(0.0f, 4.0f)
 		[
 			SNew(SButton)
-			.OnClicked_Lambda([this, CapturedWorldId]() -> FReply
+			.OnClicked_Lambda([this, CapturedRealmId]() -> FReply
 			{
-				OnWorldClicked(CapturedWorldId);
+				OnRealmClicked(CapturedRealmId);
 				return FReply::Handled();
 			})
 			[
@@ -45,7 +45,7 @@ void SWorldSelectWidget::Construct(const FArguments& InArgs)
 				.Padding(20.0f, 10.0f)
 				[
 					SNew(STextBlock)
-					.Text(FText::FromString(World.WorldName))
+					.Text(FText::FromString(Realm.RealmName))
 					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 18))
 					.ColorAndOpacity(FLinearColor::White)
 				]
@@ -55,7 +55,7 @@ void SWorldSelectWidget::Construct(const FArguments& InArgs)
 				.Padding(0.0f, 0.0f, 20.0f, 0.0f)
 				[
 					SNew(STextBlock)
-					.Text(FText::FromString(FString::Printf(TEXT("%d / %d"), World.CurrentPlayers, World.MaxPlayers)))
+					.Text(FText::FromString(FString::Printf(TEXT("%d / %d"), Realm.CurrentPlayers, Realm.MaxPlayers)))
 					.Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))
 					.ColorAndOpacity(FLinearColor(0.7f, 0.7f, 0.7f))
 				]
@@ -86,7 +86,7 @@ void SWorldSelectWidget::Construct(const FArguments& InArgs)
 			.Padding(0.0f, 0.0f, 0.0f, 30.0f)
 			[
 				SNew(STextBlock)
-				.Text(FText::FromString(TEXT("Select World")))
+				.Text(FText::FromString(TEXT("Select Realm")))
 				.Font(FCoreStyle::GetDefaultFontStyle("Bold", 32))
 				.ColorAndOpacity(FLinearColor::White)
 			]
@@ -103,7 +103,7 @@ void SWorldSelectWidget::Construct(const FArguments& InArgs)
 	];
 }
 
-void SWorldSelectWidget::OnWorldClicked(const int32 WorldId)
+void SRealmSelectWidget::OnRealmClicked(const int32 RealmId)
 {
 	if (GEngine == nullptr)
 	{
@@ -124,7 +124,7 @@ void SWorldSelectWidget::OnWorldClicked(const int32 WorldId)
 			continue;
 		}
 
-		NetSubsystem->RequestWorldSelect(WorldId);
+		NetSubsystem->RequestRealmSelect(RealmId);
 		break;
 	}
 }

@@ -57,7 +57,7 @@ public:
 	
 
 	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_HEARTBEAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_HEARTBEAT_NOT); }
-
+	
 
 private:
 

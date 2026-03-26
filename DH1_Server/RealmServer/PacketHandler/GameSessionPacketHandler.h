@@ -63,8 +63,8 @@ public:
 	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
 	static bool HANDLE_S2S_GAME_SESSION_SYNC_ENTER_NOT(const Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT& packet, const PacketSessionRef& pSession);
-static bool HANDLE_S2S_GAME_SESSION_SYNC_LEAVE_NOT(const Protocol::S2S_GAME_SESSION_SYNC_LEAVE_NOT& packet, const PacketSessionRef& pSession);
-
+	static bool HANDLE_S2S_GAME_SESSION_SYNC_LEAVE_NOT(const Protocol::S2S_GAME_SESSION_SYNC_LEAVE_NOT& packet, const PacketSessionRef& pSession);
+	
 
 	
 

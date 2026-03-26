@@ -55,5 +55,5 @@ private:
 
 	void SwitchWidget(const EAuthWidgetType WidgetType, const FString& StatusText, const FString& Email) const;
 
-	TSharedPtr<SWidget> WorldSelectWidgetRef;
+	TSharedPtr<SWidget> RealmSelectWidgetRef;
 };

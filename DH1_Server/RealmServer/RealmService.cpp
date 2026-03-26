@@ -2,6 +2,7 @@
 #include "RealmService.h"
 #include "WorldServerSession.h"
 #include "RealmSessionRegistry.h"
+#include "RedisService.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -81,6 +82,9 @@ bool RealmService::Initialize(const JsonConfig& config)
 
 	// RealmServer info
 	mRealmServerId = realmServerConfig.GetInt32("realmServerId");
+	mRealmName = realmServerConfig.GetString("realmName");
+	mMaxPlayers = realmServerConfig.GetInt32("maxPlayers");
+	mRedisTtlSeconds = realmServerConfig.GetInt64("redisTtlSeconds");
 	mHeartbeatTimeoutMs = realmServerConfig.GetInt64("heartbeatTimeoutMs");
 	mHeartbeatCheckIntervalMs = realmServerConfig.GetInt64("heartbeatCheckIntervalMs");
 	mHeartbeatIntervalMs = realmServerConfig.GetInt64("heartbeatIntervalMs");
@@ -88,7 +92,12 @@ bool RealmService::Initialize(const JsonConfig& config)
 	// RealmSessionRegistry
 	mpSessionRegistry = cpp_net_engine::MakeShared<RealmSessionRegistry>(1000);
 
-	NET_ENGINE_LOG_INFO("RealmService::Initialize - Initialization complete, realmServerId: {}", mRealmServerId);
+	// RedisService
+	const JsonConfig redisConfig = config.GetSection("redis");
+	const std::string redisUri = redisConfig.GetString("connectionUri");
+	mpRedisService = std::make_shared<RedisService>(redisUri, mpActorService);
+
+	NET_ENGINE_LOG_INFO("RealmService::Initialize - Initialization complete, realmServerId: {}, realmName: {}", mRealmServerId, mRealmName);
 	return true;
 }
 
@@ -136,17 +145,28 @@ bool RealmService::Start()
 void RealmService::Run()
 {
 	auto lastHeartbeatCheck = std::chrono::steady_clock::now();
+	auto lastRedisUpdate = std::chrono::steady_clock::now();
+
+	// 시작 직후 즉시 한 번 등록
+	updateRealmRegistration();
 
 	while (mbRunning.load())
 	{
 		const auto now = std::chrono::steady_clock::now();
-		const auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeatCheck).count();
+		const auto heartbeatElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastHeartbeatCheck).count();
+		const auto redisElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastRedisUpdate).count();
 
-		if (elapsedMs >= mHeartbeatCheckIntervalMs)
+		if (heartbeatElapsedMs >= mHeartbeatCheckIntervalMs)
 		{
 			sendHeartbeatToWorldServers();
 			checkWorldServerHeartbeats();
 			lastHeartbeatCheck = now;
+		}
+
+		if (redisElapsedMs >= mHeartbeatCheckIntervalMs)
+		{
+			updateRealmRegistration();
+			lastRedisUpdate = now;
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -200,6 +220,21 @@ void RealmService::sendHeartbeatToWorldServers()
 	{
 		pSession->Send(sendBuffer);
 	}
+}
+
+void RealmService::updateRealmRegistration()
+{
+	RedisRealmRegistration registration;
+	registration.realmId = mRealmServerId;
+	registration.realmName = mRealmName;
+	registration.currentPlayers = static_cast<int32>(mpSessionRegistry->GetTotalSessionCount());
+	registration.maxPlayers = mMaxPlayers;
+	registration.status = static_cast<int32>(eRealmServerStatus::Online);
+
+	mpRedisService->UpdateRealmRegistration(registration, mRedisTtlSeconds);
+
+	NET_ENGINE_LOG_INFO("RealmService::updateRealmRegistration - realmId: {}, players: {}/{}",
+		mRealmServerId, registration.currentPlayers, registration.maxPlayers);
 }
 
 void RealmService::checkWorldServerHeartbeats()

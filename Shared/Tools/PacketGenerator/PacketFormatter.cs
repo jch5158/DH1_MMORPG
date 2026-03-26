@@ -217,11 +217,9 @@ private:
 ";
 
 		public static readonly string RECEIVE_HANDLE_DECLARE_FORMAT =
-            @"static bool HANDLE_{0}(const Protocol::{0}& packet, const PacketSessionRef& pSession);
-";
+			"static bool HANDLE_{0}(const Protocol::{0}& packet, const PacketSessionRef& pSession);\r\n\t";
 
-        public static readonly string SEND_MAKE_SEND_BUFFER_FORMAT =
-            @"static NetSendBufferRef MakeSendBuffer(const Protocol::{0}& packet) {{ return MakeSendBuffer(packet, packet_id::{1}); }}
-";
+		public static readonly string SEND_MAKE_SEND_BUFFER_FORMAT =
+			"static NetSendBufferRef MakeSendBuffer(const Protocol::{0}& packet) {{ return MakeSendBuffer(packet, packet_id::{1}); }}\r\n\t";
     }
 }
