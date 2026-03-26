@@ -174,3 +174,4 @@ node_modules/
 __pycache__/
 *.pyc
 cmake-build-*/
+build_log.txt
