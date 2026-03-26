@@ -6,6 +6,13 @@
         "maxSessionCount": 100,
         "sessionTimeoutMs": 120000
     },
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "password": "${DH1_MYSQL_PASSWORD}",
+        "database": "dh1_game_db"
+    },
     "worldServer": {
         "worldServerId": 1,
         "worldName": "World-1",
