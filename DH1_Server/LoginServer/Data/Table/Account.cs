@@ -43,14 +43,8 @@ namespace LoginServer.Data.Table
         [Column("account_role")]
         public EAccountRole Role { get; set; } = EAccountRole.User;
 
-        [Column("is_online")]
-        public bool IsOnline { get; set; } = false;
-
         [Column("last_login")]
         public DateTime? LastLogin { get; set; }
-
-        [Column("last_logout")]
-        public DateTime? LastLogout { get; set; }
 
         [Column("created_at")]
         public DateTime? CreatedAt { get; set; }

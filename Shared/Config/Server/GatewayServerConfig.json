@@ -39,7 +39,8 @@
         "heartbeatIntervalMs": 5000,
         "clientHeartbeatTimeoutMs": 15000,
         "worldHeartbeatTimeoutMs": 15000,
-        "redisTtlSeconds": 10
+        "redisTtlSeconds": 10,
+        "sessionTtlSeconds": 30
     },
     "mysql": {
         "host": "127.0.0.1",

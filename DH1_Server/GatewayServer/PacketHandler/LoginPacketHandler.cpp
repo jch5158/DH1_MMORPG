@@ -92,7 +92,28 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 
 			pClientSession->SetAccountId(argAccountId);
 
-			// DB: is_online = true, last_login = now
+			// Redis: 세션 등록 (온라인 상태 = Redis 키 존재 여부)
+			const int32 gatewayId = ISingleton<GatewayService>::GetInstance().GetGatewayId();
+			const int64 sessionTtlSeconds = ISingleton<GatewayService>::GetInstance().GetSessionTtlSeconds();
+			RedisServiceRef pRedisForSession = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
+			if (pRedisForSession != nullptr)
+			{
+				RedisSessionInfo sessionInfo;
+				sessionInfo.gatewayId = gatewayId;
+				sessionInfo.sessionId = pClientSession->GetSessionId();
+				sessionInfo.loginTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
+					std::chrono::system_clock::now().time_since_epoch()).count();
+
+				pRedisForSession->SetSessionAsync(argAccountId, sessionInfo, sessionTtlSeconds, [argAccountId](const bool isSuccess)
+					{
+						if (!isSuccess)
+						{
+							NET_ENGINE_LOG_ERROR("LoginPacketHandler - Redis session set failed, accountId: {}", argAccountId);
+						}
+					});
+			}
+
+			// DB: last_login = now (is_online 제거 — Redis가 관리)
 			MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetAccountMySqlServiceRef();
 			if (pMySqlService != nullptr)
 			{
@@ -102,7 +123,7 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 						{
 							const db::Account account{};
 							db(sqlpp::update(account)
-								.set(account.isOnline = true, account.lastLogin = std::chrono::system_clock::now())
+								.set(account.lastLogin = std::chrono::system_clock::now())
 								.where(account.accountId == static_cast<int64>(argAccountId)));
 						}
 						catch (const sqlpp::exception& e)

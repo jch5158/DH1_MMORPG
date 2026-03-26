@@ -5,6 +5,7 @@
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisGatewayInfo, gatewayId, ip, port, status, currentSessionCount)
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisRealmInfo, realmId, realmName, currentPlayers, maxPlayers, status)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisSessionInfo, gatewayId, sessionId, loginTimestamp)
 
 RedisService::RedisService(const std::string& connectionUri, ActorServiceRef pActorService)
 	:mRedisActorId(0)
@@ -188,6 +189,79 @@ void RedisService::GetRealmInfoAsync(const int32 realmId, GetRealmInfoCallback c
 			{
 				NET_ENGINE_LOG_ERROR("RedisService::GetRealmInfoAsync - JSON parse error: {}", e.what());
 				argCallback(false, {});
+			}
+		});
+}
+
+void RedisService::SetSessionAsync(const uint64 accountId, const RedisSessionInfo& sessionInfo, const int64 ttlSeconds, SetStringCallback callback)
+{
+	const std::string key = "Session:" + std::to_string(accountId);
+	const nlohmann::json jsonInfo = sessionInfo;
+	const std::string value = jsonInfo.dump();
+	SetExpireStringAsync(std::move(key), std::move(value), ttlSeconds, std::move(callback));
+}
+
+void RedisService::CheckAndDeleteSessionAsync(const uint64 accountId, const int32 gatewayId, std::function<void(const bool)> callback)
+{
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argAccountId = accountId, argGatewayId = gatewayId, argCallback = std::move(callback), argService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				argCallback(false);
+				return;
+			}
+
+			const std::string key = "Session:" + std::to_string(argAccountId);
+			const auto value = pRedis->GetString(key);
+			if (!value.has_value())
+			{
+				argCallback(false);
+				return;
+			}
+
+			try
+			{
+				const auto json = nlohmann::json::parse(value.value());
+				const RedisSessionInfo info = json.get<RedisSessionInfo>();
+				if (info.gatewayId == argGatewayId)
+				{
+					pRedis->DeleteKey(key);
+					NET_ENGINE_LOG_INFO("RedisService::CheckAndDeleteSession - Session deleted, accountId: {}, sessionId: {}", argAccountId, info.sessionId);
+					argCallback(true);
+				}
+				else
+				{
+					NET_ENGINE_LOG_INFO("RedisService::CheckAndDeleteSession - Session owned by another GW({}), skipped, accountId: {}", info.gatewayId, argAccountId);
+					argCallback(false);
+				}
+			}
+			catch (const std::exception& e)
+			{
+				NET_ENGINE_LOG_ERROR("RedisService::CheckAndDeleteSession - Parse error: {}", e.what());
+				argCallback(false);
+			}
+		});
+}
+
+void RedisService::RefreshSessionTTLAsync(const Vector<uint64>& accountIds, const int64 ttlSeconds)
+{
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argAccountIds = accountIds, argTtl = ttlSeconds, argService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				return;
+			}
+
+			for (const auto accountId : argAccountIds)
+			{
+				const std::string key = "Session:" + std::to_string(accountId);
+				const auto value = pRedis->GetString(key);
+				if (value.has_value())
+				{
+					pRedis->SetExpireString(key, value.value(), argTtl);
+				}
 			}
 		});
 }

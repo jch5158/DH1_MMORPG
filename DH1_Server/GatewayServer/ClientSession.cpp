@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
-#include "MySqlService.h"
+#include "RedisService.h"
 #include "GatewayService.h"
 #include "PacketServiceTypeHandler.h"
-#include "AccountTable.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
 
 ClientSession::ClientSession(const int32 receiveBufferSize, const int32 maxPacketSize)
@@ -56,23 +55,17 @@ void ClientSession::OnDisconnected()
 			(void)pManager->RemoveClientSession(mAccountId);
 		}
 
-		// DB: is_online = false, last_logout = now
-		MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetAccountMySqlServiceRef();
-		if (pMySqlService != nullptr)
+		// Redis: 내 GW가 마지막 관리자일 때만 세션 삭제 (다른 GW에 재접속했으면 무시)
+		const int32 gatewayId = ISingleton<GatewayService>::GetInstance().GetGatewayId();
+		RedisServiceRef pRedisService = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
+		if (pRedisService != nullptr)
 		{
 			const uint64 accountId = mAccountId;
-			pMySqlService->ExecuteAsync([accountId](sqlpp::mysql::connection& db)
+			pRedisService->CheckAndDeleteSessionAsync(accountId, gatewayId, [accountId](const bool isDeleted)
 				{
-					try
+					if (isDeleted)
 					{
-						const db::Account account{};
-						db(sqlpp::update(account)
-							.set(account.isOnline = false, account.lastLogout = std::chrono::system_clock::now())
-							.where(account.accountId == static_cast<int64>(accountId)));
-					}
-					catch (const sqlpp::exception& e)
-					{
-						NET_ENGINE_LOG_ERROR("ClientSession::OnDisconnected - DB update failed, accountId: {}, error: {}", accountId, e.what());
+						NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - Redis session cleared, accountId: {}", accountId);
 					}
 				});
 		}

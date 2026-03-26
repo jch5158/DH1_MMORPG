@@ -24,6 +24,13 @@ struct RedisRealmInfo
 	int32 status;
 };
 
+struct RedisSessionInfo
+{
+	int32 gatewayId;
+	uint64 sessionId;
+	int64 loginTimestamp;
+};
+
 using GetRealmListCallback = std::function<void(const Vector<RedisRealmInfo>&)>;
 using GetRealmInfoCallback = std::function<void(const bool, const RedisRealmInfo&)>;
 
@@ -45,6 +52,11 @@ public:
 
 	void GetRealmListAsync(GetRealmListCallback callback);
 	void GetRealmInfoAsync(const int32 realmId, GetRealmInfoCallback callback);
+
+	// 세션 관리 (온라인 상태)
+	void SetSessionAsync(const uint64 accountId, const RedisSessionInfo& sessionInfo, const int64 ttlSeconds, SetStringCallback callback);
+	void CheckAndDeleteSessionAsync(const uint64 accountId, const int32 gatewayId, std::function<void(const bool)> callback);
+	void RefreshSessionTTLAsync(const Vector<uint64>& accountIds, const int64 ttlSeconds);
 
 private:
 	uint64 mRedisActorId;

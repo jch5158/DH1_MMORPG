@@ -151,6 +151,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	mClientHeartbeatTimeoutMs = gatewayConfig.GetInt64("clientHeartbeatTimeoutMs");
 	mWorldHeartbeatTimeoutMs = gatewayConfig.GetInt64("worldHeartbeatTimeoutMs");
 	mRedisTtlSeconds = gatewayConfig.GetInt64("redisTtlSeconds");
+	mSessionTtlSeconds = gatewayConfig.GetInt64("sessionTtlSeconds");
 	mListenIp = serverConfig.GetString("ip");
 	mListenPort = serverConfig.GetUInt16("port");
 	mPublicIp = gatewayConfig.GetString("publicIp");
@@ -235,6 +236,7 @@ void GatewayService::Run()
 			sendHeartbeatToWorld();
 			checkClientHeartbeats();
 			checkWorldHeartbeats();
+			refreshSessionTTLs();
 			lastHeartbeat = now;
 
 			NET_ENGINE_LOG_INFO("GatewayService::Run - SessionCount: {}, GatewayId: {}", mpServerService->GetCurrentSessionCount(), mGatewayId);
@@ -434,4 +436,25 @@ void GatewayService::updateGatewayRegistration(const eGatewayStatus status)
 	info.currentSessionCount = mpServerService->GetCurrentSessionCount();
 
 	mpRedisService->UpdateGatewayInfo(info);
+}
+
+int64 GatewayService::GetSessionTtlSeconds() const
+{
+	return mSessionTtlSeconds;
+}
+
+void GatewayService::refreshSessionTTLs()
+{
+	if (mpRedisService == nullptr || mpClientSessionManager == nullptr)
+	{
+		return;
+	}
+
+	const Vector<uint64> accountIds = mpClientSessionManager->GetAllAccountIds();
+	if (accountIds.empty())
+	{
+		return;
+	}
+
+	mpRedisService->RefreshSessionTTLAsync(accountIds, mSessionTtlSeconds);
 }

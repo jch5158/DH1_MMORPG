@@ -37,3 +37,15 @@ ClientSessionRef ClientSessionManager::GetClientSession(const uint64 accountId)
 
 	return iter->second;
 }
+
+Vector<uint64> ClientSessionManager::GetAllAccountIds()
+{
+	SharedLock lock(mLock);
+	Vector<uint64> accountIds;
+	accountIds.reserve(mClientSessions.size());
+	for (const auto& [accountId, pSession] : mClientSessions)
+	{
+		accountIds.push_back(accountId);
+	}
+	return accountIds;
+}

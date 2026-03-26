@@ -12,6 +12,7 @@ public:
 	[[nodiscard]] bool AddClientSession(const uint64 accountId, ClientSessionRef pSession);
 	[[nodiscard]] bool RemoveClientSession(const uint64 accountId);
 	[[nodiscard]] ClientSessionRef GetClientSession(const uint64 accountId);
+	[[nodiscard]] Vector<uint64> GetAllAccountIds();
 
 private:
 	const int32 mMaxSessionCount;

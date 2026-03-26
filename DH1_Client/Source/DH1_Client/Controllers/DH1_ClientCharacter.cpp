@@ -117,8 +117,8 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	UInputModifierNegate* NegateLeft = NewObject<UInputModifierNegate>(this);
 	LeftMapping.Modifiers.Add(NegateLeft);
 
-	// 마우스 왼쪽 클릭 바인딩
-	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::LeftMouseButton);
+	// 마우스 오른쪽 클릭 바인딩
+	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
 }
 
 void ADH1_ClientCharacter::BeginPlay()

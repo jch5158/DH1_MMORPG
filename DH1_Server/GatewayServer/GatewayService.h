@@ -34,6 +34,7 @@ public:
 	[[nodiscard]] MySqlServiceRef GetAccountMySqlServiceRef() const;
 	[[nodiscard]] int32 GetGatewayId() const;
 	[[nodiscard]] int32 GetWorldServerId() const;
+	[[nodiscard]] int64 GetSessionTtlSeconds() const;
 
 private:
 
@@ -50,6 +51,7 @@ private:
 		, mClientHeartbeatTimeoutMs(15000)
 		, mWorldHeartbeatTimeoutMs(15000)
 		, mRedisTtlSeconds(10)
+		, mSessionTtlSeconds(30)
 		, mListenPort(0)
 		, mbRunning(false)
 	{}
@@ -58,6 +60,7 @@ private:
 	void checkClientHeartbeats();
 	void checkWorldHeartbeats();
 	void sendHeartbeatToWorld();
+	void refreshSessionTTLs();
 
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpWorldClientService;
@@ -75,6 +78,7 @@ private:
 	int64 mClientHeartbeatTimeoutMs;
 	int64 mWorldHeartbeatTimeoutMs;
 	int64 mRedisTtlSeconds;
+	int64 mSessionTtlSeconds;
 	std::string mListenIp;
 	std::string mPublicIp;
 	uint16 mListenPort;
