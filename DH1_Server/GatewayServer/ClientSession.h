@@ -18,10 +18,15 @@ public:
 	[[nodiscard]] uint64 GetAccountId() const { return mAccountId; }
 	[[nodiscard]] bool IsLoggedIn() const { return mAccountId != 0; }
 
+	void SetWorldServerId(const int32 worldServerId) { mWorldServerId = worldServerId; }
+	[[nodiscard]] int32 GetWorldServerId() const { return mWorldServerId; }
+	[[nodiscard]] bool IsInWorld() const { return mWorldServerId != 0; }
+
 	void UpdateHeartbeat();
 	[[nodiscard]] int64 GetLastHeartbeatMs() const;
 
 private:
 	uint64 mAccountId = 0;
+	int32 mWorldServerId = 0;
 	std::atomic<int64> mLastHeartbeatMs{0};
 };

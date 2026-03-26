@@ -1,0 +1,92 @@
+#include "pch.h"
+#include "GameSessionManager.h"
+
+GameSessionManager::GameSessionManager(const int32 maxSessionCount)
+	: mMaxSessionCount(maxSessionCount)
+{
+	mGameSessions.reserve(maxSessionCount);
+}
+
+int32 GameSessionManager::GetMaxSessionCount() const
+{
+	return mMaxSessionCount;
+}
+
+int32 GameSessionManager::GetCurrentSessionCount() const
+{
+	SharedLock lock(mLock);
+	return static_cast<int32>(mGameSessions.size());
+}
+
+bool GameSessionManager::AddSession(const GameSessionInfo& sessionInfo)
+{
+	UniqueLock lock(mLock);
+
+	if (static_cast<int32>(mGameSessions.size()) >= mMaxSessionCount)
+	{
+		return false;
+	}
+
+	return mGameSessions.try_emplace(sessionInfo.mAccountId, sessionInfo).second;
+}
+
+bool GameSessionManager::RemoveSession(const uint64 accountId)
+{
+	UniqueLock lock(mLock);
+	return mGameSessions.erase(accountId) > 0;
+}
+
+bool GameSessionManager::UpdateSession(const GameSessionInfo& sessionInfo)
+{
+	UniqueLock lock(mLock);
+
+	const auto iter = mGameSessions.find(sessionInfo.mAccountId);
+	if (iter == mGameSessions.end())
+	{
+		return false;
+	}
+
+	iter->second = sessionInfo;
+	return true;
+}
+
+bool GameSessionManager::HasSession(const uint64 accountId) const
+{
+	SharedLock lock(mLock);
+	return mGameSessions.contains(accountId);
+}
+
+std::optional<GameSessionInfo> GameSessionManager::GetSession(const uint64 accountId) const
+{
+	SharedLock lock(mLock);
+
+	const auto iter = mGameSessions.find(accountId);
+	if (iter == mGameSessions.end())
+	{
+		return std::nullopt;
+	}
+
+	return iter->second;
+}
+
+Vector<uint64> GameSessionManager::RemoveSessionsByGateway(const int32 gatewayServerId)
+{
+	UniqueLock lock(mLock);
+
+	Vector<uint64> removedAccountIds;
+
+	for (auto iter = mGameSessions.begin(); iter != mGameSessions.end();)
+	{
+		if (iter->second.mGatewayServerId == gatewayServerId)
+		{
+			removedAccountIds.push_back(iter->first);
+			iter = mGameSessions.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+	return removedAccountIds;
+}

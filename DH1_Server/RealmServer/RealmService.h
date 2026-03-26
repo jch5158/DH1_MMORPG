@@ -32,6 +32,7 @@ public:
 
 	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
+	[[nodiscard]] RealmSessionRegistryRef GetSessionRegistryRef() const;
 
 private:
 
@@ -53,6 +54,7 @@ private:
 
 	ServerServiceRef mpServerService;
 	ActorServiceRef mpActorService;
+	RealmSessionRegistryRef mpSessionRegistry;
 
 	int32 mNetworkDispatchThreadCount;
 	int32 mActorDispatchThreadCount;

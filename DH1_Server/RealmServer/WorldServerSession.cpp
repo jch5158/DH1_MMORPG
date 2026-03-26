@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "WorldServerSession.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
+#include "RealmSessionRegistry.h"
+#include "RealmService.h"
 
 WorldServerSession::WorldServerSession(const int32 receiveBufferSize, const int32 maxPacketSize)
 	: PacketSession(receiveBufferSize, maxPacketSize)
@@ -24,6 +26,21 @@ void WorldServerSession::OnDisconnecting(const eDisconnectReason reason)
 void WorldServerSession::OnDisconnected()
 {
 	NET_ENGINE_LOG_WARN("WorldServerSession::OnDisconnected - WorldServer disconnected, sessionId: {}, worldServerId: {}", GetSessionId(), mWorldServerId);
+
+	// WorldServer 끊김 시 해당 월드에 속한 모든 세션 제거
+	if (mWorldServerId != 0)
+	{
+		const auto pSessionRegistry = ISingleton<RealmService>::GetInstance().GetSessionRegistryRef();
+		if (pSessionRegistry != nullptr)
+		{
+			const Vector<uint64> removedAccountIds = pSessionRegistry->RemoveSessionsByWorldServer(mWorldServerId);
+
+			if (!removedAccountIds.empty())
+			{
+				NET_ENGINE_LOG_INFO("WorldServerSession::OnDisconnected - Removed {} sessions for worldServerId: {}", removedAccountIds.size(), mWorldServerId);
+			}
+		}
+	}
 }
 
 void WorldServerSession::OnSend(const int32 len)

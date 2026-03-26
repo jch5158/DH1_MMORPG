@@ -3,6 +3,7 @@
 #include "GatewaySession.h"
 #include "RealmSession.h"
 #include "RedisService.h"
+#include "GameSessionManager.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -126,6 +127,9 @@ bool WorldService::Initialize(const JsonConfig& config)
 	mGatewayHeartbeatTimeoutMs = worldServerConfig.GetInt64("gatewayHeartbeatTimeoutMs");
 	mRealmHeartbeatTimeoutMs = worldServerConfig.GetInt64("realmHeartbeatTimeoutMs");
 	mRedisTtlSeconds = worldServerConfig.GetInt64("redisTtlSeconds");
+
+	// GameSessionManager
+	mpGameSessionManager = cpp_net_engine::MakeShared<GameSessionManager>(mMaxPlayers);
 
 	NET_ENGINE_LOG_INFO("WorldService::Initialize - Initialization complete, worldServerId: {}", mWorldServerId);
 	return true;
@@ -262,6 +266,11 @@ RedisServiceRef WorldService::GetRedisServiceRef() const
 int32 WorldService::GetWorldServerId() const
 {
 	return mWorldServerId;
+}
+
+GameSessionManagerRef WorldService::GetGameSessionManagerRef() const
+{
+	return mpGameSessionManager;
 }
 
 void WorldService::sendHeartbeatToRealm()

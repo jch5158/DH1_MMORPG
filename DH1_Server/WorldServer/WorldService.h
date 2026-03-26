@@ -36,6 +36,7 @@ public:
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
 	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 	[[nodiscard]] int32 GetWorldServerId() const;
+	[[nodiscard]] GameSessionManagerRef GetGameSessionManagerRef() const;
 
 private:
 
@@ -66,6 +67,7 @@ private:
 	ClientServiceRef mpRealmClientService;
 	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
+	GameSessionManagerRef mpGameSessionManager;
 
 	int32 mNetworkDispatchThreadCount;
 	int32 mActorDispatchThreadCount;

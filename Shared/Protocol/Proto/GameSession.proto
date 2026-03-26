@@ -1,0 +1,80 @@
+syntax = "proto3";
+package Protocol;
+
+import "Enum.proto";
+import "PacketOption.proto";
+
+option (service_type) = SERVICE_TYPE_GAME_SESSION;
+option (handler_name) = "GameSessionPacketHandler";
+
+// Gateway -> World: 클라이언트 월드 진입 요청
+message S2S_GAME_SESSION_ENTER_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    uint64 accountId = 1;
+    uint64 gatewaySessionId = 2;
+    int32 gatewayServerId = 3;
+}
+
+// World -> Gateway: 월드 진입 결과 응답
+message S2S_GAME_SESSION_ENTER_RES
+{
+    option (sender) = WORLD_SERVER;
+    option (receiver) = GATEWAY_SERVER;
+
+    uint64 accountId = 1;
+    eGameSessionResult result = 2;
+}
+
+// Gateway -> World: 클라이언트 월드 이탈 통보
+message S2S_GAME_SESSION_LEAVE_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    uint64 accountId = 1;
+    uint64 gatewaySessionId = 2;
+}
+
+// World -> Realm: 세션 진입 동기화
+message S2S_GAME_SESSION_SYNC_ENTER_NOT
+{
+    option (sender) = WORLD_SERVER;
+    option (receiver) = REALM_SERVER;
+
+    uint64 accountId = 1;
+    int32 worldServerId = 2;
+    int32 gatewayServerId = 3;
+}
+
+// World -> Realm: 세션 이탈 동기화
+message S2S_GAME_SESSION_SYNC_LEAVE_NOT
+{
+    option (sender) = WORLD_SERVER;
+    option (receiver) = REALM_SERVER;
+
+    uint64 accountId = 1;
+    int32 worldServerId = 2;
+}
+
+// World -> Gateway: 특정 클라이언트에게 패킷 중계
+message S2S_RELAY_TO_CLIENT_NOT
+{
+    option (sender) = WORLD_SERVER;
+    option (receiver) = GATEWAY_SERVER;
+
+    uint64 gatewaySessionId = 1;
+    bytes payload = 2;
+}
+
+// Gateway -> World: 클라이언트 패킷을 월드로 중계
+message S2S_RELAY_TO_WORLD_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    uint64 accountId = 1;
+    bytes payload = 2;
+}

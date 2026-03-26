@@ -1,5 +1,5 @@
 
-Ì
+Ô
 Struct.protoProtocol"©
 WorldServerInfo
 worldId (RworldId
@@ -8,4 +8,8 @@
 
 maxPlayers (R
 maxPlayers
-status (Rstatusbproto3
+status (Rstatus"…
+GameSessionInfo
+	accountId (R	accountId*
+gatewaySessionId (RgatewaySessionId(
+gatewayServerId (RgatewayServerIdbproto3

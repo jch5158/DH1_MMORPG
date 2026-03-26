@@ -54,12 +54,13 @@ enum eServiceType : int {
   SERVICE_TYPE_HEARTBEAT = 3,
   SERVICE_TYPE_SERVER_HEARTBEAT = 4,
   SERVICE_TYPE_WORLD = 5,
+  SERVICE_TYPE_GAME_SESSION = 6,
   eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool eServiceType_IsValid(int value);
 constexpr eServiceType eServiceType_MIN = SERVICE_TYPE_NONE;
-constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_WORLD;
+constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_GAME_SESSION;
 constexpr int eServiceType_ARRAYSIZE = eServiceType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eServiceType_descriptor();
@@ -163,6 +164,33 @@ inline bool eWorldSelectResult_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eWorldSelectResult>(
     eWorldSelectResult_descriptor(), name, value);
 }
+enum eGameSessionResult : int {
+  GAME_SESSION_SUCCESS = 0,
+  GAME_SESSION_FAIL_FULL = 1,
+  GAME_SESSION_FAIL_DUPLICATE = 2,
+  GAME_SESSION_FAIL_INTERNAL = 3,
+  eGameSessionResult_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  eGameSessionResult_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool eGameSessionResult_IsValid(int value);
+constexpr eGameSessionResult eGameSessionResult_MIN = GAME_SESSION_SUCCESS;
+constexpr eGameSessionResult eGameSessionResult_MAX = GAME_SESSION_FAIL_INTERNAL;
+constexpr int eGameSessionResult_ARRAYSIZE = eGameSessionResult_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eGameSessionResult_descriptor();
+template<typename T>
+inline const std::string& eGameSessionResult_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, eGameSessionResult>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function eGameSessionResult_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    eGameSessionResult_descriptor(), enum_t_value);
+}
+inline bool eGameSessionResult_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, eGameSessionResult* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eGameSessionResult>(
+    eGameSessionResult_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -204,6 +232,11 @@ template <> struct is_proto_enum< ::Protocol::eWorldSelectResult> : ::std::true_
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eWorldSelectResult>() {
   return ::Protocol::eWorldSelectResult_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::eGameSessionResult> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eGameSessionResult>() {
+  return ::Protocol::eGameSessionResult_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE
