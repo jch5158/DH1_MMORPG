@@ -36,6 +36,7 @@ message S2S_GAME_SESSION_LEAVE_NOT
 
     uint64 accountId = 1;
     uint64 gatewaySessionId = 2;
+    int32 reason = 3;           // 0=Normal, 1=DuplicateLogin
 }
 
 // World -> Realm: 세션 진입 동기화

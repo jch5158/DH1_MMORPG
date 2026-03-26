@@ -265,3 +265,23 @@ void RedisService::RefreshSessionTTLAsync(const Vector<uint64>& accountIds, cons
 			}
 		});
 }
+
+void RedisService::PublishKickAsync(const int32 targetGatewayId, const uint64 accountId)
+{
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argTargetGwId = targetGatewayId, argAccountId = accountId, argService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				return;
+			}
+
+			const std::string channel = "GW:kick:" + std::to_string(argTargetGwId);
+			nlohmann::json json;
+			json["accountId"] = argAccountId;
+			const std::string message = json.dump();
+
+			const int64 receivers = pRedis->Publish(channel, message);
+			NET_ENGINE_LOG_INFO("RedisService::PublishKickAsync - Published kick to GW:{}, accountId: {}, receivers: {}", argTargetGwId, argAccountId, receivers);
+		});
+}

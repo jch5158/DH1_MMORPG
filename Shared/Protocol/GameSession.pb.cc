@@ -54,6 +54,7 @@ PROTOBUF_CONSTEXPR S2S_GAME_SESSION_LEAVE_NOT::S2S_GAME_SESSION_LEAVE_NOT(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.accountid_)*/uint64_t{0u}
   , /*decltype(_impl_.gatewaysessionid_)*/uint64_t{0u}
+  , /*decltype(_impl_.reason_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct S2S_GAME_SESSION_LEAVE_NOTDefaultTypeInternal {
   PROTOBUF_CONSTEXPR S2S_GAME_SESSION_LEAVE_NOTDefaultTypeInternal()
@@ -152,6 +153,7 @@ const uint32_t TableStruct_GameSession_2eproto::offsets[] PROTOBUF_SECTION_VARIA
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2S_GAME_SESSION_LEAVE_NOT, _impl_.accountid_),
   PROTOBUF_FIELD_OFFSET(::Protocol::S2S_GAME_SESSION_LEAVE_NOT, _impl_.gatewaysessionid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2S_GAME_SESSION_LEAVE_NOT, _impl_.reason_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -190,10 +192,10 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 0, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_ENTER_NOT)},
   { 9, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_ENTER_RES)},
   { 17, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_LEAVE_NOT)},
-  { 25, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT)},
-  { 34, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_SYNC_LEAVE_NOT)},
-  { 42, -1, -1, sizeof(::Protocol::S2S_RELAY_TO_CLIENT_NOT)},
-  { 50, -1, -1, sizeof(::Protocol::S2S_RELAY_TO_WORLD_NOT)},
+  { 26, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT)},
+  { 35, -1, -1, sizeof(::Protocol::S2S_GAME_SESSION_SYNC_LEAVE_NOT)},
+  { 43, -1, -1, sizeof(::Protocol::S2S_RELAY_TO_CLIENT_NOT)},
+  { 51, -1, -1, sizeof(::Protocol::S2S_RELAY_TO_WORLD_NOT)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -213,19 +215,20 @@ const char descriptor_table_protodef_GameSession_2eproto[] PROTOBUF_SECTION_VARI
   "ySessionId\030\002 \001(\004\022\027\n\017gatewayServerId\030\003 \001("
   "\005:\010\240\265\030\004\250\265\030\005\"g\n\032S2S_GAME_SESSION_ENTER_RE"
   "S\022\021\n\taccountId\030\001 \001(\004\022,\n\006result\030\002 \001(\0162\034.P"
-  "rotocol.eGameSessionResult:\010\240\265\030\005\250\265\030\004\"S\n\032"
+  "rotocol.eGameSessionResult:\010\240\265\030\005\250\265\030\004\"c\n\032"
   "S2S_GAME_SESSION_LEAVE_NOT\022\021\n\taccountId\030"
-  "\001 \001(\004\022\030\n\020gatewaySessionId\030\002 \001(\004:\010\240\265\030\004\250\265\030"
-  "\005\"n\n\037S2S_GAME_SESSION_SYNC_ENTER_NOT\022\021\n\t"
-  "accountId\030\001 \001(\004\022\025\n\rworldServerId\030\002 \001(\005\022\027"
-  "\n\017gatewayServerId\030\003 \001(\005:\010\240\265\030\005\250\265\030\010\"U\n\037S2S"
-  "_GAME_SESSION_SYNC_LEAVE_NOT\022\021\n\taccountI"
-  "d\030\001 \001(\004\022\025\n\rworldServerId\030\002 \001(\005:\010\240\265\030\005\250\265\030\010"
-  "\"N\n\027S2S_RELAY_TO_CLIENT_NOT\022\030\n\020gatewaySe"
-  "ssionId\030\001 \001(\004\022\017\n\007payload\030\002 \001(\014:\010\240\265\030\005\250\265\030\004"
-  "\"F\n\026S2S_RELAY_TO_WORLD_NOT\022\021\n\taccountId\030"
-  "\001 \001(\004\022\017\n\007payload\030\002 \001(\014:\010\240\265\030\004\250\265\030\005B \210\265\030\006\222\265"
-  "\030\030GameSessionPacketHandlerb\006proto3"
+  "\001 \001(\004\022\030\n\020gatewaySessionId\030\002 \001(\004\022\016\n\006reaso"
+  "n\030\003 \001(\005:\010\240\265\030\004\250\265\030\005\"n\n\037S2S_GAME_SESSION_SY"
+  "NC_ENTER_NOT\022\021\n\taccountId\030\001 \001(\004\022\025\n\rworld"
+  "ServerId\030\002 \001(\005\022\027\n\017gatewayServerId\030\003 \001(\005:"
+  "\010\240\265\030\005\250\265\030\010\"U\n\037S2S_GAME_SESSION_SYNC_LEAVE"
+  "_NOT\022\021\n\taccountId\030\001 \001(\004\022\025\n\rworldServerId"
+  "\030\002 \001(\005:\010\240\265\030\005\250\265\030\010\"N\n\027S2S_RELAY_TO_CLIENT_"
+  "NOT\022\030\n\020gatewaySessionId\030\001 \001(\004\022\017\n\007payload"
+  "\030\002 \001(\014:\010\240\265\030\005\250\265\030\004\"F\n\026S2S_RELAY_TO_WORLD_N"
+  "OT\022\021\n\taccountId\030\001 \001(\004\022\017\n\007payload\030\002 \001(\014:\010"
+  "\240\265\030\004\250\265\030\005B \210\265\030\006\222\265\030\030GameSessionPacketHandl"
+  "erb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_GameSession_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -233,7 +236,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_GameSession_2eproto
 };
 static ::_pbi::once_flag descriptor_table_GameSession_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_GameSession_2eproto = {
-    false, false, 754, descriptor_table_protodef_GameSession_2eproto,
+    false, false, 770, descriptor_table_protodef_GameSession_2eproto,
     "GameSession.proto",
     &descriptor_table_GameSession_2eproto_once, descriptor_table_GameSession_2eproto_deps, 2, 7,
     schemas, file_default_instances, TableStruct_GameSession_2eproto::offsets,
@@ -715,12 +718,13 @@ S2S_GAME_SESSION_LEAVE_NOT::S2S_GAME_SESSION_LEAVE_NOT(const S2S_GAME_SESSION_LE
   new (&_impl_) Impl_{
       decltype(_impl_.accountid_){}
     , decltype(_impl_.gatewaysessionid_){}
+    , decltype(_impl_.reason_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&_impl_.accountid_, &from._impl_.accountid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.gatewaysessionid_) -
-    reinterpret_cast<char*>(&_impl_.accountid_)) + sizeof(_impl_.gatewaysessionid_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.reason_) -
+    reinterpret_cast<char*>(&_impl_.accountid_)) + sizeof(_impl_.reason_));
   // @@protoc_insertion_point(copy_constructor:Protocol.S2S_GAME_SESSION_LEAVE_NOT)
 }
 
@@ -731,6 +735,7 @@ inline void S2S_GAME_SESSION_LEAVE_NOT::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.accountid_){uint64_t{0u}}
     , decltype(_impl_.gatewaysessionid_){uint64_t{0u}}
+    , decltype(_impl_.reason_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -759,8 +764,8 @@ void S2S_GAME_SESSION_LEAVE_NOT::Clear() {
   (void) cached_has_bits;
 
   ::memset(&_impl_.accountid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.gatewaysessionid_) -
-      reinterpret_cast<char*>(&_impl_.accountid_)) + sizeof(_impl_.gatewaysessionid_));
+      reinterpret_cast<char*>(&_impl_.reason_) -
+      reinterpret_cast<char*>(&_impl_.accountid_)) + sizeof(_impl_.reason_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -782,6 +787,14 @@ const char* S2S_GAME_SESSION_LEAVE_NOT::_InternalParse(const char* ptr, ::_pbi::
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _impl_.gatewaysessionid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 reason = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _impl_.reason_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -827,6 +840,12 @@ uint8_t* S2S_GAME_SESSION_LEAVE_NOT::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteUInt64ToArray(2, this->_internal_gatewaysessionid(), target);
   }
 
+  // int32 reason = 3;
+  if (this->_internal_reason() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(3, this->_internal_reason(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -853,6 +872,11 @@ size_t S2S_GAME_SESSION_LEAVE_NOT::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_gatewaysessionid());
   }
 
+  // int32 reason = 3;
+  if (this->_internal_reason() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_reason());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -877,6 +901,9 @@ void S2S_GAME_SESSION_LEAVE_NOT::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_
   if (from._internal_gatewaysessionid() != 0) {
     _this->_internal_set_gatewaysessionid(from._internal_gatewaysessionid());
   }
+  if (from._internal_reason() != 0) {
+    _this->_internal_set_reason(from._internal_reason());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -895,8 +922,8 @@ void S2S_GAME_SESSION_LEAVE_NOT::InternalSwap(S2S_GAME_SESSION_LEAVE_NOT* other)
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(S2S_GAME_SESSION_LEAVE_NOT, _impl_.gatewaysessionid_)
-      + sizeof(S2S_GAME_SESSION_LEAVE_NOT::_impl_.gatewaysessionid_)
+      PROTOBUF_FIELD_OFFSET(S2S_GAME_SESSION_LEAVE_NOT, _impl_.reason_)
+      + sizeof(S2S_GAME_SESSION_LEAVE_NOT::_impl_.reason_)
       - PROTOBUF_FIELD_OFFSET(S2S_GAME_SESSION_LEAVE_NOT, _impl_.accountid_)>(
           reinterpret_cast<char*>(&_impl_.accountid_),
           reinterpret_cast<char*>(&other->_impl_.accountid_));

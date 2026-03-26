@@ -21,6 +21,7 @@ public:
     std::optional<std::string> GetDelString(const std::string& key) const;
     bool DeleteKey(const std::string& key) const;
     Vector<std::string> Keys(const std::string& pattern) const;
+    int64 Publish(const std::string& channel, const std::string& message) const;
 
 private:
 

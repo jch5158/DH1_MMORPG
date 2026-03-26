@@ -27,8 +27,8 @@ void ClientSession::OnDisconnected()
 
 	if (mAccountId != 0)
 	{
-		// 월드에 진입한 상태라면 WorldServer에 이탈 통보
-		if (mWorldServerId != 0)
+		// DuplicateLogin으로 이미 처리된 경우 LEAVE_NOT 중복 전송 방지
+		if (mWorldServerId != 0 && !mbDuplicateLoginHandled)
 		{
 			const auto pWorldClientService = ISingleton<GatewayService>::GetInstance().GetWorldClientServiceRef();
 			if (pWorldClientService != nullptr)

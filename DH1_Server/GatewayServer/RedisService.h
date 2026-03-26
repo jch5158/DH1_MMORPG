@@ -58,6 +58,9 @@ public:
 	void CheckAndDeleteSessionAsync(const uint64 accountId, const int32 gatewayId, std::function<void(const bool)> callback);
 	void RefreshSessionTTLAsync(const Vector<uint64>& accountIds, const int64 ttlSeconds);
 
+	// 크로스 GW 킥 발행
+	void PublishKickAsync(const int32 targetGatewayId, const uint64 accountId);
+
 private:
 	uint64 mRedisActorId;
 	ActorServiceRef mpActorService;

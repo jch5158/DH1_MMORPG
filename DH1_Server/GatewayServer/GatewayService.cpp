@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GatewayService.h"
+#include "RedisSubscriber.h"
 #include "ClientSession.h"
 #include "WorldSession.h"
 #include "ClientSessionManager.h"
@@ -107,7 +108,8 @@ bool GatewayService::Initialize(const JsonConfig& config)
 	}
 
 	// RedisService
-	mpRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), mpActorService);
+	mRedisConnectionUri = redisConfig.GetString("connectionUri");
+	mpRedisService = cpp_net_engine::MakeShared<RedisService>(mRedisConnectionUri, mpActorService);
 
 	// MySqlService
 	if (config.HasKey("mysql"))
@@ -213,6 +215,10 @@ bool GatewayService::Start()
 			});
 	}
 
+	// Redis Pub/Sub 구독 (크로스 GW 킥)
+	mpRedisSubscriber = std::make_unique<RedisSubscriber>();
+	mpRedisSubscriber->Start(mRedisConnectionUri, mGatewayId);
+
 	mbRunning.store(true);
 
 	NET_ENGINE_LOG_INFO("GatewayService::Start - Server started");
@@ -246,6 +252,13 @@ void GatewayService::Run()
 	}
 
 	updateGatewayRegistration(eGatewayStatus::ShuttingDown);
+
+	// Redis Subscriber 종료
+	if (mpRedisSubscriber != nullptr)
+	{
+		mpRedisSubscriber->Stop();
+	}
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	NET_ENGINE_LOG_INFO("GatewayService - Closing service...");

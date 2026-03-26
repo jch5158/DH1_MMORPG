@@ -18,6 +18,9 @@ public:
 	[[nodiscard]] std::optional<GameSessionInfo> GetSession(const uint64 accountId) const;
 	[[nodiscard]] Vector<uint64> RemoveSessionsByGateway(const int32 gatewayServerId);
 
+	bool SetSessionPending(const uint64 accountId);
+	[[nodiscard]] Vector<uint64> GetExpiredPendingSessions(const int64 timeoutMs) const;
+
 private:
 	const int32 mMaxSessionCount;
 

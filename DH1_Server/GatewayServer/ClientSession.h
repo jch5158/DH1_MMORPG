@@ -25,8 +25,12 @@ public:
 	void UpdateHeartbeat();
 	[[nodiscard]] int64 GetLastHeartbeatMs() const;
 
+	void SetDuplicateLoginHandled() { mbDuplicateLoginHandled = true; }
+	[[nodiscard]] bool IsDuplicateLoginHandled() const { return mbDuplicateLoginHandled; }
+
 private:
 	uint64 mAccountId = 0;
 	int32 mWorldServerId = 0;
+	bool mbDuplicateLoginHandled = false;
 	std::atomic<int64> mLastHeartbeatMs{0};
 };

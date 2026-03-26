@@ -148,3 +148,21 @@ bool RedisActor::DeleteKey(const std::string& key) const
         return false;
     }
 }
+
+int64 RedisActor::Publish(const std::string& channel, const std::string& message) const
+{
+    if (!mRedis)
+    {
+        return 0;
+    }
+
+    try
+    {
+        return static_cast<int64>(mRedis->publish(channel, message));
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] Publish Error : {}", e.what());
+        return 0;
+    }
+}

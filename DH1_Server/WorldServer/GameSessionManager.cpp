@@ -90,3 +90,43 @@ Vector<uint64> GameSessionManager::RemoveSessionsByGateway(const int32 gatewaySe
 
 	return removedAccountIds;
 }
+
+bool GameSessionManager::SetSessionPending(const uint64 accountId)
+{
+	UniqueLock lock(mLock);
+
+	const auto iter = mGameSessions.find(accountId);
+	if (iter == mGameSessions.end())
+	{
+		return false;
+	}
+
+	iter->second.mState = eSessionState::Pending;
+	iter->second.mPendingStartMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	return true;
+}
+
+Vector<uint64> GameSessionManager::GetExpiredPendingSessions(const int64 timeoutMs) const
+{
+	SharedLock lock(mLock);
+
+	const int64 nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	Vector<uint64> expired;
+
+	for (const auto& [accountId, sessionInfo] : mGameSessions)
+	{
+		if (sessionInfo.mState == eSessionState::Pending && sessionInfo.mPendingStartMs > 0)
+		{
+			if (nowMs - sessionInfo.mPendingStartMs > timeoutMs)
+			{
+				expired.push_back(accountId);
+			}
+		}
+	}
+
+	return expired;
+}

@@ -6,6 +6,8 @@
 #include "GameSessionManager.h"
 #include "GridManager.h"
 #include "GameTickProcessor.h"
+#include "PacketHandler/GameSessionPacketHandler.h"
+#include "Contents/GameObject.h"
 #include "NetService.h"
 #include "NetworkScheduler.h"
 #include "ActorService.h"
@@ -241,6 +243,7 @@ void WorldService::Run()
 			sendHeartbeatToGateways();
 			checkGatewayHeartbeats();
 			checkRealmHeartbeat();
+			cleanupPendingSessions();
 			lastHeartbeat = now;
 
 			NET_ENGINE_LOG_INFO("WorldService::Run - SessionCount: {}, PlayerCount: {}, WorldServerId: {}",
@@ -444,4 +447,43 @@ void WorldService::updateWorldRegistration(const eWorldServerStatus status)
 	info.status = static_cast<int32>(status);
 
 	mpRedisService->UpdateWorldServerInfo(info, mRedisTtlSeconds);
+}
+
+void WorldService::cleanupPendingSessions()
+{
+	constexpr int64 pendingTimeoutMs = 30000; // 30초
+
+	const Vector<uint64> expiredAccountIds = mpGameSessionManager->GetExpiredPendingSessions(pendingTimeoutMs);
+
+	for (const uint64 accountId : expiredAccountIds)
+	{
+		NET_ENGINE_LOG_WARN("WorldService::cleanupPendingSessions - Pending session expired, accountId: {}", accountId);
+
+		// PlayerObject 제거
+		if (mpGridManager != nullptr)
+		{
+			const auto pObject = mpGridManager->GetObjectByAccountId(accountId);
+			if (pObject != nullptr)
+			{
+				mpGridManager->RemoveObject(pObject->GetId());
+			}
+		}
+
+		// 세션 제거
+		(void)mpGameSessionManager->RemoveSession(accountId);
+
+		// RealmServer에 이탈 동기화
+		if (mpRealmClientService != nullptr)
+		{
+			const auto pRealmSession = std::static_pointer_cast<RealmSession>(mpRealmClientService->GetFirstSessionRef());
+			if (pRealmSession != nullptr)
+			{
+				Protocol::S2S_GAME_SESSION_SYNC_LEAVE_NOT syncPacket;
+				syncPacket.set_accountid(accountId);
+				syncPacket.set_worldserverid(mWorldServerId);
+
+				pRealmSession->Send(GameSessionPacketHandler::MakeSendBuffer(syncPacket));
+			}
+		}
+	}
 }

@@ -304,6 +304,7 @@
     </ClCompile>
     <ClCompile Include="RedisActor.cpp" />
     <ClCompile Include="RedisService.cpp" />
+    <ClCompile Include="RedisSubscriber.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Shared\Protocol\Echo.pb.h" />
@@ -334,6 +335,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RedisActor.h" />
     <ClInclude Include="RedisService.h" />
+    <ClInclude Include="RedisSubscriber.h" />
     <ClInclude Include="PointerType.h" />
   </ItemGroup>
   <ItemGroup>

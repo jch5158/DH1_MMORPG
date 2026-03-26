@@ -22,7 +22,7 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[5];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[6];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
@@ -50,11 +50,13 @@ const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "eSessionResult\022\030\n\024GAME_SESSION_SUCCESS\020\000"
   "\022\032\n\026GAME_SESSION_FAIL_FULL\020\001\022\037\n\033GAME_SES"
   "SION_FAIL_DUPLICATE\020\002\022\036\n\032GAME_SESSION_FA"
-  "IL_INTERNAL\020\003b\006proto3"
+  "IL_INTERNAL\020\003*R\n\023eSessionLeaveReason\022\030\n\024"
+  "SESSION_LEAVE_NORMAL\020\000\022!\n\035SESSION_LEAVE_"
+  "DUPLICATE_LOGIN\020\001b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 861, descriptor_table_protodef_Enum_2eproto,
+    false, false, 945, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -152,6 +154,20 @@ bool eGameSessionResult_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eSessionLeaveReason_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[5];
+}
+bool eSessionLeaveReason_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
       return true;
     default:
       return false;

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "LoginPacketHandler.h"
+#include "GameSessionPacketHandler.h"
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
 #include "RedisService.h"
@@ -75,11 +76,63 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 				return;
 			}
 
+			// 같은 GW 내 중복 로그인 체크
 			if (const auto pExistingSession = pManager->GetClientSession(argAccountId))
 			{
-				NET_ENGINE_LOG_INFO("LoginPacketHandler - Duplicate login, kicking accountId: {}", argAccountId);
+				NET_ENGINE_LOG_INFO("LoginPacketHandler - Duplicate login (same GW), kicking accountId: {}", argAccountId);
+
+				// 월드에 진입한 상태라면 WorldServer에 이탈 통보 (DuplicateLogin)
+				if (pExistingSession->IsInWorld())
+				{
+					const auto pWorldClientService = ISingleton<GatewayService>::GetInstance().GetWorldClientServiceRef();
+					if (pWorldClientService != nullptr)
+					{
+						const auto pWorldSession = pWorldClientService->GetFirstSessionRef();
+						if (pWorldSession != nullptr)
+						{
+							Protocol::S2S_GAME_SESSION_LEAVE_NOT sessionLeavePacket;
+							sessionLeavePacket.set_accountid(argAccountId);
+							sessionLeavePacket.set_gatewaysessionid(pExistingSession->GetSessionId());
+							sessionLeavePacket.set_reason(static_cast<int32>(Protocol::eSessionLeaveReason::SESSION_LEAVE_DUPLICATE_LOGIN));
+							pWorldSession->Send(GameSessionPacketHandler::MakeSendBuffer(sessionLeavePacket));
+						}
+					}
+				}
+
+				pExistingSession->SetDuplicateLoginHandled();
 				pExistingSession->Disconnect(eDisconnectReason::DuplicateLogin);
 				(void)pManager->RemoveClientSession(argAccountId);
+			}
+			else
+			{
+				// 다른 GW에 접속 중인지 Redis로 확인 → PUBLISH 킥
+				RedisServiceRef pRedisCheck = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
+				if (pRedisCheck != nullptr)
+				{
+					const int32 myGatewayId = ISingleton<GatewayService>::GetInstance().GetGatewayId();
+					pRedisCheck->GetStringAsync("Session:" + std::to_string(argAccountId), [argAccountId, myGatewayId, pRedisCheck](const std::optional<std::string>& value)
+						{
+							if (!value.has_value())
+							{
+								return;
+							}
+
+							try
+							{
+								const auto json = nlohmann::json::parse(value.value());
+								const int32 existingGwId = json.at("gatewayId").get<int32>();
+								if (existingGwId != myGatewayId)
+								{
+									NET_ENGINE_LOG_INFO("LoginPacketHandler - Duplicate login (cross GW), publishing kick to GW:{}, accountId: {}", existingGwId, argAccountId);
+									pRedisCheck->PublishKickAsync(existingGwId, argAccountId);
+								}
+							}
+							catch (const std::exception&)
+							{
+								// 파싱 실패 — 무시
+							}
+						});
+				}
 			}
 
 			const auto pClientSession = std::static_pointer_cast<ClientSession>(pSession);

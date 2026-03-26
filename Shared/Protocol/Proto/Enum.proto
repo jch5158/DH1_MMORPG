@@ -50,3 +50,9 @@ enum eGameSessionResult
     GAME_SESSION_FAIL_DUPLICATE = 2;
     GAME_SESSION_FAIL_INTERNAL = 3;
 }
+
+enum eSessionLeaveReason
+{
+    SESSION_LEAVE_NORMAL = 0;
+    SESSION_LEAVE_DUPLICATE_LOGIN = 1;
+}

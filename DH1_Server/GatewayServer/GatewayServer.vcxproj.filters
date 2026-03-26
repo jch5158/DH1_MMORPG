@@ -26,6 +26,9 @@
     <Filter Include="Core\Network\Session">
       <UniqueIdentifier>{2038bf49-2d7b-4a8a-9a33-81785e54f635}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Redis">
+      <UniqueIdentifier>{f1a2b3c4-d5e6-7890-abcd-112233445566}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Core\Thread">
       <UniqueIdentifier>{ae9314b0-9c91-47d8-95c5-cdddd1b07e14}</UniqueIdentifier>
     </Filter>
@@ -90,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="RedisService.cpp">
       <Filter>Contents\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisSubscriber.cpp">
+      <Filter>Core\Redis</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler\HeartbeatPacketHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
@@ -176,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="RedisService.h">
       <Filter>Contents\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisSubscriber.h">
+      <Filter>Core\Redis</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\HeartbeatPacketHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>

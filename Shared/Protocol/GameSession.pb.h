@@ -534,6 +534,7 @@ class S2S_GAME_SESSION_LEAVE_NOT final :
   enum : int {
     kAccountIdFieldNumber = 1,
     kGatewaySessionIdFieldNumber = 2,
+    kReasonFieldNumber = 3,
   };
   // uint64 accountId = 1;
   void clear_accountid();
@@ -553,6 +554,15 @@ class S2S_GAME_SESSION_LEAVE_NOT final :
   void _internal_set_gatewaysessionid(uint64_t value);
   public:
 
+  // int32 reason = 3;
+  void clear_reason();
+  int32_t reason() const;
+  void set_reason(int32_t value);
+  private:
+  int32_t _internal_reason() const;
+  void _internal_set_reason(int32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.S2S_GAME_SESSION_LEAVE_NOT)
  private:
   class _Internal;
@@ -563,6 +573,7 @@ class S2S_GAME_SESSION_LEAVE_NOT final :
   struct Impl_ {
     uint64_t accountid_;
     uint64_t gatewaysessionid_;
+    int32_t reason_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1382,6 +1393,26 @@ inline void S2S_GAME_SESSION_LEAVE_NOT::_internal_set_gatewaysessionid(uint64_t 
 inline void S2S_GAME_SESSION_LEAVE_NOT::set_gatewaysessionid(uint64_t value) {
   _internal_set_gatewaysessionid(value);
   // @@protoc_insertion_point(field_set:Protocol.S2S_GAME_SESSION_LEAVE_NOT.gatewaySessionId)
+}
+
+// int32 reason = 3;
+inline void S2S_GAME_SESSION_LEAVE_NOT::clear_reason() {
+  _impl_.reason_ = 0;
+}
+inline int32_t S2S_GAME_SESSION_LEAVE_NOT::_internal_reason() const {
+  return _impl_.reason_;
+}
+inline int32_t S2S_GAME_SESSION_LEAVE_NOT::reason() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2S_GAME_SESSION_LEAVE_NOT.reason)
+  return _internal_reason();
+}
+inline void S2S_GAME_SESSION_LEAVE_NOT::_internal_set_reason(int32_t value) {
+  
+  _impl_.reason_ = value;
+}
+inline void S2S_GAME_SESSION_LEAVE_NOT::set_reason(int32_t value) {
+  _internal_set_reason(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2S_GAME_SESSION_LEAVE_NOT.reason)
 }
 
 // -------------------------------------------------------------------

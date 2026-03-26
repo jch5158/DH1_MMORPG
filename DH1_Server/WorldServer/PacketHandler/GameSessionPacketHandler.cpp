@@ -114,6 +114,7 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol::S2S_GAME_SESSION_LEAVE_NOT& packet, const PacketSessionRef& pSession)
 {
 	const uint64 accountId = packet.accountid();
+	const int32 reason = packet.reason();
 
 	auto& worldService = ISingleton<WorldService>::GetInstance();
 	const auto pGameSessionManager = worldService.GetGameSessionManagerRef();
@@ -122,7 +123,22 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 		return false;
 	}
 
-	// PlayerObject 제거
+	// 중복 로그인: 캐릭터/세션을 제거하지 않고 Pending 상태로 전환 (재연결 대기)
+	if (reason == static_cast<int32>(Protocol::eSessionLeaveReason::SESSION_LEAVE_DUPLICATE_LOGIN))
+	{
+		if (pGameSessionManager->SetSessionPending(accountId))
+		{
+			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Session set to Pending (DuplicateLogin), accountId: {}", accountId);
+		}
+		else
+		{
+			NET_ENGINE_LOG_WARN("GameSessionPacketHandler - Session not found for Pending, accountId: {}", accountId);
+		}
+
+		return true;
+	}
+
+	// 일반 이탈: PlayerObject + 세션 제거
 	const auto pGridManager = worldService.GetGridManagerRef();
 	if (pGridManager != nullptr)
 	{

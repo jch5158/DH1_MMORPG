@@ -3,6 +3,7 @@
 #include "RedisService.h"
 
 class JsonConfig;
+#include "RedisSubscriber.h"
 
 class GatewayService : public ISingleton<GatewayService>
 {
@@ -66,6 +67,7 @@ private:
 	ClientServiceRef mpWorldClientService;
 	ActorServiceRef mpActorService;
 	RedisServiceRef mpRedisService;
+	std::unique_ptr<RedisSubscriber> mpRedisSubscriber;
 	MySqlServiceRef mpMySqlService;
 	MySqlServiceRef mpAccountMySqlService;
 	ClientSessionManagerRef mpClientSessionManager;
@@ -79,6 +81,7 @@ private:
 	int64 mWorldHeartbeatTimeoutMs;
 	int64 mRedisTtlSeconds;
 	int64 mSessionTtlSeconds;
+	std::string mRedisConnectionUri;
 	std::string mListenIp;
 	std::string mPublicIp;
 	uint16 mListenPort;

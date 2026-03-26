@@ -69,6 +69,7 @@ private:
 	void sendHeartbeatToGateways();
 	void checkGatewayHeartbeats();
 	void checkRealmHeartbeat();
+	void cleanupPendingSessions();
 
 	ServerServiceRef mpServerService;
 	ClientServiceRef mpRealmClientService;
