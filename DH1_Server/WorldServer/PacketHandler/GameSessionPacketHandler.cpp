@@ -6,9 +6,37 @@
 #include "GridManager.h"
 #include "PlayerObject.h"
 #include "WorldService.h"
+#include "MySqlService.h"
+#include "Table/PlayerCharacterTable.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
 #include "PacketHandler/MovementPacketHandler.h"
+#include "Movement.pb.h"
 #include "RelayContext.h"
+
+namespace
+{
+	template<typename T>
+	NetSendBufferRef MakeMovementSendBuffer(const T& packet, const uint16 packetId)
+	{
+		const uint16 dataSize = static_cast<uint16>(packet.ByteSizeLong());
+		const uint16 packetSize = dataSize + static_cast<uint16>(sizeof(PacketHeader));
+
+		auto sendBuffer = cpp_net_engine::MakeSendBuffer(packetSize);
+		byte* pBuffer = sendBuffer->Reserve(packetSize);
+		if (pBuffer == nullptr)
+		{
+			return nullptr;
+		}
+
+		auto* header = reinterpret_cast<PacketHeader*>(pBuffer);
+		header->size = packetSize;
+		header->id = (static_cast<uint32>(Protocol::eServiceType::SERVICE_TYPE_MOVEMENT) << 16) | static_cast<uint32>(packetId);
+		packet.SerializeToArray(&header[1], dataSize);
+		sendBuffer->Commit(packetSize);
+
+		return sendBuffer;
+	}
+}
 
 bool GameSessionPacketHandler::Validate(const PacketSessionRef& pSession)
 {
@@ -50,6 +78,38 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 			response.set_result(Protocol::GAME_SESSION_SUCCESS);
 			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Session updated (reconnect), accountId: {}, gatewaySessionId: {}, gatewayServerId: {}",
 				accountId, gatewaySessionId, gatewayServerId);
+
+			// Gateway에 결과 응답
+			pSession->Send(GameSessionPacketHandler::MakeSendBuffer(response));
+
+			// 기존 PlayerObject의 gateway 정보 갱신
+			const auto pGridManager = worldService.GetGridManagerRef();
+			if (pGridManager != nullptr)
+			{
+				const auto pObject = pGridManager->GetObjectByAccountId(accountId);
+				if (pObject != nullptr)
+				{
+					const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
+					pPlayer->SetGatewayInfo(gatewaySessionId, gatewayServerId);
+				}
+			}
+
+			// RealmServer에 동기화
+			const auto pRealmClientService = worldService.GetRealmClientServiceRef();
+			if (pRealmClientService != nullptr)
+			{
+				const auto pRealmSession = std::static_pointer_cast<RealmSession>(pRealmClientService->GetFirstSessionRef());
+				if (pRealmSession != nullptr)
+				{
+					Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT syncPacket;
+					syncPacket.set_accountid(accountId);
+					syncPacket.set_worldserverid(worldService.GetWorldServerId());
+					syncPacket.set_gatewayserverid(gatewayServerId);
+					pRealmSession->Send(GameSessionPacketHandler::MakeSendBuffer(syncPacket));
+				}
+			}
+
+			return true;
 		}
 		else
 		{
@@ -75,36 +135,107 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 	// Gateway에 결과 응답
 	pSession->Send(GameSessionPacketHandler::MakeSendBuffer(response));
 
-	// 성공 시 PlayerObject 생성 + RealmServer에 동기화
+	// 성공 시 DB 로드 → PlayerObject 생성 → RealmServer 동기화
 	if (response.result() == Protocol::GAME_SESSION_SUCCESS)
 	{
-		// PlayerObject 생성 (스폰 위치 0,0,0)
+		const auto pMySqlService = worldService.GetMySqlServiceRef();
 		const auto pGridManager = worldService.GetGridManagerRef();
-		if (pGridManager != nullptr)
-		{
-			auto pPlayerObject = cpp_net_engine::MakeShared<PlayerObject>(accountId, gatewaySessionId, gatewayServerId);
-			pPlayerObject->SetMoveSpeed(worldService.GetDefaultMoveSpeed());
-
-			const int32 spawnCellX = pGridManager->ComputeCellX(0.0f);
-			const int32 spawnCellY = pGridManager->ComputeCellY(0.0f);
-			pGridManager->AddObject(pPlayerObject, spawnCellX, spawnCellY);
-
-			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - PlayerObject created, accountId: {}, actorId: {}", accountId, pPlayerObject->GetId());
-		}
-
+		const int32 worldServerId = worldService.GetWorldServerId();
+		const float defaultMoveSpeed = worldService.GetDefaultMoveSpeed();
 		const auto pRealmClientService = worldService.GetRealmClientServiceRef();
-		if (pRealmClientService != nullptr)
-		{
-			const auto pRealmSession = std::static_pointer_cast<RealmSession>(pRealmClientService->GetFirstSessionRef());
-			if (pRealmSession != nullptr)
-			{
-				Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT syncPacket;
-				syncPacket.set_accountid(accountId);
-				syncPacket.set_worldserverid(worldService.GetWorldServerId());
-				syncPacket.set_gatewayserverid(gatewayServerId);
 
-				pRealmSession->Send(GameSessionPacketHandler::MakeSendBuffer(syncPacket));
-			}
+		if (pMySqlService != nullptr && pGridManager != nullptr)
+		{
+			pMySqlService->ExecuteAsync([accountId, gatewaySessionId, gatewayServerId, worldServerId,
+				defaultMoveSpeed, pGridManager, pRealmClientService, pSession](sqlpp::mysql::connection& db)
+				{
+					const db::PlayerCharacter table{};
+
+					float posX = 0.0f, posY = 0.0f, posZ = 0.0f;
+					float rotYaw = 0.0f;
+					int32 level = 1;
+					int64 experience = 0;
+
+					// DB에서 캐릭터 조회
+					auto result = db(sqlpp::select(sqlpp::all_of(table)).from(table).where(
+						table.accountId == static_cast<int64>(accountId)));
+
+					if (!result.empty())
+					{
+						const auto& row = result.front();
+						posX = static_cast<float>(row.positionX);
+						posY = static_cast<float>(row.positionY);
+						posZ = static_cast<float>(row.positionZ);
+						rotYaw = static_cast<float>(row.rotationYaw);
+						level = static_cast<int32>(row.level);
+						experience = static_cast<int64>(row.experience);
+
+						// Z=0이면 기본 스폰 높이로 보정
+						if (posZ < 1.0f)
+						{
+							posZ = 148.0f;
+						}
+
+						// last_played_at 갱신
+						db(sqlpp::update(table).set(
+							table.lastPlayedAt = std::chrono::system_clock::now()
+						).where(table.accountId == static_cast<int64>(accountId)));
+
+						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Character loaded from DB, accountId: {}, pos: ({}, {}, {}), level: {}",
+							accountId, posX, posY, posZ, level);
+					}
+					else
+					{
+						// 새 캐릭터 생성
+						const std::string charName = "Player_" + std::to_string(accountId);
+
+						constexpr double defaultSpawnZ = 148.0;
+
+						db(sqlpp::insert_into(table).set(
+							table.accountId = static_cast<int64>(accountId),
+							table.characterName = charName,
+							table.level = 1,
+							table.experience = static_cast<int64>(0),
+							table.positionX = 0.0,
+							table.positionY = 0.0,
+							table.positionZ = defaultSpawnZ,
+							table.rotationYaw = 0.0,
+							table.worldId = worldServerId
+						));
+
+						posZ = static_cast<float>(defaultSpawnZ);
+
+						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - New character created in DB, accountId: {}, name: {}", accountId, charName);
+					}
+
+					// PlayerObject 생성 (DB 위치 반영)
+					auto pPlayerObject = cpp_net_engine::MakeShared<PlayerObject>(accountId, gatewaySessionId, gatewayServerId);
+					pPlayerObject->SetMoveSpeed(defaultMoveSpeed);
+					pPlayerObject->SetPosition(posX, posY, posZ);
+					pPlayerObject->SetRotationYaw(rotYaw);
+
+					const int32 spawnCellX = pGridManager->ComputeCellX(posX);
+					const int32 spawnCellY = pGridManager->ComputeCellY(posY);
+					pGridManager->AddObject(pPlayerObject, spawnCellX, spawnCellY);
+
+					NET_ENGINE_LOG_INFO("GameSessionPacketHandler - PlayerObject created, accountId: {}, actorId: {}, pos: ({}, {}, {})",
+						accountId, pPlayerObject->GetId(), posX, posY, posZ);
+
+					// RealmServer에 동기화
+					if (pRealmClientService != nullptr)
+					{
+						const auto pRealmSession = std::static_pointer_cast<RealmSession>(pRealmClientService->GetFirstSessionRef());
+						if (pRealmSession != nullptr)
+						{
+							Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT syncPacket;
+							syncPacket.set_accountid(accountId);
+							syncPacket.set_worldserverid(worldServerId);
+							syncPacket.set_gatewayserverid(gatewayServerId);
+
+							pRealmSession->Send(GameSessionPacketHandler::MakeSendBuffer(syncPacket));
+						}
+					}
+				});
 		}
 	}
 
@@ -123,9 +254,42 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 		return false;
 	}
 
-	// 중복 로그인: 캐릭터/세션을 제거하지 않고 Pending 상태로 전환 (재연결 대기)
+	// 중복 로그인: 위치 저장 후 Pending 상태로 전환 (재연결 대기)
 	if (reason == static_cast<int32>(Protocol::eSessionLeaveReason::SESSION_LEAVE_DUPLICATE_LOGIN))
 	{
+		// 현재 위치를 DB에 저장
+		const auto pGridManager = worldService.GetGridManagerRef();
+		if (pGridManager != nullptr)
+		{
+			const auto pObject = pGridManager->GetObjectByAccountId(accountId);
+			if (pObject != nullptr)
+			{
+				const float posX = pObject->GetPositionX();
+				const float posY = pObject->GetPositionY();
+				const float posZ = pObject->GetPositionZ();
+				const float rotYaw = pObject->GetRotationYaw();
+
+				const auto pMySqlService = worldService.GetMySqlServiceRef();
+				if (pMySqlService != nullptr)
+				{
+					pMySqlService->ExecuteAsync([accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
+						{
+							const db::PlayerCharacter table{};
+							db(sqlpp::update(table).set(
+								table.positionX = static_cast<double>(posX),
+								table.positionY = static_cast<double>(posY),
+								table.positionZ = static_cast<double>(posZ),
+								table.rotationYaw = static_cast<double>(rotYaw),
+								table.lastPlayedAt = std::chrono::system_clock::now()
+							).where(table.accountId == static_cast<int64>(accountId)));
+
+							NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Position saved before Pending, accountId: {}, pos: ({}, {}, {})",
+								accountId, posX, posY, posZ);
+						});
+				}
+			}
+		}
+
 		if (pGameSessionManager->SetSessionPending(accountId))
 		{
 			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Session set to Pending (DuplicateLogin), accountId: {}", accountId);
@@ -138,13 +302,38 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 		return true;
 	}
 
-	// 일반 이탈: PlayerObject + 세션 제거
+	// 일반 이탈: DB에 위치 저장 → PlayerObject + 세션 제거
 	const auto pGridManager = worldService.GetGridManagerRef();
 	if (pGridManager != nullptr)
 	{
 		const auto pObject = pGridManager->GetObjectByAccountId(accountId);
 		if (pObject != nullptr)
 		{
+			// DB에 현재 위치 저장
+			const float posX = pObject->GetPositionX();
+			const float posY = pObject->GetPositionY();
+			const float posZ = pObject->GetPositionZ();
+			const float rotYaw = pObject->GetRotationYaw();
+
+			const auto pMySqlService = worldService.GetMySqlServiceRef();
+			if (pMySqlService != nullptr)
+			{
+				pMySqlService->ExecuteAsync([accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
+					{
+						const db::PlayerCharacter table{};
+						db(sqlpp::update(table).set(
+							table.positionX = static_cast<double>(posX),
+							table.positionY = static_cast<double>(posY),
+							table.positionZ = static_cast<double>(posZ),
+							table.rotationYaw = static_cast<double>(rotYaw),
+							table.lastPlayedAt = std::chrono::system_clock::now()
+						).where(table.accountId == static_cast<int64>(accountId)));
+
+						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Character position saved, accountId: {}, pos: ({}, {}, {})",
+							accountId, posX, posY, posZ);
+					});
+			}
+
 			pGridManager->RemoveObject(pObject->GetId());
 		}
 	}

@@ -49,6 +49,10 @@ public:
 		{
 			return HandlePacket<Protocol::S2C_ENTITY_LEAVE_NOT>(size, pBuffer, pSession, HANDLE_S2C_ENTITY_LEAVE_NOT);
 		};
+		sPacketHandleMap[packet_id::eMovementPacketId::S2C_SPAWN_POSITION_RES] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return HandlePacket<Protocol::S2C_SPAWN_POSITION_RES>(size, pBuffer, pSession, HANDLE_S2C_SPAWN_POSITION_RES);
+		};
 
 	}
 
@@ -74,9 +78,11 @@ public:
 	static bool HANDLE_S2C_ENTITY_SNAPSHOT_NOT(const Protocol::S2C_ENTITY_SNAPSHOT_NOT& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_S2C_ENTITY_ENTER_NOT(const Protocol::S2C_ENTITY_ENTER_NOT& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_S2C_ENTITY_LEAVE_NOT(const Protocol::S2C_ENTITY_LEAVE_NOT& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_S2C_SPAWN_POSITION_RES(const Protocol::S2C_SPAWN_POSITION_RES& packet, const PacketSessionRef& pSession);
 	
 
 	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_MOVE_INPUT_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_MOVE_INPUT_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_SPAWN_POSITION_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_SPAWN_POSITION_REQ); }
 	
 
 private:

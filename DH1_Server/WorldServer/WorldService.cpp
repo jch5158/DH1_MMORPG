@@ -238,8 +238,6 @@ void WorldService::Run()
 
 	auto lastHeartbeat = std::chrono::steady_clock::now();
 	auto lastGameTick = std::chrono::steady_clock::now();
-	auto lastPositionSave = std::chrono::steady_clock::now();
-	constexpr int64 positionSaveIntervalMs = 30000;
 
 	while (mbRunning.load())
 	{
@@ -269,13 +267,6 @@ void WorldService::Run()
 				mpServerService->GetCurrentSessionCount(), mpGridManager->GetObjectCount(), mWorldServerId);
 		}
 
-		// 주기적 위치 저장 (30초)
-		const auto positionSaveElapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastPositionSave).count();
-		if (positionSaveElapsedMs >= positionSaveIntervalMs)
-		{
-			saveAllPlayerPositions();
-			lastPositionSave = now;
-		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
@@ -481,67 +472,6 @@ void WorldService::updateWorldRegistration(const eWorldServerStatus status)
 	mpRedisService->UpdateWorldServerInfo(info, mRedisTtlSeconds);
 }
 
-void WorldService::saveAllPlayerPositions()
-{
-	if (mpMySqlService == nullptr || !mpMySqlService->IsInitialized())
-	{
-		return;
-	}
-
-	const Vector<GameObjectRef> objects = mpGridManager->GetAllObjects();
-	if (objects.empty())
-	{
-		return;
-	}
-
-	const int32 worldServerId = mWorldServerId;
-
-	for (const auto& pObject : objects)
-	{
-		if (pObject->GetObjectType() != eGameObjectType::Player)
-		{
-			continue;
-		}
-
-		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
-		if (pPlayer == nullptr)
-		{
-			continue;
-		}
-
-		const uint64 accountId = pPlayer->GetAccountId();
-		const float posX = pPlayer->GetPositionX();
-		const float posY = pPlayer->GetPositionY();
-		const float posZ = pPlayer->GetPositionZ();
-		const float rotYaw = pPlayer->GetRotationYaw();
-
-		mpMySqlService->ExecuteAsync([accountId, posX, posY, posZ, rotYaw, worldServerId](sqlpp::mysql::connection& db) -> void
-			{
-				try
-				{
-					const db::PlayerCharacter table{};
-
-					db(sqlpp::update(table)
-						.set(
-							table.positionX = posX,
-							table.positionY = posY,
-							table.positionZ = posZ,
-							table.rotationYaw = rotYaw,
-							table.worldId = worldServerId,
-							table.lastPlayedAt = std::chrono::system_clock::now()
-						)
-						.where(table.accountId == static_cast<int64>(accountId)));
-				}
-				catch (const sqlpp::exception& e)
-				{
-					NET_ENGINE_LOG_ERROR("WorldService::saveAllPlayerPositions - Failed to save position for accountId: {}, error: {}",
-						accountId, e.what());
-				}
-			});
-	}
-
-	NET_ENGINE_LOG_INFO("WorldService::saveAllPlayerPositions - Saved positions for {} players", objects.size());
-}
 
 void WorldService::cleanupPendingSessions()
 {

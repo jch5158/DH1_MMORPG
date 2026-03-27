@@ -47,13 +47,27 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 				// Email
 				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 14)
 				[
-					AuthStyle::MakeInput(EmailInput, FText::FromString(TEXT("이메일")))
+					AuthStyle::MakeInput(EmailInput, FText::FromString(TEXT("이메일")), false,
+						[this](const FText&, ETextCommit::Type CommitType)
+						{
+							if (CommitType == ETextCommit::OnEnter && PasswordInput.IsValid())
+							{
+								FSlateApplication::Get().SetKeyboardFocus(PasswordInput);
+							}
+						})
 				]
 
 				// Password
 				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 28)
 				[
-					AuthStyle::MakeInput(PasswordInput, FText::FromString(TEXT("비밀번호")), true)
+					AuthStyle::MakeInput(PasswordInput, FText::FromString(TEXT("비밀번호")), true,
+						[this](const FText&, ETextCommit::Type CommitType)
+						{
+							if (CommitType == ETextCommit::OnEnter)
+							{
+								OnLoginClicked();
+							}
+						})
 				]
 
 				// Login Button
@@ -92,10 +106,18 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 		]
 	];
 
-	// Bind network delegates
-	if (const UGameInstance* GI = UGameInstance::StaticClass()->GetDefaultObject<UGameInstance>())
+	// 이메일 입력란에 자동 포커스
+	if (EmailInput.IsValid())
 	{
-		// Delegate binding happens in SAuthMasterWidget after GameInstance is available
+		RegisterActiveTimer(0.0f, FWidgetActiveTimerDelegate::CreateLambda(
+			[this](double, float) -> EActiveTimerReturnType
+			{
+				if (EmailInput.IsValid())
+				{
+					FSlateApplication::Get().SetKeyboardFocus(EmailInput);
+				}
+				return EActiveTimerReturnType::Stop;
+			}));
 	}
 }
 

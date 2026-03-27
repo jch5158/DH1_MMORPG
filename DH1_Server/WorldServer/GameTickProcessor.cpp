@@ -83,7 +83,7 @@ void GameTickProcessor::processMovementInputs()
 
 		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
 		pPlayer->UpdateMoveInput(input.mSequenceId, input.mDirectionX, input.mDirectionY, input.mDirectionZ,
-			input.mRotationYaw, input.mClientTimestamp);
+			input.mRotationYaw, input.mClientTimestamp, input.mPositionZ);
 
 		mMovedActorIds.push_back(pPlayer->GetId());
 
@@ -120,11 +120,11 @@ void GameTickProcessor::updatePositions(const float deltaSec)
 				pObject->GetVelocityZ() * scale);
 		}
 
-		// 위치 갱신
+		// 위치 갱신 (Z는 클라이언트에서 직접 동기화하므로 velocity 기반 갱신하지 않음)
 		pObject->SetPosition(
 			pObject->GetPositionX() + pObject->GetVelocityX() * deltaSec,
 			pObject->GetPositionY() + pObject->GetVelocityY() * deltaSec,
-			pObject->GetPositionZ() + pObject->GetVelocityZ() * deltaSec);
+			pObject->GetPositionZ());
 
 		NET_ENGINE_LOG_TRACE("GameTick - Position updated, actorId: {}, pos: ({:.1f}, {:.1f}, {:.1f})",
 			pObject->GetId(), pObject->GetPositionX(), pObject->GetPositionY(), pObject->GetPositionZ());

@@ -141,6 +141,45 @@ void ADH1_ClientCharacter::BeginPlay()
 		// 마우스 커서 표시
 		const_cast<APlayerController*>(PC)->bShowMouseCursor = true;
 		const_cast<APlayerController*>(PC)->DefaultMouseCursor = EMouseCursor::Default;
+
+		// 서버 위치 수신 전까지 캐릭터 숨기고 낙하 방지
+		SetActorHiddenInGame(true);
+		SetActorEnableCollision(false);
+		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->StopMovementImmediately();
+
+		// 서버에 스폰 위치 요청
+		if (UGameInstance* GI = Cast<UGameInstance>(GetGameInstance()))
+		{
+			if (UClientNetSubsystem* NetSub = GI->GetSubsystem<UClientNetSubsystem>())
+			{
+				NetSub->RequestSpawnPosition();
+			}
+		}
+
+		// 서버 응답(S2C_SPAWN_POSITION_RES)을 0.05초마다 체크하여 적용
+		GetWorldTimerManager().SetTimer(SpawnPositionTimerHandle, FTimerDelegate::CreateLambda([this]()
+			{
+				extern bool MovementPacketHandler_ConsumePendingSpawn(FVector& OutPos, float& OutYaw);
+
+				FVector Pos;
+				float Yaw;
+				if (MovementPacketHandler_ConsumePendingSpawn(Pos, Yaw))
+				{
+					SetActorLocation(Pos);
+					SetActorRotation(FRotator(0.0f, Yaw, 0.0f));
+
+					// 캐릭터 표시 + 물리 복원
+					SetActorHiddenInGame(false);
+					SetActorEnableCollision(true);
+					GetCharacterMovement()->GravityScale = 1.0f;
+
+					GetWorldTimerManager().ClearTimer(SpawnPositionTimerHandle);
+
+					UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Spawn position applied: %s, yaw: %.1f"),
+						*Pos.ToString(), Yaw);
+				}
+			}), 0.05f, true);
 	}
 	else
 	{

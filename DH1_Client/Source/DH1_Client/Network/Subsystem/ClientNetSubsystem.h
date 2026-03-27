@@ -86,6 +86,9 @@ public:
     void SendMoveInput(const FVector& Direction, float RotationYaw);
     void SendMoveStop();
 
+    // 스폰 위치 요청
+    void RequestSpawnPosition();
+
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;

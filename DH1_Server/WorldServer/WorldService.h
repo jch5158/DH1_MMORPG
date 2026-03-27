@@ -70,7 +70,6 @@ private:
 	void sendHeartbeatToGateways();
 	void checkGatewayHeartbeats();
 	void checkRealmHeartbeat();
-	void saveAllPlayerPositions();
 	void cleanupPendingSessions();
 
 	ServerServiceRef mpServerService;

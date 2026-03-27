@@ -115,7 +115,8 @@ namespace AuthStyle
 		return FCoreStyle::GetDefaultFontStyle("Regular", 18);
 	}
 
-	inline TSharedRef<SWidget> MakeInput(TSharedPtr<SEditableTextBox>& OutBox, const FText& Hint, bool bIsPassword = false)
+	inline TSharedRef<SWidget> MakeInput(TSharedPtr<SEditableTextBox>& OutBox, const FText& Hint, bool bIsPassword = false,
+		TFunction<void(const FText&, ETextCommit::Type)> OnCommitted = nullptr)
 	{
 		return SNew(SBox)
 			.HeightOverride(48.0f)
@@ -127,6 +128,10 @@ namespace AuthStyle
 				.Font(InputFont())
 				.BackgroundColor(C::InputBg)
 				.ForegroundColor(C::InputFg)
+				.OnTextCommitted_Lambda([OnCommitted](const FText& Text, ETextCommit::Type CommitType)
+					{
+						if (OnCommitted) OnCommitted(Text, CommitType);
+					})
 			];
 	}
 

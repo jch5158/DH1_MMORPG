@@ -19,6 +19,7 @@ message C2S_MOVE_INPUT_NOT
     Vector3 direction = 2;
     float rotationYaw = 3;
     int64 clientTimestamp = 4;
+    float positionZ = 5;
 }
 
 // Gateway -> Client: 서버 이동 결과 (본인)
@@ -60,4 +61,22 @@ message S2C_ENTITY_LEAVE_NOT
     option (receiver) = CLIENT;
 
     repeated uint64 entityIds = 1;
+}
+
+// Client -> Gateway -> World: 스폰 위치 요청
+message C2S_SPAWN_POSITION_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+}
+
+// Gateway -> Client: 스폰 위치 응답
+message S2C_SPAWN_POSITION_RES
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    Vector3 position = 1;
+    float rotationYaw = 2;
 }

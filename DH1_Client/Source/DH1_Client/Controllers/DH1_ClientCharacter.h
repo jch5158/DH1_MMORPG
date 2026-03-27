@@ -82,4 +82,7 @@ private:
 	// 패킷 쓰로틀
 	float MovePacketTimer = 0.0f;
 	static constexpr float MovePacketInterval = 0.05f;
+
+	// 스폰 위치 폴링 타이머
+	FTimerHandle SpawnPositionTimerHandle;
 };

@@ -15,7 +15,7 @@ void PlayerObject::SetGatewayInfo(const uint64 sessionId, const int32 serverId)
 	mGatewayServerId = serverId;
 }
 
-void PlayerObject::UpdateMoveInput(const uint32 sequenceId, const float dirX, const float dirY, const float dirZ, const float rotYaw, const int64 timestamp)
+void PlayerObject::UpdateMoveInput(const uint32 sequenceId, const float dirX, const float dirY, const float dirZ, const float rotYaw, const int64 timestamp, const float posZ)
 {
 	const float length = std::sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
 
@@ -34,6 +34,9 @@ void PlayerObject::UpdateMoveInput(const uint32 sequenceId, const float dirX, co
 		mVelocityZ = 0.0f;
 		mbMoving = false;
 	}
+
+	// 클라이언트 Z 위치 동기화
+	mPositionZ = posZ;
 
 	mRotationYaw = rotYaw;
 	mLastSequenceId = sequenceId;

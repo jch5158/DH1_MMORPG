@@ -15,7 +15,7 @@ public:
 	[[nodiscard]] int64 GetLastInputTimestamp() const { return mLastInputTimestamp; }
 
 	void SetGatewayInfo(const uint64 sessionId, const int32 serverId);
-	void UpdateMoveInput(const uint32 sequenceId, const float dirX, const float dirY, const float dirZ, const float rotYaw, const int64 timestamp);
+	void UpdateMoveInput(const uint32 sequenceId, const float dirX, const float dirY, const float dirZ, const float rotYaw, const int64 timestamp, const float posZ);
 
 private:
 

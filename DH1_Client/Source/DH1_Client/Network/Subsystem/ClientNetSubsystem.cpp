@@ -9,6 +9,8 @@
 #include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
 
@@ -321,6 +323,16 @@ void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float Ro
 	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now().time_since_epoch()).count();
 
+	// 현재 캐릭터 Z 위치
+	float CurrentZ = 0.0f;
+	if (const UWorld* World = GetWorld())
+	{
+		if (const ACharacter* Character = UGameplayStatics::GetPlayerCharacter(World, 0))
+		{
+			CurrentZ = static_cast<float>(Character->GetActorLocation().Z);
+		}
+	}
+
 	Protocol::C2S_MOVE_INPUT_NOT packet;
 	packet.set_sequenceid(MoveSequenceId);
 	packet.mutable_direction()->set_x(static_cast<float>(Direction.X));
@@ -328,6 +340,7 @@ void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float Ro
 	packet.mutable_direction()->set_z(static_cast<float>(Direction.Z));
 	packet.set_rotationyaw(RotationYaw);
 	packet.set_clienttimestamp(nowMs);
+	packet.set_positionz(CurrentZ);
 
 	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
 
@@ -337,5 +350,28 @@ void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float Ro
 
 void UClientNetSubsystem::SendMoveStop()
 {
-	SendMoveInput(FVector::ZeroVector, 0.0f);
+	// 현재 캐릭터 yaw를 유지하여 전송
+	float CurrentYaw = 0.0f;
+	if (const UWorld* World = GetWorld())
+	{
+		if (const ACharacter* Character = UGameplayStatics::GetPlayerCharacter(World, 0))
+		{
+			CurrentYaw = Character->GetActorRotation().Yaw;
+		}
+	}
+
+	SendMoveInput(FVector::ZeroVector, CurrentYaw);
+}
+
+void UClientNetSubsystem::RequestSpawnPosition()
+{
+	if (!ServiceRef) return;
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr) return;
+
+	Protocol::C2S_SPAWN_POSITION_REQ packet;
+	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
+
+	UE_LOG(LogNetEngine, Warning, TEXT("RequestSpawnPosition sent"));
 }

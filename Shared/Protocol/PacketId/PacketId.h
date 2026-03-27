@@ -45,6 +45,8 @@ namespace packet_id
         S2C_ENTITY_SNAPSHOT_NOT = 3,
         S2C_ENTITY_ENTER_NOT = 4,
         S2C_ENTITY_LEAVE_NOT = 5,
+        C2S_SPAWN_POSITION_REQ = 6,
+        S2C_SPAWN_POSITION_RES = 7,
 	};
 
 

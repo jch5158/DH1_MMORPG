@@ -9,4 +9,5 @@ struct MoveInputEntry
 	float mDirectionZ = 0.0f;
 	float mRotationYaw = 0.0f;
 	int64 mClientTimestamp = 0;
+	float mPositionZ = 0.0f;
 };
