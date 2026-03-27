@@ -40,6 +40,7 @@ public:
 	[[nodiscard]] GameSessionManagerRef GetGameSessionManagerRef() const;
 	[[nodiscard]] GridManagerRef GetGridManagerRef() const;
 	[[nodiscard]] GameTickProcessorRef GetGameTickProcessorRef() const;
+	[[nodiscard]] NavMeshManagerRef GetNavMeshManagerRef() const;
 	[[nodiscard]] float GetDefaultMoveSpeed() const;
 
 private:
@@ -79,6 +80,7 @@ private:
 	MySqlServiceRef mpMySqlService;
 	GameSessionManagerRef mpGameSessionManager;
 	GridManagerRef mpGridManager;
+	NavMeshManagerRef mpNavMeshManager;
 	GameTickProcessorRef mpGameTickProcessor;
 
 	int32 mNetworkDispatchThreadCount;
@@ -95,6 +97,7 @@ private:
 	float mDefaultMoveSpeed;
 	float mAoiCellSize;
 	int32 mAoiRange;
+	std::string mNavMeshFilePath;
 	std::string mListenIp;
 	uint16 mListenPort;
 

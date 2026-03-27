@@ -6,6 +6,7 @@
 #include "MySqlService.h"
 #include "GameSessionManager.h"
 #include "GridManager.h"
+#include "NavMeshManager.h"
 #include "GameTickProcessor.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
 #include "GameObject.h"
@@ -162,8 +163,23 @@ bool WorldService::Initialize(const JsonConfig& config)
 	// GridManager
 	mpGridManager = cpp_net_engine::MakeShared<GridManager>(mAoiCellSize, mAoiRange);
 
+	// NavMeshManager
+	mpNavMeshManager = cpp_net_engine::MakeShared<NavMeshManager>();
+	if (config.HasKey("gameTick"))
+	{
+		const JsonConfig gameTickConfig = config.GetSection("gameTick");
+		if (gameTickConfig.HasKey("navMeshFilePath"))
+		{
+			mNavMeshFilePath = gameTickConfig.GetString("navMeshFilePath");
+			if (!mpNavMeshManager->LoadFromFile(mNavMeshFilePath))
+			{
+				NET_ENGINE_LOG_WARN("WorldService::Initialize - NavMesh not loaded ({}), pathfinding disabled", mNavMeshFilePath);
+			}
+		}
+	}
+
 	// GameTickProcessor
-	mpGameTickProcessor = cpp_net_engine::MakeShared<GameTickProcessor>(mpGridManager, mDefaultMoveSpeed);
+	mpGameTickProcessor = cpp_net_engine::MakeShared<GameTickProcessor>(mpGridManager, mpNavMeshManager, mDefaultMoveSpeed);
 
 	NET_ENGINE_LOG_INFO("WorldService::Initialize - Initialization complete, worldServerId: {}, tickIntervalMs: {}", mWorldServerId, mGameTickIntervalMs);
 	return true;
@@ -325,6 +341,11 @@ GridManagerRef WorldService::GetGridManagerRef() const
 GameTickProcessorRef WorldService::GetGameTickProcessorRef() const
 {
 	return mpGameTickProcessor;
+}
+
+NavMeshManagerRef WorldService::GetNavMeshManagerRef() const
+{
+	return mpNavMeshManager;
 }
 
 float WorldService::GetDefaultMoveSpeed() const

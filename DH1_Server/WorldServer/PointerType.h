@@ -14,3 +14,4 @@ DECLARE_SMART_PTR(PlayerObject);
 DECLARE_SMART_PTR(GridCell);
 DECLARE_SMART_PTR(GridManager);
 DECLARE_SMART_PTR(GameTickProcessor);
+DECLARE_SMART_PTR(NavMeshManager);

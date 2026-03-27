@@ -90,6 +90,9 @@
     <ClCompile Include="GameTickProcessor.cpp">
       <Filter>Contents\Core</Filter>
     </ClCompile>
+    <ClCompile Include="NavMeshManager.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
     <ClCompile Include="RealmSession.cpp">
       <Filter>Core\Network\Session</Filter>
     </ClCompile>
@@ -168,6 +171,12 @@
       <Filter>Contents\Core</Filter>
     </ClInclude>
     <ClInclude Include="MoveInputEntry.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveToPositionEntry.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="NavMeshManager.h">
       <Filter>Contents\Core</Filter>
     </ClInclude>
     <ClInclude Include="GameTickProcessor.h">

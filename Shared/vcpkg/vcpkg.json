@@ -9,7 +9,8 @@
     "utfcpp",
     "redis-plus-plus",
     "sqlpp11",
-    "sqlpp11-connector-mysql"
+    "sqlpp11-connector-mysql",
+    "recastnavigation"
   ],
   "overrides": [
     {
