@@ -11,7 +11,8 @@
         "port": 3306,
         "user": "root",
         "password": "${DH1_MYSQL_PASSWORD}",
-        "database": "dh1_game_db"
+        "database": "dh1_game_db",
+        "poolSize": 4
     },
     "worldServer": {
         "worldServerId": 1,
@@ -31,9 +32,6 @@
     "realmServer": {
         "ip": "127.0.0.1",
         "port": 9200,
-        "runningThreadCount": 1,
-        "waitTimeoutMs": 10,
-        "tickIntervalMs": 16,
         "reconnectIntervalMs": 3000
     },
     "redis": {

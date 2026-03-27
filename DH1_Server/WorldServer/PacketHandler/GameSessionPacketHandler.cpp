@@ -162,7 +162,7 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 
 		if (pMySqlService != nullptr && pGridManager != nullptr)
 		{
-			pMySqlService->ExecuteAsync([accountId, gatewaySessionId, gatewayServerId, worldServerId,
+			pMySqlService->ExecuteAsync(accountId, [accountId, gatewaySessionId, gatewayServerId, worldServerId,
 				defaultMoveSpeed, pGridManager, pRealmClientService, pSession](sqlpp::mysql::connection& db)
 				{
 					const db::PlayerCharacter table{};
@@ -304,7 +304,7 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 				const auto pMySqlService = worldService.GetMySqlServiceRef();
 				if (pMySqlService != nullptr)
 				{
-					pMySqlService->ExecuteAsync([accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
+					pMySqlService->ExecuteAsync(accountId, [accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
 						{
 							const db::PlayerCharacter table{};
 							db(sqlpp::update(table).set(
@@ -350,7 +350,7 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 			const auto pMySqlService = worldService.GetMySqlServiceRef();
 			if (pMySqlService != nullptr)
 			{
-				pMySqlService->ExecuteAsync([accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
+				pMySqlService->ExecuteAsync(accountId, [accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
 					{
 						const db::PlayerCharacter table{};
 						db(sqlpp::update(table).set(
@@ -368,6 +368,13 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 
 			pGridManager->RemoveObject(pObject->GetId());
 		}
+	}
+
+	// MySQL 로드밸런서 배정 해제
+	const auto pMySqlService = worldService.GetMySqlServiceRef();
+	if (pMySqlService != nullptr)
+	{
+		pMySqlService->ReleaseRoutingKey(accountId);
 	}
 
 	if (pGameSessionManager->RemoveSession(accountId))

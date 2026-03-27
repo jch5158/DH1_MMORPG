@@ -17,9 +17,11 @@ public:
 
     bool SetString(const std::string& key, const std::string& value) const;
     bool SetExpireString(const std::string& key, const std::string& value, const int64 ttlSeconds) const;
+    bool SetNxExpireString(const std::string& key, const std::string& value, const int64 ttlSeconds) const;
     std::optional<std::string> GetString(const std::string& key) const;
     std::optional<std::string> GetDelString(const std::string& key) const;
     bool DeleteKey(const std::string& key) const;
+    bool Expire(const std::string& key, int64 ttlSeconds) const;
     Vector<std::string> Keys(const std::string& pattern) const;
     int64 Publish(const std::string& channel, const std::string& message) const;
 

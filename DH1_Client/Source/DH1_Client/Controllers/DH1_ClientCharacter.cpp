@@ -148,38 +148,12 @@ void ADH1_ClientCharacter::BeginPlay()
 		GetCharacterMovement()->GravityScale = 0.0f;
 		GetCharacterMovement()->StopMovementImmediately();
 
-		// 서버에 스폰 위치 요청
-		if (UGameInstance* GI = Cast<UGameInstance>(GetGameInstance()))
+		// 스폰 위치 수신 delegate 바인딩 + 요청
+		if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 		{
-			if (UClientNetSubsystem* NetSub = GI->GetSubsystem<UClientNetSubsystem>())
-			{
-				NetSub->RequestSpawnPosition();
-			}
+			NetSub->OnSpawnPositionReceived.AddUObject(this, &ADH1_ClientCharacter::OnSpawnPositionReceived);
+			NetSub->RequestSpawnPosition();
 		}
-
-		// 서버 응답(S2C_SPAWN_POSITION_RES)을 0.05초마다 체크하여 적용
-		GetWorldTimerManager().SetTimer(SpawnPositionTimerHandle, FTimerDelegate::CreateLambda([this]()
-			{
-				extern bool MovementPacketHandler_ConsumePendingSpawn(FVector& OutPos, float& OutYaw);
-
-				FVector Pos;
-				float Yaw;
-				if (MovementPacketHandler_ConsumePendingSpawn(Pos, Yaw))
-				{
-					SetActorLocation(Pos);
-					SetActorRotation(FRotator(0.0f, Yaw, 0.0f));
-
-					// 캐릭터 표시 + 물리 복원
-					SetActorHiddenInGame(false);
-					SetActorEnableCollision(true);
-					GetCharacterMovement()->GravityScale = 1.0f;
-
-					GetWorldTimerManager().ClearTimer(SpawnPositionTimerHandle);
-
-					UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Spawn position applied: %s, yaw: %.1f"),
-						*Pos.ToString(), Yaw);
-				}
-			}), 0.05f, true);
 	}
 	else
 	{
@@ -231,7 +205,7 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 
 			if (UClientNetSubsystem* NetSubsystem = GetNetSubsystem())
 			{
-				NetSubsystem->SendMoveStop();
+				NetSubsystem->SendMoveStop(GetActorRotation().Yaw);
 			}
 		}
 		else
@@ -252,7 +226,8 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 			if (NetSubsystem != nullptr)
 			{
 				const float Yaw = CurrentMoveDirection.Rotation().Yaw;
-				NetSubsystem->SendMoveInput(CurrentMoveDirection, Yaw);
+				const float PosZ = static_cast<float>(GetActorLocation().Z);
+				NetSubsystem->SendMoveInput(CurrentMoveDirection, Yaw, PosZ);
 			}
 			else
 			{
@@ -307,7 +282,7 @@ void ADH1_ClientCharacter::OnMoveInputCompleted()
 
 	if (UClientNetSubsystem* NetSubsystem = GetNetSubsystem())
 	{
-		NetSubsystem->SendMoveStop();
+		NetSubsystem->SendMoveStop(GetActorRotation().Yaw);
 	}
 }
 
@@ -331,6 +306,26 @@ void ADH1_ClientCharacter::OnClickMove()
 		UE_LOG(LogCharacterMove, Log, TEXT("ClickMove - Target: (%.1f, %.1f, %.1f)"),
 			ClickMoveTarget.X, ClickMoveTarget.Y, ClickMoveTarget.Z);
 	}
+}
+
+void ADH1_ClientCharacter::OnSpawnPositionReceived(const FVector& Position, const float Yaw)
+{
+	SetActorLocation(Position);
+	SetActorRotation(FRotator(0.0f, Yaw, 0.0f));
+
+	// 캐릭터 표시 + 물리 복원
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	GetCharacterMovement()->GravityScale = 1.0f;
+
+	// 1회만 수신
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->OnSpawnPositionReceived.RemoveAll(this);
+	}
+
+	UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Spawn position applied: %s, yaw: %.1f"),
+		*Position.ToString(), Yaw);
 }
 
 UClientNetSubsystem* ADH1_ClientCharacter::GetNetSubsystem() const

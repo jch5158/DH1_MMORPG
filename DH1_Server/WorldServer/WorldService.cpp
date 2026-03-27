@@ -102,19 +102,15 @@ bool WorldService::Initialize(const JsonConfig& config)
 		dbConfig.user = mysqlConfig.GetString("user");
 		dbConfig.password = mysqlConfig.GetString("password");
 		dbConfig.database = mysqlConfig.GetString("database");
+		dbConfig.poolSize = mysqlConfig.HasKey("poolSize") ? mysqlConfig.GetInt32("poolSize") : 4;
 
 		mpMySqlService = cpp_net_engine::MakeShared<MySqlService>(dbConfig, mpActorService);
 	}
 
-	// RealmServer ClientService
+	// RealmServer ClientService — ServerService와 NetworkScheduler 공유
 	if (config.HasKey("realmServer"))
 	{
 		const JsonConfig realmServerConfig = config.GetSection("realmServer");
-
-		NetworkSchedulerConfig realmNetConfig;
-		realmNetConfig.runningThreadCount = realmServerConfig.GetUInt32("runningThreadCount");
-		realmNetConfig.waitTimeoutMs = realmServerConfig.GetUInt32("waitTimeoutMs");
-		realmNetConfig.tickIntervalMs = realmServerConfig.GetUInt32("tickIntervalMs");
 
 		ClientServiceConfig realmServiceConfig;
 		realmServiceConfig.netAddress = NetAddress(realmServerConfig.GetString("ip"), realmServerConfig.GetUInt16("port"));
@@ -123,7 +119,7 @@ bool WorldService::Initialize(const JsonConfig& config)
 		realmServiceConfig.bAutoReconnect = true;
 		realmServiceConfig.reconnectIntervalMs = realmServerConfig.GetInt64("reconnectIntervalMs");
 		realmServiceConfig.maxReconnectCount = 0;
-		realmServiceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(realmNetConfig);
+		realmServiceConfig.pNetworkScheduler = serviceConfig.pNetworkScheduler; // 스케줄러 공유
 		realmServiceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> RealmSessionRef
 			{
 				return cpp_net_engine::MakeShared<RealmSession>(receiveBufferSize, sendBufferSize);
@@ -183,7 +179,7 @@ bool WorldService::Start()
 		return false;
 	}
 
-	// RealmServer connection
+	// RealmServer connection (NetworkScheduler는 ServerService와 공유)
 	if (mpRealmClientService != nullptr)
 	{
 		if (mpRealmClientService->Start() == false)
@@ -191,17 +187,9 @@ bool WorldService::Start()
 			NET_ENGINE_LOG_ERROR("WorldService::Start - RealmServer ClientService start failed");
 			return false;
 		}
-
-		ThreadManager::GetInstance().Launch("Realm Network Dispatch", [pScheduler = mpRealmClientService->GetNetworkScheduler()]() -> void
-			{
-				while (!pScheduler->IsStopped())
-				{
-					pScheduler->Dispatch();
-				}
-			});
 	}
 
-	// Network dispatch threads
+	// Network dispatch threads (ServerService + RealmClientService 공유 스케줄러)
 	for (int32 iter = 0; iter < mNetworkDispatchThreadCount; ++iter)
 	{
 		ThreadManager::GetInstance().Launch("Network Dispatch", [pScheduler = mpServerService->GetNetworkScheduler()]() -> void

@@ -14,6 +14,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHttpLoginErrorDelegate, int32 /*HttpStat
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEmailVerificationRequiredDelegate, const FString& /*Message*/, const FString& /*Email*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmListReceivedDelegate, const TArray<FRealmServerInfo>& /*RealmList*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmSelectResultDelegate, int32 /*eRealmSelectResult*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPositionReceivedDelegate, const FVector& /*Position*/, float /*Yaw*/);
 
 USTRUCT(BlueprintType)
 struct FRealmServerInfo
@@ -78,13 +79,14 @@ public:
     void NotifyLoginResult(int32 Result);
     void NotifyRealmList(const TArray<FRealmServerInfo>& RealmList);
     void NotifyRealmSelectResult(int32 Result);
+    void NotifySpawnPosition(const FVector& Position, float Yaw);
 
     void RequestRealmList();
     void RequestRealmSelect(int32 RealmId);
 
     // 이동 패킷 전송
-    void SendMoveInput(const FVector& Direction, float RotationYaw);
-    void SendMoveStop();
+    void SendMoveInput(const FVector& Direction, float RotationYaw, float PositionZ);
+    void SendMoveStop(float CurrentYaw);
 
     // 스폰 위치 요청
     void RequestSpawnPosition();
@@ -95,6 +97,7 @@ public:
     FOnEmailVerificationRequiredDelegate OnEmailVerificationRequired;
     FOnRealmListReceivedDelegate OnRealmListReceived;
     FOnRealmSelectResultDelegate OnRealmSelectResult;
+    FOnSpawnPositionReceivedDelegate OnSpawnPositionReceived;
 
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);

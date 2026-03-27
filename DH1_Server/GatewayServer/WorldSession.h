@@ -21,5 +21,5 @@ public:
 private:
 
 	std::atomic<int64> mLastHeartbeatMs{0};
-	int32 mWorldServerId = 0;
+	std::atomic<int32> mWorldServerId{0};
 };

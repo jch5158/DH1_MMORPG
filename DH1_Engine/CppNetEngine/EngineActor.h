@@ -14,3 +14,4 @@
 #include "ActorManager.h"
 #include "ActorDispatcher.h"
 #include "ActorService.h"
+#include "ActorLoadBalancer.h"

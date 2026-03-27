@@ -9,8 +9,6 @@
 #include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
 
@@ -303,7 +301,7 @@ void UClientNetSubsystem::RequestRealmSelect(const int32 RealmId)
 	pSession->Send(RealmPacketHandler::MakeSendBuffer(packet));
 }
 
-void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float RotationYaw)
+void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float RotationYaw, const float PositionZ)
 {
 	if (ServiceRef == nullptr)
 	{
@@ -323,16 +321,6 @@ void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float Ro
 	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now().time_since_epoch()).count();
 
-	// 현재 캐릭터 Z 위치
-	float CurrentZ = 0.0f;
-	if (const UWorld* World = GetWorld())
-	{
-		if (const ACharacter* Character = UGameplayStatics::GetPlayerCharacter(World, 0))
-		{
-			CurrentZ = static_cast<float>(Character->GetActorLocation().Z);
-		}
-	}
-
 	Protocol::C2S_MOVE_INPUT_NOT packet;
 	packet.set_sequenceid(MoveSequenceId);
 	packet.mutable_direction()->set_x(static_cast<float>(Direction.X));
@@ -340,7 +328,7 @@ void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float Ro
 	packet.mutable_direction()->set_z(static_cast<float>(Direction.Z));
 	packet.set_rotationyaw(RotationYaw);
 	packet.set_clienttimestamp(nowMs);
-	packet.set_positionz(CurrentZ);
+	packet.set_positionz(PositionZ);
 
 	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
 
@@ -348,19 +336,19 @@ void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float Ro
 		MoveSequenceId, Direction.X, Direction.Y, Direction.Z, RotationYaw);
 }
 
-void UClientNetSubsystem::SendMoveStop()
+void UClientNetSubsystem::SendMoveStop(const float CurrentYaw)
 {
-	// 현재 캐릭터 yaw를 유지하여 전송
-	float CurrentYaw = 0.0f;
-	if (const UWorld* World = GetWorld())
-	{
-		if (const ACharacter* Character = UGameplayStatics::GetPlayerCharacter(World, 0))
-		{
-			CurrentYaw = Character->GetActorRotation().Yaw;
-		}
-	}
+	SendMoveInput(FVector::ZeroVector, CurrentYaw, 0.0f);
+}
 
-	SendMoveInput(FVector::ZeroVector, CurrentYaw);
+void UClientNetSubsystem::NotifySpawnPosition(const FVector& Position, const float Yaw)
+{
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifySpawnPosition: pos=%s, yaw=%.1f"), *Position.ToString(), Yaw);
+	AsyncTask(ENamedThreads::GameThread, [this, Position, Yaw]()
+		{
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting SpawnPosition, Bound: %d"), OnSpawnPositionReceived.IsBound());
+			OnSpawnPositionReceived.Broadcast(Position, Yaw);
+		});
 }
 
 void UClientNetSubsystem::RequestSpawnPosition()

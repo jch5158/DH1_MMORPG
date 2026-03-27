@@ -83,6 +83,6 @@ private:
 	float MovePacketTimer = 0.0f;
 	static constexpr float MovePacketInterval = 0.05f;
 
-	// 스폰 위치 폴링 타이머
-	FTimerHandle SpawnPositionTimerHandle;
+	// 스폰 위치 수신 콜백
+	void OnSpawnPositionReceived(const FVector& Position, float Yaw);
 };

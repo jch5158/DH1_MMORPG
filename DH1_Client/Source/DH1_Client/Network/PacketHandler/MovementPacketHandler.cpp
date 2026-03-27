@@ -1,23 +1,9 @@
 #include "MovementPacketHandler.h"
-#include "Async/Async.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"
+#include "Engine/GameInstance.h"
+#include "Engine/Engine.h"
+#include "Network/Subsystem/ClientNetSubsystem.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogMovement, Log, All);
-
-// 스폰 위치 대기용 static 변수
-static FVector PendingSpawnPosition = FVector::ZeroVector;
-static float PendingSpawnYaw = 0.0f;
-static bool bHasPendingSpawn = false;
-
-bool MovementPacketHandler_ConsumePendingSpawn(FVector& OutPos, float& OutYaw)
-{
-	if (!bHasPendingSpawn) return false;
-	OutPos = PendingSpawnPosition;
-	OutYaw = PendingSpawnYaw;
-	bHasPendingSpawn = false;
-	return true;
-}
 
 bool MovementPacketHandler::Validate(const PacketSessionRef& pSession)
 {
@@ -86,10 +72,28 @@ bool MovementPacketHandler::HANDLE_S2C_SPAWN_POSITION_RES(const Protocol::S2C_SP
 	UE_LOG(LogMovement, Warning, TEXT("SPAWN_POSITION_RES - pos: (%.1f, %.1f, %.1f), yaw: %.1f"),
 		posX, posY, posZ, rotYaw);
 
-	// 위치를 static에 저장 — 캐릭터 BeginPlay에서 가져감
-	PendingSpawnPosition = FVector(posX, posY, posZ);
-	PendingSpawnYaw = rotYaw;
-	bHasPendingSpawn = true;
+	if (GEngine == nullptr)
+	{
+		return false;
+	}
+
+	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	{
+		UGameInstance* GameInstance = Context.OwningGameInstance;
+		if (GameInstance == nullptr)
+		{
+			continue;
+		}
+
+		UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>();
+		if (NetSubsystem == nullptr)
+		{
+			continue;
+		}
+
+		NetSubsystem->NotifySpawnPosition(FVector(posX, posY, posZ), rotYaw);
+		break;
+	}
 
 	return true;
 }

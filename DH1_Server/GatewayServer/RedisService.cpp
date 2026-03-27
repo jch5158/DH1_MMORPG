@@ -74,6 +74,22 @@ void RedisService::SetExpireStringAsync(std::string key, std::string value, cons
 		});
 }
 
+void RedisService::SetNxExpireStringAsync(std::string key, std::string value, const int64 ttlSeconds, SetStringCallback callback)
+{
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argValue = std::move(value), argCallback = std::move(callback), argTtlSeconds = ttlSeconds, argService = shared_from_this()]()->void
+		{
+			const RedisActorRef pRedis = argService->GetRedisActorRef();
+			if (pRedis == nullptr)
+			{
+				argCallback(false);
+				return;
+			}
+
+			const bool isSuccess = pRedis->SetNxExpireString(argKey, argValue, argTtlSeconds);
+			argCallback(isSuccess);
+		});
+}
+
 void RedisService::GetStringAsync(std::string key, GetStringCallback callback)
 {
 	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argKey = std::move(key), argCallback = std::move(callback), argService = shared_from_this()]()->void
@@ -254,14 +270,11 @@ void RedisService::RefreshSessionTTLAsync(const Vector<uint64>& accountIds, cons
 				return;
 			}
 
+			// EXPIRE만 호출 (GET+SET 대신) — N+1 제거, TTL만 갱신
 			for (const auto accountId : argAccountIds)
 			{
 				const std::string key = "Session:" + std::to_string(accountId);
-				const auto value = pRedis->GetString(key);
-				if (value.has_value())
-				{
-					pRedis->SetExpireString(key, value.value(), argTtl);
-				}
+				pRedis->Expire(key, argTtl);
 			}
 		});
 }

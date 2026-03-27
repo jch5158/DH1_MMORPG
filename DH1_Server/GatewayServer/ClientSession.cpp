@@ -2,6 +2,7 @@
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
 #include "RedisService.h"
+#include "MySqlService.h"
 #include "GatewayService.h"
 #include "PacketServiceTypeHandler.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
@@ -53,6 +54,17 @@ void ClientSession::OnDisconnected()
 		if (pManager != nullptr)
 		{
 			(void)pManager->RemoveClientSession(mAccountId);
+		}
+
+		// MySQL 로드밸런서 배정 해제
+		auto& gw = ISingleton<GatewayService>::GetInstance();
+		if (const auto pMySql = gw.GetMySqlServiceRef())
+		{
+			pMySql->ReleaseRoutingKey(mAccountId);
+		}
+		if (const auto pAccountMySql = gw.GetAccountMySqlServiceRef())
+		{
+			pAccountMySql->ReleaseRoutingKey(mAccountId);
 		}
 
 		// Redis: 내 GW가 마지막 관리자일 때만 세션 삭제 (다른 GW에 재접속했으면 무시)

@@ -28,9 +28,19 @@ public:
 	void SetDuplicateLoginHandled() { mbDuplicateLoginHandled = true; }
 	[[nodiscard]] bool IsDuplicateLoginHandled() const { return mbDuplicateLoginHandled; }
 
+	// 이동 패킷 검증용
+	void SetLastMoveSequenceId(const uint32 seq) { mLastMoveSequenceId = seq; }
+	[[nodiscard]] uint32 GetLastMoveSequenceId() const { return mLastMoveSequenceId; }
+	void SetLastMoveTimestampMs(const int64 ms) { mLastMoveTimestampMs = ms; }
+	[[nodiscard]] int64 GetLastMoveTimestampMs() const { return mLastMoveTimestampMs; }
+
 private:
 	uint64 mAccountId = 0;
 	int32 mWorldServerId = 0;
 	bool mbDuplicateLoginHandled = false;
 	std::atomic<int64> mLastHeartbeatMs{0};
+
+	// 이동 패킷 검증
+	uint32 mLastMoveSequenceId = 0;
+	int64 mLastMoveTimestampMs = 0;
 };

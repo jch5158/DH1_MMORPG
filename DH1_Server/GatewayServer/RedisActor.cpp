@@ -64,6 +64,26 @@ bool RedisActor::SetExpireString(const std::string& key, const std::string& valu
     }
 }
 
+bool RedisActor::SetNxExpireString(const std::string& key, const std::string& value, const int64 ttlSeconds) const
+{
+    if (!mRedis)
+    {
+        return false;
+    }
+
+    try
+    {
+        // SET key value EX ttl NX — 키가 없을 때만 설정 (원자적 중복 방지)
+        const bool isSet = mRedis->set(key, value, std::chrono::seconds(ttlSeconds), sw::redis::UpdateType::NOT_EXIST);
+        return isSet;
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] SetNx Error : {}", e.what());
+        return false;
+    }
+}
+
 std::optional<std::string> RedisActor::GetString(const std::string& key) const
 {
     if (!mRedis)
@@ -128,6 +148,24 @@ Vector<std::string> RedisActor::Keys(const std::string& pattern) const
     }
 
     return result;
+}
+
+bool RedisActor::Expire(const std::string& key, const int64 ttlSeconds) const
+{
+    if (!mRedis)
+    {
+        return false;
+    }
+
+    try
+    {
+        return mRedis->expire(key, std::chrono::seconds(ttlSeconds));
+    }
+    catch (const sw::redis::Error& e)
+    {
+        NET_ENGINE_LOG_ERROR("[RedisActor] Expire Error : {}", e.what());
+        return false;
+    }
 }
 
 bool RedisActor::DeleteKey(const std::string& key) const

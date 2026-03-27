@@ -60,15 +60,39 @@ bool MovementPacketHandler::HANDLE_C2S_MOVE_INPUT_NOT(const Protocol::C2S_MOVE_I
 		return false;
 	}
 
+	// 방향 벡터 NaN/Inf 검증
+	const float dirX = packet.direction().x();
+	const float dirY = packet.direction().y();
+	const float dirZ = packet.direction().z();
+	const float rotYaw = packet.rotationyaw();
+	const float posZ = packet.positionz();
+
+	if (std::isnan(dirX) || std::isnan(dirY) || std::isnan(dirZ) ||
+		std::isinf(dirX) || std::isinf(dirY) || std::isinf(dirZ) ||
+		std::isnan(rotYaw) || std::isinf(rotYaw) ||
+		std::isnan(posZ) || std::isinf(posZ))
+	{
+		NET_ENGINE_LOG_WARN("MovementPacketHandler (World) - Invalid float values, accountId: {}", accountId);
+		return true; // 무시
+	}
+
+	// 방향 벡터 크기 검증
+	const float dirLengthSq = dirX * dirX + dirY * dirY + dirZ * dirZ;
+	if (dirLengthSq > 1.5f)
+	{
+		NET_ENGINE_LOG_WARN("MovementPacketHandler (World) - Direction vector too large ({:.2f}), accountId: {}", dirLengthSq, accountId);
+		return true; // 무시
+	}
+
 	MoveInputEntry entry;
 	entry.mAccountId = accountId;
 	entry.mSequenceId = packet.sequenceid();
-	entry.mDirectionX = packet.direction().x();
-	entry.mDirectionY = packet.direction().y();
-	entry.mDirectionZ = packet.direction().z();
-	entry.mRotationYaw = packet.rotationyaw();
+	entry.mDirectionX = dirX;
+	entry.mDirectionY = dirY;
+	entry.mDirectionZ = dirZ;
+	entry.mRotationYaw = rotYaw;
 	entry.mClientTimestamp = packet.clienttimestamp();
-	entry.mPositionZ = packet.positionz();
+	entry.mPositionZ = posZ;
 
 	pGameTickProcessor->EnqueueMoveInput(entry);
 

@@ -7,6 +7,7 @@ namespace DbMigration.Data.Table
     [Table("player_character")]
     [Index(nameof(AccountId))]
     [Index(nameof(CharacterName), IsUnique = true)]
+    [Index(nameof(WorldId))]
     public class PlayerCharacter
     {
         [Key]
@@ -28,16 +29,16 @@ namespace DbMigration.Data.Table
         public long Experience { get; set; } = 0;
 
         [Column("position_x")]
-        public float PositionX { get; set; } = 0;
+        public double PositionX { get; set; } = 0;
 
         [Column("position_y")]
-        public float PositionY { get; set; } = 0;
+        public double PositionY { get; set; } = 0;
 
         [Column("position_z")]
-        public float PositionZ { get; set; } = 0;
+        public double PositionZ { get; set; } = 0;
 
         [Column("rotation_yaw")]
-        public float RotationYaw { get; set; } = 0;
+        public double RotationYaw { get; set; } = 0;
 
         [Column("world_id")]
         public int WorldId { get; set; } = 1;

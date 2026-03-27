@@ -10,6 +10,7 @@ struct MySqlConfig
 	std::string user;
 	std::string password;
 	std::string database;
+	int32 poolSize = 1;
 };
 
 class MySqlActor final : public Actor

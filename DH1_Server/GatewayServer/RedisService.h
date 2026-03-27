@@ -46,6 +46,7 @@ public:
 
 	void SetStringAsync(std::string key, std::string value, SetStringCallback callback);
 	void SetExpireStringAsync(std::string key, std::string value, const int64 ttlSeconds, SetStringCallback callback);
+	void SetNxExpireStringAsync(std::string key, std::string value, const int64 ttlSeconds, SetStringCallback callback);
 	void GetStringAsync(std::string key, GetStringCallback callback);
 	void GetDelStringAsync(std::string key, GetStringCallback callback);
 	void DeleteKeyAsync(std::string key, DeleteKeyCallback callback);

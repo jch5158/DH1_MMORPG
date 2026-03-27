@@ -76,15 +76,10 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		return false;
 	}
 
-	// WorldServer ClientService
+	// WorldServer ClientService — ServerService와 NetworkScheduler 공유
 	if (config.HasKey("worldServer"))
 	{
 		const JsonConfig worldServerConfig = config.GetSection("worldServer");
-
-		NetworkSchedulerConfig worldNetConfig;
-		worldNetConfig.runningThreadCount = worldServerConfig.GetUInt32("runningThreadCount");
-		worldNetConfig.waitTimeoutMs = worldServerConfig.GetUInt32("waitTimeoutMs");
-		worldNetConfig.tickIntervalMs = worldServerConfig.GetUInt32("tickIntervalMs");
 
 		ClientServiceConfig worldServiceConfig;
 		worldServiceConfig.netAddress = NetAddress(worldServerConfig.GetString("ip"), worldServerConfig.GetUInt16("port"));
@@ -93,7 +88,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		worldServiceConfig.bAutoReconnect = true;
 		worldServiceConfig.reconnectIntervalMs = worldServerConfig.GetInt64("reconnectIntervalMs");
 		worldServiceConfig.maxReconnectCount = 0;
-		worldServiceConfig.pNetworkScheduler = cpp_net_engine::MakeShared<NetworkScheduler>(worldNetConfig);
+		worldServiceConfig.pNetworkScheduler = serviceConfig.pNetworkScheduler; // 스케줄러 공유
 		worldServiceConfig.sessionFactory = [receiveBufferSize, sendBufferSize]() -> WorldSessionRef
 			{
 				return cpp_net_engine::MakeShared<WorldSession>(receiveBufferSize, sendBufferSize);
@@ -121,6 +116,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		dbConfig.user = mysqlConfig.GetString("user");
 		dbConfig.password = mysqlConfig.GetString("password");
 		dbConfig.database = mysqlConfig.GetString("database");
+		dbConfig.poolSize = mysqlConfig.HasKey("poolSize") ? mysqlConfig.GetInt32("poolSize") : 4;
 
 		mpMySqlService = cpp_net_engine::MakeShared<MySqlService>(dbConfig, mpActorService);
 	}
@@ -135,6 +131,7 @@ bool GatewayService::Initialize(const JsonConfig& config)
 		accountDbConfig.user = accountMysqlConfig.GetString("user");
 		accountDbConfig.password = accountMysqlConfig.GetString("password");
 		accountDbConfig.database = accountMysqlConfig.GetString("database");
+		accountDbConfig.poolSize = accountMysqlConfig.HasKey("poolSize") ? accountMysqlConfig.GetInt32("poolSize") : 2;
 
 		mpAccountMySqlService = cpp_net_engine::MakeShared<MySqlService>(accountDbConfig, mpActorService);
 	}
@@ -172,7 +169,7 @@ bool GatewayService::Start()
 		return false;
 	}
 
-	// WorldServer connection
+	// WorldServer connection (NetworkScheduler는 ServerService와 공유)
 	if (mpWorldClientService != nullptr)
 	{
 		if (mpWorldClientService->Start() == false)
@@ -180,17 +177,9 @@ bool GatewayService::Start()
 			NET_ENGINE_LOG_ERROR("GatewayService::Start - WorldServer ClientService start failed");
 			return false;
 		}
-
-		ThreadManager::GetInstance().Launch("World Network Dispatch", [pScheduler = mpWorldClientService->GetNetworkScheduler()]() -> void
-			{
-				while (!pScheduler->IsStopped())
-				{
-					pScheduler->Dispatch();
-				}
-			});
 	}
 
-	// Network dispatch threads
+	// Network dispatch threads (ServerService + WorldClientService 공유 스케줄러)
 	for (int32 iter = 0; iter < mNetworkDispatchThreadCount; ++iter)
 	{
 		ThreadManager::GetInstance().Launch("Network Dispatch", [pScheduler = mpServerService->GetNetworkScheduler()]()->void

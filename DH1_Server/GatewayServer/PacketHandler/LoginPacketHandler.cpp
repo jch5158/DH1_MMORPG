@@ -39,9 +39,11 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 	}
 
 	// GetDelStringAsync: Redis GETDEL로 조회와 삭제를 원자적으로 수행 (티켓 재사용 방지)
-	pRedisService->GetDelStringAsync("ticket:" + packet.ticket(), [pSession, argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
+	std::weak_ptr<PacketSession> weakSession = pSession;
+	pRedisService->GetDelStringAsync("ticket:" + packet.ticket(), [weakSession, argAccountId = packet.accountid()](const std::optional<std::string>& resultStr)->void
 		{
-			if (!pSession->IsConnected())
+			auto pSession = weakSession.lock();
+			if (pSession == nullptr || !pSession->IsConnected())
 			{
 				return;
 			}
@@ -170,7 +172,7 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 			MySqlServiceRef pMySqlService = ISingleton<GatewayService>::GetInstance().GetAccountMySqlServiceRef();
 			if (pMySqlService != nullptr)
 			{
-				pMySqlService->ExecuteAsync([argAccountId](sqlpp::mysql::connection& db)
+				pMySqlService->ExecuteAsync(argAccountId, [argAccountId](sqlpp::mysql::connection& db)
 					{
 						try
 						{
