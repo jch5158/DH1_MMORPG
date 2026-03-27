@@ -85,4 +85,18 @@ private:
 
 	// 스폰 위치 수신 콜백
 	void OnSpawnPositionReceived(const FVector& Position, float Yaw);
+
+	// 서버 경로 이동
+	void OnMovePathReceived(uint32 SeqId, const TArray<FVector>& Waypoints, float MoveSpeed);
+	void OnPositionCorrected(const FVector& CorrectedPosition);
+	void FollowServerPath(float DeltaSeconds);
+
+	TArray<FVector> ServerPath;
+	int32 CurrentPathIndex = -1;
+	bool bIsServerPathMoving = false;
+
+	// 위치 보정 보간
+	FVector CorrectionTarget = FVector::ZeroVector;
+	bool bIsCorrecting = false;
+	float CorrectionAlpha = 0.0f;
 };

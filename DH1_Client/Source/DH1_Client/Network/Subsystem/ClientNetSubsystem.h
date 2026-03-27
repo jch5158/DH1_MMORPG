@@ -15,6 +15,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEmailVerificationRequiredDelegate, const
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmListReceivedDelegate, const TArray<FRealmServerInfo>& /*RealmList*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmSelectResultDelegate, int32 /*eRealmSelectResult*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPositionReceivedDelegate, const FVector& /*Position*/, float /*Yaw*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnMovePathReceivedDelegate, uint32 /*SeqId*/, const TArray<FVector>& /*Waypoints*/, float /*MoveSpeed*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPositionCorrectionDelegate, const FVector& /*CorrectedPosition*/);
 
 USTRUCT(BlueprintType)
 struct FRealmServerInfo
@@ -80,6 +82,8 @@ public:
     void NotifyRealmList(const TArray<FRealmServerInfo>& RealmList);
     void NotifyRealmSelectResult(int32 Result);
     void NotifySpawnPosition(const FVector& Position, float Yaw);
+    void NotifyMovePath(uint32 SeqId, const TArray<FVector>& Waypoints, float MoveSpeed);
+    void NotifyPositionCorrection(const FVector& CorrectedPosition);
 
     void RequestRealmList();
     void RequestRealmSelect(int32 RealmId);
@@ -91,6 +95,9 @@ public:
     // 스폰 위치 요청
     void RequestSpawnPosition();
 
+    // 클릭 이동 (목적지 → 서버 경로 계산)
+    void SendMoveToPosition(const FVector& Destination);
+
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;
@@ -98,6 +105,8 @@ public:
     FOnRealmListReceivedDelegate OnRealmListReceived;
     FOnRealmSelectResultDelegate OnRealmSelectResult;
     FOnSpawnPositionReceivedDelegate OnSpawnPositionReceived;
+    FOnMovePathReceivedDelegate OnMovePathReceived;
+    FOnPositionCorrectionDelegate OnPositionCorrection;
 
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);

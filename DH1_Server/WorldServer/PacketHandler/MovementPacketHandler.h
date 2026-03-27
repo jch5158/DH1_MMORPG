@@ -41,6 +41,10 @@ public:
 		{
 			return HandlePacket<Protocol::C2S_SPAWN_POSITION_REQ>(size, pBuffer, pSession, HANDLE_C2S_SPAWN_POSITION_REQ);
 		};
+		sPacketHandleMap[packet_id::eMovementPacketId::C2S_MOVE_TO_POSITION_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return HandlePacket<Protocol::C2S_MOVE_TO_POSITION_REQ>(size, pBuffer, pSession, HANDLE_C2S_MOVE_TO_POSITION_REQ);
+		};
 
 	}
 
@@ -64,6 +68,7 @@ public:
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_MOVE_INPUT_NOT(const Protocol::C2S_MOVE_INPUT_NOT& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_SPAWN_POSITION_REQ(const Protocol::C2S_SPAWN_POSITION_REQ& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_C2S_MOVE_TO_POSITION_REQ(const Protocol::C2S_MOVE_TO_POSITION_REQ& packet, const PacketSessionRef& pSession);
 	
 
 	

@@ -363,3 +363,43 @@ void UClientNetSubsystem::RequestSpawnPosition()
 
 	UE_LOG(LogNetEngine, Warning, TEXT("RequestSpawnPosition sent"));
 }
+
+void UClientNetSubsystem::SendMoveToPosition(const FVector& Destination)
+{
+	if (!ServiceRef) return;
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr) return;
+
+	++MoveSequenceId;
+
+	Protocol::C2S_MOVE_TO_POSITION_REQ packet;
+	packet.set_sequenceid(MoveSequenceId);
+	packet.mutable_destination()->set_x(static_cast<float>(Destination.X));
+	packet.mutable_destination()->set_y(static_cast<float>(Destination.Y));
+	packet.mutable_destination()->set_z(static_cast<float>(Destination.Z));
+	packet.set_clienttimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count());
+
+	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
+
+	UE_LOG(LogNetEngine, Log, TEXT("SendMoveToPosition - seq: %u, dest: %s"), MoveSequenceId, *Destination.ToString());
+}
+
+void UClientNetSubsystem::NotifyMovePath(const uint32 SeqId, const TArray<FVector>& Waypoints, const float MoveSpeed)
+{
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyMovePath: seq=%u, waypoints=%d"), SeqId, Waypoints.Num());
+	AsyncTask(ENamedThreads::GameThread, [this, SeqId, Waypoints, MoveSpeed]()
+		{
+			OnMovePathReceived.Broadcast(SeqId, Waypoints, MoveSpeed);
+		});
+}
+
+void UClientNetSubsystem::NotifyPositionCorrection(const FVector& CorrectedPosition)
+{
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyPositionCorrection: %s"), *CorrectedPosition.ToString());
+	AsyncTask(ENamedThreads::GameThread, [this, CorrectedPosition]()
+		{
+			OnPositionCorrection.Broadcast(CorrectedPosition);
+		});
+}

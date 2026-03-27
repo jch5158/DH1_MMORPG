@@ -97,3 +97,76 @@ bool MovementPacketHandler::HANDLE_S2C_SPAWN_POSITION_RES(const Protocol::S2C_SP
 
 	return true;
 }
+
+bool MovementPacketHandler::HANDLE_S2C_MOVE_PATH_RES(const Protocol::S2C_MOVE_PATH_RES& packet, const PacketSessionRef& pSession)
+{
+	UE_LOG(LogMovement, Log, TEXT("MOVE_PATH_RES - seq: %u, waypoints: %d, speed: %.1f"),
+		packet.sequenceid(), packet.waypoints_size(), packet.movespeed());
+
+	if (GEngine == nullptr)
+	{
+		return false;
+	}
+
+	TArray<FVector> Waypoints;
+	Waypoints.Reserve(packet.waypoints_size());
+	for (int32 i = 0; i < packet.waypoints_size(); ++i)
+	{
+		const auto& wp = packet.waypoints(i);
+		Waypoints.Add(FVector(wp.x(), wp.y(), wp.z()));
+	}
+
+	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	{
+		UGameInstance* GameInstance = Context.OwningGameInstance;
+		if (GameInstance == nullptr)
+		{
+			continue;
+		}
+
+		UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>();
+		if (NetSubsystem == nullptr)
+		{
+			continue;
+		}
+
+		NetSubsystem->NotifyMovePath(packet.sequenceid(), Waypoints, packet.movespeed());
+		break;
+	}
+
+	return true;
+}
+
+bool MovementPacketHandler::HANDLE_S2C_POSITION_CORRECTION_NOT(const Protocol::S2C_POSITION_CORRECTION_NOT& packet, const PacketSessionRef& pSession)
+{
+	const float posX = packet.correctedposition().x();
+	const float posY = packet.correctedposition().y();
+	const float posZ = packet.correctedposition().z();
+
+	UE_LOG(LogMovement, Warning, TEXT("POSITION_CORRECTION - pos: (%.1f, %.1f, %.1f)"), posX, posY, posZ);
+
+	if (GEngine == nullptr)
+	{
+		return false;
+	}
+
+	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	{
+		UGameInstance* GameInstance = Context.OwningGameInstance;
+		if (GameInstance == nullptr)
+		{
+			continue;
+		}
+
+		UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>();
+		if (NetSubsystem == nullptr)
+		{
+			continue;
+		}
+
+		NetSubsystem->NotifyPositionCorrection(FVector(posX, posY, posZ));
+		break;
+	}
+
+	return true;
+}

@@ -447,6 +447,31 @@ void GameTickProcessor::updatePathFollowing(const float deltaSec)
 
 void GameTickProcessor::sendPathResults()
 {
-	// TODO: Phase 3 프로토콜 추가 후 S2C_MOVE_PATH_RES 전송 구현
-	mPendingPathResults.clear();
+	for (const auto& result : mPendingPathResults)
+	{
+		const auto pObject = mpGridManager->GetObjectByAccountId(result.mAccountId);
+		if (pObject == nullptr || pObject->GetObjectType() != eGameObjectType::Player)
+		{
+			continue;
+		}
+
+		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
+
+		Protocol::S2C_MOVE_PATH_RES response;
+		response.set_sequenceid(result.mSequenceId);
+		response.set_movespeed(result.mMoveSpeed);
+		response.set_servertimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now().time_since_epoch()).count());
+
+		for (const auto& wp : result.mWaypoints)
+		{
+			auto* pWaypoint = response.add_waypoints();
+			pWaypoint->set_x(wp.mX);
+			pWaypoint->set_y(wp.mY);
+			pWaypoint->set_z(wp.mZ);
+		}
+
+		sendRelayToClient(pPlayer->GetGatewaySessionId(), pPlayer->GetGatewayServerId(),
+			MakeMovementSendBuffer(response, packet_id::S2C_MOVE_PATH_RES));
+	}
 }

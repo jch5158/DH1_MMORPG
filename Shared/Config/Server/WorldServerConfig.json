@@ -27,7 +27,8 @@
         "tickIntervalMs": 50,
         "moveSpeed": 600,
         "aoiCellSize": 2000,
-        "aoiRange": 1
+        "aoiRange": 1,
+        "navMeshFilePath": "NavMesh/L_GameWorld.bin"
     },
     "realmServer": {
         "ip": "127.0.0.1",

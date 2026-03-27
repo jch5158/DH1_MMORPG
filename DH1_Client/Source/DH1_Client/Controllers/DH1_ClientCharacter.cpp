@@ -148,10 +148,12 @@ void ADH1_ClientCharacter::BeginPlay()
 		GetCharacterMovement()->GravityScale = 0.0f;
 		GetCharacterMovement()->StopMovementImmediately();
 
-		// 스폰 위치 수신 delegate 바인딩 + 요청
+		// delegate 바인딩
 		if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 		{
 			NetSub->OnSpawnPositionReceived.AddUObject(this, &ADH1_ClientCharacter::OnSpawnPositionReceived);
+			NetSub->OnMovePathReceived.AddUObject(this, &ADH1_ClientCharacter::OnMovePathReceived);
+			NetSub->OnPositionCorrection.AddUObject(this, &ADH1_ClientCharacter::OnPositionCorrected);
 			NetSub->RequestSpawnPosition();
 		}
 	}
@@ -191,6 +193,28 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// 위치 보정 보간
+	if (bIsCorrecting)
+	{
+		CorrectionAlpha += DeltaSeconds * 5.0f; // ~200ms
+		const FVector CurrentPos = GetActorLocation();
+		const FVector NewPos = FMath::Lerp(CurrentPos, CorrectionTarget, FMath::Clamp(CorrectionAlpha, 0.0f, 1.0f));
+		SetActorLocation(NewPos);
+
+		if (CorrectionAlpha >= 1.0f)
+		{
+			bIsCorrecting = false;
+		}
+		return;
+	}
+
+	// 서버 경로 이동 (클릭 이동의 서버 응답)
+	if (bIsServerPathMoving)
+	{
+		FollowServerPath(DeltaSeconds);
+		return;
+	}
 
 	// 마우스 클릭 이동 처리
 	if (bIsClickMoving)
@@ -298,9 +322,16 @@ void ADH1_ClientCharacter::OnClickMove()
 	if (PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
 	{
 		ClickMoveTarget = HitResult.ImpactPoint;
-		bIsClickMoving = true;
 		bIsKeyMoving = false;
 
+		// 서버에 목적지 전송 (서버가 경로 계산)
+		if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+		{
+			NetSub->SendMoveToPosition(ClickMoveTarget);
+		}
+
+		// 서버 응답 전까지 목적지 방향으로 로컬 이동 시작 (예측)
+		bIsClickMoving = true;
 		CurrentMoveDirection = (ClickMoveTarget - GetActorLocation()).GetSafeNormal2D();
 
 		UE_LOG(LogCharacterMove, Log, TEXT("ClickMove - Target: (%.1f, %.1f, %.1f)"),
@@ -326,6 +357,75 @@ void ADH1_ClientCharacter::OnSpawnPositionReceived(const FVector& Position, cons
 
 	UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Spawn position applied: %s, yaw: %.1f"),
 		*Position.ToString(), Yaw);
+}
+
+void ADH1_ClientCharacter::OnMovePathReceived(const uint32 SeqId, const TArray<FVector>& Waypoints, const float MoveSpeed)
+{
+	// 클릭 이동 로컬 예측 중단
+	bIsClickMoving = false;
+	CurrentMoveDirection = FVector::ZeroVector;
+
+	if (Waypoints.Num() == 0)
+	{
+		UE_LOG(LogCharacterMove, Warning, TEXT("OnMovePathReceived - Empty path, seq: %u"), SeqId);
+		return;
+	}
+
+	ServerPath = Waypoints;
+	CurrentPathIndex = 0;
+	bIsServerPathMoving = true;
+
+	UE_LOG(LogCharacterMove, Log, TEXT("OnMovePathReceived - seq: %u, waypoints: %d, speed: %.1f"),
+		SeqId, Waypoints.Num(), MoveSpeed);
+}
+
+void ADH1_ClientCharacter::OnPositionCorrected(const FVector& CorrectedPosition)
+{
+	CorrectionTarget = CorrectedPosition;
+	bIsCorrecting = true;
+	CorrectionAlpha = 0.0f;
+
+	// WASD 이동 중단
+	CurrentMoveDirection = FVector::ZeroVector;
+	bIsKeyMoving = false;
+
+	UE_LOG(LogCharacterMove, Warning, TEXT("OnPositionCorrected - target: %s"), *CorrectedPosition.ToString());
+}
+
+void ADH1_ClientCharacter::FollowServerPath(const float DeltaSeconds)
+{
+	if (CurrentPathIndex < 0 || CurrentPathIndex >= ServerPath.Num())
+	{
+		bIsServerPathMoving = false;
+		CurrentMoveDirection = FVector::ZeroVector;
+		return;
+	}
+
+	const FVector CurrentLocation = GetActorLocation();
+	const FVector Target = ServerPath[CurrentPathIndex];
+	const float Distance = FVector::Dist2D(CurrentLocation, Target);
+
+	if (Distance < 50.0f)
+	{
+		++CurrentPathIndex;
+		if (CurrentPathIndex >= ServerPath.Num())
+		{
+			// 경로 완료
+			bIsServerPathMoving = false;
+			CurrentMoveDirection = FVector::ZeroVector;
+
+			if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+			{
+				NetSub->SendMoveStop(GetActorRotation().Yaw);
+			}
+			return;
+		}
+	}
+
+	// 현재 웨이포인트를 향해 이동
+	const FVector NextTarget = ServerPath[CurrentPathIndex];
+	CurrentMoveDirection = (NextTarget - CurrentLocation).GetSafeNormal2D();
+	AddMovementInput(CurrentMoveDirection, 1.0f);
 }
 
 UClientNetSubsystem* ADH1_ClientCharacter::GetNetSubsystem() const

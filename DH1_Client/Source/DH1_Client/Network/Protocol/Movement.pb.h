@@ -52,6 +52,9 @@ namespace Protocol {
 class C2S_MOVE_INPUT_NOT;
 struct C2S_MOVE_INPUT_NOTDefaultTypeInternal;
 extern C2S_MOVE_INPUT_NOTDefaultTypeInternal _C2S_MOVE_INPUT_NOT_default_instance_;
+class C2S_MOVE_TO_POSITION_REQ;
+struct C2S_MOVE_TO_POSITION_REQDefaultTypeInternal;
+extern C2S_MOVE_TO_POSITION_REQDefaultTypeInternal _C2S_MOVE_TO_POSITION_REQ_default_instance_;
 class C2S_SPAWN_POSITION_REQ;
 struct C2S_SPAWN_POSITION_REQDefaultTypeInternal;
 extern C2S_SPAWN_POSITION_REQDefaultTypeInternal _C2S_SPAWN_POSITION_REQ_default_instance_;
@@ -64,20 +67,29 @@ extern S2C_ENTITY_LEAVE_NOTDefaultTypeInternal _S2C_ENTITY_LEAVE_NOT_default_ins
 class S2C_ENTITY_SNAPSHOT_NOT;
 struct S2C_ENTITY_SNAPSHOT_NOTDefaultTypeInternal;
 extern S2C_ENTITY_SNAPSHOT_NOTDefaultTypeInternal _S2C_ENTITY_SNAPSHOT_NOT_default_instance_;
+class S2C_MOVE_PATH_RES;
+struct S2C_MOVE_PATH_RESDefaultTypeInternal;
+extern S2C_MOVE_PATH_RESDefaultTypeInternal _S2C_MOVE_PATH_RES_default_instance_;
 class S2C_MOVE_RESULT_NOT;
 struct S2C_MOVE_RESULT_NOTDefaultTypeInternal;
 extern S2C_MOVE_RESULT_NOTDefaultTypeInternal _S2C_MOVE_RESULT_NOT_default_instance_;
+class S2C_POSITION_CORRECTION_NOT;
+struct S2C_POSITION_CORRECTION_NOTDefaultTypeInternal;
+extern S2C_POSITION_CORRECTION_NOTDefaultTypeInternal _S2C_POSITION_CORRECTION_NOT_default_instance_;
 class S2C_SPAWN_POSITION_RES;
 struct S2C_SPAWN_POSITION_RESDefaultTypeInternal;
 extern S2C_SPAWN_POSITION_RESDefaultTypeInternal _S2C_SPAWN_POSITION_RES_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
 template<> ::Protocol::C2S_MOVE_INPUT_NOT* Arena::CreateMaybeMessage<::Protocol::C2S_MOVE_INPUT_NOT>(Arena*);
+template<> ::Protocol::C2S_MOVE_TO_POSITION_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_MOVE_TO_POSITION_REQ>(Arena*);
 template<> ::Protocol::C2S_SPAWN_POSITION_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_SPAWN_POSITION_REQ>(Arena*);
 template<> ::Protocol::S2C_ENTITY_ENTER_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_ENTITY_ENTER_NOT>(Arena*);
 template<> ::Protocol::S2C_ENTITY_LEAVE_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_ENTITY_LEAVE_NOT>(Arena*);
 template<> ::Protocol::S2C_ENTITY_SNAPSHOT_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_ENTITY_SNAPSHOT_NOT>(Arena*);
+template<> ::Protocol::S2C_MOVE_PATH_RES* Arena::CreateMaybeMessage<::Protocol::S2C_MOVE_PATH_RES>(Arena*);
 template<> ::Protocol::S2C_MOVE_RESULT_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_MOVE_RESULT_NOT>(Arena*);
+template<> ::Protocol::S2C_POSITION_CORRECTION_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_POSITION_CORRECTION_NOT>(Arena*);
 template<> ::Protocol::S2C_SPAWN_POSITION_RES* Arena::CreateMaybeMessage<::Protocol::S2C_SPAWN_POSITION_RES>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
@@ -1266,6 +1278,543 @@ class S2C_SPAWN_POSITION_RES final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Movement_2eproto;
 };
+// -------------------------------------------------------------------
+
+class C2S_MOVE_TO_POSITION_REQ final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C2S_MOVE_TO_POSITION_REQ) */ {
+ public:
+  inline C2S_MOVE_TO_POSITION_REQ() : C2S_MOVE_TO_POSITION_REQ(nullptr) {}
+  ~C2S_MOVE_TO_POSITION_REQ() override;
+  explicit PROTOBUF_CONSTEXPR C2S_MOVE_TO_POSITION_REQ(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C2S_MOVE_TO_POSITION_REQ(const C2S_MOVE_TO_POSITION_REQ& from);
+  C2S_MOVE_TO_POSITION_REQ(C2S_MOVE_TO_POSITION_REQ&& from) noexcept
+    : C2S_MOVE_TO_POSITION_REQ() {
+    *this = ::std::move(from);
+  }
+
+  inline C2S_MOVE_TO_POSITION_REQ& operator=(const C2S_MOVE_TO_POSITION_REQ& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C2S_MOVE_TO_POSITION_REQ& operator=(C2S_MOVE_TO_POSITION_REQ&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C2S_MOVE_TO_POSITION_REQ& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C2S_MOVE_TO_POSITION_REQ* internal_default_instance() {
+    return reinterpret_cast<const C2S_MOVE_TO_POSITION_REQ*>(
+               &_C2S_MOVE_TO_POSITION_REQ_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(C2S_MOVE_TO_POSITION_REQ& a, C2S_MOVE_TO_POSITION_REQ& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C2S_MOVE_TO_POSITION_REQ* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C2S_MOVE_TO_POSITION_REQ* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C2S_MOVE_TO_POSITION_REQ* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C2S_MOVE_TO_POSITION_REQ>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const C2S_MOVE_TO_POSITION_REQ& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const C2S_MOVE_TO_POSITION_REQ& from) {
+    C2S_MOVE_TO_POSITION_REQ::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(C2S_MOVE_TO_POSITION_REQ* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C2S_MOVE_TO_POSITION_REQ";
+  }
+  protected:
+  explicit C2S_MOVE_TO_POSITION_REQ(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDestinationFieldNumber = 2,
+    kClientTimestampFieldNumber = 3,
+    kSequenceIdFieldNumber = 1,
+  };
+  // .Protocol.Vector3 destination = 2;
+  bool has_destination() const;
+  private:
+  bool _internal_has_destination() const;
+  public:
+  void clear_destination();
+  const ::Protocol::Vector3& destination() const;
+  PROTOBUF_NODISCARD ::Protocol::Vector3* release_destination();
+  ::Protocol::Vector3* mutable_destination();
+  void set_allocated_destination(::Protocol::Vector3* destination);
+  private:
+  const ::Protocol::Vector3& _internal_destination() const;
+  ::Protocol::Vector3* _internal_mutable_destination();
+  public:
+  void unsafe_arena_set_allocated_destination(
+      ::Protocol::Vector3* destination);
+  ::Protocol::Vector3* unsafe_arena_release_destination();
+
+  // int64 clientTimestamp = 3;
+  void clear_clienttimestamp();
+  int64_t clienttimestamp() const;
+  void set_clienttimestamp(int64_t value);
+  private:
+  int64_t _internal_clienttimestamp() const;
+  void _internal_set_clienttimestamp(int64_t value);
+  public:
+
+  // uint32 sequenceId = 1;
+  void clear_sequenceid();
+  uint32_t sequenceid() const;
+  void set_sequenceid(uint32_t value);
+  private:
+  uint32_t _internal_sequenceid() const;
+  void _internal_set_sequenceid(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.C2S_MOVE_TO_POSITION_REQ)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::Protocol::Vector3* destination_;
+    int64_t clienttimestamp_;
+    uint32_t sequenceid_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Movement_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S2C_MOVE_PATH_RES final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S2C_MOVE_PATH_RES) */ {
+ public:
+  inline S2C_MOVE_PATH_RES() : S2C_MOVE_PATH_RES(nullptr) {}
+  ~S2C_MOVE_PATH_RES() override;
+  explicit PROTOBUF_CONSTEXPR S2C_MOVE_PATH_RES(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S2C_MOVE_PATH_RES(const S2C_MOVE_PATH_RES& from);
+  S2C_MOVE_PATH_RES(S2C_MOVE_PATH_RES&& from) noexcept
+    : S2C_MOVE_PATH_RES() {
+    *this = ::std::move(from);
+  }
+
+  inline S2C_MOVE_PATH_RES& operator=(const S2C_MOVE_PATH_RES& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S2C_MOVE_PATH_RES& operator=(S2C_MOVE_PATH_RES&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S2C_MOVE_PATH_RES& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S2C_MOVE_PATH_RES* internal_default_instance() {
+    return reinterpret_cast<const S2C_MOVE_PATH_RES*>(
+               &_S2C_MOVE_PATH_RES_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(S2C_MOVE_PATH_RES& a, S2C_MOVE_PATH_RES& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S2C_MOVE_PATH_RES* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S2C_MOVE_PATH_RES* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S2C_MOVE_PATH_RES* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S2C_MOVE_PATH_RES>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S2C_MOVE_PATH_RES& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S2C_MOVE_PATH_RES& from) {
+    S2C_MOVE_PATH_RES::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S2C_MOVE_PATH_RES* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S2C_MOVE_PATH_RES";
+  }
+  protected:
+  explicit S2C_MOVE_PATH_RES(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kWaypointsFieldNumber = 2,
+    kSequenceIdFieldNumber = 1,
+    kMoveSpeedFieldNumber = 3,
+    kServerTimestampFieldNumber = 4,
+  };
+  // repeated .Protocol.Vector3 waypoints = 2;
+  int waypoints_size() const;
+  private:
+  int _internal_waypoints_size() const;
+  public:
+  void clear_waypoints();
+  ::Protocol::Vector3* mutable_waypoints(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::Vector3 >*
+      mutable_waypoints();
+  private:
+  const ::Protocol::Vector3& _internal_waypoints(int index) const;
+  ::Protocol::Vector3* _internal_add_waypoints();
+  public:
+  const ::Protocol::Vector3& waypoints(int index) const;
+  ::Protocol::Vector3* add_waypoints();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::Vector3 >&
+      waypoints() const;
+
+  // uint32 sequenceId = 1;
+  void clear_sequenceid();
+  uint32_t sequenceid() const;
+  void set_sequenceid(uint32_t value);
+  private:
+  uint32_t _internal_sequenceid() const;
+  void _internal_set_sequenceid(uint32_t value);
+  public:
+
+  // float moveSpeed = 3;
+  void clear_movespeed();
+  float movespeed() const;
+  void set_movespeed(float value);
+  private:
+  float _internal_movespeed() const;
+  void _internal_set_movespeed(float value);
+  public:
+
+  // int64 serverTimestamp = 4;
+  void clear_servertimestamp();
+  int64_t servertimestamp() const;
+  void set_servertimestamp(int64_t value);
+  private:
+  int64_t _internal_servertimestamp() const;
+  void _internal_set_servertimestamp(int64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.S2C_MOVE_PATH_RES)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::Vector3 > waypoints_;
+    uint32_t sequenceid_;
+    float movespeed_;
+    int64_t servertimestamp_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Movement_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S2C_POSITION_CORRECTION_NOT final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S2C_POSITION_CORRECTION_NOT) */ {
+ public:
+  inline S2C_POSITION_CORRECTION_NOT() : S2C_POSITION_CORRECTION_NOT(nullptr) {}
+  ~S2C_POSITION_CORRECTION_NOT() override;
+  explicit PROTOBUF_CONSTEXPR S2C_POSITION_CORRECTION_NOT(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S2C_POSITION_CORRECTION_NOT(const S2C_POSITION_CORRECTION_NOT& from);
+  S2C_POSITION_CORRECTION_NOT(S2C_POSITION_CORRECTION_NOT&& from) noexcept
+    : S2C_POSITION_CORRECTION_NOT() {
+    *this = ::std::move(from);
+  }
+
+  inline S2C_POSITION_CORRECTION_NOT& operator=(const S2C_POSITION_CORRECTION_NOT& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S2C_POSITION_CORRECTION_NOT& operator=(S2C_POSITION_CORRECTION_NOT&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S2C_POSITION_CORRECTION_NOT& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S2C_POSITION_CORRECTION_NOT* internal_default_instance() {
+    return reinterpret_cast<const S2C_POSITION_CORRECTION_NOT*>(
+               &_S2C_POSITION_CORRECTION_NOT_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(S2C_POSITION_CORRECTION_NOT& a, S2C_POSITION_CORRECTION_NOT& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S2C_POSITION_CORRECTION_NOT* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S2C_POSITION_CORRECTION_NOT* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S2C_POSITION_CORRECTION_NOT* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S2C_POSITION_CORRECTION_NOT>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S2C_POSITION_CORRECTION_NOT& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S2C_POSITION_CORRECTION_NOT& from) {
+    S2C_POSITION_CORRECTION_NOT::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S2C_POSITION_CORRECTION_NOT* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S2C_POSITION_CORRECTION_NOT";
+  }
+  protected:
+  explicit S2C_POSITION_CORRECTION_NOT(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kCorrectedPositionFieldNumber = 1,
+    kServerTimestampFieldNumber = 2,
+  };
+  // .Protocol.Vector3 correctedPosition = 1;
+  bool has_correctedposition() const;
+  private:
+  bool _internal_has_correctedposition() const;
+  public:
+  void clear_correctedposition();
+  const ::Protocol::Vector3& correctedposition() const;
+  PROTOBUF_NODISCARD ::Protocol::Vector3* release_correctedposition();
+  ::Protocol::Vector3* mutable_correctedposition();
+  void set_allocated_correctedposition(::Protocol::Vector3* correctedposition);
+  private:
+  const ::Protocol::Vector3& _internal_correctedposition() const;
+  ::Protocol::Vector3* _internal_mutable_correctedposition();
+  public:
+  void unsafe_arena_set_allocated_correctedposition(
+      ::Protocol::Vector3* correctedposition);
+  ::Protocol::Vector3* unsafe_arena_release_correctedposition();
+
+  // int64 serverTimestamp = 2;
+  void clear_servertimestamp();
+  int64_t servertimestamp() const;
+  void set_servertimestamp(int64_t value);
+  private:
+  int64_t _internal_servertimestamp() const;
+  void _internal_set_servertimestamp(int64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.S2C_POSITION_CORRECTION_NOT)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::Protocol::Vector3* correctedposition_;
+    int64_t servertimestamp_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Movement_2eproto;
+};
 // ===================================================================
 
 
@@ -1942,9 +2491,354 @@ inline void S2C_SPAWN_POSITION_RES::set_rotationyaw(float value) {
   // @@protoc_insertion_point(field_set:Protocol.S2C_SPAWN_POSITION_RES.rotationYaw)
 }
 
+// -------------------------------------------------------------------
+
+// C2S_MOVE_TO_POSITION_REQ
+
+// uint32 sequenceId = 1;
+inline void C2S_MOVE_TO_POSITION_REQ::clear_sequenceid() {
+  _impl_.sequenceid_ = 0u;
+}
+inline uint32_t C2S_MOVE_TO_POSITION_REQ::_internal_sequenceid() const {
+  return _impl_.sequenceid_;
+}
+inline uint32_t C2S_MOVE_TO_POSITION_REQ::sequenceid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_MOVE_TO_POSITION_REQ.sequenceId)
+  return _internal_sequenceid();
+}
+inline void C2S_MOVE_TO_POSITION_REQ::_internal_set_sequenceid(uint32_t value) {
+  
+  _impl_.sequenceid_ = value;
+}
+inline void C2S_MOVE_TO_POSITION_REQ::set_sequenceid(uint32_t value) {
+  _internal_set_sequenceid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C2S_MOVE_TO_POSITION_REQ.sequenceId)
+}
+
+// .Protocol.Vector3 destination = 2;
+inline bool C2S_MOVE_TO_POSITION_REQ::_internal_has_destination() const {
+  return this != internal_default_instance() && _impl_.destination_ != nullptr;
+}
+inline bool C2S_MOVE_TO_POSITION_REQ::has_destination() const {
+  return _internal_has_destination();
+}
+inline const ::Protocol::Vector3& C2S_MOVE_TO_POSITION_REQ::_internal_destination() const {
+  const ::Protocol::Vector3* p = _impl_.destination_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::Vector3&>(
+      ::Protocol::_Vector3_default_instance_);
+}
+inline const ::Protocol::Vector3& C2S_MOVE_TO_POSITION_REQ::destination() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_MOVE_TO_POSITION_REQ.destination)
+  return _internal_destination();
+}
+inline void C2S_MOVE_TO_POSITION_REQ::unsafe_arena_set_allocated_destination(
+    ::Protocol::Vector3* destination) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.destination_);
+  }
+  _impl_.destination_ = destination;
+  if (destination) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.C2S_MOVE_TO_POSITION_REQ.destination)
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::release_destination() {
+  
+  ::Protocol::Vector3* temp = _impl_.destination_;
+  _impl_.destination_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::unsafe_arena_release_destination() {
+  // @@protoc_insertion_point(field_release:Protocol.C2S_MOVE_TO_POSITION_REQ.destination)
+  
+  ::Protocol::Vector3* temp = _impl_.destination_;
+  _impl_.destination_ = nullptr;
+  return temp;
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::_internal_mutable_destination() {
+  
+  if (_impl_.destination_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::Vector3>(GetArenaForAllocation());
+    _impl_.destination_ = p;
+  }
+  return _impl_.destination_;
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::mutable_destination() {
+  ::Protocol::Vector3* _msg = _internal_mutable_destination();
+  // @@protoc_insertion_point(field_mutable:Protocol.C2S_MOVE_TO_POSITION_REQ.destination)
+  return _msg;
+}
+inline void C2S_MOVE_TO_POSITION_REQ::set_allocated_destination(::Protocol::Vector3* destination) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.destination_);
+  }
+  if (destination) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(destination));
+    if (message_arena != submessage_arena) {
+      destination = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, destination, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.destination_ = destination;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_MOVE_TO_POSITION_REQ.destination)
+}
+
+// int64 clientTimestamp = 3;
+inline void C2S_MOVE_TO_POSITION_REQ::clear_clienttimestamp() {
+  _impl_.clienttimestamp_ = int64_t{0};
+}
+inline int64_t C2S_MOVE_TO_POSITION_REQ::_internal_clienttimestamp() const {
+  return _impl_.clienttimestamp_;
+}
+inline int64_t C2S_MOVE_TO_POSITION_REQ::clienttimestamp() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_MOVE_TO_POSITION_REQ.clientTimestamp)
+  return _internal_clienttimestamp();
+}
+inline void C2S_MOVE_TO_POSITION_REQ::_internal_set_clienttimestamp(int64_t value) {
+  
+  _impl_.clienttimestamp_ = value;
+}
+inline void C2S_MOVE_TO_POSITION_REQ::set_clienttimestamp(int64_t value) {
+  _internal_set_clienttimestamp(value);
+  // @@protoc_insertion_point(field_set:Protocol.C2S_MOVE_TO_POSITION_REQ.clientTimestamp)
+}
+
+// -------------------------------------------------------------------
+
+// S2C_MOVE_PATH_RES
+
+// uint32 sequenceId = 1;
+inline void S2C_MOVE_PATH_RES::clear_sequenceid() {
+  _impl_.sequenceid_ = 0u;
+}
+inline uint32_t S2C_MOVE_PATH_RES::_internal_sequenceid() const {
+  return _impl_.sequenceid_;
+}
+inline uint32_t S2C_MOVE_PATH_RES::sequenceid() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_MOVE_PATH_RES.sequenceId)
+  return _internal_sequenceid();
+}
+inline void S2C_MOVE_PATH_RES::_internal_set_sequenceid(uint32_t value) {
+  
+  _impl_.sequenceid_ = value;
+}
+inline void S2C_MOVE_PATH_RES::set_sequenceid(uint32_t value) {
+  _internal_set_sequenceid(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_MOVE_PATH_RES.sequenceId)
+}
+
+// repeated .Protocol.Vector3 waypoints = 2;
+inline int S2C_MOVE_PATH_RES::_internal_waypoints_size() const {
+  return _impl_.waypoints_.size();
+}
+inline int S2C_MOVE_PATH_RES::waypoints_size() const {
+  return _internal_waypoints_size();
+}
+inline ::Protocol::Vector3* S2C_MOVE_PATH_RES::mutable_waypoints(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.S2C_MOVE_PATH_RES.waypoints)
+  return _impl_.waypoints_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::Vector3 >*
+S2C_MOVE_PATH_RES::mutable_waypoints() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.S2C_MOVE_PATH_RES.waypoints)
+  return &_impl_.waypoints_;
+}
+inline const ::Protocol::Vector3& S2C_MOVE_PATH_RES::_internal_waypoints(int index) const {
+  return _impl_.waypoints_.Get(index);
+}
+inline const ::Protocol::Vector3& S2C_MOVE_PATH_RES::waypoints(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_MOVE_PATH_RES.waypoints)
+  return _internal_waypoints(index);
+}
+inline ::Protocol::Vector3* S2C_MOVE_PATH_RES::_internal_add_waypoints() {
+  return _impl_.waypoints_.Add();
+}
+inline ::Protocol::Vector3* S2C_MOVE_PATH_RES::add_waypoints() {
+  ::Protocol::Vector3* _add = _internal_add_waypoints();
+  // @@protoc_insertion_point(field_add:Protocol.S2C_MOVE_PATH_RES.waypoints)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::Vector3 >&
+S2C_MOVE_PATH_RES::waypoints() const {
+  // @@protoc_insertion_point(field_list:Protocol.S2C_MOVE_PATH_RES.waypoints)
+  return _impl_.waypoints_;
+}
+
+// float moveSpeed = 3;
+inline void S2C_MOVE_PATH_RES::clear_movespeed() {
+  _impl_.movespeed_ = 0;
+}
+inline float S2C_MOVE_PATH_RES::_internal_movespeed() const {
+  return _impl_.movespeed_;
+}
+inline float S2C_MOVE_PATH_RES::movespeed() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_MOVE_PATH_RES.moveSpeed)
+  return _internal_movespeed();
+}
+inline void S2C_MOVE_PATH_RES::_internal_set_movespeed(float value) {
+  
+  _impl_.movespeed_ = value;
+}
+inline void S2C_MOVE_PATH_RES::set_movespeed(float value) {
+  _internal_set_movespeed(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_MOVE_PATH_RES.moveSpeed)
+}
+
+// int64 serverTimestamp = 4;
+inline void S2C_MOVE_PATH_RES::clear_servertimestamp() {
+  _impl_.servertimestamp_ = int64_t{0};
+}
+inline int64_t S2C_MOVE_PATH_RES::_internal_servertimestamp() const {
+  return _impl_.servertimestamp_;
+}
+inline int64_t S2C_MOVE_PATH_RES::servertimestamp() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_MOVE_PATH_RES.serverTimestamp)
+  return _internal_servertimestamp();
+}
+inline void S2C_MOVE_PATH_RES::_internal_set_servertimestamp(int64_t value) {
+  
+  _impl_.servertimestamp_ = value;
+}
+inline void S2C_MOVE_PATH_RES::set_servertimestamp(int64_t value) {
+  _internal_set_servertimestamp(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_MOVE_PATH_RES.serverTimestamp)
+}
+
+// -------------------------------------------------------------------
+
+// S2C_POSITION_CORRECTION_NOT
+
+// .Protocol.Vector3 correctedPosition = 1;
+inline bool S2C_POSITION_CORRECTION_NOT::_internal_has_correctedposition() const {
+  return this != internal_default_instance() && _impl_.correctedposition_ != nullptr;
+}
+inline bool S2C_POSITION_CORRECTION_NOT::has_correctedposition() const {
+  return _internal_has_correctedposition();
+}
+inline const ::Protocol::Vector3& S2C_POSITION_CORRECTION_NOT::_internal_correctedposition() const {
+  const ::Protocol::Vector3* p = _impl_.correctedposition_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::Vector3&>(
+      ::Protocol::_Vector3_default_instance_);
+}
+inline const ::Protocol::Vector3& S2C_POSITION_CORRECTION_NOT::correctedposition() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_POSITION_CORRECTION_NOT.correctedPosition)
+  return _internal_correctedposition();
+}
+inline void S2C_POSITION_CORRECTION_NOT::unsafe_arena_set_allocated_correctedposition(
+    ::Protocol::Vector3* correctedposition) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.correctedposition_);
+  }
+  _impl_.correctedposition_ = correctedposition;
+  if (correctedposition) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.S2C_POSITION_CORRECTION_NOT.correctedPosition)
+}
+inline ::Protocol::Vector3* S2C_POSITION_CORRECTION_NOT::release_correctedposition() {
+  
+  ::Protocol::Vector3* temp = _impl_.correctedposition_;
+  _impl_.correctedposition_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::Vector3* S2C_POSITION_CORRECTION_NOT::unsafe_arena_release_correctedposition() {
+  // @@protoc_insertion_point(field_release:Protocol.S2C_POSITION_CORRECTION_NOT.correctedPosition)
+  
+  ::Protocol::Vector3* temp = _impl_.correctedposition_;
+  _impl_.correctedposition_ = nullptr;
+  return temp;
+}
+inline ::Protocol::Vector3* S2C_POSITION_CORRECTION_NOT::_internal_mutable_correctedposition() {
+  
+  if (_impl_.correctedposition_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::Vector3>(GetArenaForAllocation());
+    _impl_.correctedposition_ = p;
+  }
+  return _impl_.correctedposition_;
+}
+inline ::Protocol::Vector3* S2C_POSITION_CORRECTION_NOT::mutable_correctedposition() {
+  ::Protocol::Vector3* _msg = _internal_mutable_correctedposition();
+  // @@protoc_insertion_point(field_mutable:Protocol.S2C_POSITION_CORRECTION_NOT.correctedPosition)
+  return _msg;
+}
+inline void S2C_POSITION_CORRECTION_NOT::set_allocated_correctedposition(::Protocol::Vector3* correctedposition) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.correctedposition_);
+  }
+  if (correctedposition) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(correctedposition));
+    if (message_arena != submessage_arena) {
+      correctedposition = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, correctedposition, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.correctedposition_ = correctedposition;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S2C_POSITION_CORRECTION_NOT.correctedPosition)
+}
+
+// int64 serverTimestamp = 2;
+inline void S2C_POSITION_CORRECTION_NOT::clear_servertimestamp() {
+  _impl_.servertimestamp_ = int64_t{0};
+}
+inline int64_t S2C_POSITION_CORRECTION_NOT::_internal_servertimestamp() const {
+  return _impl_.servertimestamp_;
+}
+inline int64_t S2C_POSITION_CORRECTION_NOT::servertimestamp() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_POSITION_CORRECTION_NOT.serverTimestamp)
+  return _internal_servertimestamp();
+}
+inline void S2C_POSITION_CORRECTION_NOT::_internal_set_servertimestamp(int64_t value) {
+  
+  _impl_.servertimestamp_ = value;
+}
+inline void S2C_POSITION_CORRECTION_NOT::set_servertimestamp(int64_t value) {
+  _internal_set_servertimestamp(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_POSITION_CORRECTION_NOT.serverTimestamp)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

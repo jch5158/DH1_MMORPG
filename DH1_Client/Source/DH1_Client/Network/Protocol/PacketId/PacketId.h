@@ -47,6 +47,9 @@ namespace packet_id
         S2C_ENTITY_LEAVE_NOT = 5,
         C2S_SPAWN_POSITION_REQ = 6,
         S2C_SPAWN_POSITION_RES = 7,
+        C2S_MOVE_TO_POSITION_REQ = 8,
+        S2C_MOVE_PATH_RES = 9,
+        S2C_POSITION_CORRECTION_NOT = 10,
 	};
 
 

@@ -80,3 +80,37 @@ message S2C_SPAWN_POSITION_RES
     Vector3 position = 1;
     float rotationYaw = 2;
 }
+
+// Client -> Gateway -> World: 클릭 이동 (목적지 전송, 서버가 경로 계산)
+message C2S_MOVE_TO_POSITION_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    uint32 sequenceId = 1;
+    Vector3 destination = 2;
+    int64 clientTimestamp = 3;
+}
+
+// Gateway -> Client: 서버 계산 경로 응답 (웨이포인트 목록)
+message S2C_MOVE_PATH_RES
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    uint32 sequenceId = 1;
+    repeated Vector3 waypoints = 2;
+    float moveSpeed = 3;
+    int64 serverTimestamp = 4;
+}
+
+// Gateway -> Client: 위치 보정 (WASD로 벽 관통 시)
+message S2C_POSITION_CORRECTION_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    Vector3 correctedPosition = 1;
+    int64 serverTimestamp = 2;
+}

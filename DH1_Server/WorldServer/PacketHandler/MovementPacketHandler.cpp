@@ -151,3 +151,46 @@ bool MovementPacketHandler::HANDLE_C2S_SPAWN_POSITION_REQ(const Protocol::C2S_SP
 
 	return true;
 }
+
+bool MovementPacketHandler::HANDLE_C2S_MOVE_TO_POSITION_REQ(const Protocol::C2S_MOVE_TO_POSITION_REQ& packet, const PacketSessionRef& pSession)
+{
+	const uint64 accountId = RelayContext::GetAccountId();
+	if (accountId == 0)
+	{
+		NET_ENGINE_LOG_ERROR("MovementPacketHandler - MOVE_TO_POSITION_REQ, RelayContext accountId is 0");
+		return false;
+	}
+
+	// 목적지 NaN/Inf 검증
+	const float destX = packet.destination().x();
+	const float destY = packet.destination().y();
+	const float destZ = packet.destination().z();
+
+	if (std::isnan(destX) || std::isnan(destY) || std::isnan(destZ) ||
+		std::isinf(destX) || std::isinf(destY) || std::isinf(destZ))
+	{
+		NET_ENGINE_LOG_WARN("MovementPacketHandler (World) - Invalid destination, accountId: {}", accountId);
+		return true;
+	}
+
+	const auto pGameTickProcessor = ISingleton<WorldService>::GetInstance().GetGameTickProcessorRef();
+	if (pGameTickProcessor == nullptr)
+	{
+		return false;
+	}
+
+	MoveToPositionEntry entry;
+	entry.mAccountId = accountId;
+	entry.mSequenceId = packet.sequenceid();
+	entry.mDestinationX = destX;
+	entry.mDestinationY = destY;
+	entry.mDestinationZ = destZ;
+	entry.mClientTimestamp = packet.clienttimestamp();
+
+	pGameTickProcessor->EnqueueMoveToPosition(entry);
+
+	NET_ENGINE_LOG_TRACE("MovementPacketHandler - MOVE_TO_POSITION_REQ received, accountId: {}, dest: ({:.1f}, {:.1f}, {:.1f})",
+		accountId, destX, destY, destZ);
+
+	return true;
+}
