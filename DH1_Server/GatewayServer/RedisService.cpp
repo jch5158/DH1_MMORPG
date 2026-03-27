@@ -4,7 +4,7 @@
 #include <CrashReporter.h>
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisGatewayInfo, gatewayId, ip, port, status, currentSessionCount)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisWorldServerInfo, worldId, worldName, currentPlayers, maxPlayers, status)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RedisRealmInfo, realmId, realmName, currentPlayers, maxPlayers, status)
 
 RedisService::RedisService(const std::string& connectionUri, ActorServiceRef pActorService)
 	:mRedisActorId(0)
@@ -121,7 +121,7 @@ void RedisService::DeleteKeyAsync(std::string key, DeleteKeyCallback callback)
 		});
 }
 
-void RedisService::GetWorldServerListAsync(GetWorldServerListCallback callback)
+void RedisService::GetRealmListAsync(GetRealmListCallback callback)
 {
 	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argCallback = std::move(callback), argService = shared_from_this()]()->void
 		{
@@ -132,8 +132,8 @@ void RedisService::GetWorldServerListAsync(GetWorldServerListCallback callback)
 				return;
 			}
 
-			Vector<RedisWorldServerInfo> worldServers;
-			const auto keys = pRedis->Keys("World:*");
+			Vector<RedisRealmInfo> realms;
+			const auto keys = pRedis->Keys("Realm:*");
 
 			for (const auto& key : keys)
 			{
@@ -146,22 +146,22 @@ void RedisService::GetWorldServerListAsync(GetWorldServerListCallback callback)
 				try
 				{
 					const auto json = nlohmann::json::parse(value.value());
-					RedisWorldServerInfo info = json.get<RedisWorldServerInfo>();
-					worldServers.emplace_back(std::move(info));
+					RedisRealmInfo info = json.get<RedisRealmInfo>();
+					realms.emplace_back(std::move(info));
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					NET_ENGINE_LOG_ERROR("RedisService::GetWorldServerListAsync - JSON parse error: {}", e.what());
+					NET_ENGINE_LOG_ERROR("RedisService::GetRealmListAsync - JSON parse error: {}", e.what());
 				}
 			}
 
-			argCallback(worldServers);
+			argCallback(realms);
 		});
 }
 
-void RedisService::GetWorldServerInfoAsync(const int32 worldId, GetWorldServerInfoCallback callback)
+void RedisService::GetRealmInfoAsync(const int32 realmId, GetRealmInfoCallback callback)
 {
-	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argWorldId = worldId, argCallback = std::move(callback), argService = shared_from_this()]()->void
+	mpActorService->GetActorDispatcher().Post(mRedisActorId, [argRealmId = realmId, argCallback = std::move(callback), argService = shared_from_this()]()->void
 		{
 			const RedisActorRef pRedis = argService->GetRedisActorRef();
 			if (pRedis == nullptr)
@@ -170,7 +170,7 @@ void RedisService::GetWorldServerInfoAsync(const int32 worldId, GetWorldServerIn
 				return;
 			}
 
-			const std::string key = "World:" + std::to_string(argWorldId);
+			const std::string key = "Realm:" + std::to_string(argRealmId);
 			const auto value = pRedis->GetString(key);
 			if (!value.has_value())
 			{
@@ -181,12 +181,12 @@ void RedisService::GetWorldServerInfoAsync(const int32 worldId, GetWorldServerIn
 			try
 			{
 				const auto json = nlohmann::json::parse(value.value());
-				RedisWorldServerInfo info = json.get<RedisWorldServerInfo>();
+				RedisRealmInfo info = json.get<RedisRealmInfo>();
 				argCallback(true, info);
 			}
 			catch (const nlohmann::json::exception& e)
 			{
-				NET_ENGINE_LOG_ERROR("RedisService::GetWorldServerInfoAsync - JSON parse error: {}", e.what());
+				NET_ENGINE_LOG_ERROR("RedisService::GetRealmInfoAsync - JSON parse error: {}", e.what());
 				argCallback(false, {});
 			}
 		});

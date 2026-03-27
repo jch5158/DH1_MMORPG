@@ -53,7 +53,7 @@ enum eServiceType : int {
   SERVICE_TYPE_LOGIN = 2,
   SERVICE_TYPE_HEARTBEAT = 3,
   SERVICE_TYPE_SERVER_HEARTBEAT = 4,
-  SERVICE_TYPE_WORLD = 5,
+  SERVICE_TYPE_REALM = 5,
   SERVICE_TYPE_GAME_SESSION = 6,
   eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
@@ -137,32 +137,32 @@ inline bool eLoginResult_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eLoginResult>(
     eLoginResult_descriptor(), name, value);
 }
-enum eWorldSelectResult : int {
-  WORLD_SELECT_SUCCESS = 0,
-  WORLD_SELECT_FAIL_NOT_FOUND = 1,
-  WORLD_SELECT_FAIL_FULL = 2,
-  WORLD_SELECT_FAIL_MAINTENANCE = 3,
-  eWorldSelectResult_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
-  eWorldSelectResult_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+enum eRealmSelectResult : int {
+  REALM_SELECT_SUCCESS = 0,
+  REALM_SELECT_FAIL_NOT_FOUND = 1,
+  REALM_SELECT_FAIL_FULL = 2,
+  REALM_SELECT_FAIL_MAINTENANCE = 3,
+  eRealmSelectResult_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  eRealmSelectResult_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
-bool eWorldSelectResult_IsValid(int value);
-constexpr eWorldSelectResult eWorldSelectResult_MIN = WORLD_SELECT_SUCCESS;
-constexpr eWorldSelectResult eWorldSelectResult_MAX = WORLD_SELECT_FAIL_MAINTENANCE;
-constexpr int eWorldSelectResult_ARRAYSIZE = eWorldSelectResult_MAX + 1;
+bool eRealmSelectResult_IsValid(int value);
+constexpr eRealmSelectResult eRealmSelectResult_MIN = REALM_SELECT_SUCCESS;
+constexpr eRealmSelectResult eRealmSelectResult_MAX = REALM_SELECT_FAIL_MAINTENANCE;
+constexpr int eRealmSelectResult_ARRAYSIZE = eRealmSelectResult_MAX + 1;
 
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eWorldSelectResult_descriptor();
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eRealmSelectResult_descriptor();
 template<typename T>
-inline const std::string& eWorldSelectResult_Name(T enum_t_value) {
-  static_assert(::std::is_same<T, eWorldSelectResult>::value ||
+inline const std::string& eRealmSelectResult_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, eRealmSelectResult>::value ||
     ::std::is_integral<T>::value,
-    "Incorrect type passed to function eWorldSelectResult_Name.");
+    "Incorrect type passed to function eRealmSelectResult_Name.");
   return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-    eWorldSelectResult_descriptor(), enum_t_value);
+    eRealmSelectResult_descriptor(), enum_t_value);
 }
-inline bool eWorldSelectResult_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, eWorldSelectResult* value) {
-  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eWorldSelectResult>(
-    eWorldSelectResult_descriptor(), name, value);
+inline bool eRealmSelectResult_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, eRealmSelectResult* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eRealmSelectResult>(
+    eRealmSelectResult_descriptor(), name, value);
 }
 enum eGameSessionResult : int {
   GAME_SESSION_SUCCESS = 0,
@@ -228,10 +228,10 @@ template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eLoginResult>() {
   return ::Protocol::eLoginResult_descriptor();
 }
-template <> struct is_proto_enum< ::Protocol::eWorldSelectResult> : ::std::true_type {};
+template <> struct is_proto_enum< ::Protocol::eRealmSelectResult> : ::std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eWorldSelectResult>() {
-  return ::Protocol::eWorldSelectResult_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eRealmSelectResult>() {
+  return ::Protocol::eRealmSelectResult_descriptor();
 }
 template <> struct is_proto_enum< ::Protocol::eGameSessionResult> : ::std::true_type {};
 template <>

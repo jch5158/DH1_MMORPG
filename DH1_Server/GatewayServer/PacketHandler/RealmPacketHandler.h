@@ -16,11 +16,11 @@
 #include "Struct.pb.h"
 #include "PacketOption.pb.h"
 #include "PacketId.h"
-#include "World.pb.h"
+#include "Realm.pb.h"
 
 #endif
 
-class WorldPacketHandler
+class RealmPacketHandler
 {
 public:
 
@@ -33,13 +33,13 @@ public:
 
 	static void Init()
 	{
-		sPacketHandleMap[packet_id::eWorldPacketId::C2S_WORLD_LIST_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		sPacketHandleMap[packet_id::eRealmPacketId::C2S_REALM_LIST_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
-			return HandlePacket<Protocol::C2S_WORLD_LIST_REQ>(size, pBuffer, pSession, HANDLE_C2S_WORLD_LIST_REQ);
+			return HandlePacket<Protocol::C2S_REALM_LIST_REQ>(size, pBuffer, pSession, HANDLE_C2S_REALM_LIST_REQ);
 		};
-		sPacketHandleMap[packet_id::eWorldPacketId::C2S_WORLD_SELECT_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		sPacketHandleMap[packet_id::eRealmPacketId::C2S_REALM_SELECT_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
-			return HandlePacket<Protocol::C2S_WORLD_SELECT_REQ>(size, pBuffer, pSession, HANDLE_C2S_WORLD_SELECT_REQ);
+			return HandlePacket<Protocol::C2S_REALM_SELECT_REQ>(size, pBuffer, pSession, HANDLE_C2S_REALM_SELECT_REQ);
 		};
 
 	}
@@ -62,12 +62,12 @@ public:
 
 	static bool Validate(const PacketSessionRef& pSession);
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
-	static bool HANDLE_C2S_WORLD_LIST_REQ(const Protocol::C2S_WORLD_LIST_REQ& packet, const PacketSessionRef& pSession);
-static bool HANDLE_C2S_WORLD_SELECT_REQ(const Protocol::C2S_WORLD_SELECT_REQ& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_C2S_REALM_LIST_REQ(const Protocol::C2S_REALM_LIST_REQ& packet, const PacketSessionRef& pSession);
+static bool HANDLE_C2S_REALM_SELECT_REQ(const Protocol::C2S_REALM_SELECT_REQ& packet, const PacketSessionRef& pSession);
 
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_WORLD_LIST_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_WORLD_LIST_RES); }
-static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_WORLD_SELECT_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_WORLD_SELECT_RES); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_REALM_LIST_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_REALM_LIST_RES); }
+static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_REALM_SELECT_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_REALM_SELECT_RES); }
 
 
 private:
@@ -109,10 +109,10 @@ private:
 
 		auto* header = reinterpret_cast<PacketHeader*>(pBuffer);
 		header->size = packetSize;
-		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_WORLD, packetId);
+		header->id = MAKE_PACKET_HEADER_ID(Protocol::eServiceType::SERVICE_TYPE_REALM, packetId);
 		if (!packet.SerializeToArray(&header[1], dataSize))
 		{
-			NET_ENGINE_LOG_FATAL("World::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
+			NET_ENGINE_LOG_FATAL("Realm::MakeSendBuffer SerializeToArray is Failed, &header[1] : {}, packetId : {}, dataSize : {}", fmt::ptr(&header[1]), header->id, dataSize);
 			CrashReporter::Crash();
 		}
 

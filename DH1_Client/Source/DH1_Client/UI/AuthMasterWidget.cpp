@@ -1,11 +1,11 @@
-﻿#include "AuthMasterWidget.h"
+#include "AuthMasterWidget.h"
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 #include "LoginWidget.h"
 #include "SignUpWidget.h"
 #include "EmailVerificationWidget.h"
 #include "ResetPasswordWidget.h"
-#include "WorldSelectWidget.h"
+#include "RealmSelectWidget.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/Engine.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
@@ -67,33 +67,33 @@ void UAuthMasterWidget::HandleLoginSuccess()
 		return;
 	}
 
-	// 월드 선택 결과 수신 시 LobbyLevel 진입
-	NetSubsystem->OnWorldSelectResult.AddLambda([this, GameInstance](const int32 Result)
+	// 렐름 선택 결과 수신 시 LobbyLevel 진입
+	NetSubsystem->OnRealmSelectResult.AddLambda([this, GameInstance](const int32 Result)
 		{
 			if (Result == 0)
 			{
-				if (WorldSelectWidgetRef.IsValid() && GEngine && GEngine->GameViewport)
+				if (RealmSelectWidgetRef.IsValid() && GEngine && GEngine->GameViewport)
 				{
-					GEngine->GameViewport->RemoveViewportWidgetContent(WorldSelectWidgetRef.ToSharedRef());
-					WorldSelectWidgetRef.Reset();
+					GEngine->GameViewport->RemoveViewportWidgetContent(RealmSelectWidgetRef.ToSharedRef());
+					RealmSelectWidgetRef.Reset();
 				}
 
 				UGameplayStatics::OpenLevel(GameInstance, LobbyLevelName);
 			}
 		});
 
-	// 월드 목록 수신 시 WorldSelectWidget 표시
-	NetSubsystem->OnWorldListReceived.AddLambda([this](const TArray<FWorldServerInfo>& WorldList)
+	// 렐름 목록 수신 시 RealmSelectWidget 표시
+	NetSubsystem->OnRealmListReceived.AddLambda([this](const TArray<FRealmServerInfo>& RealmList)
 		{
 			SetVisibility(ESlateVisibility::Collapsed);
 
-			TSharedRef<SWorldSelectWidget> SelectWidget = SNew(SWorldSelectWidget).WorldList(WorldList);
-			WorldSelectWidgetRef = SelectWidget;
+			TSharedRef<SRealmSelectWidget> SelectWidget = SNew(SRealmSelectWidget).RealmList(RealmList);
+			RealmSelectWidgetRef = SelectWidget;
 			GEngine->GameViewport->AddViewportWidgetContent(SelectWidget);
 		});
 
-	// 월드 목록 요청
-	NetSubsystem->RequestWorldList();
+	// 렐름 목록 요청
+	NetSubsystem->RequestRealmList();
 }
 
 void UAuthMasterWidget::HandleGoToResetPassword() const
@@ -108,7 +108,7 @@ void UAuthMasterWidget::SwitchWidget(const EAuthWidgetType WidgetType, const FSt
 		return;
 	}
 
-	switch (WidgetType) 
+	switch (WidgetType)
 	{
 	case EAuthWidgetType::Login:
 

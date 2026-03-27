@@ -238,6 +238,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Movement.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="GatewaySession.cpp" />
     <ClCompile Include="RealmSession.cpp" />
     <ClCompile Include="RedisActor.cpp" />
@@ -246,6 +252,8 @@
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
     <ClCompile Include="GameSessionManager.cpp" />
+    <ClCompile Include="PlayerStateManager.cpp" />
+    <ClCompile Include="GameTickProcessor.cpp" />
     <ClCompile Include="WorldServer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -271,6 +279,7 @@
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h" />
     <ClInclude Include="..\..\Shared\Protocol\GameSession.pb.h" />
+    <ClInclude Include="..\..\Shared\Protocol\Movement.pb.h" />
     <ClInclude Include="GatewaySession.h" />
     <ClInclude Include="RealmSession.h" />
     <ClInclude Include="RedisActor.h" />
@@ -280,6 +289,10 @@
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h" />
     <ClInclude Include="GameSessionInfo.h" />
     <ClInclude Include="GameSessionManager.h" />
+    <ClInclude Include="PlayerState.h" />
+    <ClInclude Include="MoveInputEntry.h" />
+    <ClInclude Include="PlayerStateManager.h" />
+    <ClInclude Include="GameTickProcessor.h" />
     <ClInclude Include="PointerType.h" />
     <ClInclude Include="WorldService.h" />
     <ClInclude Include="pch.h" />
@@ -290,6 +303,7 @@
     <None Include="..\..\Shared\Protocol\Proto\ServerHeartbeat.proto" />
     <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
     <None Include="..\..\Shared\Protocol\Proto\GameSession.proto" />
+    <None Include="..\..\Shared\Protocol\Proto\Movement.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,7 +5,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
-#include "Network/PacketHandler/WorldPacketHandler.h"
+#include "Network/PacketHandler/RealmPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
@@ -245,27 +245,27 @@ void UClientNetSubsystem::NotifyLoginResult(const int32 Result)
 		});
 }
 
-void UClientNetSubsystem::NotifyWorldList(const TArray<FWorldServerInfo>& WorldList)
+void UClientNetSubsystem::NotifyRealmList(const TArray<FRealmServerInfo>& RealmList)
 {
-	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyWorldList: count=%d"), WorldList.Num());
-	AsyncTask(ENamedThreads::GameThread, [this, WorldList]()
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyRealmList: count=%d"), RealmList.Num());
+	AsyncTask(ENamedThreads::GameThread, [this, RealmList]()
 		{
-			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting WorldList: count=%d, Bound: %d"), WorldList.Num(), OnWorldListReceived.IsBound());
-			OnWorldListReceived.Broadcast(WorldList);
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting RealmList: count=%d, Bound: %d"), RealmList.Num(), OnRealmListReceived.IsBound());
+			OnRealmListReceived.Broadcast(RealmList);
 		});
 }
 
-void UClientNetSubsystem::NotifyWorldSelectResult(const int32 Result)
+void UClientNetSubsystem::NotifyRealmSelectResult(const int32 Result)
 {
-	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyWorldSelectResult: %d"), Result);
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyRealmSelectResult: %d"), Result);
 	AsyncTask(ENamedThreads::GameThread, [this, Result]()
 		{
-			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting WorldSelectResult: %d, Bound: %d"), Result, OnWorldSelectResult.IsBound());
-			OnWorldSelectResult.Broadcast(Result);
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting RealmSelectResult: %d, Bound: %d"), Result, OnRealmSelectResult.IsBound());
+			OnRealmSelectResult.Broadcast(Result);
 		});
 }
 
-void UClientNetSubsystem::RequestWorldList()
+void UClientNetSubsystem::RequestRealmList()
 {
 	if (ServiceRef == nullptr)
 	{
@@ -278,11 +278,11 @@ void UClientNetSubsystem::RequestWorldList()
 		return;
 	}
 
-	Protocol::C2S_WORLD_LIST_REQ packet;
-	pSession->Send(WorldPacketHandler::MakeSendBuffer(packet));
+	Protocol::C2S_REALM_LIST_REQ packet;
+	pSession->Send(RealmPacketHandler::MakeSendBuffer(packet));
 }
 
-void UClientNetSubsystem::RequestWorldSelect(const int32 WorldId)
+void UClientNetSubsystem::RequestRealmSelect(const int32 RealmId)
 {
 	if (ServiceRef == nullptr)
 	{
@@ -295,7 +295,7 @@ void UClientNetSubsystem::RequestWorldSelect(const int32 WorldId)
 		return;
 	}
 
-	Protocol::C2S_WORLD_SELECT_REQ packet;
-	packet.set_worldid(WorldId);
-	pSession->Send(WorldPacketHandler::MakeSendBuffer(packet));
+	Protocol::C2S_REALM_SELECT_REQ packet;
+	packet.set_realmid(RealmId);
+	pSession->Send(RealmPacketHandler::MakeSendBuffer(packet));
 }

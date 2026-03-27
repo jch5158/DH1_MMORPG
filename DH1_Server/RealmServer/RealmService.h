@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RedisService.h"
+
 class JsonConfig;
 
 enum class eRealmServerStatus : uint8
@@ -32,6 +34,7 @@ public:
 
 	[[nodiscard]] ServerServiceRef GetServerServiceRef() const;
 	[[nodiscard]] ActorServiceRef GetActorServiceRef() const;
+	[[nodiscard]] RedisServiceRef GetRedisServiceRef() const;
 	[[nodiscard]] RealmSessionRegistryRef GetSessionRegistryRef() const;
 
 private:
@@ -39,21 +42,26 @@ private:
 	RealmService()
 		: mpServerService()
 		, mpActorService()
+		, mpRedisService()
 		, mNetworkDispatchThreadCount(0)
 		, mActorDispatchThreadCount(0)
 		, mRealmServerId(0)
 		, mHeartbeatTimeoutMs(15000)
 		, mHeartbeatCheckIntervalMs(5000)
 		, mHeartbeatIntervalMs(5000)
+		, mRedisTtlSeconds(10)
+		, mMaxPlayers(5000)
 		, mListenPort(0)
 		, mbRunning(false)
 	{}
 
 	void checkWorldServerHeartbeats();
 	void sendHeartbeatToWorldServers();
+	void updateRealmRegistration();
 
 	ServerServiceRef mpServerService;
 	ActorServiceRef mpActorService;
+	RedisServiceRef mpRedisService;
 	RealmSessionRegistryRef mpSessionRegistry;
 
 	int32 mNetworkDispatchThreadCount;
@@ -63,6 +71,9 @@ private:
 	int64 mHeartbeatTimeoutMs;
 	int64 mHeartbeatCheckIntervalMs;
 	int64 mHeartbeatIntervalMs;
+	int64 mRedisTtlSeconds;
+	int32 mMaxPlayers;
+	std::string mRealmName;
 	std::string mListenIp;
 	uint16 mListenPort;
 

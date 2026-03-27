@@ -1,10 +1,10 @@
 syntax = "proto3";
 package Protocol;
 
-message WorldServerInfo
+message RealmServerInfo
 {
-    int32 worldId = 1;
-    string worldName = 2;
+    int32 realmId = 1;
+    string realmName = 2;
     int32 currentPlayers = 3;
     int32 maxPlayers = 4;
     int32 status = 5;

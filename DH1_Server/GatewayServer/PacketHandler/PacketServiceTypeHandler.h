@@ -6,8 +6,8 @@
 #include "GameSessionPacketHandler.h"
 #include "HeartbeatPacketHandler.h"
 #include "LoginPacketHandler.h"
+#include "RealmPacketHandler.h"
 #include "ServerHeartbeatPacketHandler.h"
-#include "WorldPacketHandler.h"
 
 #include "SessionValidator.h"
 
@@ -25,8 +25,8 @@ public:
 		GameSessionPacketHandler::Init();
 		HeartbeatPacketHandler::Init();
 		LoginPacketHandler::Init();
+		RealmPacketHandler::Init();
 		ServerHeartbeatPacketHandler::Init();
-		WorldPacketHandler::Init();
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_GAME_SESSION] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
@@ -43,14 +43,14 @@ public:
 			return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_REALM] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return RealmPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+		};
+
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_SERVER_HEARTBEAT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
 			return ServerHeartbeatPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
-		};
-
-		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_WORLD] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
-		{
-			return WorldPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
 

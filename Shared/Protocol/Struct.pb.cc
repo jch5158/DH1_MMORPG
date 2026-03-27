@@ -21,23 +21,23 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace Protocol {
-PROTOBUF_CONSTEXPR WorldServerInfo::WorldServerInfo(
+PROTOBUF_CONSTEXPR RealmServerInfo::RealmServerInfo(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.worldname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.worldid_)*/0
+    /*decltype(_impl_.realmname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.realmid_)*/0
   , /*decltype(_impl_.currentplayers_)*/0
   , /*decltype(_impl_.maxplayers_)*/0
   , /*decltype(_impl_.status_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
-struct WorldServerInfoDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR WorldServerInfoDefaultTypeInternal()
+struct RealmServerInfoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR RealmServerInfoDefaultTypeInternal()
       : _instance(::_pbi::ConstantInitialized{}) {}
-  ~WorldServerInfoDefaultTypeInternal() {}
+  ~RealmServerInfoDefaultTypeInternal() {}
   union {
-    WorldServerInfo _instance;
+    RealmServerInfo _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 WorldServerInfoDefaultTypeInternal _WorldServerInfo_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 RealmServerInfoDefaultTypeInternal _RealmServerInfo_default_instance_;
 PROTOBUF_CONSTEXPR GameSessionInfo::GameSessionInfo(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.accountid_)*/uint64_t{0u}
@@ -60,16 +60,16 @@ static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors
 
 const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Protocol::WorldServerInfo, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::RealmServerInfo, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::Protocol::WorldServerInfo, _impl_.worldid_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::WorldServerInfo, _impl_.worldname_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::WorldServerInfo, _impl_.currentplayers_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::WorldServerInfo, _impl_.maxplayers_),
-  PROTOBUF_FIELD_OFFSET(::Protocol::WorldServerInfo, _impl_.status_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::RealmServerInfo, _impl_.realmid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::RealmServerInfo, _impl_.realmname_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::RealmServerInfo, _impl_.currentplayers_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::RealmServerInfo, _impl_.maxplayers_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::RealmServerInfo, _impl_.status_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::GameSessionInfo, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -81,18 +81,18 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   PROTOBUF_FIELD_OFFSET(::Protocol::GameSessionInfo, _impl_.gatewayserverid_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::Protocol::WorldServerInfo)},
+  { 0, -1, -1, sizeof(::Protocol::RealmServerInfo)},
   { 11, -1, -1, sizeof(::Protocol::GameSessionInfo)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::Protocol::_WorldServerInfo_default_instance_._instance,
+  &::Protocol::_RealmServerInfo_default_instance_._instance,
   &::Protocol::_GameSessionInfo_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014Struct.proto\022\010Protocol\"q\n\017WorldServerI"
-  "nfo\022\017\n\007worldId\030\001 \001(\005\022\021\n\tworldName\030\002 \001(\t\022"
+  "\n\014Struct.proto\022\010Protocol\"q\n\017RealmServerI"
+  "nfo\022\017\n\007realmId\030\001 \001(\005\022\021\n\trealmName\030\002 \001(\t\022"
   "\026\n\016currentPlayers\030\003 \001(\005\022\022\n\nmaxPlayers\030\004 "
   "\001(\005\022\016\n\006status\030\005 \001(\005\"W\n\017GameSessionInfo\022\021"
   "\n\taccountId\030\001 \001(\004\022\030\n\020gatewaySessionId\030\002 "
@@ -117,62 +117,62 @@ namespace Protocol {
 
 // ===================================================================
 
-class WorldServerInfo::_Internal {
+class RealmServerInfo::_Internal {
  public:
 };
 
-WorldServerInfo::WorldServerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+RealmServerInfo::RealmServerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:Protocol.WorldServerInfo)
+  // @@protoc_insertion_point(arena_constructor:Protocol.RealmServerInfo)
 }
-WorldServerInfo::WorldServerInfo(const WorldServerInfo& from)
+RealmServerInfo::RealmServerInfo(const RealmServerInfo& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
-  WorldServerInfo* const _this = this; (void)_this;
+  RealmServerInfo* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.worldname_){}
-    , decltype(_impl_.worldid_){}
+      decltype(_impl_.realmname_){}
+    , decltype(_impl_.realmid_){}
     , decltype(_impl_.currentplayers_){}
     , decltype(_impl_.maxplayers_){}
     , decltype(_impl_.status_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.worldname_.InitDefault();
+  _impl_.realmname_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.worldname_.Set("", GetArenaForAllocation());
+    _impl_.realmname_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_worldname().empty()) {
-    _this->_impl_.worldname_.Set(from._internal_worldname(), 
+  if (!from._internal_realmname().empty()) {
+    _this->_impl_.realmname_.Set(from._internal_realmname(), 
       _this->GetArenaForAllocation());
   }
-  ::memcpy(&_impl_.worldid_, &from._impl_.worldid_,
+  ::memcpy(&_impl_.realmid_, &from._impl_.realmid_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.status_) -
-    reinterpret_cast<char*>(&_impl_.worldid_)) + sizeof(_impl_.status_));
-  // @@protoc_insertion_point(copy_constructor:Protocol.WorldServerInfo)
+    reinterpret_cast<char*>(&_impl_.realmid_)) + sizeof(_impl_.status_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.RealmServerInfo)
 }
 
-inline void WorldServerInfo::SharedCtor(
+inline void RealmServerInfo::SharedCtor(
     ::_pb::Arena* arena, bool is_message_owned) {
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.worldname_){}
-    , decltype(_impl_.worldid_){0}
+      decltype(_impl_.realmname_){}
+    , decltype(_impl_.realmid_){0}
     , decltype(_impl_.currentplayers_){0}
     , decltype(_impl_.maxplayers_){0}
     , decltype(_impl_.status_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
-  _impl_.worldname_.InitDefault();
+  _impl_.realmname_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.worldname_.Set("", GetArenaForAllocation());
+    _impl_.realmname_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
-WorldServerInfo::~WorldServerInfo() {
-  // @@protoc_insertion_point(destructor:Protocol.WorldServerInfo)
+RealmServerInfo::~RealmServerInfo() {
+  // @@protoc_insertion_point(destructor:Protocol.RealmServerInfo)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -180,49 +180,49 @@ WorldServerInfo::~WorldServerInfo() {
   SharedDtor();
 }
 
-inline void WorldServerInfo::SharedDtor() {
+inline void RealmServerInfo::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.worldname_.Destroy();
+  _impl_.realmname_.Destroy();
 }
 
-void WorldServerInfo::SetCachedSize(int size) const {
+void RealmServerInfo::SetCachedSize(int size) const {
   _impl_._cached_size_.Set(size);
 }
 
-void WorldServerInfo::Clear() {
-// @@protoc_insertion_point(message_clear_start:Protocol.WorldServerInfo)
+void RealmServerInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.RealmServerInfo)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  _impl_.worldname_.ClearToEmpty();
-  ::memset(&_impl_.worldid_, 0, static_cast<size_t>(
+  _impl_.realmname_.ClearToEmpty();
+  ::memset(&_impl_.realmid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&_impl_.status_) -
-      reinterpret_cast<char*>(&_impl_.worldid_)) + sizeof(_impl_.status_));
+      reinterpret_cast<char*>(&_impl_.realmid_)) + sizeof(_impl_.status_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* WorldServerInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+const char* RealmServerInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // int32 worldId = 1;
+      // int32 realmId = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _impl_.worldid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          _impl_.realmid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // string worldName = 2;
+      // string realmName = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          auto str = _internal_mutable_worldname();
+          auto str = _internal_mutable_realmname();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "Protocol.WorldServerInfo.worldName"));
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.RealmServerInfo.realmName"));
         } else
           goto handle_unusual;
         continue;
@@ -273,26 +273,26 @@ failure:
 #undef CHK_
 }
 
-uint8_t* WorldServerInfo::_InternalSerialize(
+uint8_t* RealmServerInfo::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Protocol.WorldServerInfo)
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.RealmServerInfo)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 worldId = 1;
-  if (this->_internal_worldid() != 0) {
+  // int32 realmId = 1;
+  if (this->_internal_realmid() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_worldid(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_realmid(), target);
   }
 
-  // string worldName = 2;
-  if (!this->_internal_worldname().empty()) {
+  // string realmName = 2;
+  if (!this->_internal_realmname().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_worldname().data(), static_cast<int>(this->_internal_worldname().length()),
+      this->_internal_realmname().data(), static_cast<int>(this->_internal_realmname().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "Protocol.WorldServerInfo.worldName");
+      "Protocol.RealmServerInfo.realmName");
     target = stream->WriteStringMaybeAliased(
-        2, this->_internal_worldname(), target);
+        2, this->_internal_realmname(), target);
   }
 
   // int32 currentPlayers = 3;
@@ -317,28 +317,28 @@ uint8_t* WorldServerInfo::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:Protocol.WorldServerInfo)
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.RealmServerInfo)
   return target;
 }
 
-size_t WorldServerInfo::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Protocol.WorldServerInfo)
+size_t RealmServerInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.RealmServerInfo)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string worldName = 2;
-  if (!this->_internal_worldname().empty()) {
+  // string realmName = 2;
+  if (!this->_internal_realmname().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_worldname());
+        this->_internal_realmname());
   }
 
-  // int32 worldId = 1;
-  if (this->_internal_worldid() != 0) {
-    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_worldid());
+  // int32 realmId = 1;
+  if (this->_internal_realmid() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_realmid());
   }
 
   // int32 currentPlayers = 3;
@@ -359,26 +359,26 @@ size_t WorldServerInfo::ByteSizeLong() const {
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData WorldServerInfo::_class_data_ = {
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData RealmServerInfo::_class_data_ = {
     ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    WorldServerInfo::MergeImpl
+    RealmServerInfo::MergeImpl
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*WorldServerInfo::GetClassData() const { return &_class_data_; }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*RealmServerInfo::GetClassData() const { return &_class_data_; }
 
 
-void WorldServerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
-  auto* const _this = static_cast<WorldServerInfo*>(&to_msg);
-  auto& from = static_cast<const WorldServerInfo&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.WorldServerInfo)
+void RealmServerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<RealmServerInfo*>(&to_msg);
+  auto& from = static_cast<const RealmServerInfo&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.RealmServerInfo)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (!from._internal_worldname().empty()) {
-    _this->_internal_set_worldname(from._internal_worldname());
+  if (!from._internal_realmname().empty()) {
+    _this->_internal_set_realmname(from._internal_realmname());
   }
-  if (from._internal_worldid() != 0) {
-    _this->_internal_set_worldid(from._internal_worldid());
+  if (from._internal_realmid() != 0) {
+    _this->_internal_set_realmid(from._internal_realmid());
   }
   if (from._internal_currentplayers() != 0) {
     _this->_internal_set_currentplayers(from._internal_currentplayers());
@@ -392,35 +392,35 @@ void WorldServerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
-void WorldServerInfo::CopyFrom(const WorldServerInfo& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.WorldServerInfo)
+void RealmServerInfo::CopyFrom(const RealmServerInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.RealmServerInfo)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool WorldServerInfo::IsInitialized() const {
+bool RealmServerInfo::IsInitialized() const {
   return true;
 }
 
-void WorldServerInfo::InternalSwap(WorldServerInfo* other) {
+void RealmServerInfo::InternalSwap(RealmServerInfo* other) {
   using std::swap;
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.worldname_, lhs_arena,
-      &other->_impl_.worldname_, rhs_arena
+      &_impl_.realmname_, lhs_arena,
+      &other->_impl_.realmname_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(WorldServerInfo, _impl_.status_)
-      + sizeof(WorldServerInfo::_impl_.status_)
-      - PROTOBUF_FIELD_OFFSET(WorldServerInfo, _impl_.worldid_)>(
-          reinterpret_cast<char*>(&_impl_.worldid_),
-          reinterpret_cast<char*>(&other->_impl_.worldid_));
+      PROTOBUF_FIELD_OFFSET(RealmServerInfo, _impl_.status_)
+      + sizeof(RealmServerInfo::_impl_.status_)
+      - PROTOBUF_FIELD_OFFSET(RealmServerInfo, _impl_.realmid_)>(
+          reinterpret_cast<char*>(&_impl_.realmid_),
+          reinterpret_cast<char*>(&other->_impl_.realmid_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata WorldServerInfo::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata RealmServerInfo::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Struct_2eproto_getter, &descriptor_table_Struct_2eproto_once,
       file_level_metadata_Struct_2eproto[0]);
@@ -664,9 +664,9 @@ void GameSessionInfo::InternalSwap(GameSessionInfo* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::Protocol::WorldServerInfo*
-Arena::CreateMaybeMessage< ::Protocol::WorldServerInfo >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::Protocol::WorldServerInfo >(arena);
+template<> PROTOBUF_NOINLINE ::Protocol::RealmServerInfo*
+Arena::CreateMaybeMessage< ::Protocol::RealmServerInfo >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::RealmServerInfo >(arena);
 }
 template<> PROTOBUF_NOINLINE ::Protocol::GameSessionInfo*
 Arena::CreateMaybeMessage< ::Protocol::GameSessionInfo >(Arena* arena) {

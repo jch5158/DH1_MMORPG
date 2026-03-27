@@ -3,7 +3,7 @@
 #include "ClientSession.h"
 #include "ClientSessionManager.h"
 #include "GatewayService.h"
-#include "WorldPacketHandler.h"
+#include "RealmPacketHandler.h"
 
 bool GameSessionPacketHandler::Validate(const PacketSessionRef& pSession)
 {
@@ -35,26 +35,26 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_RES(const Protocol:
 		return true;
 	}
 
-	Protocol::S2C_WORLD_SELECT_RES response;
+	Protocol::S2C_REALM_SELECT_RES response;
 
 	if (result == Protocol::GAME_SESSION_SUCCESS)
 	{
 		pClientSession->SetWorldServerId(gatewayService.GetWorldServerId());
-		response.set_result(Protocol::WORLD_SELECT_SUCCESS);
-		NET_ENGINE_LOG_INFO("GameSessionPacketHandler - World enter success, accountId: {}", accountId);
+		response.set_result(Protocol::REALM_SELECT_SUCCESS);
+		NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Realm enter success, accountId: {}", accountId);
 	}
 	else if (result == Protocol::GAME_SESSION_FAIL_FULL)
 	{
-		response.set_result(Protocol::WORLD_SELECT_FAIL_FULL);
-		NET_ENGINE_LOG_WARN("GameSessionPacketHandler - World enter failed (full), accountId: {}", accountId);
+		response.set_result(Protocol::REALM_SELECT_FAIL_FULL);
+		NET_ENGINE_LOG_WARN("GameSessionPacketHandler - Realm enter failed (full), accountId: {}", accountId);
 	}
 	else
 	{
-		response.set_result(Protocol::WORLD_SELECT_FAIL_NOT_FOUND);
-		NET_ENGINE_LOG_ERROR("GameSessionPacketHandler - World enter failed, accountId: {}, result: {}", accountId, static_cast<int32>(result));
+		response.set_result(Protocol::REALM_SELECT_FAIL_NOT_FOUND);
+		NET_ENGINE_LOG_ERROR("GameSessionPacketHandler - Realm enter failed, accountId: {}, result: {}", accountId, static_cast<int32>(result));
 	}
 
-	pClientSession->Send(WorldPacketHandler::MakeSendBuffer(response));
+	pClientSession->Send(RealmPacketHandler::MakeSendBuffer(response));
 
 	return true;
 }

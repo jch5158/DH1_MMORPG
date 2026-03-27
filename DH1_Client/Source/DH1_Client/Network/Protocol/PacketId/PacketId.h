@@ -13,10 +13,21 @@ namespace packet_id
 	};
 
 
+	enum eGameSessionPacketId : uint16
+	{
+        S2S_GAME_SESSION_ENTER_NOT = 1,
+        S2S_GAME_SESSION_ENTER_RES = 2,
+        S2S_GAME_SESSION_LEAVE_NOT = 3,
+        S2S_GAME_SESSION_SYNC_ENTER_NOT = 4,
+        S2S_GAME_SESSION_SYNC_LEAVE_NOT = 5,
+        S2S_RELAY_TO_CLIENT_NOT = 6,
+        S2S_RELAY_TO_WORLD_NOT = 7,
+	};
+
+
 	enum eHeartbeatPacketId : uint16
 	{
-        C2S_HEARTBEAT_REQ = 1,
-        S2C_HEARTBEAT_RES = 2,
+        C2S_HEARTBEAT_NOT = 1,
 	};
 
 
@@ -27,18 +38,18 @@ namespace packet_id
 	};
 
 
-	enum eServerHeartbeatPacketId : uint16
+	enum eRealmPacketId : uint16
 	{
-        S2S_HEARTBEAT_NOT = 1,
+        C2S_REALM_LIST_REQ = 1,
+        S2C_REALM_LIST_RES = 2,
+        C2S_REALM_SELECT_REQ = 3,
+        S2C_REALM_SELECT_RES = 4,
 	};
 
 
-	enum eWorldPacketId : uint16
+	enum eServerHeartbeatPacketId : uint16
 	{
-        C2S_WORLD_LIST_REQ = 1,
-        S2C_WORLD_LIST_RES = 2,
-        C2S_WORLD_SELECT_REQ = 3,
-        S2C_WORLD_SELECT_RES = 4,
+        S2S_HEARTBEAT_NOT = 1,
 	};
 
 }

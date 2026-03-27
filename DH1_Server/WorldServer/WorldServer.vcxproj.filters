@@ -72,6 +72,9 @@
     <ClCompile Include="..\..\Shared\Protocol\GameSession.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Movement.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
     <ClCompile Include="RealmSession.cpp">
       <Filter>Core\Network\Session</Filter>
     </ClCompile>
@@ -91,6 +94,12 @@
       <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
     <ClCompile Include="GameSessionManager.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStateManager.cpp">
+      <Filter>Contents\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTickProcessor.cpp">
       <Filter>Contents\Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,6 +131,9 @@
     <ClInclude Include="..\..\Shared\Protocol\GameSession.pb.h">
       <Filter>Core\Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Movement.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
     <ClInclude Include="RealmSession.h">
       <Filter>Core\Network\Session</Filter>
     </ClInclude>
@@ -146,6 +158,18 @@
     <ClInclude Include="GameSessionManager.h">
       <Filter>Contents\Core</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerState.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveInputEntry.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStateManager.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTickProcessor.h">
+      <Filter>Contents\Core</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h">
       <Filter>Core\Network\Protocol\PacketId</Filter>
     </ClInclude>
@@ -164,6 +188,9 @@
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\GameSession.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Movement.proto">
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>

@@ -22,7 +22,7 @@ THIRD_PARTY_INCLUDES_START
 #include "Struct.pb.h"
 #include "Login.pb.h"
 #include "Heartbeat.pb.h"
-#include "World.pb.h"
+#include "Realm.pb.h"
 #include "Echo.pb.h"
 
 #pragma pop_macro("cast")

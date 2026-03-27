@@ -40,6 +40,9 @@
     <Filter Include="Contents\Core">
       <UniqueIdentifier>{b4c5d6e7-f8a9-0123-bcde-123456789012}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Contents\Database">
+      <UniqueIdentifier>{a3b4c5d6-e7f8-9012-abcd-012345678901}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RealmServer.cpp">
@@ -77,6 +80,12 @@
     </ClCompile>
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisActor.cpp">
+      <Filter>Contents\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="RedisService.cpp">
+      <Filter>Contents\Service</Filter>
     </ClCompile>
     <ClCompile Include="RealmSessionRegistry.cpp">
       <Filter>Contents\Core</Filter>
@@ -121,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisActor.h">
+      <Filter>Contents\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="RedisService.h">
+      <Filter>Contents\Service</Filter>
     </ClInclude>
     <ClInclude Include="RealmSessionRegistry.h">
       <Filter>Contents\Core</Filter>

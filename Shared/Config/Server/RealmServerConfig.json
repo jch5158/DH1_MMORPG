@@ -7,9 +7,15 @@
     },
     "realmServer": {
         "realmServerId": 1,
+        "realmName": "Realm-1",
+        "maxPlayers": 5000,
         "heartbeatTimeoutMs": 15000,
         "heartbeatCheckIntervalMs": 5000,
-        "heartbeatIntervalMs": 5000
+        "heartbeatIntervalMs": 5000,
+        "redisTtlSeconds": 10
+    },
+    "redis": {
+        "connectionUri": "tcp://127.0.0.1:6379"
     },
     "session": {
         "receiveBufferSize": 16384,

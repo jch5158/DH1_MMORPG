@@ -48,36 +48,36 @@ namespace Protocol {
 class GameSessionInfo;
 struct GameSessionInfoDefaultTypeInternal;
 extern GameSessionInfoDefaultTypeInternal _GameSessionInfo_default_instance_;
-class WorldServerInfo;
-struct WorldServerInfoDefaultTypeInternal;
-extern WorldServerInfoDefaultTypeInternal _WorldServerInfo_default_instance_;
+class RealmServerInfo;
+struct RealmServerInfoDefaultTypeInternal;
+extern RealmServerInfoDefaultTypeInternal _RealmServerInfo_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
 template<> ::Protocol::GameSessionInfo* Arena::CreateMaybeMessage<::Protocol::GameSessionInfo>(Arena*);
-template<> ::Protocol::WorldServerInfo* Arena::CreateMaybeMessage<::Protocol::WorldServerInfo>(Arena*);
+template<> ::Protocol::RealmServerInfo* Arena::CreateMaybeMessage<::Protocol::RealmServerInfo>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
 
 // ===================================================================
 
-class WorldServerInfo final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.WorldServerInfo) */ {
+class RealmServerInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.RealmServerInfo) */ {
  public:
-  inline WorldServerInfo() : WorldServerInfo(nullptr) {}
-  ~WorldServerInfo() override;
-  explicit PROTOBUF_CONSTEXPR WorldServerInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline RealmServerInfo() : RealmServerInfo(nullptr) {}
+  ~RealmServerInfo() override;
+  explicit PROTOBUF_CONSTEXPR RealmServerInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  WorldServerInfo(const WorldServerInfo& from);
-  WorldServerInfo(WorldServerInfo&& from) noexcept
-    : WorldServerInfo() {
+  RealmServerInfo(const RealmServerInfo& from);
+  RealmServerInfo(RealmServerInfo&& from) noexcept
+    : RealmServerInfo() {
     *this = ::std::move(from);
   }
 
-  inline WorldServerInfo& operator=(const WorldServerInfo& from) {
+  inline RealmServerInfo& operator=(const RealmServerInfo& from) {
     CopyFrom(from);
     return *this;
   }
-  inline WorldServerInfo& operator=(WorldServerInfo&& from) noexcept {
+  inline RealmServerInfo& operator=(RealmServerInfo&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -100,20 +100,20 @@ class WorldServerInfo final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const WorldServerInfo& default_instance() {
+  static const RealmServerInfo& default_instance() {
     return *internal_default_instance();
   }
-  static inline const WorldServerInfo* internal_default_instance() {
-    return reinterpret_cast<const WorldServerInfo*>(
-               &_WorldServerInfo_default_instance_);
+  static inline const RealmServerInfo* internal_default_instance() {
+    return reinterpret_cast<const RealmServerInfo*>(
+               &_RealmServerInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(WorldServerInfo& a, WorldServerInfo& b) {
+  friend void swap(RealmServerInfo& a, RealmServerInfo& b) {
     a.Swap(&b);
   }
-  inline void Swap(WorldServerInfo* other) {
+  inline void Swap(RealmServerInfo* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -126,7 +126,7 @@ class WorldServerInfo final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(WorldServerInfo* other) {
+  void UnsafeArenaSwap(RealmServerInfo* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -134,14 +134,14 @@ class WorldServerInfo final :
 
   // implements Message ----------------------------------------------
 
-  WorldServerInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<WorldServerInfo>(arena);
+  RealmServerInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<RealmServerInfo>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const WorldServerInfo& from);
+  void CopyFrom(const RealmServerInfo& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom( const WorldServerInfo& from) {
-    WorldServerInfo::MergeImpl(*this, from);
+  void MergeFrom( const RealmServerInfo& from) {
+    RealmServerInfo::MergeImpl(*this, from);
   }
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
@@ -159,15 +159,15 @@ class WorldServerInfo final :
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(WorldServerInfo* other);
+  void InternalSwap(RealmServerInfo* other);
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Protocol.WorldServerInfo";
+    return "Protocol.RealmServerInfo";
   }
   protected:
-  explicit WorldServerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit RealmServerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   public:
 
@@ -181,33 +181,33 @@ class WorldServerInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kWorldNameFieldNumber = 2,
-    kWorldIdFieldNumber = 1,
+    kRealmNameFieldNumber = 2,
+    kRealmIdFieldNumber = 1,
     kCurrentPlayersFieldNumber = 3,
     kMaxPlayersFieldNumber = 4,
     kStatusFieldNumber = 5,
   };
-  // string worldName = 2;
-  void clear_worldname();
-  const std::string& worldname() const;
+  // string realmName = 2;
+  void clear_realmname();
+  const std::string& realmname() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_worldname(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_worldname();
-  PROTOBUF_NODISCARD std::string* release_worldname();
-  void set_allocated_worldname(std::string* worldname);
+  void set_realmname(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_realmname();
+  PROTOBUF_NODISCARD std::string* release_realmname();
+  void set_allocated_realmname(std::string* realmname);
   private:
-  const std::string& _internal_worldname() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_worldname(const std::string& value);
-  std::string* _internal_mutable_worldname();
+  const std::string& _internal_realmname() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_realmname(const std::string& value);
+  std::string* _internal_mutable_realmname();
   public:
 
-  // int32 worldId = 1;
-  void clear_worldid();
-  int32_t worldid() const;
-  void set_worldid(int32_t value);
+  // int32 realmId = 1;
+  void clear_realmid();
+  int32_t realmid() const;
+  void set_realmid(int32_t value);
   private:
-  int32_t _internal_worldid() const;
-  void _internal_set_worldid(int32_t value);
+  int32_t _internal_realmid() const;
+  void _internal_set_realmid(int32_t value);
   public:
 
   // int32 currentPlayers = 3;
@@ -237,7 +237,7 @@ class WorldServerInfo final :
   void _internal_set_status(int32_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:Protocol.WorldServerInfo)
+  // @@protoc_insertion_point(class_scope:Protocol.RealmServerInfo)
  private:
   class _Internal;
 
@@ -245,8 +245,8 @@ class WorldServerInfo final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr worldname_;
-    int32_t worldid_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr realmname_;
+    int32_t realmid_;
     int32_t currentplayers_;
     int32_t maxplayers_;
     int32_t status_;
@@ -434,136 +434,136 @@ class GameSessionInfo final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// WorldServerInfo
+// RealmServerInfo
 
-// int32 worldId = 1;
-inline void WorldServerInfo::clear_worldid() {
-  _impl_.worldid_ = 0;
+// int32 realmId = 1;
+inline void RealmServerInfo::clear_realmid() {
+  _impl_.realmid_ = 0;
 }
-inline int32_t WorldServerInfo::_internal_worldid() const {
-  return _impl_.worldid_;
+inline int32_t RealmServerInfo::_internal_realmid() const {
+  return _impl_.realmid_;
 }
-inline int32_t WorldServerInfo::worldid() const {
-  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.worldId)
-  return _internal_worldid();
+inline int32_t RealmServerInfo::realmid() const {
+  // @@protoc_insertion_point(field_get:Protocol.RealmServerInfo.realmId)
+  return _internal_realmid();
 }
-inline void WorldServerInfo::_internal_set_worldid(int32_t value) {
+inline void RealmServerInfo::_internal_set_realmid(int32_t value) {
   
-  _impl_.worldid_ = value;
+  _impl_.realmid_ = value;
 }
-inline void WorldServerInfo::set_worldid(int32_t value) {
-  _internal_set_worldid(value);
-  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.worldId)
+inline void RealmServerInfo::set_realmid(int32_t value) {
+  _internal_set_realmid(value);
+  // @@protoc_insertion_point(field_set:Protocol.RealmServerInfo.realmId)
 }
 
-// string worldName = 2;
-inline void WorldServerInfo::clear_worldname() {
-  _impl_.worldname_.ClearToEmpty();
+// string realmName = 2;
+inline void RealmServerInfo::clear_realmname() {
+  _impl_.realmname_.ClearToEmpty();
 }
-inline const std::string& WorldServerInfo::worldname() const {
-  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.worldName)
-  return _internal_worldname();
+inline const std::string& RealmServerInfo::realmname() const {
+  // @@protoc_insertion_point(field_get:Protocol.RealmServerInfo.realmName)
+  return _internal_realmname();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void WorldServerInfo::set_worldname(ArgT0&& arg0, ArgT... args) {
+void RealmServerInfo::set_realmname(ArgT0&& arg0, ArgT... args) {
  
- _impl_.worldname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.worldName)
+ _impl_.realmname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.RealmServerInfo.realmName)
 }
-inline std::string* WorldServerInfo::mutable_worldname() {
-  std::string* _s = _internal_mutable_worldname();
-  // @@protoc_insertion_point(field_mutable:Protocol.WorldServerInfo.worldName)
+inline std::string* RealmServerInfo::mutable_realmname() {
+  std::string* _s = _internal_mutable_realmname();
+  // @@protoc_insertion_point(field_mutable:Protocol.RealmServerInfo.realmName)
   return _s;
 }
-inline const std::string& WorldServerInfo::_internal_worldname() const {
-  return _impl_.worldname_.Get();
+inline const std::string& RealmServerInfo::_internal_realmname() const {
+  return _impl_.realmname_.Get();
 }
-inline void WorldServerInfo::_internal_set_worldname(const std::string& value) {
+inline void RealmServerInfo::_internal_set_realmname(const std::string& value) {
   
-  _impl_.worldname_.Set(value, GetArenaForAllocation());
+  _impl_.realmname_.Set(value, GetArenaForAllocation());
 }
-inline std::string* WorldServerInfo::_internal_mutable_worldname() {
+inline std::string* RealmServerInfo::_internal_mutable_realmname() {
   
-  return _impl_.worldname_.Mutable(GetArenaForAllocation());
+  return _impl_.realmname_.Mutable(GetArenaForAllocation());
 }
-inline std::string* WorldServerInfo::release_worldname() {
-  // @@protoc_insertion_point(field_release:Protocol.WorldServerInfo.worldName)
-  return _impl_.worldname_.Release();
+inline std::string* RealmServerInfo::release_realmname() {
+  // @@protoc_insertion_point(field_release:Protocol.RealmServerInfo.realmName)
+  return _impl_.realmname_.Release();
 }
-inline void WorldServerInfo::set_allocated_worldname(std::string* worldname) {
-  if (worldname != nullptr) {
+inline void RealmServerInfo::set_allocated_realmname(std::string* realmname) {
+  if (realmname != nullptr) {
     
   } else {
     
   }
-  _impl_.worldname_.SetAllocated(worldname, GetArenaForAllocation());
+  _impl_.realmname_.SetAllocated(realmname, GetArenaForAllocation());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.worldname_.IsDefault()) {
-    _impl_.worldname_.Set("", GetArenaForAllocation());
+  if (_impl_.realmname_.IsDefault()) {
+    _impl_.realmname_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:Protocol.WorldServerInfo.worldName)
+  // @@protoc_insertion_point(field_set_allocated:Protocol.RealmServerInfo.realmName)
 }
 
 // int32 currentPlayers = 3;
-inline void WorldServerInfo::clear_currentplayers() {
+inline void RealmServerInfo::clear_currentplayers() {
   _impl_.currentplayers_ = 0;
 }
-inline int32_t WorldServerInfo::_internal_currentplayers() const {
+inline int32_t RealmServerInfo::_internal_currentplayers() const {
   return _impl_.currentplayers_;
 }
-inline int32_t WorldServerInfo::currentplayers() const {
-  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.currentPlayers)
+inline int32_t RealmServerInfo::currentplayers() const {
+  // @@protoc_insertion_point(field_get:Protocol.RealmServerInfo.currentPlayers)
   return _internal_currentplayers();
 }
-inline void WorldServerInfo::_internal_set_currentplayers(int32_t value) {
+inline void RealmServerInfo::_internal_set_currentplayers(int32_t value) {
   
   _impl_.currentplayers_ = value;
 }
-inline void WorldServerInfo::set_currentplayers(int32_t value) {
+inline void RealmServerInfo::set_currentplayers(int32_t value) {
   _internal_set_currentplayers(value);
-  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.currentPlayers)
+  // @@protoc_insertion_point(field_set:Protocol.RealmServerInfo.currentPlayers)
 }
 
 // int32 maxPlayers = 4;
-inline void WorldServerInfo::clear_maxplayers() {
+inline void RealmServerInfo::clear_maxplayers() {
   _impl_.maxplayers_ = 0;
 }
-inline int32_t WorldServerInfo::_internal_maxplayers() const {
+inline int32_t RealmServerInfo::_internal_maxplayers() const {
   return _impl_.maxplayers_;
 }
-inline int32_t WorldServerInfo::maxplayers() const {
-  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.maxPlayers)
+inline int32_t RealmServerInfo::maxplayers() const {
+  // @@protoc_insertion_point(field_get:Protocol.RealmServerInfo.maxPlayers)
   return _internal_maxplayers();
 }
-inline void WorldServerInfo::_internal_set_maxplayers(int32_t value) {
+inline void RealmServerInfo::_internal_set_maxplayers(int32_t value) {
   
   _impl_.maxplayers_ = value;
 }
-inline void WorldServerInfo::set_maxplayers(int32_t value) {
+inline void RealmServerInfo::set_maxplayers(int32_t value) {
   _internal_set_maxplayers(value);
-  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.maxPlayers)
+  // @@protoc_insertion_point(field_set:Protocol.RealmServerInfo.maxPlayers)
 }
 
 // int32 status = 5;
-inline void WorldServerInfo::clear_status() {
+inline void RealmServerInfo::clear_status() {
   _impl_.status_ = 0;
 }
-inline int32_t WorldServerInfo::_internal_status() const {
+inline int32_t RealmServerInfo::_internal_status() const {
   return _impl_.status_;
 }
-inline int32_t WorldServerInfo::status() const {
-  // @@protoc_insertion_point(field_get:Protocol.WorldServerInfo.status)
+inline int32_t RealmServerInfo::status() const {
+  // @@protoc_insertion_point(field_get:Protocol.RealmServerInfo.status)
   return _internal_status();
 }
-inline void WorldServerInfo::_internal_set_status(int32_t value) {
+inline void RealmServerInfo::_internal_set_status(int32_t value) {
   
   _impl_.status_ = value;
 }
-inline void WorldServerInfo::set_status(int32_t value) {
+inline void RealmServerInfo::set_status(int32_t value) {
   _internal_set_status(value);
-  // @@protoc_insertion_point(field_set:Protocol.WorldServerInfo.status)
+  // @@protoc_insertion_point(field_set:Protocol.RealmServerInfo.status)
 }
 
 // -------------------------------------------------------------------

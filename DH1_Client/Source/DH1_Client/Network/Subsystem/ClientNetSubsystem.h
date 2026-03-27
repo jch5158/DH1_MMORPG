@@ -12,19 +12,19 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGatewayLoginResultDelegate, int32 /*eLoginResult*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHttpLoginErrorDelegate, int32 /*HttpStatusCode*/, const FString& /*Message*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEmailVerificationRequiredDelegate, const FString& /*Message*/, const FString& /*Email*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorldListReceivedDelegate, const TArray<FWorldServerInfo>& /*WorldList*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnWorldSelectResultDelegate, int32 /*eWorldSelectResult*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmListReceivedDelegate, const TArray<FRealmServerInfo>& /*RealmList*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmSelectResultDelegate, int32 /*eRealmSelectResult*/);
 
 USTRUCT(BlueprintType)
-struct FWorldServerInfo
+struct FRealmServerInfo
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	int32 WorldId = 0;
+	int32 RealmId = 0;
 
 	UPROPERTY(BlueprintReadOnly)
-	FString WorldName;
+	FString RealmName;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentPlayers = 0;
@@ -76,18 +76,18 @@ public:
     void SetAuthData(const FString& ArgTicket, const FString& ArgAccountId);
     AuthData GetAuthData() const;
     void NotifyLoginResult(int32 Result);
-    void NotifyWorldList(const TArray<FWorldServerInfo>& WorldList);
-    void NotifyWorldSelectResult(int32 Result);
+    void NotifyRealmList(const TArray<FRealmServerInfo>& RealmList);
+    void NotifyRealmSelectResult(int32 Result);
 
-    void RequestWorldList();
-    void RequestWorldSelect(int32 WorldId);
+    void RequestRealmList();
+    void RequestRealmSelect(int32 RealmId);
 
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;
     FOnEmailVerificationRequiredDelegate OnEmailVerificationRequired;
-    FOnWorldListReceivedDelegate OnWorldListReceived;
-    FOnWorldSelectResultDelegate OnWorldSelectResult;
+    FOnRealmListReceivedDelegate OnRealmListReceived;
+    FOnRealmSelectResultDelegate OnRealmSelectResult;
 
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);

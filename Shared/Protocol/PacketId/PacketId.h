@@ -38,18 +38,18 @@ namespace packet_id
 	};
 
 
-	enum eServerHeartbeatPacketId : uint16
+	enum eRealmPacketId : uint16
 	{
-        S2S_HEARTBEAT_NOT = 1,
+        C2S_REALM_LIST_REQ = 1,
+        S2C_REALM_LIST_RES = 2,
+        C2S_REALM_SELECT_REQ = 3,
+        S2C_REALM_SELECT_RES = 4,
 	};
 
 
-	enum eWorldPacketId : uint16
+	enum eServerHeartbeatPacketId : uint16
 	{
-        C2S_WORLD_LIST_REQ = 1,
-        S2C_WORLD_LIST_RES = 2,
-        C2S_WORLD_SELECT_REQ = 3,
-        S2C_WORLD_SELECT_RES = 4,
+        S2S_HEARTBEAT_NOT = 1,
 	};
 
 }

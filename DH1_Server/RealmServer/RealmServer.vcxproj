@@ -242,6 +242,8 @@
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp" />
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
+    <ClCompile Include="RedisActor.cpp" />
+    <ClCompile Include="RedisService.cpp" />
     <ClCompile Include="RealmSessionRegistry.cpp" />
     <ClCompile Include="RealmServer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
@@ -272,6 +274,8 @@
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h" />
+    <ClInclude Include="RedisActor.h" />
+    <ClInclude Include="RedisService.h" />
     <ClInclude Include="RealmSessionRegistry.h" />
     <ClInclude Include="PointerType.h" />
     <ClInclude Include="RealmService.h" />

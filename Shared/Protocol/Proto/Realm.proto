@@ -5,35 +5,35 @@ import "Enum.proto";
 import "Struct.proto";
 import "PacketOption.proto";
 
-option (service_type) = SERVICE_TYPE_WORLD;
-option (handler_name) = "WorldPacketHandler";
+option (service_type) = SERVICE_TYPE_REALM;
+option (handler_name) = "RealmPacketHandler";
 
-message C2S_WORLD_LIST_REQ
+message C2S_REALM_LIST_REQ
 {
     option (sender) = CLIENT;
     option (receiver) = GATEWAY_SERVER;
 }
 
-message S2C_WORLD_LIST_RES
+message S2C_REALM_LIST_RES
 {
     option (sender) = GATEWAY_SERVER;
     option (receiver) = CLIENT;
 
-    repeated WorldServerInfo worlds = 1;
+    repeated RealmServerInfo realms = 1;
 }
 
-message C2S_WORLD_SELECT_REQ
+message C2S_REALM_SELECT_REQ
 {
     option (sender) = CLIENT;
     option (receiver) = GATEWAY_SERVER;
 
-    int32 worldId = 1;
+    int32 realmId = 1;
 }
 
-message S2C_WORLD_SELECT_RES
+message S2C_REALM_SELECT_RES
 {
     option (sender) = GATEWAY_SERVER;
     option (receiver) = CLIENT;
 
-    eWorldSelectResult result = 1;
+    eRealmSelectResult result = 1;
 }

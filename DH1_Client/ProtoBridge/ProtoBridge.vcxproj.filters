@@ -30,10 +30,10 @@
     <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Realm.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\World.pb.cc">
+    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
       <Filter>Network\Protocol</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,13 +53,14 @@
     <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Realm.pb.h">
+      <Filter>Network\Protocol</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h">
       <Filter>Network\Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Shared\Protocol\World.pb.h">
-      <Filter>Network\Protocol</Filter>
-    </ClInclude>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
@@ -78,10 +79,10 @@
     <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
-    <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Realm.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
-    <None Include="..\..\Shared\Protocol\Proto\World.proto">
+    <None Include="..\..\Shared\Protocol\Proto\Struct.proto">
       <Filter>Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>

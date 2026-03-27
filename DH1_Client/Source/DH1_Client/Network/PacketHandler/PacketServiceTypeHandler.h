@@ -5,7 +5,7 @@
 #pragma once
 #include "HeartbeatPacketHandler.h"
 #include "LoginPacketHandler.h"
-#include "WorldPacketHandler.h"
+#include "RealmPacketHandler.h"
 
 #include "SessionValidator.h"
 
@@ -22,7 +22,7 @@ public:
 	{
 		HeartbeatPacketHandler::Init();
 		LoginPacketHandler::Init();
-		WorldPacketHandler::Init();
+		RealmPacketHandler::Init();
 
 		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_HEARTBEAT] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
@@ -34,9 +34,9 @@ public:
 			return LoginPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
-		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_WORLD] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		sPacketServiceTypeMap[Protocol::eServiceType::SERVICE_TYPE_REALM] = [](const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{
-			return WorldPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
+			return RealmPacketHandler::HandlePacket(size, packetId, pBuffer, pSession);
 		};
 
 

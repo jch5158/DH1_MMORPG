@@ -78,11 +78,21 @@ bool RealmService::Initialize(const JsonConfig& config)
 	mNetworkDispatchThreadCount = networkSchedulerConfig.GetInt32("runningThreadCount");
 	mActorDispatchThreadCount = actorSchedulerConfig.GetInt32("runningThreadCount");
 
+	// RedisService
+	if (config.HasKey("redis"))
+	{
+		const JsonConfig redisConfig = config.GetSection("redis");
+		mpRedisService = cpp_net_engine::MakeShared<RedisService>(redisConfig.GetString("connectionUri"), mpActorService);
+	}
+
 	// RealmServer info
 	mRealmServerId = realmServerConfig.GetInt32("realmServerId");
 	mHeartbeatTimeoutMs = realmServerConfig.GetInt64("heartbeatTimeoutMs");
 	mHeartbeatCheckIntervalMs = realmServerConfig.GetInt64("heartbeatCheckIntervalMs");
 	mHeartbeatIntervalMs = realmServerConfig.GetInt64("heartbeatIntervalMs");
+	mRedisTtlSeconds = realmServerConfig.GetInt64("redisTtlSeconds");
+	mMaxPlayers = realmServerConfig.GetInt32("maxPlayers");
+	mRealmName = realmServerConfig.GetString("realmName");
 
 	// RealmSessionRegistry
 	mpSessionRegistry = cpp_net_engine::MakeShared<RealmSessionRegistry>(1000);
@@ -145,6 +155,7 @@ void RealmService::Run()
 		{
 			sendHeartbeatToWorldServers();
 			checkWorldServerHeartbeats();
+			updateRealmRegistration();
 			lastHeartbeatCheck = now;
 		}
 
@@ -174,6 +185,11 @@ ServerServiceRef RealmService::GetServerServiceRef() const
 ActorServiceRef RealmService::GetActorServiceRef() const
 {
 	return mpActorService;
+}
+
+RedisServiceRef RealmService::GetRedisServiceRef() const
+{
+	return mpRedisService;
 }
 
 RealmSessionRegistryRef RealmService::GetSessionRegistryRef() const
@@ -230,4 +246,21 @@ void RealmService::checkWorldServerHeartbeats()
 			pWorldServerSession->Disconnect(eDisconnectReason::Timeout);
 		}
 	}
+}
+
+void RealmService::updateRealmRegistration()
+{
+	if (mpRedisService == nullptr)
+	{
+		return;
+	}
+
+	RedisRealmRegistration info;
+	info.realmId = mRealmServerId;
+	info.realmName = mRealmName;
+	info.currentPlayers = mpSessionRegistry->GetTotalSessionCount();
+	info.maxPlayers = mMaxPlayers;
+	info.status = static_cast<int32>(eRealmServerStatus::Online);
+
+	mpRedisService->UpdateRealmRegistration(info, mRedisTtlSeconds);
 }
