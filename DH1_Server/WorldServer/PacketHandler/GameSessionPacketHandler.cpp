@@ -91,6 +91,22 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 				{
 					const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
 					pPlayer->SetGatewayInfo(gatewaySessionId, gatewayServerId);
+
+					// 재접속 시 저장된 위치를 클라이언트에 전송
+					Protocol::S2C_SPAWN_POSITION_RES reconnectSpawnRes;
+					reconnectSpawnRes.mutable_position()->set_x(pPlayer->GetPositionX());
+					reconnectSpawnRes.mutable_position()->set_y(pPlayer->GetPositionY());
+					reconnectSpawnRes.mutable_position()->set_z(pPlayer->GetPositionZ());
+					reconnectSpawnRes.set_rotationyaw(pPlayer->GetRotationYaw());
+
+					auto reconnectInnerBuffer = MakeMovementSendBuffer(reconnectSpawnRes, packet_id::S2C_SPAWN_POSITION_RES);
+					Protocol::S2S_RELAY_TO_CLIENT_NOT reconnectRelay;
+					reconnectRelay.set_gatewaysessionid(gatewaySessionId);
+					reconnectRelay.set_payload(reconnectInnerBuffer->GetReadPtr(), reconnectInnerBuffer->GetUseSize());
+					pSession->Send(GameSessionPacketHandler::MakeSendBuffer(reconnectRelay));
+
+					NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Reconnect spawn position sent to client, accountId: {}, pos: ({}, {}, {})",
+						accountId, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
 				}
 			}
 
@@ -220,6 +236,22 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 
 					NET_ENGINE_LOG_INFO("GameSessionPacketHandler - PlayerObject created, accountId: {}, actorId: {}, pos: ({}, {}, {})",
 						accountId, pPlayerObject->GetId(), posX, posY, posZ);
+
+						// DB 로드 후 초기 위치를 클라이언트에 전송
+						Protocol::S2C_SPAWN_POSITION_RES spawnRes;
+						spawnRes.mutable_position()->set_x(posX);
+						spawnRes.mutable_position()->set_y(posY);
+						spawnRes.mutable_position()->set_z(posZ);
+						spawnRes.set_rotationyaw(rotYaw);
+
+						auto spawnInnerBuffer = MakeMovementSendBuffer(spawnRes, packet_id::S2C_SPAWN_POSITION_RES);
+						Protocol::S2S_RELAY_TO_CLIENT_NOT spawnRelay;
+						spawnRelay.set_gatewaysessionid(gatewaySessionId);
+						spawnRelay.set_payload(spawnInnerBuffer->GetReadPtr(), spawnInnerBuffer->GetUseSize());
+						pSession->Send(GameSessionPacketHandler::MakeSendBuffer(spawnRelay));
+
+						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Initial spawn position sent to client, accountId: {}, pos: ({}, {}, {}), yaw: {}",
+							accountId, posX, posY, posZ, rotYaw);
 
 					// RealmServer에 동기화
 					if (pRealmClientService != nullptr)
