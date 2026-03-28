@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-setlocal
+setlocal enabledelayedexpansion
 
 set "BASE_DIR=%~dp0..\.."
 set "CONFIG=%~1"
@@ -13,11 +13,17 @@ echo ============================================
 echo  DH1 MMORPG Server Launcher [%CONFIG%]
 echo ============================================
 
-if "%DH1_REDIS_HOST%"=="" (
-    set "DH1_REDIS_HOST=127.0.0.1"
-)
-if "%DH1_REDIS_PORT%"=="" (
-    set "DH1_REDIS_PORT=6379"
+:: .env 파일 로드 (루트 디렉토리)
+if exist "%BASE_DIR%\.env" (
+    for /f "usebackq tokens=1,* delims==" %%A in ("%BASE_DIR%\.env") do (
+        set "LINE=%%A"
+        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
+            set "%%A=%%B"
+        )
+    )
+    echo [Info] Loaded .env
+) else (
+    echo [Warning] .env not found, using defaults
 )
 
 set "SERVER_DIR=%BASE_DIR%\Binaries\Server\%CONFIG%"

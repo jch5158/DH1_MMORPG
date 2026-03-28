@@ -5,10 +5,10 @@
       "command": "mcp-server-mysql",
       "args": [],
       "env": {
-        "MYSQL_HOST": "127.0.0.1",
-        "MYSQL_PORT": "3306",
-        "MYSQL_USER": "root",
-        "MYSQL_PASSWORD": "${MYSQL_PASSWORD}",
+        "MYSQL_HOST": "${DH1_MYSQL_HOST}",
+        "MYSQL_PORT": "${DH1_MYSQL_PORT}",
+        "MYSQL_USER": "${DH1_MYSQL_USER}",
+        "MYSQL_PASSWORD": "${DH1_MYSQL_PASSWORD}",
         "MYSQL_ALLOW_WRITE": "true"
       }
     },
@@ -20,8 +20,8 @@
         "@liangshanli/mcp-server-redis"
       ],
       "env": {
-        "REDIS_HOST": "localhost",
-        "REDIS_PORT": "6379"
+        "REDIS_HOST": "${DH1_REDIS_HOST}",
+        "REDIS_PORT": "${DH1_REDIS_PORT}"
       }
     },
     "unrealMCP": {

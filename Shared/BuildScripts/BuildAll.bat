@@ -30,6 +30,20 @@ echo  DH1_MMORPG Build All - %CONFIG% ^| %PLATFORM%
 echo ============================================================
 echo.
 
+:: .env 파일 로드 (루트 디렉토리)
+if exist "%ROOT_DIR%\.env" (
+    for /f "usebackq tokens=1,* delims==" %%A in ("%ROOT_DIR%\.env") do (
+        set "LINE=%%A"
+        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
+            set "%%A=%%B"
+        )
+    )
+    echo [Info] Loaded .env
+) else (
+    echo [Warning] .env not found, skipping
+)
+echo.
+
 :: Find MSBuild via vswhere
 set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if not exist "%VSWHERE%" (

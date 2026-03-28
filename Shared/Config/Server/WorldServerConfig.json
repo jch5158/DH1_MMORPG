@@ -28,7 +28,7 @@
         "moveSpeed": 600,
         "aoiCellSize": 2000,
         "aoiRange": 1,
-        "navMeshFilePath": "E:/Projects/DH1_MMORPG/Shared/NavMesh/L_GameWorld.bin"
+        "navMeshFilePath": "${DH1_NAVMESH_PATH}"
     },
     "realmServer": {
         "ip": "127.0.0.1",
