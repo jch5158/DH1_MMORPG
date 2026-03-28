@@ -15,6 +15,9 @@ string ResolveEnvVars(string value)
     });
 }
 
+builder.Configuration["SmtpSettings:AppPassword"] = ResolveEnvVars(
+    builder.Configuration["SmtpSettings:AppPassword"] ?? string.Empty);
+
 var connectionString = ResolveEnvVars(
     builder.Configuration.GetConnectionString("AccountDbConnection")
     ?? throw new InvalidOperationException("appsettings.json에 AccountDbConnection 설정이 없습니다."));
