@@ -51,24 +51,13 @@ void GameTickProcessor::ProcessTick(const int64 deltaMs)
 {
 	const float deltaSec = static_cast<float>(deltaMs) / 1000.0f;
 
-	processMovementInputs();
 	processMoveToPositionRequests();
-	validateWasdPositions();
-	updatePositions(deltaSec);
 	updatePathFollowing(deltaSec);
-	sendMoveResults();
 	sendPathResults();
 	processVisibilityChanges();
 	broadcastSnapshots();
 
-	mMovedActorIds.clear();
 	mPendingPathResults.clear();
-}
-
-void GameTickProcessor::EnqueueMoveInput(const MoveInputEntry& entry)
-{
-	std::lock_guard<Mutex> lock(mInputQueueLock);
-	mPendingInputs.push_back(entry);
 }
 
 void GameTickProcessor::EnqueueMoveToPosition(const MoveToPositionEntry& entry)
@@ -77,102 +66,6 @@ void GameTickProcessor::EnqueueMoveToPosition(const MoveToPositionEntry& entry)
 	mPendingMoveToInputs.push_back(entry);
 }
 
-void GameTickProcessor::processMovementInputs()
-{
-	{
-		std::lock_guard<Mutex> lock(mInputQueueLock);
-		mProcessingInputs.swap(mPendingInputs);
-		mPendingInputs.clear();
-	}
-
-	for (const auto& input : mProcessingInputs)
-	{
-		const auto pObject = mpGridManager->GetObjectByAccountId(input.mAccountId);
-		if (pObject == nullptr || pObject->GetObjectType() != eGameObjectType::Player)
-		{
-			continue;
-		}
-
-		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
-		pPlayer->UpdateMoveInput(input.mSequenceId, input.mDirectionX, input.mDirectionY, input.mDirectionZ,
-			input.mRotationYaw, input.mClientTimestamp, input.mPositionZ);
-
-		mMovedActorIds.push_back(pPlayer->GetId());
-
-		NET_ENGINE_LOG_TRACE("GameTick - Input processed, accountId: {}, seq: {}, vel: ({:.1f}, {:.1f}, {:.1f})",
-			input.mAccountId, input.mSequenceId, pPlayer->GetVelocityX(), pPlayer->GetVelocityY(), pPlayer->GetVelocityZ());
-	}
-
-	mProcessingInputs.clear();
-}
-
-void GameTickProcessor::updatePositions(const float deltaSec)
-{
-	const auto allObjects = mpGridManager->GetAllObjects();
-
-	for (const auto& pObject : allObjects)
-	{
-		if (!pObject->IsMoving())
-		{
-			continue;
-		}
-
-		// 속도 상한 검증
-		const float speedSq = pObject->GetVelocityX() * pObject->GetVelocityX()
-			+ pObject->GetVelocityY() * pObject->GetVelocityY()
-			+ pObject->GetVelocityZ() * pObject->GetVelocityZ();
-		const float maxSpeed = mMoveSpeed * 1.5f;
-		if (speedSq > maxSpeed * maxSpeed)
-		{
-			const float speed = std::sqrt(speedSq);
-			const float scale = maxSpeed / speed;
-			pObject->SetVelocity(
-				pObject->GetVelocityX() * scale,
-				pObject->GetVelocityY() * scale,
-				pObject->GetVelocityZ() * scale);
-		}
-
-		// 위치 갱신 (Z는 클라이언트에서 직접 동기화하므로 velocity 기반 갱신하지 않음)
-		pObject->SetPosition(
-			pObject->GetPositionX() + pObject->GetVelocityX() * deltaSec,
-			pObject->GetPositionY() + pObject->GetVelocityY() * deltaSec,
-			pObject->GetPositionZ());
-
-		NET_ENGINE_LOG_TRACE("GameTick - Position updated, actorId: {}, pos: ({:.1f}, {:.1f}, {:.1f})",
-			pObject->GetId(), pObject->GetPositionX(), pObject->GetPositionY(), pObject->GetPositionZ());
-	}
-}
-
-void GameTickProcessor::sendMoveResults()
-{
-	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::steady_clock::now().time_since_epoch()).count();
-
-	for (const uint64 actorId : mMovedActorIds)
-	{
-		const auto pObject = mpGridManager->GetObjectByActorId(actorId);
-		if (pObject == nullptr || pObject->GetObjectType() != eGameObjectType::Player)
-		{
-			continue;
-		}
-
-		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
-
-		Protocol::S2C_MOVE_RESULT_NOT result;
-		result.set_sequenceid(pPlayer->GetLastSequenceId());
-		result.mutable_position()->set_x(pPlayer->GetPositionX());
-		result.mutable_position()->set_y(pPlayer->GetPositionY());
-		result.mutable_position()->set_z(pPlayer->GetPositionZ());
-		result.mutable_velocity()->set_x(pPlayer->GetVelocityX());
-		result.mutable_velocity()->set_y(pPlayer->GetVelocityY());
-		result.mutable_velocity()->set_z(pPlayer->GetVelocityZ());
-		result.set_rotationyaw(pPlayer->GetRotationYaw());
-		result.set_servertimestamp(nowMs);
-
-		sendRelayToClient(pPlayer->GetGatewaySessionId(), pPlayer->GetGatewayServerId(),
-			MakeMovementSendBuffer(result, packet_id::S2C_MOVE_RESULT_NOT));
-	}
-}
 
 void GameTickProcessor::processVisibilityChanges()
 {
@@ -328,6 +221,10 @@ void GameTickProcessor::processMoveToPositionRequests()
 
 	if (mpNavMeshManager == nullptr || !mpNavMeshManager->IsLoaded())
 	{
+		if (!mProcessingMoveToInputs.empty())
+		{
+			NET_ENGINE_LOG_WARN("processMoveToPosition - NavMesh not loaded, skipping {} inputs", mProcessingMoveToInputs.size());
+		}
 		mProcessingMoveToInputs.clear();
 		return;
 	}
@@ -342,7 +239,30 @@ void GameTickProcessor::processMoveToPositionRequests()
 
 		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
 
-		const Vector3f start(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+		// 클라이언트 현재 위치로 서버 위치 동기화 (DB 저장 정확도를 위해)
+		if (input.mHasCurrentPosition)
+		{
+			pPlayer->SetPosition(input.mCurrentX, input.mCurrentY, input.mCurrentZ);
+		}
+
+		// 서버 위치가 NavMesh 밖이면 가장 가까운 유효 위치로 snap
+		Vector3f start(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+		if (!mpNavMeshManager->IsPositionWalkable(start.mX, start.mY, start.mZ, 200.0f))
+		{
+			Vector3f snapped;
+			if (mpNavMeshManager->GetNearestValidPosition(start.mX, start.mY, start.mZ, 100000.0f, snapped))
+			{
+				pPlayer->SetPosition(snapped.mX, snapped.mY, snapped.mZ);
+				start = snapped;
+				NET_ENGINE_LOG_WARN("processMoveToPosition - start off NavMesh, snapped to ({:.1f}, {:.1f}, {:.1f}), accountId: {}",
+					snapped.mX, snapped.mY, snapped.mZ, input.mAccountId);
+			}
+			else
+			{
+				NET_ENGINE_LOG_ERROR("processMoveToPosition - snap failed! start: ({:.1f}, {:.1f}, {:.1f}), accountId: {}",
+					start.mX, start.mY, start.mZ, input.mAccountId);
+			}
+		}
 		const Vector3f end(input.mDestinationX, input.mDestinationY, input.mDestinationZ);
 
 		PathResult result;
@@ -350,7 +270,11 @@ void GameTickProcessor::processMoveToPositionRequests()
 		result.mSequenceId = input.mSequenceId;
 		result.mMoveSpeed = pPlayer->GetMoveSpeed();
 
-		if (mpNavMeshManager->FindPath(start, end, result.mWaypoints))
+		const bool bPathFound = mpNavMeshManager->FindPath(start, end, result.mWaypoints);
+		NET_ENGINE_LOG_INFO("processMoveToPosition - accountId: {}, start: ({:.1f},{:.1f},{:.1f}), end: ({:.1f},{:.1f},{:.1f}), pathFound: {}, waypoints: {}",
+			input.mAccountId, start.mX, start.mY, start.mZ, end.mX, end.mY, end.mZ,
+			bPathFound, result.mWaypoints.size());
+		if (bPathFound)
 		{
 			pPlayer->SetPath(Vector<Vector3f>(result.mWaypoints));
 		}
@@ -361,35 +285,6 @@ void GameTickProcessor::processMoveToPositionRequests()
 	mProcessingMoveToInputs.clear();
 }
 
-void GameTickProcessor::validateWasdPositions()
-{
-	if (mpNavMeshManager == nullptr || !mpNavMeshManager->IsLoaded())
-	{
-		return;
-	}
-
-	// WASD 이동 후 위치가 NavMesh 바깥이면 보정
-	for (const auto& input : mProcessingInputs)
-	{
-		const auto pObject = mpGridManager->GetObjectByAccountId(input.mAccountId);
-		if (pObject == nullptr || !pObject->IsMoving())
-		{
-			continue;
-		}
-
-		if (!mpNavMeshManager->IsPositionWalkable(pObject->GetPositionX(), pObject->GetPositionY(), pObject->GetPositionZ()))
-		{
-			Vector3f corrected;
-			if (mpNavMeshManager->GetNearestValidPosition(
-				pObject->GetPositionX(), pObject->GetPositionY(), pObject->GetPositionZ(), 500.0f, corrected))
-			{
-				pObject->SetPosition(corrected.mX, corrected.mY, corrected.mZ);
-				pObject->SetVelocity(0.0f, 0.0f, 0.0f);
-				pObject->SetMoving(false);
-			}
-		}
-	}
-}
 
 void GameTickProcessor::updatePathFollowing(const float deltaSec)
 {
@@ -411,13 +306,13 @@ void GameTickProcessor::updatePathFollowing(const float deltaSec)
 		const Vector3f& waypoint = pPlayer->GetCurrentWaypoint();
 		const float dx = waypoint.mX - pPlayer->GetPositionX();
 		const float dy = waypoint.mY - pPlayer->GetPositionY();
-		const float dz = waypoint.mZ - pPlayer->GetPositionZ();
-		const float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
+		// Z는 클라이언트 동기화 값 사용 — 수평 거리만으로 웨이포인트 도달 판정
+		const float dist = std::sqrt(dx * dx + dy * dy);
 
 		if (dist < 30.0f)
 		{
-			// 웨이포인트 도달
-			pPlayer->SetPosition(waypoint.mX, waypoint.mY, waypoint.mZ);
+			// 웨이포인트 도달 — Z는 클라이언트 동기화 값 유지
+			pPlayer->SetPosition(waypoint.mX, waypoint.mY, pPlayer->GetPositionZ());
 
 			if (!pPlayer->AdvanceToNextWaypoint())
 			{
@@ -425,23 +320,19 @@ void GameTickProcessor::updatePathFollowing(const float deltaSec)
 				pPlayer->ClearPath();
 			}
 
-			mMovedActorIds.push_back(pPlayer->GetId());
 			continue;
 		}
 
-		// 웨이포인트를 향해 이동
+		// 웨이포인트를 향해 이동 — Z는 클라이언트 동기화 값 유지
 		const float moveDistance = pPlayer->GetMoveSpeed() * deltaSec;
 		const float ratio = std::min(moveDistance / dist, 1.0f);
 
 		const float newX = pPlayer->GetPositionX() + dx * ratio;
 		const float newY = pPlayer->GetPositionY() + dy * ratio;
-		const float newZ = pPlayer->GetPositionZ() + dz * ratio;
 
-		pPlayer->SetPosition(newX, newY, newZ);
+		pPlayer->SetPosition(newX, newY, pPlayer->GetPositionZ());
 		pPlayer->SetVelocity(dx / dist * pPlayer->GetMoveSpeed(), dy / dist * pPlayer->GetMoveSpeed(), 0.0f);
 		pPlayer->SetRotationYaw(std::atan2(dy, dx) * 180.0f / 3.14159265f);
-
-		mMovedActorIds.push_back(pPlayer->GetId());
 	}
 }
 

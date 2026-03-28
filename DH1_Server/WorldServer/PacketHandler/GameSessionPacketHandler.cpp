@@ -347,10 +347,12 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 			const float posZ = pObject->GetPositionZ();
 			const float rotYaw = pObject->GetRotationYaw();
 
+			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - LEAVE saving pos: ({}, {}, {}), accountId: {}",
+				posX, posY, posZ, accountId);
 			const auto pMySqlService = worldService.GetMySqlServiceRef();
 			if (pMySqlService != nullptr)
 			{
-				pMySqlService->ExecuteAsync(accountId, [accountId, posX, posY, posZ, rotYaw](sqlpp::mysql::connection& db)
+				pMySqlService->ExecuteAsync(accountId, [accountId, posX, posY, posZ, rotYaw, pMySqlService](sqlpp::mysql::connection& db)
 					{
 						const db::PlayerCharacter table{};
 						db(sqlpp::update(table).set(
@@ -363,18 +365,13 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 
 						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Character position saved, accountId: {}, pos: ({}, {}, {})",
 							accountId, posX, posY, posZ);
+						// DB 저장 완료 후 라우팅 키 해제 (재로그인 LOAD와 순서 보장)
+						pMySqlService->ReleaseRoutingKey(accountId);
 					});
 			}
 
 			pGridManager->RemoveObject(pObject->GetId());
 		}
-	}
-
-	// MySQL 로드밸런서 배정 해제
-	const auto pMySqlService = worldService.GetMySqlServiceRef();
-	if (pMySqlService != nullptr)
-	{
-		pMySqlService->ReleaseRoutingKey(accountId);
 	}
 
 	if (pGameSessionManager->RemoveSession(accountId))

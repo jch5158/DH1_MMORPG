@@ -3,7 +3,6 @@
 #include "GameTickProcessor.h"
 #include "GridManager.h"
 #include "PlayerObject.h"
-#include "MoveInputEntry.h"
 #include "WorldService.h"
 #include "RelayContext.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
@@ -47,58 +46,7 @@ bool MovementPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const ui
 
 bool MovementPacketHandler::HANDLE_C2S_MOVE_INPUT_NOT(const Protocol::C2S_MOVE_INPUT_NOT& packet, const PacketSessionRef& pSession)
 {
-	const uint64 accountId = RelayContext::GetAccountId();
-	if (accountId == 0)
-	{
-		NET_ENGINE_LOG_ERROR("MovementPacketHandler - RelayContext accountId is 0");
-		return false;
-	}
-
-	const auto pGameTickProcessor = ISingleton<WorldService>::GetInstance().GetGameTickProcessorRef();
-	if (pGameTickProcessor == nullptr)
-	{
-		return false;
-	}
-
-	// 방향 벡터 NaN/Inf 검증
-	const float dirX = packet.direction().x();
-	const float dirY = packet.direction().y();
-	const float dirZ = packet.direction().z();
-	const float rotYaw = packet.rotationyaw();
-	const float posZ = packet.positionz();
-
-	if (std::isnan(dirX) || std::isnan(dirY) || std::isnan(dirZ) ||
-		std::isinf(dirX) || std::isinf(dirY) || std::isinf(dirZ) ||
-		std::isnan(rotYaw) || std::isinf(rotYaw) ||
-		std::isnan(posZ) || std::isinf(posZ))
-	{
-		NET_ENGINE_LOG_WARN("MovementPacketHandler (World) - Invalid float values, accountId: {}", accountId);
-		return true; // 무시
-	}
-
-	// 방향 벡터 크기 검증
-	const float dirLengthSq = dirX * dirX + dirY * dirY + dirZ * dirZ;
-	if (dirLengthSq > 1.5f)
-	{
-		NET_ENGINE_LOG_WARN("MovementPacketHandler (World) - Direction vector too large ({:.2f}), accountId: {}", dirLengthSq, accountId);
-		return true; // 무시
-	}
-
-	MoveInputEntry entry;
-	entry.mAccountId = accountId;
-	entry.mSequenceId = packet.sequenceid();
-	entry.mDirectionX = dirX;
-	entry.mDirectionY = dirY;
-	entry.mDirectionZ = dirZ;
-	entry.mRotationYaw = rotYaw;
-	entry.mClientTimestamp = packet.clienttimestamp();
-	entry.mPositionZ = posZ;
-
-	pGameTickProcessor->EnqueueMoveInput(entry);
-
-	NET_ENGINE_LOG_TRACE("MovementPacketHandler - MOVE_INPUT received, accountId: {}, seq: {}, dir: ({:.1f}, {:.1f}, {:.1f})",
-		accountId, packet.sequenceid(), packet.direction().x(), packet.direction().y(), packet.direction().z());
-
+	// WASD 이동 비활성화 — 클릭이동으로 통일
 	return true;
 }
 
@@ -186,6 +134,10 @@ bool MovementPacketHandler::HANDLE_C2S_MOVE_TO_POSITION_REQ(const Protocol::C2S_
 	entry.mDestinationY = destY;
 	entry.mDestinationZ = destZ;
 	entry.mClientTimestamp = packet.clienttimestamp();
+	entry.mHasCurrentPosition = packet.has_currentposition();
+	entry.mCurrentX = packet.currentposition().x();
+	entry.mCurrentY = packet.currentposition().y();
+	entry.mCurrentZ = packet.currentposition().z();
 
 	pGameTickProcessor->EnqueueMoveToPosition(entry);
 

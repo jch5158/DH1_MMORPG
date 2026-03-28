@@ -1,7 +1,7 @@
 #pragma once
 
-struct dtNavMesh;
-struct dtNavMeshQuery;
+class dtNavMesh;
+class dtNavMeshQuery;
 
 struct Vector3f
 {

@@ -170,9 +170,6 @@
     <ClInclude Include="GridManager.h">
       <Filter>Contents\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MoveInputEntry.h">
-      <Filter>Contents\Core</Filter>
-    </ClInclude>
     <ClInclude Include="MoveToPositionEntry.h">
       <Filter>Contents\Core</Filter>
     </ClInclude>
