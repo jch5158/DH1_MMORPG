@@ -51,6 +51,7 @@
 # =============================================================================
 *.lib   filter=lfs diff=lfs merge=lfs -text
 *.pdb   filter=lfs diff=lfs merge=lfs -text
+Shared/Tools/CrashHandler/*.exe filter=lfs diff=lfs merge=lfs -text
 
 # =============================================================================
 # UE5 바이너리 에셋 (diff/merge 시도하지 않음)
