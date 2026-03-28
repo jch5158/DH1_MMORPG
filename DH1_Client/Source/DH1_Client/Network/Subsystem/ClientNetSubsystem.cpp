@@ -301,45 +301,6 @@ void UClientNetSubsystem::RequestRealmSelect(const int32 RealmId)
 	pSession->Send(RealmPacketHandler::MakeSendBuffer(packet));
 }
 
-void UClientNetSubsystem::SendMoveInput(const FVector& Direction, const float RotationYaw, const float PositionZ)
-{
-	if (ServiceRef == nullptr)
-	{
-		UE_LOG(LogNetEngine, Warning, TEXT("SendMoveInput - ServiceRef is NULL"));
-		return;
-	}
-
-	const auto pSession = ServiceRef->GetFirstSessionRef();
-	if (pSession == nullptr)
-	{
-		UE_LOG(LogNetEngine, Warning, TEXT("SendMoveInput - Session is NULL (not connected)"));
-		return;
-	}
-
-	++MoveSequenceId;
-
-	const auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::steady_clock::now().time_since_epoch()).count();
-
-	Protocol::C2S_MOVE_INPUT_NOT packet;
-	packet.set_sequenceid(MoveSequenceId);
-	packet.mutable_direction()->set_x(static_cast<float>(Direction.X));
-	packet.mutable_direction()->set_y(static_cast<float>(Direction.Y));
-	packet.mutable_direction()->set_z(static_cast<float>(Direction.Z));
-	packet.set_rotationyaw(RotationYaw);
-	packet.set_clienttimestamp(nowMs);
-	packet.set_positionz(PositionZ);
-
-	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
-
-	UE_LOG(LogNetEngine, Warning, TEXT("SendMoveInput - seq: %u, dir: (%.1f, %.1f, %.1f), yaw: %.1f"),
-		MoveSequenceId, Direction.X, Direction.Y, Direction.Z, RotationYaw);
-}
-
-void UClientNetSubsystem::SendMoveStop(const float CurrentYaw)
-{
-	SendMoveInput(FVector::ZeroVector, CurrentYaw, 0.0f);
-}
 
 void UClientNetSubsystem::NotifySpawnPosition(const FVector& Position, const float Yaw)
 {
@@ -364,7 +325,7 @@ void UClientNetSubsystem::RequestSpawnPosition()
 	UE_LOG(LogNetEngine, Warning, TEXT("RequestSpawnPosition sent"));
 }
 
-void UClientNetSubsystem::SendMoveToPosition(const FVector& Destination)
+void UClientNetSubsystem::SendMoveToPosition(const FVector& CurrentPosition, const FVector& Destination)
 {
 	if (!ServiceRef) return;
 
@@ -380,10 +341,14 @@ void UClientNetSubsystem::SendMoveToPosition(const FVector& Destination)
 	packet.mutable_destination()->set_z(static_cast<float>(Destination.Z));
 	packet.set_clienttimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::steady_clock::now().time_since_epoch()).count());
+	packet.mutable_currentposition()->set_x(static_cast<float>(CurrentPosition.X));
+	packet.mutable_currentposition()->set_y(static_cast<float>(CurrentPosition.Y));
+	packet.mutable_currentposition()->set_z(static_cast<float>(CurrentPosition.Z));
 
 	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
 
-	UE_LOG(LogNetEngine, Log, TEXT("SendMoveToPosition - seq: %u, dest: %s"), MoveSequenceId, *Destination.ToString());
+	UE_LOG(LogNetEngine, Log, TEXT("SendMoveToPosition - seq: %u, from: %s, dest: %s"),
+		MoveSequenceId, *CurrentPosition.ToString(), *Destination.ToString());
 }
 
 void UClientNetSubsystem::NotifyMovePath(const uint32 SeqId, const TArray<FVector>& Waypoints, const float MoveSpeed)

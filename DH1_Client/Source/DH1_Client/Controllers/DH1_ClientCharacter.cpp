@@ -79,46 +79,12 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	// 매핑 컨텍스트
 	DefaultMappingContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Default"));
 
-	// WASD 바인딩
-	auto& WMapping = DefaultMappingContext->MapKey(MoveAction, EKeys::W);
-	UInputModifierSwizzleAxis* SwizzleW = NewObject<UInputModifierSwizzleAxis>(this);
-	SwizzleW->Order = EInputAxisSwizzle::YXZ;
-	WMapping.Modifiers.Add(SwizzleW);
-
-	auto& SMapping = DefaultMappingContext->MapKey(MoveAction, EKeys::S);
-	UInputModifierSwizzleAxis* SwizzleS = NewObject<UInputModifierSwizzleAxis>(this);
-	SwizzleS->Order = EInputAxisSwizzle::YXZ;
-	SMapping.Modifiers.Add(SwizzleS);
-	UInputModifierNegate* NegateS = NewObject<UInputModifierNegate>(this);
-	SMapping.Modifiers.Add(NegateS);
-
-	DefaultMappingContext->MapKey(MoveAction, EKeys::D);
-
-	auto& AMapping = DefaultMappingContext->MapKey(MoveAction, EKeys::A);
-	UInputModifierNegate* NegateA = NewObject<UInputModifierNegate>(this);
-	AMapping.Modifiers.Add(NegateA);
-
-	// 방향키 바인딩
-	auto& UpMapping = DefaultMappingContext->MapKey(MoveAction, EKeys::Up);
-	UInputModifierSwizzleAxis* SwizzleUp = NewObject<UInputModifierSwizzleAxis>(this);
-	SwizzleUp->Order = EInputAxisSwizzle::YXZ;
-	UpMapping.Modifiers.Add(SwizzleUp);
-
-	auto& DownMapping = DefaultMappingContext->MapKey(MoveAction, EKeys::Down);
-	UInputModifierSwizzleAxis* SwizzleDown = NewObject<UInputModifierSwizzleAxis>(this);
-	SwizzleDown->Order = EInputAxisSwizzle::YXZ;
-	DownMapping.Modifiers.Add(SwizzleDown);
-	UInputModifierNegate* NegateDown = NewObject<UInputModifierNegate>(this);
-	DownMapping.Modifiers.Add(NegateDown);
-
-	DefaultMappingContext->MapKey(MoveAction, EKeys::Right);
-
-	auto& LeftMapping = DefaultMappingContext->MapKey(MoveAction, EKeys::Left);
-	UInputModifierNegate* NegateLeft = NewObject<UInputModifierNegate>(this);
-	LeftMapping.Modifiers.Add(NegateLeft);
-
-	// 마우스 오른쪽 클릭 바인딩
+	// 우클릭 → 클릭 이동
 	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
+
+	// 카메라 회전 액션 (미사용 - 우클릭은 클릭 이동으로 예약)
+	RightMouseAction = NewObject<UInputAction>(this, TEXT("IA_RightMouse"));
+	RightMouseAction->ValueType = EInputActionValueType::Boolean;
 }
 
 void ADH1_ClientCharacter::BeginPlay()
@@ -138,9 +104,14 @@ void ADH1_ClientCharacter::BeginPlay()
 			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - MappingContext added"));
 		}
 
-		// 마우스 커서 표시
-		const_cast<APlayerController*>(PC)->bShowMouseCursor = true;
-		const_cast<APlayerController*>(PC)->DefaultMouseCursor = EMouseCursor::Default;
+		// 마우스 커서 표시 + GameAndUI 입력 모드 (클릭 이동 + 카메라 회전 동시 지원)
+		APlayerController* MutablePC = const_cast<APlayerController*>(PC);
+		MutablePC->bShowMouseCursor = true;
+		MutablePC->DefaultMouseCursor = EMouseCursor::Default;
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		MutablePC->SetInputMode(InputMode);
 
 		// 서버 위치 수신 전까지 캐릭터 숨기고 낙하 방지
 		SetActorHiddenInGame(true);
@@ -175,17 +146,17 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (MoveAction != nullptr)
-		{
-			EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADH1_ClientCharacter::OnMoveInput);
-			EnhancedInput->BindAction(MoveAction, ETriggerEvent::Completed, this, &ADH1_ClientCharacter::OnMoveInputCompleted);
-			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - MoveAction bound"));
-		}
-
 		if (ClickMoveAction != nullptr)
 		{
 			EnhancedInput->BindAction(ClickMoveAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnClickMove);
 			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - ClickMoveAction bound"));
+		}
+
+		if (RightMouseAction != nullptr)
+		{
+			EnhancedInput->BindAction(RightMouseAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnRightMousePressed);
+			EnhancedInput->BindAction(RightMouseAction, ETriggerEvent::Completed, this, &ADH1_ClientCharacter::OnRightMouseReleased);
+			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - RightMouseAction bound"));
 		}
 	}
 }
@@ -226,11 +197,6 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 		{
 			bIsClickMoving = false;
 			CurrentMoveDirection = FVector::ZeroVector;
-
-			if (UClientNetSubsystem* NetSubsystem = GetNetSubsystem())
-			{
-				NetSubsystem->SendMoveStop(GetActorRotation().Yaw);
-			}
 		}
 		else
 		{
@@ -238,25 +204,16 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 		}
 	}
 
-	// 이동 패킷 쓰로틀
-	MovePacketTimer += DeltaSeconds;
-	if (MovePacketTimer >= MovePacketInterval)
+	// 카메라 회전 (우클릭 홀드 + 마우스 드래그)
+	if (bRightMouseHeld)
 	{
-		MovePacketTimer = 0.0f;
-
-		if (!CurrentMoveDirection.IsNearlyZero())
+		if (const APlayerController* PC = Cast<APlayerController>(Controller))
 		{
-			UClientNetSubsystem* NetSubsystem = GetNetSubsystem();
-			if (NetSubsystem != nullptr)
-			{
-				const float Yaw = CurrentMoveDirection.Rotation().Yaw;
-				const float PosZ = static_cast<float>(GetActorLocation().Z);
-				NetSubsystem->SendMoveInput(CurrentMoveDirection, Yaw, PosZ);
-			}
-			else
-			{
-				UE_LOG(LogCharacterMove, Warning, TEXT("NetSubsystem is NULL - cannot send move packet"));
-			}
+			float MouseDX, MouseDY;
+			PC->GetInputMouseDelta(MouseDX, MouseDY);
+			CameraYaw += MouseDX * 2.0f;
+			CameraPitch = FMath::Clamp(CameraPitch - MouseDY * 1.5f, -80.0f, -15.0f);
+			CameraBoom->SetRelativeRotation(FRotator(CameraPitch, CameraYaw, 0.0f));
 		}
 	}
 
@@ -269,45 +226,12 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 
 void ADH1_ClientCharacter::OnMoveInput(const FInputActionValue& Value)
 {
-	const FVector2D Input = Value.Get<FVector2D>();
-
-	if (Input.IsNearlyZero())
-	{
-		return;
-	}
-
-	bIsClickMoving = false;
-	bIsKeyMoving = true;
-
-	const APlayerController* PC = Cast<APlayerController>(Controller);
-	if (PC == nullptr || PC->PlayerCameraManager == nullptr)
-	{
-		return;
-	}
-
-	const FRotator CameraRotation = PC->PlayerCameraManager->GetCameraRotation();
-	const FRotator YawRotation(0.0f, CameraRotation.Yaw, 0.0f);
-
-	const FVector ForwardDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDir = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	CurrentMoveDirection = (ForwardDir * Input.Y + RightDir * Input.X).GetSafeNormal();
+	// WASD 이동 비활성화 — 클릭이동으로 통일
 }
 
 void ADH1_ClientCharacter::OnMoveInputCompleted()
 {
-	if (!bIsKeyMoving)
-	{
-		return;
-	}
-
-	bIsKeyMoving = false;
-	CurrentMoveDirection = FVector::ZeroVector;
-
-	if (UClientNetSubsystem* NetSubsystem = GetNetSubsystem())
-	{
-		NetSubsystem->SendMoveStop(GetActorRotation().Yaw);
-	}
+	// WASD 이동 비활성화 — 클릭이동으로 통일
 }
 
 void ADH1_ClientCharacter::OnClickMove()
@@ -324,10 +248,10 @@ void ADH1_ClientCharacter::OnClickMove()
 		ClickMoveTarget = HitResult.ImpactPoint;
 		bIsKeyMoving = false;
 
-		// 서버에 목적지 전송 (서버가 경로 계산)
+		// 서버에 현재 위치 + 목적지 전송 (서버가 경로 계산)
 		if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 		{
-			NetSub->SendMoveToPosition(ClickMoveTarget);
+			NetSub->SendMoveToPosition(GetActorLocation(), ClickMoveTarget);
 		}
 
 		// 서버 응답 전까지 목적지 방향으로 로컬 이동 시작 (예측)
@@ -361,19 +285,26 @@ void ADH1_ClientCharacter::OnSpawnPositionReceived(const FVector& Position, cons
 
 void ADH1_ClientCharacter::OnMovePathReceived(const uint32 SeqId, const TArray<FVector>& Waypoints, const float MoveSpeed)
 {
-	// 클릭 이동 로컬 예측 중단
-	bIsClickMoving = false;
-	CurrentMoveDirection = FVector::ZeroVector;
-
 	if (Waypoints.Num() == 0)
 	{
+		// 서버 경로 없음 — 로컬 예측 유지하여 이동 계속
 		UE_LOG(LogCharacterMove, Warning, TEXT("OnMovePathReceived - Empty path, seq: %u"), SeqId);
 		return;
 	}
 
+	// 클릭 이동 로컬 예측 중단 (유효한 서버 경로로 전환)
+	bIsClickMoving = false;
+	CurrentMoveDirection = FVector::ZeroVector;
+
 	ServerPath = Waypoints;
 	CurrentPathIndex = 0;
 	bIsServerPathMoving = true;
+
+	// 서버 이동 속도 적용 (0이면 기본값 유지)
+	if (MoveSpeed > 0.0f)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = MoveSpeed;
+	}
 
 	UE_LOG(LogCharacterMove, Log, TEXT("OnMovePathReceived - seq: %u, waypoints: %d, speed: %.1f"),
 		SeqId, Waypoints.Num(), MoveSpeed);
@@ -410,13 +341,14 @@ void ADH1_ClientCharacter::FollowServerPath(const float DeltaSeconds)
 		++CurrentPathIndex;
 		if (CurrentPathIndex >= ServerPath.Num())
 		{
-			// 경로 완료
+			// 서버 경로 완료 — 목적지 미도달 시 로컬 예측으로 마무리
 			bIsServerPathMoving = false;
 			CurrentMoveDirection = FVector::ZeroVector;
 
-			if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+			const float RemainDist = FVector::Dist2D(GetActorLocation(), ClickMoveTarget);
+			if (RemainDist > 50.0f)
 			{
-				NetSub->SendMoveStop(GetActorRotation().Yaw);
+				bIsClickMoving = true;
 			}
 			return;
 		}
@@ -426,6 +358,28 @@ void ADH1_ClientCharacter::FollowServerPath(const float DeltaSeconds)
 	const FVector NextTarget = ServerPath[CurrentPathIndex];
 	CurrentMoveDirection = (NextTarget - CurrentLocation).GetSafeNormal2D();
 	AddMovementInput(CurrentMoveDirection, 1.0f);
+}
+
+void ADH1_ClientCharacter::OnRightMousePressed(const FInputActionValue& Value)
+{
+	bRightMouseHeld = true;
+
+	// 우클릭 홀드 중 커서 숨김
+	if (APlayerController* PC = Cast<APlayerController>(Controller))
+	{
+		PC->bShowMouseCursor = false;
+	}
+}
+
+void ADH1_ClientCharacter::OnRightMouseReleased(const FInputActionValue& Value)
+{
+	bRightMouseHeld = false;
+
+	// 우클릭 해제 시 커서 복원
+	if (APlayerController* PC = Cast<APlayerController>(Controller))
+	{
+		PC->bShowMouseCursor = true;
+	}
 }
 
 UClientNetSubsystem* ADH1_ClientCharacter::GetNetSubsystem() const

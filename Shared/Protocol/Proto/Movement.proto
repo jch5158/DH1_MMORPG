@@ -20,6 +20,8 @@ message C2S_MOVE_INPUT_NOT
     float rotationYaw = 3;
     int64 clientTimestamp = 4;
     float positionZ = 5;
+    float positionX = 6;
+    float positionY = 7;
 }
 
 // Gateway -> Client: 서버 이동 결과 (본인)
@@ -91,6 +93,7 @@ message C2S_MOVE_TO_POSITION_REQ
     uint32 sequenceId = 1;
     Vector3 destination = 2;
     int64 clientTimestamp = 3;
+    Vector3 currentPosition = 4;
 }
 
 // Gateway -> Client: 서버 계산 경로 응답 (웨이포인트 목록)

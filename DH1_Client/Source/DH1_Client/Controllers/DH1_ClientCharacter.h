@@ -58,6 +58,8 @@ private:
 	void OnMoveInput(const FInputActionValue& Value);
 	void OnMoveInputCompleted();
 	void OnClickMove();
+	void OnRightMousePressed(const FInputActionValue& Value);
+	void OnRightMouseReleased(const FInputActionValue& Value);
 
 	UClientNetSubsystem* GetNetSubsystem() const;
 
@@ -71,7 +73,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInputAction> ClickMoveAction;
 
-	// 마우스 클릭 이동
+	UPROPERTY()
+	TObjectPtr<UInputAction> RightMouseAction;
+
+	// 마우스 클릭 이동 (좌클릭)
 	FVector ClickMoveTarget = FVector::ZeroVector;
 	bool bIsClickMoving = false;
 
@@ -79,9 +84,10 @@ private:
 	FVector CurrentMoveDirection = FVector::ZeroVector;
 	bool bIsKeyMoving = false;
 
-	// 패킷 쓰로틀
-	float MovePacketTimer = 0.0f;
-	static constexpr float MovePacketInterval = 0.05f;
+	// 카메라 회전 (우클릭 홀드)
+	bool bRightMouseHeld = false;
+	float CameraYaw = 0.0f;
+	float CameraPitch = -50.0f;
 
 	// 스폰 위치 수신 콜백
 	void OnSpawnPositionReceived(const FVector& Position, float Yaw);

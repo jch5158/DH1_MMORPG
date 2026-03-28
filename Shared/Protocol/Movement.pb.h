@@ -222,6 +222,8 @@ class C2S_MOVE_INPUT_NOT final :
     kRotationYawFieldNumber = 3,
     kClientTimestampFieldNumber = 4,
     kPositionZFieldNumber = 5,
+    kPositionXFieldNumber = 6,
+    kPositionYFieldNumber = 7,
   };
   // .Protocol.Vector3 direction = 2;
   bool has_direction() const;
@@ -277,6 +279,24 @@ class C2S_MOVE_INPUT_NOT final :
   void _internal_set_positionz(float value);
   public:
 
+  // float positionX = 6;
+  void clear_positionx();
+  float positionx() const;
+  void set_positionx(float value);
+  private:
+  float _internal_positionx() const;
+  void _internal_set_positionx(float value);
+  public:
+
+  // float positionY = 7;
+  void clear_positiony();
+  float positiony() const;
+  void set_positiony(float value);
+  private:
+  float _internal_positiony() const;
+  void _internal_set_positiony(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.C2S_MOVE_INPUT_NOT)
  private:
   class _Internal;
@@ -290,6 +310,8 @@ class C2S_MOVE_INPUT_NOT final :
     float rotationyaw_;
     int64_t clienttimestamp_;
     float positionz_;
+    float positionx_;
+    float positiony_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1402,6 +1424,7 @@ class C2S_MOVE_TO_POSITION_REQ final :
 
   enum : int {
     kDestinationFieldNumber = 2,
+    kCurrentPositionFieldNumber = 4,
     kClientTimestampFieldNumber = 3,
     kSequenceIdFieldNumber = 1,
   };
@@ -1422,6 +1445,24 @@ class C2S_MOVE_TO_POSITION_REQ final :
   void unsafe_arena_set_allocated_destination(
       ::Protocol::Vector3* destination);
   ::Protocol::Vector3* unsafe_arena_release_destination();
+
+  // .Protocol.Vector3 currentPosition = 4;
+  bool has_currentposition() const;
+  private:
+  bool _internal_has_currentposition() const;
+  public:
+  void clear_currentposition();
+  const ::Protocol::Vector3& currentposition() const;
+  PROTOBUF_NODISCARD ::Protocol::Vector3* release_currentposition();
+  ::Protocol::Vector3* mutable_currentposition();
+  void set_allocated_currentposition(::Protocol::Vector3* currentposition);
+  private:
+  const ::Protocol::Vector3& _internal_currentposition() const;
+  ::Protocol::Vector3* _internal_mutable_currentposition();
+  public:
+  void unsafe_arena_set_allocated_currentposition(
+      ::Protocol::Vector3* currentposition);
+  ::Protocol::Vector3* unsafe_arena_release_currentposition();
 
   // int64 clientTimestamp = 3;
   void clear_clienttimestamp();
@@ -1450,6 +1491,7 @@ class C2S_MOVE_TO_POSITION_REQ final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::Protocol::Vector3* destination_;
+    ::Protocol::Vector3* currentposition_;
     int64_t clienttimestamp_;
     uint32_t sequenceid_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -1989,6 +2031,46 @@ inline void C2S_MOVE_INPUT_NOT::_internal_set_positionz(float value) {
 inline void C2S_MOVE_INPUT_NOT::set_positionz(float value) {
   _internal_set_positionz(value);
   // @@protoc_insertion_point(field_set:Protocol.C2S_MOVE_INPUT_NOT.positionZ)
+}
+
+// float positionX = 6;
+inline void C2S_MOVE_INPUT_NOT::clear_positionx() {
+  _impl_.positionx_ = 0;
+}
+inline float C2S_MOVE_INPUT_NOT::_internal_positionx() const {
+  return _impl_.positionx_;
+}
+inline float C2S_MOVE_INPUT_NOT::positionx() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_MOVE_INPUT_NOT.positionX)
+  return _internal_positionx();
+}
+inline void C2S_MOVE_INPUT_NOT::_internal_set_positionx(float value) {
+  
+  _impl_.positionx_ = value;
+}
+inline void C2S_MOVE_INPUT_NOT::set_positionx(float value) {
+  _internal_set_positionx(value);
+  // @@protoc_insertion_point(field_set:Protocol.C2S_MOVE_INPUT_NOT.positionX)
+}
+
+// float positionY = 7;
+inline void C2S_MOVE_INPUT_NOT::clear_positiony() {
+  _impl_.positiony_ = 0;
+}
+inline float C2S_MOVE_INPUT_NOT::_internal_positiony() const {
+  return _impl_.positiony_;
+}
+inline float C2S_MOVE_INPUT_NOT::positiony() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_MOVE_INPUT_NOT.positionY)
+  return _internal_positiony();
+}
+inline void C2S_MOVE_INPUT_NOT::_internal_set_positiony(float value) {
+  
+  _impl_.positiony_ = value;
+}
+inline void C2S_MOVE_INPUT_NOT::set_positiony(float value) {
+  _internal_set_positiony(value);
+  // @@protoc_insertion_point(field_set:Protocol.C2S_MOVE_INPUT_NOT.positionY)
 }
 
 // -------------------------------------------------------------------
@@ -2618,6 +2700,91 @@ inline void C2S_MOVE_TO_POSITION_REQ::_internal_set_clienttimestamp(int64_t valu
 inline void C2S_MOVE_TO_POSITION_REQ::set_clienttimestamp(int64_t value) {
   _internal_set_clienttimestamp(value);
   // @@protoc_insertion_point(field_set:Protocol.C2S_MOVE_TO_POSITION_REQ.clientTimestamp)
+}
+
+// .Protocol.Vector3 currentPosition = 4;
+inline bool C2S_MOVE_TO_POSITION_REQ::_internal_has_currentposition() const {
+  return this != internal_default_instance() && _impl_.currentposition_ != nullptr;
+}
+inline bool C2S_MOVE_TO_POSITION_REQ::has_currentposition() const {
+  return _internal_has_currentposition();
+}
+inline const ::Protocol::Vector3& C2S_MOVE_TO_POSITION_REQ::_internal_currentposition() const {
+  const ::Protocol::Vector3* p = _impl_.currentposition_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::Vector3&>(
+      ::Protocol::_Vector3_default_instance_);
+}
+inline const ::Protocol::Vector3& C2S_MOVE_TO_POSITION_REQ::currentposition() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_MOVE_TO_POSITION_REQ.currentPosition)
+  return _internal_currentposition();
+}
+inline void C2S_MOVE_TO_POSITION_REQ::unsafe_arena_set_allocated_currentposition(
+    ::Protocol::Vector3* currentposition) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.currentposition_);
+  }
+  _impl_.currentposition_ = currentposition;
+  if (currentposition) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.C2S_MOVE_TO_POSITION_REQ.currentPosition)
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::release_currentposition() {
+  
+  ::Protocol::Vector3* temp = _impl_.currentposition_;
+  _impl_.currentposition_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::unsafe_arena_release_currentposition() {
+  // @@protoc_insertion_point(field_release:Protocol.C2S_MOVE_TO_POSITION_REQ.currentPosition)
+  
+  ::Protocol::Vector3* temp = _impl_.currentposition_;
+  _impl_.currentposition_ = nullptr;
+  return temp;
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::_internal_mutable_currentposition() {
+  
+  if (_impl_.currentposition_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::Vector3>(GetArenaForAllocation());
+    _impl_.currentposition_ = p;
+  }
+  return _impl_.currentposition_;
+}
+inline ::Protocol::Vector3* C2S_MOVE_TO_POSITION_REQ::mutable_currentposition() {
+  ::Protocol::Vector3* _msg = _internal_mutable_currentposition();
+  // @@protoc_insertion_point(field_mutable:Protocol.C2S_MOVE_TO_POSITION_REQ.currentPosition)
+  return _msg;
+}
+inline void C2S_MOVE_TO_POSITION_REQ::set_allocated_currentposition(::Protocol::Vector3* currentposition) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.currentposition_);
+  }
+  if (currentposition) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(currentposition));
+    if (message_arena != submessage_arena) {
+      currentposition = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, currentposition, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.currentposition_ = currentposition;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_MOVE_TO_POSITION_REQ.currentPosition)
 }
 
 // -------------------------------------------------------------------

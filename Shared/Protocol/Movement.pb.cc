@@ -28,6 +28,8 @@ PROTOBUF_CONSTEXPR C2S_MOVE_INPUT_NOT::C2S_MOVE_INPUT_NOT(
   , /*decltype(_impl_.rotationyaw_)*/0
   , /*decltype(_impl_.clienttimestamp_)*/int64_t{0}
   , /*decltype(_impl_.positionz_)*/0
+  , /*decltype(_impl_.positionx_)*/0
+  , /*decltype(_impl_.positiony_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct C2S_MOVE_INPUT_NOTDefaultTypeInternal {
   PROTOBUF_CONSTEXPR C2S_MOVE_INPUT_NOTDefaultTypeInternal()
@@ -124,6 +126,7 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 PROTOBUF_CONSTEXPR C2S_MOVE_TO_POSITION_REQ::C2S_MOVE_TO_POSITION_REQ(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.destination_)*/nullptr
+  , /*decltype(_impl_.currentposition_)*/nullptr
   , /*decltype(_impl_.clienttimestamp_)*/int64_t{0}
   , /*decltype(_impl_.sequenceid_)*/0u
   , /*decltype(_impl_._cached_size_)*/{}} {}
@@ -183,6 +186,8 @@ const uint32_t TableStruct_Movement_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_INPUT_NOT, _impl_.rotationyaw_),
   PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_INPUT_NOT, _impl_.clienttimestamp_),
   PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_INPUT_NOT, _impl_.positionz_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_INPUT_NOT, _impl_.positionx_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_INPUT_NOT, _impl_.positiony_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2C_MOVE_RESULT_NOT, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -239,6 +244,7 @@ const uint32_t TableStruct_Movement_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_TO_POSITION_REQ, _impl_.sequenceid_),
   PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_TO_POSITION_REQ, _impl_.destination_),
   PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_TO_POSITION_REQ, _impl_.clienttimestamp_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C2S_MOVE_TO_POSITION_REQ, _impl_.currentposition_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2C_MOVE_PATH_RES, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -260,15 +266,15 @@ const uint32_t TableStruct_Movement_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::C2S_MOVE_INPUT_NOT)},
-  { 11, -1, -1, sizeof(::Protocol::S2C_MOVE_RESULT_NOT)},
-  { 22, -1, -1, sizeof(::Protocol::S2C_ENTITY_SNAPSHOT_NOT)},
-  { 30, -1, -1, sizeof(::Protocol::S2C_ENTITY_ENTER_NOT)},
-  { 37, -1, -1, sizeof(::Protocol::S2C_ENTITY_LEAVE_NOT)},
-  { 44, -1, -1, sizeof(::Protocol::C2S_SPAWN_POSITION_REQ)},
-  { 50, -1, -1, sizeof(::Protocol::S2C_SPAWN_POSITION_RES)},
-  { 58, -1, -1, sizeof(::Protocol::C2S_MOVE_TO_POSITION_REQ)},
-  { 67, -1, -1, sizeof(::Protocol::S2C_MOVE_PATH_RES)},
-  { 77, -1, -1, sizeof(::Protocol::S2C_POSITION_CORRECTION_NOT)},
+  { 13, -1, -1, sizeof(::Protocol::S2C_MOVE_RESULT_NOT)},
+  { 24, -1, -1, sizeof(::Protocol::S2C_ENTITY_SNAPSHOT_NOT)},
+  { 32, -1, -1, sizeof(::Protocol::S2C_ENTITY_ENTER_NOT)},
+  { 39, -1, -1, sizeof(::Protocol::S2C_ENTITY_LEAVE_NOT)},
+  { 46, -1, -1, sizeof(::Protocol::C2S_SPAWN_POSITION_REQ)},
+  { 52, -1, -1, sizeof(::Protocol::S2C_SPAWN_POSITION_RES)},
+  { 60, -1, -1, sizeof(::Protocol::C2S_MOVE_TO_POSITION_REQ)},
+  { 70, -1, -1, sizeof(::Protocol::S2C_MOVE_PATH_RES)},
+  { 80, -1, -1, sizeof(::Protocol::S2C_POSITION_CORRECTION_NOT)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -286,35 +292,37 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_Movement_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\016Movement.proto\022\010Protocol\032\nEnum.proto\032\014"
-  "Struct.proto\032\022PacketOption.proto\"\235\001\n\022C2S"
+  "Struct.proto\032\022PacketOption.proto\"\303\001\n\022C2S"
   "_MOVE_INPUT_NOT\022\022\n\nsequenceId\030\001 \001(\r\022$\n\td"
   "irection\030\002 \001(\0132\021.Protocol.Vector3\022\023\n\013rot"
   "ationYaw\030\003 \001(\002\022\027\n\017clientTimestamp\030\004 \001(\003\022"
-  "\021\n\tpositionZ\030\005 \001(\002:\014\240\265\030\001\250\265\030\004\250\265\030\005\"\253\001\n\023S2C"
-  "_MOVE_RESULT_NOT\022\022\n\nsequenceId\030\001 \001(\r\022#\n\010"
-  "position\030\002 \001(\0132\021.Protocol.Vector3\022#\n\010vel"
-  "ocity\030\003 \001(\0132\021.Protocol.Vector3\022\023\n\013rotati"
-  "onYaw\030\004 \001(\002\022\027\n\017serverTimestamp\030\005 \001(\003:\010\240\265"
-  "\030\004\250\265\030\001\"e\n\027S2C_ENTITY_SNAPSHOT_NOT\022\'\n\010ent"
-  "ities\030\001 \003(\0132\025.Protocol.EntityState\022\027\n\017se"
-  "rverTimestamp\030\002 \001(\003:\010\240\265\030\004\250\265\030\001\"I\n\024S2C_ENT"
-  "ITY_ENTER_NOT\022\'\n\010entities\030\001 \003(\0132\025.Protoc"
-  "ol.EntityState:\010\240\265\030\004\250\265\030\001\"3\n\024S2C_ENTITY_L"
-  "EAVE_NOT\022\021\n\tentityIds\030\001 \003(\004:\010\240\265\030\004\250\265\030\001\"&\n"
-  "\026C2S_SPAWN_POSITION_REQ:\014\240\265\030\001\250\265\030\004\250\265\030\005\"\\\n"
-  "\026S2C_SPAWN_POSITION_RES\022#\n\010position\030\001 \001("
-  "\0132\021.Protocol.Vector3\022\023\n\013rotationYaw\030\002 \001("
-  "\002:\010\240\265\030\004\250\265\030\001\"}\n\030C2S_MOVE_TO_POSITION_REQ\022"
-  "\022\n\nsequenceId\030\001 \001(\r\022&\n\013destination\030\002 \001(\013"
-  "2\021.Protocol.Vector3\022\027\n\017clientTimestamp\030\003"
-  " \001(\003:\014\240\265\030\001\250\265\030\004\250\265\030\005\"\203\001\n\021S2C_MOVE_PATH_RES"
-  "\022\022\n\nsequenceId\030\001 \001(\r\022$\n\twaypoints\030\002 \003(\0132"
-  "\021.Protocol.Vector3\022\021\n\tmoveSpeed\030\003 \001(\002\022\027\n"
-  "\017serverTimestamp\030\004 \001(\003:\010\240\265\030\004\250\265\030\001\"n\n\033S2C_"
-  "POSITION_CORRECTION_NOT\022,\n\021correctedPosi"
-  "tion\030\001 \001(\0132\021.Protocol.Vector3\022\027\n\017serverT"
-  "imestamp\030\002 \001(\003:\010\240\265\030\004\250\265\030\001B\035\210\265\030\007\222\265\030\025Moveme"
-  "ntPacketHandlerb\006proto3"
+  "\021\n\tpositionZ\030\005 \001(\002\022\021\n\tpositionX\030\006 \001(\002\022\021\n"
+  "\tpositionY\030\007 \001(\002:\014\240\265\030\001\250\265\030\004\250\265\030\005\"\253\001\n\023S2C_M"
+  "OVE_RESULT_NOT\022\022\n\nsequenceId\030\001 \001(\r\022#\n\010po"
+  "sition\030\002 \001(\0132\021.Protocol.Vector3\022#\n\010veloc"
+  "ity\030\003 \001(\0132\021.Protocol.Vector3\022\023\n\013rotation"
+  "Yaw\030\004 \001(\002\022\027\n\017serverTimestamp\030\005 \001(\003:\010\240\265\030\004"
+  "\250\265\030\001\"e\n\027S2C_ENTITY_SNAPSHOT_NOT\022\'\n\010entit"
+  "ies\030\001 \003(\0132\025.Protocol.EntityState\022\027\n\017serv"
+  "erTimestamp\030\002 \001(\003:\010\240\265\030\004\250\265\030\001\"I\n\024S2C_ENTIT"
+  "Y_ENTER_NOT\022\'\n\010entities\030\001 \003(\0132\025.Protocol"
+  ".EntityState:\010\240\265\030\004\250\265\030\001\"3\n\024S2C_ENTITY_LEA"
+  "VE_NOT\022\021\n\tentityIds\030\001 \003(\004:\010\240\265\030\004\250\265\030\001\"&\n\026C"
+  "2S_SPAWN_POSITION_REQ:\014\240\265\030\001\250\265\030\004\250\265\030\005\"\\\n\026S"
+  "2C_SPAWN_POSITION_RES\022#\n\010position\030\001 \001(\0132"
+  "\021.Protocol.Vector3\022\023\n\013rotationYaw\030\002 \001(\002:"
+  "\010\240\265\030\004\250\265\030\001\"\251\001\n\030C2S_MOVE_TO_POSITION_REQ\022\022"
+  "\n\nsequenceId\030\001 \001(\r\022&\n\013destination\030\002 \001(\0132"
+  "\021.Protocol.Vector3\022\027\n\017clientTimestamp\030\003 "
+  "\001(\003\022*\n\017currentPosition\030\004 \001(\0132\021.Protocol."
+  "Vector3:\014\240\265\030\001\250\265\030\004\250\265\030\005\"\203\001\n\021S2C_MOVE_PATH_"
+  "RES\022\022\n\nsequenceId\030\001 \001(\r\022$\n\twaypoints\030\002 \003"
+  "(\0132\021.Protocol.Vector3\022\021\n\tmoveSpeed\030\003 \001(\002"
+  "\022\027\n\017serverTimestamp\030\004 \001(\003:\010\240\265\030\004\250\265\030\001\"n\n\033S"
+  "2C_POSITION_CORRECTION_NOT\022,\n\021correctedP"
+  "osition\030\001 \001(\0132\021.Protocol.Vector3\022\027\n\017serv"
+  "erTimestamp\030\002 \001(\003:\010\240\265\030\004\250\265\030\001B\035\210\265\030\007\222\265\030\025Mov"
+  "ementPacketHandlerb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Movement_2eproto_deps[3] = {
   &::descriptor_table_Enum_2eproto,
@@ -323,7 +331,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Movement_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Movement_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Movement_2eproto = {
-    false, false, 1183, descriptor_table_protodef_Movement_2eproto,
+    false, false, 1266, descriptor_table_protodef_Movement_2eproto,
     "Movement.proto",
     &descriptor_table_Movement_2eproto_once, descriptor_table_Movement_2eproto_deps, 3, 10,
     schemas, file_default_instances, TableStruct_Movement_2eproto::offsets,
@@ -370,6 +378,8 @@ C2S_MOVE_INPUT_NOT::C2S_MOVE_INPUT_NOT(const C2S_MOVE_INPUT_NOT& from)
     , decltype(_impl_.rotationyaw_){}
     , decltype(_impl_.clienttimestamp_){}
     , decltype(_impl_.positionz_){}
+    , decltype(_impl_.positionx_){}
+    , decltype(_impl_.positiony_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -377,8 +387,8 @@ C2S_MOVE_INPUT_NOT::C2S_MOVE_INPUT_NOT(const C2S_MOVE_INPUT_NOT& from)
     _this->_impl_.direction_ = new ::Protocol::Vector3(*from._impl_.direction_);
   }
   ::memcpy(&_impl_.sequenceid_, &from._impl_.sequenceid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.positionz_) -
-    reinterpret_cast<char*>(&_impl_.sequenceid_)) + sizeof(_impl_.positionz_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.positiony_) -
+    reinterpret_cast<char*>(&_impl_.sequenceid_)) + sizeof(_impl_.positiony_));
   // @@protoc_insertion_point(copy_constructor:Protocol.C2S_MOVE_INPUT_NOT)
 }
 
@@ -392,6 +402,8 @@ inline void C2S_MOVE_INPUT_NOT::SharedCtor(
     , decltype(_impl_.rotationyaw_){0}
     , decltype(_impl_.clienttimestamp_){int64_t{0}}
     , decltype(_impl_.positionz_){0}
+    , decltype(_impl_.positionx_){0}
+    , decltype(_impl_.positiony_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -425,8 +437,8 @@ void C2S_MOVE_INPUT_NOT::Clear() {
   }
   _impl_.direction_ = nullptr;
   ::memset(&_impl_.sequenceid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.positionz_) -
-      reinterpret_cast<char*>(&_impl_.sequenceid_)) + sizeof(_impl_.positionz_));
+      reinterpret_cast<char*>(&_impl_.positiony_) -
+      reinterpret_cast<char*>(&_impl_.sequenceid_)) + sizeof(_impl_.positiony_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -472,6 +484,22 @@ const char* C2S_MOVE_INPUT_NOT::_InternalParse(const char* ptr, ::_pbi::ParseCon
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 45)) {
           _impl_.positionz_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else
+          goto handle_unusual;
+        continue;
+      // float positionX = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 53)) {
+          _impl_.positionx_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else
+          goto handle_unusual;
+        continue;
+      // float positionY = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 61)) {
+          _impl_.positiony_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else
           goto handle_unusual;
@@ -544,6 +572,26 @@ uint8_t* C2S_MOVE_INPUT_NOT::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteFloatToArray(5, this->_internal_positionz(), target);
   }
 
+  // float positionX = 6;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_positionx = this->_internal_positionx();
+  uint32_t raw_positionx;
+  memcpy(&raw_positionx, &tmp_positionx, sizeof(tmp_positionx));
+  if (raw_positionx != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteFloatToArray(6, this->_internal_positionx(), target);
+  }
+
+  // float positionY = 7;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_positiony = this->_internal_positiony();
+  uint32_t raw_positiony;
+  memcpy(&raw_positiony, &tmp_positiony, sizeof(tmp_positiony));
+  if (raw_positiony != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteFloatToArray(7, this->_internal_positiony(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -595,6 +643,24 @@ size_t C2S_MOVE_INPUT_NOT::ByteSizeLong() const {
     total_size += 1 + 4;
   }
 
+  // float positionX = 6;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_positionx = this->_internal_positionx();
+  uint32_t raw_positionx;
+  memcpy(&raw_positionx, &tmp_positionx, sizeof(tmp_positionx));
+  if (raw_positionx != 0) {
+    total_size += 1 + 4;
+  }
+
+  // float positionY = 7;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_positiony = this->_internal_positiony();
+  uint32_t raw_positiony;
+  memcpy(&raw_positiony, &tmp_positiony, sizeof(tmp_positiony));
+  if (raw_positiony != 0) {
+    total_size += 1 + 4;
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -637,6 +703,20 @@ void C2S_MOVE_INPUT_NOT::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, con
   if (raw_positionz != 0) {
     _this->_internal_set_positionz(from._internal_positionz());
   }
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_positionx = from._internal_positionx();
+  uint32_t raw_positionx;
+  memcpy(&raw_positionx, &tmp_positionx, sizeof(tmp_positionx));
+  if (raw_positionx != 0) {
+    _this->_internal_set_positionx(from._internal_positionx());
+  }
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_positiony = from._internal_positiony();
+  uint32_t raw_positiony;
+  memcpy(&raw_positiony, &tmp_positiony, sizeof(tmp_positiony));
+  if (raw_positiony != 0) {
+    _this->_internal_set_positiony(from._internal_positiony());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -655,8 +735,8 @@ void C2S_MOVE_INPUT_NOT::InternalSwap(C2S_MOVE_INPUT_NOT* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(C2S_MOVE_INPUT_NOT, _impl_.positionz_)
-      + sizeof(C2S_MOVE_INPUT_NOT::_impl_.positionz_)
+      PROTOBUF_FIELD_OFFSET(C2S_MOVE_INPUT_NOT, _impl_.positiony_)
+      + sizeof(C2S_MOVE_INPUT_NOT::_impl_.positiony_)
       - PROTOBUF_FIELD_OFFSET(C2S_MOVE_INPUT_NOT, _impl_.direction_)>(
           reinterpret_cast<char*>(&_impl_.direction_),
           reinterpret_cast<char*>(&other->_impl_.direction_));
@@ -1892,17 +1972,28 @@ void S2C_SPAWN_POSITION_RES::InternalSwap(S2C_SPAWN_POSITION_RES* other) {
 class C2S_MOVE_TO_POSITION_REQ::_Internal {
  public:
   static const ::Protocol::Vector3& destination(const C2S_MOVE_TO_POSITION_REQ* msg);
+  static const ::Protocol::Vector3& currentposition(const C2S_MOVE_TO_POSITION_REQ* msg);
 };
 
 const ::Protocol::Vector3&
 C2S_MOVE_TO_POSITION_REQ::_Internal::destination(const C2S_MOVE_TO_POSITION_REQ* msg) {
   return *msg->_impl_.destination_;
 }
+const ::Protocol::Vector3&
+C2S_MOVE_TO_POSITION_REQ::_Internal::currentposition(const C2S_MOVE_TO_POSITION_REQ* msg) {
+  return *msg->_impl_.currentposition_;
+}
 void C2S_MOVE_TO_POSITION_REQ::clear_destination() {
   if (GetArenaForAllocation() == nullptr && _impl_.destination_ != nullptr) {
     delete _impl_.destination_;
   }
   _impl_.destination_ = nullptr;
+}
+void C2S_MOVE_TO_POSITION_REQ::clear_currentposition() {
+  if (GetArenaForAllocation() == nullptr && _impl_.currentposition_ != nullptr) {
+    delete _impl_.currentposition_;
+  }
+  _impl_.currentposition_ = nullptr;
 }
 C2S_MOVE_TO_POSITION_REQ::C2S_MOVE_TO_POSITION_REQ(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -1915,6 +2006,7 @@ C2S_MOVE_TO_POSITION_REQ::C2S_MOVE_TO_POSITION_REQ(const C2S_MOVE_TO_POSITION_RE
   C2S_MOVE_TO_POSITION_REQ* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.destination_){nullptr}
+    , decltype(_impl_.currentposition_){nullptr}
     , decltype(_impl_.clienttimestamp_){}
     , decltype(_impl_.sequenceid_){}
     , /*decltype(_impl_._cached_size_)*/{}};
@@ -1922,6 +2014,9 @@ C2S_MOVE_TO_POSITION_REQ::C2S_MOVE_TO_POSITION_REQ(const C2S_MOVE_TO_POSITION_RE
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_destination()) {
     _this->_impl_.destination_ = new ::Protocol::Vector3(*from._impl_.destination_);
+  }
+  if (from._internal_has_currentposition()) {
+    _this->_impl_.currentposition_ = new ::Protocol::Vector3(*from._impl_.currentposition_);
   }
   ::memcpy(&_impl_.clienttimestamp_, &from._impl_.clienttimestamp_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.sequenceid_) -
@@ -1935,6 +2030,7 @@ inline void C2S_MOVE_TO_POSITION_REQ::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.destination_){nullptr}
+    , decltype(_impl_.currentposition_){nullptr}
     , decltype(_impl_.clienttimestamp_){int64_t{0}}
     , decltype(_impl_.sequenceid_){0u}
     , /*decltype(_impl_._cached_size_)*/{}
@@ -1953,6 +2049,7 @@ C2S_MOVE_TO_POSITION_REQ::~C2S_MOVE_TO_POSITION_REQ() {
 inline void C2S_MOVE_TO_POSITION_REQ::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   if (this != internal_default_instance()) delete _impl_.destination_;
+  if (this != internal_default_instance()) delete _impl_.currentposition_;
 }
 
 void C2S_MOVE_TO_POSITION_REQ::SetCachedSize(int size) const {
@@ -1969,6 +2066,10 @@ void C2S_MOVE_TO_POSITION_REQ::Clear() {
     delete _impl_.destination_;
   }
   _impl_.destination_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.currentposition_ != nullptr) {
+    delete _impl_.currentposition_;
+  }
+  _impl_.currentposition_ = nullptr;
   ::memset(&_impl_.clienttimestamp_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&_impl_.sequenceid_) -
       reinterpret_cast<char*>(&_impl_.clienttimestamp_)) + sizeof(_impl_.sequenceid_));
@@ -2001,6 +2102,14 @@ const char* C2S_MOVE_TO_POSITION_REQ::_InternalParse(const char* ptr, ::_pbi::Pa
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _impl_.clienttimestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .Protocol.Vector3 currentPosition = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          ptr = ctx->ParseMessage(_internal_mutable_currentposition(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -2053,6 +2162,13 @@ uint8_t* C2S_MOVE_TO_POSITION_REQ::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteInt64ToArray(3, this->_internal_clienttimestamp(), target);
   }
 
+  // .Protocol.Vector3 currentPosition = 4;
+  if (this->_internal_has_currentposition()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, _Internal::currentposition(this),
+        _Internal::currentposition(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2074,6 +2190,13 @@ size_t C2S_MOVE_TO_POSITION_REQ::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *_impl_.destination_);
+  }
+
+  // .Protocol.Vector3 currentPosition = 4;
+  if (this->_internal_has_currentposition()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.currentposition_);
   }
 
   // int64 clientTimestamp = 3;
@@ -2107,6 +2230,10 @@ void C2S_MOVE_TO_POSITION_REQ::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_ms
   if (from._internal_has_destination()) {
     _this->_internal_mutable_destination()->::Protocol::Vector3::MergeFrom(
         from._internal_destination());
+  }
+  if (from._internal_has_currentposition()) {
+    _this->_internal_mutable_currentposition()->::Protocol::Vector3::MergeFrom(
+        from._internal_currentposition());
   }
   if (from._internal_clienttimestamp() != 0) {
     _this->_internal_set_clienttimestamp(from._internal_clienttimestamp());

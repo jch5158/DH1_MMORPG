@@ -88,15 +88,11 @@ public:
     void RequestRealmList();
     void RequestRealmSelect(int32 RealmId);
 
-    // 이동 패킷 전송
-    void SendMoveInput(const FVector& Direction, float RotationYaw, float PositionZ);
-    void SendMoveStop(float CurrentYaw);
-
     // 스폰 위치 요청
     void RequestSpawnPosition();
 
-    // 클릭 이동 (목적지 → 서버 경로 계산)
-    void SendMoveToPosition(const FVector& Destination);
+    // 클릭 이동 (목적지 → 서버 경로 계산, 현재 위치도 함께 전송)
+    void SendMoveToPosition(const FVector& CurrentPosition, const FVector& Destination);
 
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;

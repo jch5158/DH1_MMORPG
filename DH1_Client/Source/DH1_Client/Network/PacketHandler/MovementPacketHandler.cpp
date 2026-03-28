@@ -17,16 +17,6 @@ bool MovementPacketHandler::HANDLE_PACKET_ID_INVALID(const uint16 size, const ui
 
 bool MovementPacketHandler::HANDLE_S2C_MOVE_RESULT_NOT(const Protocol::S2C_MOVE_RESULT_NOT& packet, const PacketSessionRef& pSession)
 {
-	const float posX = packet.position().x();
-	const float posY = packet.position().y();
-	const float posZ = packet.position().z();
-	const float rotYaw = packet.rotationyaw();
-
-	UE_LOG(LogMovement, Log, TEXT("MOVE_RESULT - seq: %u, pos: (%.1f, %.1f, %.1f), yaw: %.1f"),
-		packet.sequenceid(), posX, posY, posZ, rotYaw);
-
-	// TODO: Client-Side Prediction reconciliation
-
 	return true;
 }
 
