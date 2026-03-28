@@ -37,9 +37,36 @@ bool CrashReporter::Initialize(const std::string& appName, const std::string& ap
     }
 
     const fs::path currentDir = GetExeDirectoryPath();
-    const fs::path handlerPath = currentDir / "crashpad_handler.exe";
-    const fs::path dbPath = currentDir / "crashes";
-    const fs::path metricsPath = currentDir / "metrics";
+
+    auto GetEnv = [](const char* name) -> std::string
+    {
+        char* pValue = nullptr;
+        size_t size = 0;
+        if (_dupenv_s(&pValue, &size, name) == 0 && pValue != nullptr)
+        {
+            std::string result(pValue);
+            free(pValue);
+            return result;
+        }
+        return {};
+    };
+
+    // DH1_CRASH_HANDLER_PATH 환경변수 → 없으면 exe 디렉토리 폴백
+    const std::string handlerEnv = GetEnv("DH1_CRASH_HANDLER_PATH");
+    const fs::path handlerPath = handlerEnv.empty()
+        ? currentDir / "crashpad_handler.exe"
+        : fs::path(handlerEnv);
+
+    // DH1_CRASH_DIR 환경변수 → 없으면 exe 디렉토리/crashes 폴백
+    const std::string crashDirEnv = GetEnv("DH1_CRASH_DIR");
+    const fs::path dbPath = crashDirEnv.empty()
+        ? currentDir / "crashes"
+        : fs::path(crashDirEnv) / appName;
+
+    const fs::path metricsPath = dbPath / "metrics";
+
+    fs::create_directories(dbPath);
+    fs::create_directories(metricsPath);
 
     if (!fs::exists(handlerPath))
     {

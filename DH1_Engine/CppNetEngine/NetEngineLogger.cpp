@@ -67,6 +67,7 @@ void NetEngineLogger::Init(const NetEngineLoggerConfig& config)
 	{
 		if (config.bEnableFile)
 		{
+			std::filesystem::create_directories(config.logDirectory);
 			const std::string logPath = config.logDirectory + "/" + config.logFileName;
 			const auto fileSink = cpp_net_engine::MakeShared<spdlog::sinks::daily_file_sink_mt>(logPath, 0, 0);
 			fileSink->set_pattern(logPattern);
