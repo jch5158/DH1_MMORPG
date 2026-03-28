@@ -82,13 +82,22 @@ artifacts/
 # Unreal Engine (DH1_Client)
 # =============================================================================
 DH1_Client/Binaries/
+DH1_Client/Binaries/
 DH1_Client/Intermediate/
 DH1_Client/Saved/
 DH1_Client/DerivedDataCache/
 DH1_Client/.idea/
 DH1_Client/.vs/
 DH1_Client/*.sln
+DH1_Client/Plugins/UnrealMCP/
+DH1_Client/Plugins/**/Binaries/
+DH1_Client/Plugins/**/Intermediate/
 *_BuiltData.uasset
+
+# =============================================================================
+# 임시 스크립트
+# =============================================================================
+build_worldserver.bat
 
 # =============================================================================
 # Build output (root)
