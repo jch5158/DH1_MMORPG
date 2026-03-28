@@ -23,6 +23,16 @@
         "REDIS_HOST": "localhost",
         "REDIS_PORT": "6379"
       }
+    },
+    "unrealMCP": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "E:/Projects/unreal-mcp/Python",
+        "run",
+        "unreal_mcp_server.py"
+      ]
     }
   }
 }

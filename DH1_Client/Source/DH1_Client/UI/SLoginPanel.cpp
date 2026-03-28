@@ -1,4 +1,4 @@
-#include "SLoginPanel.h"
+﻿#include "SLoginPanel.h"
 #include "AuthWidgetStyle.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
 #include "Widgets/Input/SEditableTextBox.h"
@@ -15,92 +15,134 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 
 	ChildSlot
 	[
-		SNew(SBox)
-		.WidthOverride(620.0f)
-		.VAlign(VAlign_Center)
+		// Gold outer border (1px glow/border effect)
+		SNew(SBorder)
+		.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+		.BorderBackgroundColor(AuthStyle::C::CardBorder)
+		.Padding(FMargin(1.0f))
 		[
-			SNew(SBorder)
-			.BorderBackgroundColor(AuthStyle::C::CardBg)
-			.Padding(FMargin(60.0f, 50.0f))
+			SNew(SBox)
+			.WidthOverride(720.0f)
+			.VAlign(VAlign_Center)
 			[
-				SNew(SVerticalBox)
-
-				// Title
-				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 32)
+				SNew(SBorder)
+				.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+				.BorderBackgroundColor(AuthStyle::C::CardBg)
+				.Padding(FMargin(64.0f, 64.0f))
 				[
-					SNew(STextBlock)
-					.Text(FText::FromString(TEXT("로그인")))
-					.Font(AuthStyle::TitleFont())
-					.ColorAndOpacity(AuthStyle::C::Title)
-					.Justification(ETextJustify::Center)
-				]
+					SNew(SVerticalBox)
 
-				// Status
-				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 16)
-				[
-					SAssignNew(StatusText, STextBlock)
-					.Font(AuthStyle::SmallFont())
-					.ColorAndOpacity(AuthStyle::C::Dim)
-					.Justification(ETextJustify::Center)
-				]
-
-				// Email
-				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 14)
-				[
-					AuthStyle::MakeInput(EmailInput, FText::FromString(TEXT("이메일")), false,
-						[this](const FText&, ETextCommit::Type CommitType)
-						{
-							if (CommitType == ETextCommit::OnEnter && PasswordInput.IsValid())
-							{
-								FSlateApplication::Get().SetKeyboardFocus(PasswordInput);
-							}
-						})
-				]
-
-				// Password
-				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 28)
-				[
-					AuthStyle::MakeInput(PasswordInput, FText::FromString(TEXT("비밀번호")), true,
-						[this](const FText&, ETextCommit::Type CommitType)
-						{
-							if (CommitType == ETextCommit::OnEnter)
-							{
-								OnLoginClicked();
-							}
-						})
-				]
-
-				// Login Button
-				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 14)
-				[
-					SAssignNew(LoginButton, SButton)
-					.ButtonStyle(&FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button"))
-					.ButtonColorAndOpacity(AuthStyle::C::Primary)
-					.OnClicked(FOnClicked::CreateSP(this, &SLoginPanel::OnLoginClicked))
-					.ContentPadding(FMargin(0.0f, 14.0f))
+					// Game title
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 16)
 					[
 						SNew(STextBlock)
-						.Text(FText::FromString(TEXT("로그인")))
-						.Font(AuthStyle::ButtonFont())
-						.ColorAndOpacity(AuthStyle::C::BtnText)
+						.Text(FText::FromString(TEXT("DH1")))
+						.Font(FCoreStyle::GetDefaultFontStyle("Bold", 42))
+						.ColorAndOpacity(AuthStyle::C::Title)
 						.Justification(ETextJustify::Center)
 					]
-				]
 
-				// SignUp Button
-				+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 8)
-				[
-					AuthStyle::MakeSecondaryButton(
-						FText::FromString(TEXT("회원가입")),
-						FOnClicked::CreateSP(this, &SLoginPanel::OnSignUpClicked))
-				]
+					// Gold separator
+					+ SVerticalBox::Slot().AutoHeight().MaxHeight(1.0f).Padding(0, 0, 0, 28)
+					[
+						SNew(SBorder)
+						.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+						.BorderBackgroundColor(AuthStyle::C::GoldDim)
+					]
 
-				// Reset Password Button
-				+ SVerticalBox::Slot().AutoHeight()
-				[
-					AuthStyle::MakeSecondaryButton(
-						FText::FromString(TEXT("비밀번호 찾기")),
-						FOnClicked::CreateSP(this, &SLoginPanel::OnResetPasswordClicked))
+					// Status text
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 20)
+					[
+						SAssignNew(StatusText, STextBlock)
+						.Font(AuthStyle::SmallFont())
+						.ColorAndOpacity(AuthStyle::C::Dim)
+						.Justification(ETextJustify::Center)
+					]
+
+					// Email label
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 6)
+					[
+						SNew(STextBlock)
+						.Text(FText::FromString(TEXT("이메일")))
+						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 11))
+						.ColorAndOpacity(AuthStyle::C::Gold)
+					]
+
+					// Email input
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 24)
+					[
+						AuthStyle::MakeInput(EmailInput, FText::FromString(TEXT("example@mail.com")), false,
+							[this](const FText&, ETextCommit::Type CommitType)
+							{
+								if (CommitType == ETextCommit::OnEnter && PasswordInput.IsValid())
+								{
+									FSlateApplication::Get().SetKeyboardFocus(PasswordInput);
+								}
+							})
+					]
+
+					// Password label
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 6)
+					[
+						SNew(STextBlock)
+						.Text(FText::FromString(TEXT("비밀번호")))
+						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 11))
+						.ColorAndOpacity(AuthStyle::C::Gold)
+					]
+
+					// Password input
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 36)
+					[
+						AuthStyle::MakeInput(PasswordInput, FText::GetEmpty(), true,
+							[this](const FText&, ETextCommit::Type CommitType)
+							{
+								if (CommitType == ETextCommit::OnEnter)
+								{
+									OnLoginClicked();
+								}
+							})
+					]
+
+					// Login Button
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 16)
+					[
+						SAssignNew(LoginButton, SButton)
+						.ButtonStyle(&FCoreStyle::Get().GetWidgetStyle<FButtonStyle>("Button"))
+						.ButtonColorAndOpacity(AuthStyle::C::Primary)
+						.OnClicked(FOnClicked::CreateSP(this, &SLoginPanel::OnLoginClicked))
+						.ContentPadding(FMargin(0.0f, 14.0f))
+						[
+							SNew(STextBlock)
+							.Text(FText::FromString(TEXT("로그인")))
+							.Font(AuthStyle::ButtonFont())
+							.ColorAndOpacity(AuthStyle::C::BtnText)
+							.Justification(ETextJustify::Center)
+						]
+					]
+
+					// Bottom gold separator
+					+ SVerticalBox::Slot().AutoHeight().MaxHeight(1.0f).Padding(0, 4, 0, 18)
+					[
+						SNew(SBorder)
+						.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+						.BorderBackgroundColor(AuthStyle::C::GoldDim)
+					]
+
+					// SignUp Button
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 10)
+					[
+						AuthStyle::MakeSecondaryButton(
+							FText::FromString(TEXT("회원가입")),
+							FOnClicked::CreateSP(this, &SLoginPanel::OnSignUpClicked))
+					]
+
+					// Reset Password Button
+					+ SVerticalBox::Slot().AutoHeight()
+					[
+						AuthStyle::MakeSecondaryButton(
+							FText::FromString(TEXT("비밀번호 찾기")),
+							FOnClicked::CreateSP(this, &SLoginPanel::OnResetPasswordClicked))
+					]
 				]
 			]
 		]

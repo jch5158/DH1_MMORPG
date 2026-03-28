@@ -175,3 +175,4 @@ __pycache__/
 *.pyc
 cmake-build-*/
 build_log.txt
+.claude/settings.local.json
