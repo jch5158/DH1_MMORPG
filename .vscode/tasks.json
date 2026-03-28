@@ -1,0 +1,80 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "BuildAll: Debug",
+      "type": "shell",
+      "command": "${workspaceFolder}\\Shared\\BuildScripts\\BuildAll.bat",
+      "args": ["Debug"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "BuildAll: Release",
+      "type": "shell",
+      "command": "${workspaceFolder}\\Shared\\BuildScripts\\BuildAll.bat",
+      "args": ["Release"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "BuildAll: Debug (skip proto)",
+      "type": "shell",
+      "command": "${workspaceFolder}\\Shared\\BuildScripts\\BuildAll.bat",
+      "args": ["Debug", "--skip-proto"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "PacketGenerator",
+      "type": "shell",
+      "command": "${workspaceFolder}\\Shared\\BuildScripts\\PacketGenerator.bat",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "StartServers: Debug",
+      "type": "shell",
+      "command": "${workspaceFolder}\\Shared\\BuildScripts\\StartServers.bat",
+      "args": ["Debug"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "StartServers: Release",
+      "type": "shell",
+      "command": "${workspaceFolder}\\Shared\\BuildScripts\\StartServers.bat",
+      "args": ["Release"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}
