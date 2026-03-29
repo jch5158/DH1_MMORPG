@@ -78,23 +78,23 @@
     <ProjectRootDir>$([System.String]::Copy('$(SolutionDir)..').Replace('\','/'))</ProjectRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SharedDir)Protocol;$(SharedDir)Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SharedDir)Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\RealmServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SharedDir)Protocol;$(SharedDir)Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SharedDir)Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\RealmServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SharedDir)Protocol;$(SharedDir)Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SharedDir)Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\RealmServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SolutionDir)..\Shared\Protocol;$(SolutionDir)..\Shared\Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\Shared\Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\DH1_Engine\CppNetEngine;$(SharedDir)Protocol;$(SharedDir)Protocol\PacketId;$(SolutionDir)RealmServer;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SharedDir)Libraries\CppNetEngine\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\Binaries\Server\$(Configuration)\RealmServer\</OutDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -196,31 +196,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Shared\Protocol\Enum.pb.cc">
+    <ClCompile Include="$(SharedDir)Protocol\Enum.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\PacketOption.pb.cc">
+    <ClCompile Include="$(SharedDir)Protocol\PacketOption.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\Struct.pb.cc">
+    <ClCompile Include="$(SharedDir)Protocol\Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\ServerHeartbeat.pb.cc">
+    <ClCompile Include="$(SharedDir)Protocol\ServerHeartbeat.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\Shared\Protocol\GameSession.pb.cc">
+    <ClCompile Include="$(SharedDir)Protocol\GameSession.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -252,12 +252,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Shared\Protocol\Enum.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\PacketOption.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\PacketId\PacketId.h" />
-    <ClInclude Include="..\..\Shared\Protocol\Struct.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\ServerHeartbeat.pb.h" />
-    <ClInclude Include="..\..\Shared\Protocol\GameSession.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\Enum.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\PacketOption.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\PacketId\PacketId.h" />
+    <ClInclude Include="$(SharedDir)Protocol\Struct.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\ServerHeartbeat.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\GameSession.pb.h" />
     <ClInclude Include="WorldServerSession.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
@@ -270,11 +270,11 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Shared\Protocol\Proto\Enum.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\PacketOption.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\ServerHeartbeat.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\Struct.proto" />
-    <None Include="..\..\Shared\Protocol\Proto\GameSession.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\Enum.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\PacketOption.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\ServerHeartbeat.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\Struct.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\GameSession.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
