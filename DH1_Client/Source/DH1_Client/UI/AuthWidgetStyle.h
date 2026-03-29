@@ -7,40 +7,40 @@
 namespace AuthStyle
 {
 	// =========================================================================
-	// Color Palette
+	// Color Palette  (Dark Gothic / Vampire theme)
 	// =========================================================================
 	namespace C
 	{
-		// Background
-		inline const FLinearColor ScreenBg     = FLinearColor(0.008f, 0.008f, 0.02f,  0.99f);
-		inline const FLinearColor CardBg       = FLinearColor(0.032f, 0.032f, 0.085f, 1.0f);
-		inline const FLinearColor CardBorder   = FLinearColor(0.72f,  0.58f,  0.14f,  1.0f);  // gold border
+		// Background — near-black with faint warm undertone
+		inline const FLinearColor ScreenBg     = FLinearColor(0.012f, 0.010f, 0.010f, 0.99f);
+		inline const FLinearColor CardBg       = FLinearColor(0.038f, 0.030f, 0.030f, 1.0f);
+		inline const FLinearColor CardBorder   = FLinearColor(0.50f,  0.04f,  0.06f,  1.0f);  // blood red border
 
-		// Gold accent (MMORPG theme)
-		inline const FLinearColor Gold         = FLinearColor(0.83f,  0.68f,  0.21f,  1.0f);
-		inline const FLinearColor GoldDim      = FLinearColor(0.83f,  0.68f,  0.21f,  0.45f); // separator
+		// Crimson accent (vampire theme)
+		inline const FLinearColor Crimson      = FLinearColor(0.65f,  0.04f,  0.06f,  1.0f);
+		inline const FLinearColor CrimsonDim   = FLinearColor(0.65f,  0.04f,  0.06f,  0.40f); // separator
 
 		// Input
-		inline const FLinearColor InputBg      = FLinearColor(0.02f, 0.02f, 0.055f, 1.0f);
-		inline const FLinearColor InputFg      = FLinearColor(0.92f, 0.92f, 0.95f,  1.0f);
-		inline const FLinearColor InputHint    = FLinearColor(0.38f, 0.38f, 0.42f,  1.0f);
+		inline const FLinearColor InputBg      = FLinearColor(0.022f, 0.018f, 0.018f, 1.0f);
+		inline const FLinearColor InputFg      = FLinearColor(0.90f,  0.88f,  0.85f,  1.0f);
+		inline const FLinearColor InputHint    = FLinearColor(0.38f,  0.35f,  0.35f,  1.0f);
 
-		// Primary button
-		inline const FLinearColor Primary      = FLinearColor(0.09f, 0.28f, 0.65f, 1.0f);
-		inline const FLinearColor PriHover     = FLinearColor(0.14f, 0.38f, 0.85f, 1.0f);
-		inline const FLinearColor PriPress     = FLinearColor(0.05f, 0.18f, 0.48f, 1.0f);
+		// Primary button — blood red
+		inline const FLinearColor Primary      = FLinearColor(0.45f, 0.04f, 0.06f, 1.0f);
+		inline const FLinearColor PriHover     = FLinearColor(0.60f, 0.05f, 0.08f, 1.0f);
+		inline const FLinearColor PriPress     = FLinearColor(0.30f, 0.02f, 0.04f, 1.0f);
 
-		// Secondary button
-		inline const FLinearColor Secondary    = FLinearColor(0.10f, 0.10f, 0.14f, 1.0f);
-		inline const FLinearColor SecHover     = FLinearColor(0.16f, 0.16f, 0.20f, 1.0f);
-		inline const FLinearColor SecPress     = FLinearColor(0.06f, 0.06f, 0.09f, 1.0f);
+		// Secondary button — dark charcoal
+		inline const FLinearColor Secondary    = FLinearColor(0.10f, 0.09f, 0.09f, 1.0f);
+		inline const FLinearColor SecHover     = FLinearColor(0.16f, 0.14f, 0.14f, 1.0f);
+		inline const FLinearColor SecPress     = FLinearColor(0.06f, 0.05f, 0.05f, 1.0f);
 
 		// Text
-		inline const FLinearColor Title        = FLinearColor(0.83f, 0.68f, 0.21f, 1.0f);  // gold title
-		inline const FLinearColor Body         = FLinearColor(0.78f, 0.78f, 0.82f, 1.0f);
-		inline const FLinearColor Dim          = FLinearColor(0.50f, 0.50f, 0.55f, 1.0f);
-		inline const FLinearColor Error        = FLinearColor(0.95f, 0.30f, 0.30f, 1.0f);
-		inline const FLinearColor Success      = FLinearColor(0.20f, 0.90f, 0.40f, 1.0f);
+		inline const FLinearColor Title        = FLinearColor(0.90f, 0.88f, 0.86f, 1.0f);  // cool off-white
+		inline const FLinearColor Body         = FLinearColor(0.75f, 0.73f, 0.72f, 1.0f);
+		inline const FLinearColor Dim          = FLinearColor(0.45f, 0.43f, 0.42f, 1.0f);
+		inline const FLinearColor Error        = FLinearColor(0.95f, 0.25f, 0.25f, 1.0f);
+		inline const FLinearColor Success      = FLinearColor(0.25f, 0.85f, 0.40f, 1.0f);
 		inline const FLinearColor BtnText      = FLinearColor(1.0f,  1.0f,  1.0f,  1.0f);
 	}
 

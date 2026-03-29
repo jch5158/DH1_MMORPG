@@ -15,7 +15,7 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 
 	ChildSlot
 	[
-		// Gold outer border (1px glow/border effect)
+		// Blood red outer border (1px glow/border effect)
 		SNew(SBorder)
 		.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
 		.BorderBackgroundColor(AuthStyle::C::CardBorder)
@@ -42,12 +42,12 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 						.Justification(ETextJustify::Center)
 					]
 
-					// Gold separator
+					// Crimson separator
 					+ SVerticalBox::Slot().AutoHeight().MaxHeight(1.0f).Padding(0, 0, 0, 28)
 					[
 						SNew(SBorder)
 						.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
-						.BorderBackgroundColor(AuthStyle::C::GoldDim)
+						.BorderBackgroundColor(AuthStyle::C::CrimsonDim)
 					]
 
 					// Status text
@@ -65,7 +65,7 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 						SNew(STextBlock)
 						.Text(FText::FromString(TEXT("이메일")))
 						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 11))
-						.ColorAndOpacity(AuthStyle::C::Gold)
+						.ColorAndOpacity(AuthStyle::C::Crimson)
 					]
 
 					// Email input
@@ -87,7 +87,7 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 						SNew(STextBlock)
 						.Text(FText::FromString(TEXT("비밀번호")))
 						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 11))
-						.ColorAndOpacity(AuthStyle::C::Gold)
+						.ColorAndOpacity(AuthStyle::C::Crimson)
 					]
 
 					// Password input
@@ -120,12 +120,12 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 						]
 					]
 
-					// Bottom gold separator
+					// Bottom crimson separator
 					+ SVerticalBox::Slot().AutoHeight().MaxHeight(1.0f).Padding(0, 4, 0, 18)
 					[
 						SNew(SBorder)
 						.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
-						.BorderBackgroundColor(AuthStyle::C::GoldDim)
+						.BorderBackgroundColor(AuthStyle::C::CrimsonDim)
 					]
 
 					// SignUp Button

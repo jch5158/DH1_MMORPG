@@ -100,13 +100,28 @@ echo [3/4] DH1_Server done
 echo.
 
 :: Step 4: ProtoBridge
-echo [4/4] Building ProtoBridge...
+echo [4/5] Building ProtoBridge...
 "%MSBUILD%" "%ROOT_DIR%\DH1_Client\ProtoBridge\ProtoBridge.slnx" -p:Configuration=%CONFIG% -p:Platform=%PLATFORM% -m -nologo -v:minimal
 if !errorlevel! neq 0 (
     echo [FAILED] ProtoBridge build failed
     exit /b 1
 )
-echo [4/4] ProtoBridge done
+echo [4/5] ProtoBridge done
+echo.
+
+:: Step 5: UE5 Client (Development standalone)
+echo [5/5] Building DH1_Client (UE5 Development)...
+set "UBT_DLL=C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll"
+if not exist "%UBT_DLL%" (
+    echo [Error] UnrealBuildTool.dll not found: %UBT_DLL%
+    exit /b 1
+)
+dotnet "%UBT_DLL%" DH1_Client Win64 Development "-Project=%ROOT_DIR%\DH1_Client\DH1_Client.uproject"
+if !errorlevel! neq 0 (
+    echo [FAILED] UE5 client build failed
+    exit /b 1
+)
+echo [5/5] DH1_Client done
 echo.
 
 :: Done
@@ -116,5 +131,5 @@ echo  Start: %START_TIME%
 echo  End:   %TIME%
 echo ============================================================
 echo.
-echo [Info] Build UE5 client from Unreal Editor.
+echo [Info] Run StartServers.bat to launch servers + client.
 echo.
