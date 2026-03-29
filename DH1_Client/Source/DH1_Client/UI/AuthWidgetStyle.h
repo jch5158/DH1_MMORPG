@@ -171,4 +171,98 @@ namespace AuthStyle
 				.Justification(ETextJustify::Center)
 			];
 	}
+
+	// =========================================================================
+	// Vampire atmospheric background
+	// 순수 Slate 레이어로 구성된 다크 고딕 배경:
+	//   - 거의 검정에 가까운 베이스
+	//   - 상단/하단 크림슨 비네트 (blood fog)
+	//   - 좌우 엣지 다크 섀도우
+	// =========================================================================
+	inline TSharedRef<SWidget> MakeVampireBackground(
+		TSharedRef<SWidget> Content,
+		EHorizontalAlignment HAlign = HAlign_Center,
+		EVerticalAlignment   VAlign = VAlign_Center)
+	{
+		return SNew(SOverlay)
+
+		// Layer 0: 순수 검정 베이스
+		+ SOverlay::Slot()
+		[
+			SNew(SBorder)
+			.BorderImage(FlatBrush())
+			.BorderBackgroundColor(C::ScreenBg)
+		]
+
+		// Layer 1: 상단 크림슨 안개 (캐릭터 아우라 느낌)
+		+ SOverlay::Slot()
+		.VAlign(VAlign_Top)
+		[
+			SNew(SBox).HeightOverride(240.0f)
+			[
+				SNew(SBorder)
+				.BorderImage(FlatBrush())
+				.BorderBackgroundColor(FLinearColor(0.28f, 0.01f, 0.02f, 0.22f))
+			]
+		]
+
+		// Layer 2: 하단 혈안개 (blood mist)
+		+ SOverlay::Slot()
+		.VAlign(VAlign_Bottom)
+		[
+			SNew(SBox).HeightOverride(180.0f)
+			[
+				SNew(SBorder)
+				.BorderImage(FlatBrush())
+				.BorderBackgroundColor(FLinearColor(0.32f, 0.01f, 0.02f, 0.20f))
+			]
+		]
+
+		// Layer 3: 좌측 엣지 그림자
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Left)
+		[
+			SNew(SBox).WidthOverride(110.0f)
+			[
+				SNew(SBorder)
+				.BorderImage(FlatBrush())
+				.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.42f))
+			]
+		]
+
+		// Layer 4: 우측 엣지 그림자
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Right)
+		[
+			SNew(SBox).WidthOverride(110.0f)
+			[
+				SNew(SBorder)
+				.BorderImage(FlatBrush())
+				.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.42f))
+			]
+		]
+
+		// Layer 5: 중앙 미묘한 크림슨 글로우 (심장부)
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		[
+			SNew(SBox)
+			.WidthOverride(900.0f)
+			.HeightOverride(700.0f)
+			[
+				SNew(SBorder)
+				.BorderImage(FlatBrush())
+				.BorderBackgroundColor(FLinearColor(0.20f, 0.01f, 0.01f, 0.06f))
+			]
+		]
+
+		// Content
+		+ SOverlay::Slot()
+		.HAlign(HAlign)
+		.VAlign(VAlign)
+		[
+			Content
+		];
+	}
 }

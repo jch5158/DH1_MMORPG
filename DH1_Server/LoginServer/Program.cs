@@ -15,6 +15,10 @@ string ResolveEnvVars(string value)
     });
 }
 
+builder.Configuration["SmtpSettings:Host"] = ResolveEnvVars(
+    builder.Configuration["SmtpSettings:Host"] ?? string.Empty);
+builder.Configuration["SmtpSettings:SenderEmail"] = ResolveEnvVars(
+    builder.Configuration["SmtpSettings:SenderEmail"] ?? string.Empty);
 builder.Configuration["SmtpSettings:AppPassword"] = ResolveEnvVars(
     builder.Configuration["SmtpSettings:AppPassword"] ?? string.Empty);
 

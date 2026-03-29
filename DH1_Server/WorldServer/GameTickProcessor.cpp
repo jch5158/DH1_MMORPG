@@ -229,6 +229,26 @@ void GameTickProcessor::processMoveToPositionRequests()
 		return;
 	}
 
+	// 연속 클릭 시 동일 플레이어의 마지막 요청만 처리 — 중간 요청은 이미 outdated
+	{
+		std::unordered_map<uint64, size_t> latestIdx;
+		for (size_t i = 0; i < mProcessingMoveToInputs.size(); ++i)
+		{
+			latestIdx[mProcessingMoveToInputs[i].mAccountId] = i;
+		}
+
+		if (latestIdx.size() < mProcessingMoveToInputs.size())
+		{
+			Vector<MoveToPositionEntry> deduped;
+			deduped.reserve(latestIdx.size());
+			for (const auto& [accountId, idx] : latestIdx)
+			{
+				deduped.push_back(mProcessingMoveToInputs[idx]);
+			}
+			mProcessingMoveToInputs = std::move(deduped);
+		}
+	}
+
 	for (const auto& input : mProcessingMoveToInputs)
 	{
 		const auto pObject = mpGridManager->GetObjectByAccountId(input.mAccountId);

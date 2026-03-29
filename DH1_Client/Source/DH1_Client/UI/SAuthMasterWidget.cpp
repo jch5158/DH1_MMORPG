@@ -15,15 +15,7 @@
 
 void SAuthMasterWidget::Construct(const FArguments& InArgs)
 {
-	ChildSlot
-	[
-		SNew(SBorder)
-		.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
-		.BorderBackgroundColor(AuthStyle::C::ScreenBg)
-		.HAlign(HAlign_Center)
-		.VAlign(VAlign_Center)
-		[
-			SAssignNew(PanelSwitcher, SWidgetSwitcher)
+	SAssignNew(PanelSwitcher, SWidgetSwitcher)
 
 			// 0: Login
 			+ SWidgetSwitcher::Slot()
@@ -80,7 +72,11 @@ void SAuthMasterWidget::Construct(const FArguments& InArgs)
 					SwitchToLogin(StatusText, Email);
 				})
 			]
-		]
+		;
+
+	ChildSlot
+	[
+		AuthStyle::MakeVampireBackground(PanelSwitcher.ToSharedRef())
 	];
 
 	// Bind ClientNetSubsystem delegates
