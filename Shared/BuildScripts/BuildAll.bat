@@ -30,6 +30,48 @@ echo  DH1_MMORPG Build All - %CONFIG% ^| %PLATFORM%
 echo ============================================================
 echo.
 
+:: ── 환경 검증 ─────────────────────────────────────────────────
+
+:: .NET SDK 버전 확인 (global.json 기준: 10.0.201)
+for /f "usebackq delims=" %%v in (`dotnet --version 2^>nul`) do set "DOTNET_VER=%%v"
+if not defined DOTNET_VER (
+    echo [Error] .NET SDK not found. Install .NET 10.0.201.
+    exit /b 1
+)
+if not "!DOTNET_VER!"=="10.0.201" (
+    echo [Error] .NET SDK version mismatch.
+    echo         Required : 10.0.201
+    echo         Installed: !DOTNET_VER!
+    echo         Download : https://dotnet.microsoft.com/download/dotnet/10.0
+    exit /b 1
+)
+
+:: Visual Studio 버전 확인 (최소 18.0 = VS 2025)
+set "VSWHERE_EXE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+for /f "usebackq delims=" %%v in (`"!VSWHERE_EXE!" -latest -property installationVersion 2^>nul`) do set "VS_VER=%%v"
+for /f "tokens=1 delims=." %%m in ("!VS_VER!") do set "VS_MAJOR=%%m"
+if !VS_MAJOR! lss 18 (
+    echo [Error] Visual Studio 2025 ^(v18+^) required.
+    echo         Installed: !VS_VER!
+    echo         Open .vsconfig in Visual Studio Installer to install required components.
+    exit /b 1
+)
+
+:: UE5 버전 확인 (UE_5.7)
+set "UE5_ROOT=C:\Program Files\Epic Games\UE_5.7"
+if not exist "!UE5_ROOT!\Engine\Build\BatchFiles\Build.bat" (
+    echo [Error] Unreal Engine 5.7 not found at: !UE5_ROOT!
+    echo         Install UE 5.7 via Epic Games Launcher.
+    exit /b 1
+)
+
+echo [Check] .NET SDK : !DOTNET_VER! OK
+echo [Check] VS       : !VS_VER! OK
+echo [Check] UE5      : 5.7 OK
+echo.
+
+:: ──────────────────────────────────────────────────────────────
+
 :: .env 파일 로드 (루트 디렉토리)
 if exist "%ROOT_DIR%\.env" (
     for /f "usebackq tokens=1,* delims==" %%A in ("%ROOT_DIR%\.env") do (
