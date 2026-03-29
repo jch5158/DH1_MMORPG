@@ -55,7 +55,7 @@ timeout /t 3 /nobreak >nul
 
 echo [5/5] Starting DH1_Client...
 if exist "%CLIENT_EXE%" (
-    start "DH1_Client" "%CLIENT_EXE%"
+    start "DH1_Client" "%CLIENT_EXE%" "%BASE_DIR%\DH1_Client\DH1_Client.uproject"
 ) else (
     echo [Warning] DH1_Client.exe not found, skipping client launch.
     echo           Run BuildAll.bat to build the UE5 client first.
