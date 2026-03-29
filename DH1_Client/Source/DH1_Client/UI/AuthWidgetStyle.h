@@ -1,6 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/Texture2D.h"
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "Modules/ModuleManager.h"
 #include "Styling/SlateTypes.h"
 #include "Widgets/SBoxPanel.h"
 
@@ -73,6 +79,50 @@ namespace AuthStyle
 	inline const FSlateBrush* FlatBrush()
 	{
 		return FCoreStyle::Get().GetBrush("GenericWhiteBox");
+	}
+
+	// 로그인 배경 이미지 브러시
+	// Content/UI/T_LoginBg.png 파일을 런타임에 직접 로드합니다 (UAsset import 불필요).
+	inline const FSlateBrush* GetLoginBgBrush()
+	{
+		static FSlateBrush BgBrush;
+		static bool bInit = false;
+		if (!bInit)
+		{
+			bInit = true;
+			const FString FilePath = FPaths::ProjectContentDir() / TEXT("UI/T_LoginBg.png");
+
+			TArray<uint8> RawData;
+			if (!FFileHelper::LoadFileToArray(RawData, *FilePath))
+				return &BgBrush;
+
+			IImageWrapperModule& WrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>("ImageWrapper");
+			TSharedPtr<IImageWrapper> Wrapper  = WrapperModule.CreateImageWrapper(EImageFormat::PNG);
+			if (!Wrapper.IsValid() || !Wrapper->SetCompressed(RawData.GetData(), RawData.Num()))
+				return &BgBrush;
+
+			TArray64<uint8> Pixels;
+			if (!Wrapper->GetRaw(ERGBFormat::BGRA, 8, Pixels))
+				return &BgBrush;
+
+			const int32 W = Wrapper->GetWidth();
+			const int32 H = Wrapper->GetHeight();
+
+			UTexture2D* Tex = UTexture2D::CreateTransient(W, H, PF_B8G8R8A8);
+			if (!Tex)
+				return &BgBrush;
+
+			void* MipData = Tex->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+			FMemory::Memcpy(MipData, Pixels.GetData(), Pixels.Num());
+			Tex->GetPlatformData()->Mips[0].BulkData.Unlock();
+			Tex->UpdateResource();
+
+			BgBrush.SetResourceObject(Tex);
+			BgBrush.ImageSize = FVector2D(static_cast<float>(W), static_cast<float>(H));
+			BgBrush.DrawAs   = ESlateBrushDrawType::Image;
+			BgBrush.Tiling   = ESlateBrushTileType::NoTile;
+		}
+		return &BgBrush;
 	}
 
 	// =========================================================================
@@ -186,12 +236,12 @@ namespace AuthStyle
 	{
 		return SNew(SOverlay)
 
-		// Layer 0: 순수 검정 베이스
+		// Layer 0: 배경 이미지 (Content/UI/T_LoginBg 텍스처)
+		// 텍스처 미임포트 시 빈 브러시 → 투명 렌더링 (fallback 없음 주의)
 		+ SOverlay::Slot()
 		[
-			SNew(SBorder)
-			.BorderImage(FlatBrush())
-			.BorderBackgroundColor(C::ScreenBg)
+			SNew(SImage)
+			.Image(GetLoginBgBrush())
 		]
 
 		// Layer 1: 상단 크림슨 안개 (캐릭터 아우라 느낌)

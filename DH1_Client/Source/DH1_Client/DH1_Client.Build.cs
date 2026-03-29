@@ -13,7 +13,7 @@ public class DH1_Client : ModuleRules
         PublicDependencyModuleNames.AddRange([
 	        "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
             "UMG", "Slate", "SlateCore", "HTTP", "Json", "JsonUtilities", "ImageDownload",
-            "NavigationSystem", "Navmesh"
+            "NavigationSystem", "Navmesh", "ImageWrapper"
         ]);
 
         PrivateDependencyModuleNames.AddRange([]);
