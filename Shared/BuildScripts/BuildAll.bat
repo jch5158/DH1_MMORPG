@@ -151,24 +151,34 @@ if !errorlevel! neq 0 (
 echo [4/5] ProtoBridge done
 echo.
 
-:: Step 5: UE5 Client (Development standalone)
-echo [5/5] Building DH1_Client (UE5 Development)...
+:: Step 5: UE5 Client (Game + Editor targets)
 set "UBT_DLL=C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll"
 if not exist "%UBT_DLL%" (
     echo [Error] UnrealBuildTool.dll not found: %UBT_DLL%
     exit /b 1
 )
-dotnet "%UBT_DLL%" DH1_Client Win64 Development "-Project=%ROOT_DIR%\DH1_Client\DH1_Client.uproject"
+
+echo [5/6] Building DH1_Client (UE5 Game target)...
+dotnet "%UBT_DLL%" DH1_Client Win64 Development "-Project=%ROOT_DIR%\DH1_Client\DH1_Client.uproject" -NoUBA
 if !errorlevel! neq 0 (
-    echo [FAILED] UE5 client build failed
+    echo [FAILED] UE5 Game target build failed
     exit /b 1
 )
-echo [5/5] DH1_Client done
+echo [5/6] DH1_Client done
+echo.
+
+echo [6/6] Building DH1_ClientEditor (UE5 Editor target)...
+dotnet "%UBT_DLL%" DH1_ClientEditor Win64 Development "-Project=%ROOT_DIR%\DH1_Client\DH1_Client.uproject" -NoUBA
+if !errorlevel! neq 0 (
+    echo [FAILED] UE5 Editor target build failed
+    exit /b 1
+)
+echo [6/6] DH1_ClientEditor done
 echo.
 
 :: Done
 echo ============================================================
-echo  Build complete (%CONFIG% ^| %PLATFORM%)
+echo  Build complete (%CONFIG% ^| %PLATFORM%) [6/6]
 echo  Start: %START_TIME%
 echo  End:   %TIME%
 echo ============================================================
