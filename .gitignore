@@ -139,9 +139,11 @@ Shared/vcpkg/vcpkg_installed/
 vcpkg-manifest-install.log
 
 # =============================================================================
-# Crashpad dump files
+# Runtime generated output (logs, crashes, crashpad copies)
 # =============================================================================
+**/logs/
 **/crashes/
+**/crashpad_handler.exe
 
 # =============================================================================
 # Environment & secrets
