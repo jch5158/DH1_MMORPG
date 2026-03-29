@@ -15,7 +15,7 @@ DH1_Server/GatewayServer/           # Separate project, links CppNetEngine
 **Packet code generation** (must run after `.proto` changes):
 ```batch
 cd Shared/BuildScripts
-PacketGenerator.bat    # runs Protoc.bat → PacketGenerator.exe → xcopy to DH1_Client
+PacketGenerator.bat    # protoc → PacketGenerator.exe → xcopy to DH1_Client
 ```
 PacketGenerator is a C# .NET 10 tool in `Shared/Tools/PacketGenerator/`.
 
