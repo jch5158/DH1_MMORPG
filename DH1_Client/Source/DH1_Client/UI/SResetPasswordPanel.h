@@ -8,6 +8,10 @@
 
 DECLARE_DELEGATE_TwoParams(FOnResetPwGoToLogin, const FString& /*StatusText*/, const FString& /*Email*/);
 
+class SButton;
+class SEditableTextBox;
+class STextBlock;
+
 class SResetPasswordPanel : public SCompoundWidget
 {
 public:
@@ -33,12 +37,19 @@ private:
 	void OnResetPasswordResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	void SetStatus(const FString& Text, const FLinearColor& Color);
+	void SetSendCodeLoading(bool bLoading);
+	void SetResetLoading(bool bLoading);
 
 	TSharedPtr<SEditableTextBox> EmailInputText;
 	TSharedPtr<SEditableTextBox> VerifyCodeInput;
 	TSharedPtr<SEditableTextBox> PasswordInput;
 	TSharedPtr<SEditableTextBox> PasswordConfirmInput;
 	TSharedPtr<STextBlock> StatusText;
+	TSharedPtr<SButton> SendVerifyCodeButton;
+	TSharedPtr<SButton> ResetPasswordButton;
+
+	bool bSendCodeInFlight = false;
+	bool bResetInFlight = false;
 
 	FOnResetPwGoToLogin OnGoToLogin;
 };

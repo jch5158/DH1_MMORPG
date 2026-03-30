@@ -65,6 +65,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Network")
     void RequestLogin(const FString& Email, const FString& Password);
 
+    UFUNCTION(BlueprintCallable, Category = "Network")
+    FString GetLoginServerApiBaseUrl() const;
+
     // 게이트웨이 서버 TCP 연결
     UFUNCTION(BlueprintCallable, Category = "Network")
     bool ConnectToServer(const FString& IPAddress, int32 Port);

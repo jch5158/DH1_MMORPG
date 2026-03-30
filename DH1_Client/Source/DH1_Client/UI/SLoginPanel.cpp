@@ -1,10 +1,37 @@
-﻿#include "SLoginPanel.h"
+#include "SLoginPanel.h"
 #include "AuthWidgetStyle.h"
+#include "AuthErrorMapper.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
+
+namespace
+{
+	FString NormalizeEmail(const FString& InEmail)
+	{
+		return InEmail.TrimStartAndEnd().ToLower();
+	}
+
+	bool IsLikelyValidEmail(const FString& Email)
+	{
+		const FString Normalized = NormalizeEmail(Email);
+		int32 AtIndex = INDEX_NONE;
+		if (!Normalized.FindChar(TEXT('@'), AtIndex))
+		{
+			return false;
+		}
+
+		if (AtIndex <= 0 || AtIndex >= Normalized.Len() - 3)
+		{
+			return false;
+		}
+
+		const int32 DotIndex = Normalized.Find(TEXT("."), ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+		return DotIndex > AtIndex + 1 && DotIndex < Normalized.Len() - 1;
+	}
+}
 
 void SLoginPanel::Construct(const FArguments& InArgs)
 {
@@ -17,7 +44,7 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 	[
 		// Blood red outer border (1px glow/border effect)
 		SNew(SBorder)
-		.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+		.BorderImage(AuthStyle::GlassCardBorderBrush())
 		.BorderBackgroundColor(AuthStyle::C::CardBorder)
 		.Padding(FMargin(1.0f))
 		[
@@ -26,20 +53,17 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 			.VAlign(VAlign_Center)
 			[
 				SNew(SBorder)
-				.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+				.BorderImage(AuthStyle::GlassCardFillBrush())
 				.BorderBackgroundColor(AuthStyle::C::CardBg)
 				.Padding(FMargin(64.0f, 64.0f))
 				[
 					SNew(SVerticalBox)
 
-					// Game title
-					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 16)
+					// Game title removed by request
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 0)
 					[
-						SNew(STextBlock)
-						.Text(FText::FromString(TEXT("DH1")))
-						.Font(FCoreStyle::GetDefaultFontStyle("Bold", 42))
-						.ColorAndOpacity(AuthStyle::C::Title)
-						.Justification(ETextJustify::Center)
+						SNew(SSpacer)
+						.Size(FVector2D(1.0f, 0.0f))
 					]
 
 					// Crimson separator
@@ -165,6 +189,8 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 
 void SLoginPanel::ResetPanel(const FString& InStatusText, const FString& Email)
 {
+	SetLoading(false);
+
 	if (StatusText.IsValid())
 	{
 		StatusText->SetText(FText::FromString(InStatusText));
@@ -205,10 +231,15 @@ FReply SLoginPanel::OnLoginClicked()
 {
 	if (!EmailInput.IsValid() || !PasswordInput.IsValid())
 	{
+		SetStatus(TEXT("로그인 UI 초기화에 실패했습니다. 다시 실행해주세요."), AuthStyle::C::Error);
+		return FReply::Handled();
+	}
+	if (LoginButton.IsValid() && !LoginButton->IsEnabled())
+	{
 		return FReply::Handled();
 	}
 
-	const FString Email = EmailInput->GetText().ToString();
+	const FString Email = NormalizeEmail(EmailInput->GetText().ToString());
 	const FString Password = PasswordInput->GetText().ToString();
 
 	if (Email.IsEmpty() || Password.IsEmpty())
@@ -217,9 +248,14 @@ FReply SLoginPanel::OnLoginClicked()
 		return FReply::Handled();
 	}
 
-	if (!Email.Contains(TEXT("@")) || !Email.Contains(TEXT(".")))
+	if (!IsLikelyValidEmail(Email))
 	{
 		SetStatus(TEXT("유효한 이메일 형식이 아닙니다."), AuthStyle::C::Error);
+		return FReply::Handled();
+	}
+	if (Password.Len() < 8 || Password.Len() > 128)
+	{
+		SetStatus(TEXT("비밀번호는 8자 이상 128자 이하여야 합니다."), AuthStyle::C::Error);
 		return FReply::Handled();
 	}
 
@@ -235,11 +271,14 @@ FReply SLoginPanel::OnLoginClicked()
 				if (UClientNetSubsystem* Net = GI->GetSubsystem<UClientNetSubsystem>())
 				{
 					Net->RequestLogin(Email, Password);
+					return FReply::Handled();
 				}
 			}
 		}
 	}
 
+	SetLoading(false);
+	SetStatus(TEXT("네트워크 초기화에 실패했습니다. 잠시 후 다시 시도해주세요."), AuthStyle::C::Error);
 	return FReply::Handled();
 }
 
@@ -295,7 +334,8 @@ void SLoginPanel::HandleGatewayLoginResult(const int32 Result)
 void SLoginPanel::HandleHttpLoginError(const int32 StatusCode, const FString& Message)
 {
 	SetLoading(false);
-	SetStatus(Message, AuthStyle::C::Error);
+	const FString DisplayMessage = AuthErrorMapper::ResolveMessage(StatusCode, TEXT(""), Message);
+	SetStatus(DisplayMessage, AuthStyle::C::Error);
 }
 
 void SLoginPanel::HandleEmailVerificationRequired(const FString& Message, const FString& Email)

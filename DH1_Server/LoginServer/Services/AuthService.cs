@@ -1,6 +1,7 @@
 using LoginServer.Data;
 using LoginServer.Data.Table;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System.Security.Cryptography;
 
@@ -43,13 +44,15 @@ namespace LoginServer.Services
         IConnectionMultiplexer redisConnection,
         IEmailQueue emailQueue,
         GatewaySelector gatewaySelector,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger,
+        IConfiguration? configuration = null)
     {
         private const int MaxLoginFailCount = 5;
         private const int LoginLockMinutes = 10;
         private const int TicketExpirySeconds = 30;
         private const int VerifyCodeExpiryMinutes = 3;
         private const int CooldownSeconds = 30;
+        private const string EmailDeliveryConfigErrorMessage = "이메일 발송 설정이 올바르지 않습니다. 관리자에게 문의해주세요.";
 
         public async Task<LoginResult> LoginAsync(string email, string password)
         {
@@ -190,7 +193,7 @@ namespace LoginServer.Services
                 return new RegisterResult
                 {
                     Success = false,
-                    StatusCode = 400,
+                    StatusCode = sendResult == EmailDeliveryConfigErrorMessage ? 503 : 400,
                     ErrorMessage = sendResult
                 };
             }
@@ -221,7 +224,12 @@ namespace LoginServer.Services
             var sendError = await SendVerifyCodeInternalAsync(email);
             if (sendError != null)
             {
-                return new VerifyResult { Success = false, StatusCode = 400, ErrorMessage = sendError };
+                return new VerifyResult
+                {
+                    Success = false,
+                    StatusCode = sendError == EmailDeliveryConfigErrorMessage ? 503 : 400,
+                    ErrorMessage = sendError
+                };
             }
 
             return new VerifyResult { Success = true, ErrorMessage = "인증번호가 발송되었습니다." };
@@ -273,7 +281,12 @@ namespace LoginServer.Services
             var sendError = await SendResetCodeInternalAsync(email);
             if (sendError != null)
             {
-                return new VerifyResult { Success = false, StatusCode = 400, ErrorMessage = sendError };
+                return new VerifyResult
+                {
+                    Success = false,
+                    StatusCode = sendError == EmailDeliveryConfigErrorMessage ? 503 : 400,
+                    ErrorMessage = sendError
+                };
             }
 
             return new VerifyResult { Success = true, ErrorMessage = "이메일 인증번호가 발송되었습니다. 비밀번호 변경 시 인증번호가 필요합니다." };
@@ -341,6 +354,12 @@ namespace LoginServer.Services
 
         private async Task<string?> SendVerifyCodeInternalAsync(string email)
         {
+            if (!IsEmailDeliveryConfigured())
+            {
+                logger.LogError("AuthService::SendVerifyCodeInternalAsync - SMTP config missing or unresolved");
+                return EmailDeliveryConfigErrorMessage;
+            }
+
             var redisDb = redisConnection.GetDatabase();
             var cooldownKey = $"Cooldown_{email}";
 
@@ -364,6 +383,12 @@ namespace LoginServer.Services
 
         private async Task<string?> SendResetCodeInternalAsync(string email)
         {
+            if (!IsEmailDeliveryConfigured())
+            {
+                logger.LogError("AuthService::SendResetCodeInternalAsync - SMTP config missing or unresolved");
+                return EmailDeliveryConfigErrorMessage;
+            }
+
             var redisDb = redisConnection.GetDatabase();
             var cooldownKey = $"ResetCooldown_{email}";
 
@@ -383,6 +408,31 @@ namespace LoginServer.Services
             await emailQueue.QueueEmailAsync(new EmailJob(email, emailSubject, emailBody));
 
             return null;
+        }
+
+        private bool IsEmailDeliveryConfigured()
+        {
+            if (configuration == null)
+            {
+                // Unit tests may instantiate AuthService without IConfiguration.
+                return true;
+            }
+
+            var senderEmail = configuration["SmtpSettings:SenderEmail"];
+            var appPassword = configuration["SmtpSettings:AppPassword"];
+            var smtpHost = configuration["SmtpSettings:Host"];
+
+            return IsResolvedValue(senderEmail) && IsResolvedValue(appPassword) && IsResolvedValue(smtpHost);
+        }
+
+        private static bool IsResolvedValue(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            return !value.Contains("${", StringComparison.Ordinal);
         }
     }
 }

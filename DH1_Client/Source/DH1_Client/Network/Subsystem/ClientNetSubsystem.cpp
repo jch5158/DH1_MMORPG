@@ -3,14 +3,92 @@
 #include "Async/Async.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Dom/JsonValue.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Network/PacketHandler/RealmPacketHandler.h"
 #include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
+#include "UI/AuthErrorMapper.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
+
+namespace
+{
+	FString NormalizeEmail(const FString& InEmail)
+	{
+		return InEmail.TrimStartAndEnd().ToLower();
+	}
+
+	bool IsLikelyValidEmail(const FString& Email)
+	{
+		const FString Normalized = NormalizeEmail(Email);
+		int32 AtIndex = INDEX_NONE;
+		if (!Normalized.FindChar(TEXT('@'), AtIndex))
+		{
+			return false;
+		}
+
+		if (AtIndex <= 0 || AtIndex >= Normalized.Len() - 3)
+		{
+			return false;
+		}
+
+		const int32 DotIndex = Normalized.Find(TEXT("."), ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+		return DotIndex > AtIndex + 1 && DotIndex < Normalized.Len() - 1;
+	}
+
+	bool IsValidPasswordLength(const FString& Password)
+	{
+		const int32 Len = Password.Len();
+		return Len >= 8 && Len <= 128;
+	}
+
+	FString ExtractMessageFromJson(const TSharedPtr<FJsonObject>& JsonObject)
+	{
+		if (!JsonObject.IsValid())
+		{
+			return TEXT("");
+		}
+
+		FString Message;
+		if (JsonObject->TryGetStringField(TEXT("message"), Message) && !Message.IsEmpty())
+		{
+			return Message;
+		}
+
+		if (JsonObject->TryGetStringField(TEXT("detail"), Message) && !Message.IsEmpty())
+		{
+			return Message;
+		}
+
+		if (JsonObject->TryGetStringField(TEXT("title"), Message) && !Message.IsEmpty())
+		{
+			return Message;
+		}
+
+		const TSharedPtr<FJsonObject>* ErrorsObject = nullptr;
+		if (JsonObject->TryGetObjectField(TEXT("errors"), ErrorsObject) && ErrorsObject != nullptr && ErrorsObject->IsValid())
+		{
+			for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*ErrorsObject)->Values)
+			{
+				const TArray<TSharedPtr<FJsonValue>>* ErrorsArray = nullptr;
+				if (Pair.Value.IsValid() && Pair.Value->TryGetArray(ErrorsArray) && ErrorsArray != nullptr && ErrorsArray->Num() > 0)
+				{
+					const FString FirstError = (*ErrorsArray)[0].IsValid() ? (*ErrorsArray)[0]->AsString() : TEXT("");
+					if (!FirstError.IsEmpty())
+					{
+						return FirstError;
+					}
+				}
+			}
+		}
+
+		return TEXT("");
+	}
+
+}
 
 void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -83,18 +161,29 @@ bool UClientNetSubsystem::IsTickable() const
 
 void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Password)
 {
+	const FString NormalizedEmail = NormalizeEmail(Email);
+	if (!IsLikelyValidEmail(NormalizedEmail))
+	{
+		OnHttpLoginError.Broadcast(400, TEXT("유효한 이메일 형식이 아닙니다."));
+		return;
+	}
+	if (!IsValidPasswordLength(Password))
+	{
+		OnHttpLoginError.Broadcast(400, TEXT("비밀번호는 8자 이상 128자 이하여야 합니다."));
+		return;
+	}
+
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
 
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField(TEXT("Email"), Email);
+	JsonObject->SetStringField(TEXT("Email"), NormalizedEmail);
 	JsonObject->SetStringField(TEXT("Password"), Password);
 
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-	const FString Scheme = bUseHttps ? TEXT("https") : TEXT("http");
-	const FString URL = FString::Printf(TEXT("%s://%s:%d/api/auth/login"), *Scheme, *LoginServerHost, LoginServerPort);
+	const FString URL = FString::Printf(TEXT("%s/login"), *GetLoginServerApiBaseUrl());
 	NET_ENGINE_LOG_INFO("[ClientNetSubsystem] RequestLogin URL: {}", TCHAR_TO_UTF8(*URL));
 
 	Request->SetURL(URL);
@@ -104,6 +193,13 @@ void UClientNetSubsystem::RequestLogin(const FString& Email, const FString& Pass
 
 	Request->OnProcessRequestComplete().BindUObject(this, &UClientNetSubsystem::OnLoginResponseReceived);
 	Request->ProcessRequest();
+}
+
+FString UClientNetSubsystem::GetLoginServerApiBaseUrl() const
+{
+	const FString Scheme = bUseHttps ? TEXT("https") : TEXT("http");
+	const FString Host = LoginServerHost.IsEmpty() ? TEXT("localhost") : LoginServerHost;
+	return FString::Printf(TEXT("%s://%s:%d/api/auth"), *Scheme, *Host, LoginServerPort);
 }
 
 void UClientNetSubsystem::OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, const bool bWasSuccessful)
@@ -143,7 +239,7 @@ void UClientNetSubsystem::OnLoginResponseReceived(FHttpRequestPtr Request, FHttp
 	}
 	else
 	{
-		FString Message = TEXT("서버 처리 중 오류가 발생했습니다.");
+		FString Message = TEXT("");
 		FString Code;
 		FString Email;
 
@@ -152,12 +248,15 @@ void UClientNetSubsystem::OnLoginResponseReceived(FHttpRequestPtr Request, FHttp
 		TSharedPtr<FJsonObject> JsonObject;
 		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 		{
-			JsonObject->TryGetStringField(TEXT("message"), Message);
+			Message = ExtractMessageFromJson(JsonObject);
 			JsonObject->TryGetStringField(TEXT("code"), Code);
 			JsonObject->TryGetStringField(TEXT("email"), Email);
 		}
 
-		if (ResponseCode == 403 && Code == TEXT("EMAIL_UNVERIFIED"))
+		AuthErrorMapper::ReportUnknownCodeIfAny(Code, TEXT("LoginResponse"));
+		Message = AuthErrorMapper::ResolveMessage(ResponseCode, Code, Message);
+
+		if (ResponseCode == 403 && AuthErrorMapper::IsEmailUnverifiedCode(Code))
 		{
 			OnEmailVerificationRequired.Broadcast(Message, Email);
 		}

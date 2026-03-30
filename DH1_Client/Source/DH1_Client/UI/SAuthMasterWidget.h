@@ -26,6 +26,8 @@ public:
 	SLATE_BEGIN_ARGS(SAuthMasterWidget) {}
 	SLATE_END_ARGS()
 
+	~SAuthMasterWidget();
+
 	void Construct(const FArguments& InArgs);
 
 private:

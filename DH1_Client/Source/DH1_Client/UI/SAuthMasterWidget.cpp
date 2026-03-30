@@ -13,6 +13,18 @@
 #include "Widgets/Layout/SWidgetSwitcher.h"
 #include "Widgets/Layout/SBox.h"
 
+SAuthMasterWidget::~SAuthMasterWidget()
+{
+	if (UClientNetSubsystem* Net = GetNetSubsystem())
+	{
+		Net->OnGatewayLoginResult.RemoveAll(this);
+		Net->OnHttpLoginError.RemoveAll(this);
+		Net->OnEmailVerificationRequired.RemoveAll(this);
+		Net->OnRealmListReceived.RemoveAll(this);
+		Net->OnRealmSelectResult.RemoveAll(this);
+	}
+}
+
 void SAuthMasterWidget::Construct(const FArguments& InArgs)
 {
 	SAssignNew(PanelSwitcher, SWidgetSwitcher)
@@ -76,7 +88,11 @@ void SAuthMasterWidget::Construct(const FArguments& InArgs)
 
 	ChildSlot
 	[
-		AuthStyle::MakeVampireBackground(PanelSwitcher.ToSharedRef())
+		AuthStyle::MakeVampireBackground(
+			PanelSwitcher.ToSharedRef(),
+			HAlign_Center,
+			VAlign_Top,
+			FMargin(0.0f, 280.0f, 0.0f, 0.0f))
 	];
 
 	// Bind ClientNetSubsystem delegates
@@ -153,6 +169,9 @@ void SAuthMasterWidget::HandleLoginSuccess()
 	{
 		return;
 	}
+
+	Net->OnRealmSelectResult.RemoveAll(this);
+	Net->OnRealmListReceived.RemoveAll(this);
 
 	// Realm select result: navigate to lobby level
 	Net->OnRealmSelectResult.AddRaw(this, &SAuthMasterWidget::HandleRealmSelectResult);

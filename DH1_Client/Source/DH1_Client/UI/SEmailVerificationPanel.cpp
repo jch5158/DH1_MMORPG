@@ -1,22 +1,96 @@
 #include "SEmailVerificationPanel.h"
 #include "AuthWidgetStyle.h"
+#include "AuthErrorMapper.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Dom/JsonObject.h"
+#include "Engine/GameInstance.h"
+#include "Engine/Engine.h"
+#include "Network/Subsystem/ClientNetSubsystem.h"
 #include "Serialization/JsonSerializer.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 
+namespace
+{
+	FString ResolveAuthEndpointUrl(const FString& Path)
+	{
+		if (GEngine && GEngine->GameViewport)
+		{
+			if (const UWorld* World = GEngine->GameViewport->GetWorld())
+			{
+				if (const UGameInstance* GI = World->GetGameInstance())
+				{
+					if (const UClientNetSubsystem* Net = GI->GetSubsystem<UClientNetSubsystem>())
+					{
+						return FString::Printf(TEXT("%s/%s"), *Net->GetLoginServerApiBaseUrl(), *Path);
+					}
+				}
+			}
+		}
+		return FString::Printf(TEXT("https://localhost:5001/api/auth/%s"), *Path);
+	}
+
+	bool IsSixDigitCode(const FString& Code)
+	{
+		if (Code.Len() != 6)
+		{
+			return false;
+		}
+
+		for (const TCHAR Ch : Code)
+		{
+			if (!FChar::IsDigit(Ch))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	FString ExtractServerMessage(const FHttpResponsePtr& Response)
+	{
+		if (!Response.IsValid())
+		{
+			return TEXT("서버와 연결할 수 없습니다.");
+		}
+
+		FString Message;
+		const FString JsonString = Response->GetContentAsString();
+		TSharedPtr<FJsonObject> JsonObject;
+		const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+		{
+			if (JsonObject->TryGetStringField(TEXT("message"), Message) && !Message.IsEmpty())
+			{
+				return Message;
+			}
+			if (JsonObject->TryGetStringField(TEXT("detail"), Message) && !Message.IsEmpty())
+			{
+				return Message;
+			}
+			if (JsonObject->TryGetStringField(TEXT("title"), Message) && !Message.IsEmpty())
+			{
+				return Message;
+			}
+		}
+
+		return AuthErrorMapper::MessageForStatus(Response->GetResponseCode());
+	}
+}
+
 void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 {
 	OnGoToLogin = InArgs._OnGoToLogin;
+	static const FButtonStyle PrimaryStyle = AuthStyle::PrimaryButtonStyle();
+	static const FButtonStyle SecondaryStyle = AuthStyle::SecondaryButtonStyle();
 
 	ChildSlot
 	[
 		SNew(SBorder)
-		.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+		.BorderImage(AuthStyle::GlassCardBorderBrush())
 		.BorderBackgroundColor(AuthStyle::C::CardBorder)
 		.Padding(FMargin(1.0f))
 		[
@@ -25,7 +99,7 @@ void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 			.VAlign(VAlign_Center)
 			[
 				SNew(SBorder)
-				.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
+				.BorderImage(AuthStyle::GlassCardFillBrush())
 				.BorderBackgroundColor(AuthStyle::C::CardBg)
 				.Padding(FMargin(64.0f, 64.0f))
 				[
@@ -48,6 +122,8 @@ void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 						.Font(AuthStyle::SmallFont())
 						.ColorAndOpacity(AuthStyle::C::Dim)
 						.Justification(ETextJustify::Center)
+						.AutoWrapText(true)
+						.WrapTextAt(590.0f)
 					]
 
 					// Email (read-only display)
@@ -57,6 +133,8 @@ void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 						.Font(AuthStyle::BodyFont())
 						.ColorAndOpacity(AuthStyle::C::Body)
 						.Justification(ETextJustify::Center)
+						.AutoWrapText(true)
+						.WrapTextAt(590.0f)
 					]
 
 					// Verify Code
@@ -68,17 +146,35 @@ void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 					// Verify Button
 					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 16)
 					[
-						AuthStyle::MakePrimaryButton(
-							FText::FromString(TEXT("인증하기")),
-							FOnClicked::CreateSP(this, &SEmailVerificationPanel::OnVerifyClicked))
+						SAssignNew(VerifyButton, SButton)
+						.ButtonStyle(&PrimaryStyle)
+						.ButtonColorAndOpacity(AuthStyle::C::Primary)
+						.OnClicked(FOnClicked::CreateSP(this, &SEmailVerificationPanel::OnVerifyClicked))
+						.ContentPadding(FMargin(0.0f, 12.0f))
+						[
+							SNew(STextBlock)
+							.Text(FText::FromString(TEXT("인증하기")))
+							.Font(AuthStyle::ButtonFont())
+							.ColorAndOpacity(AuthStyle::C::BtnText)
+							.Justification(ETextJustify::Center)
+						]
 					]
 
 					// Resend Button
 					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 10)
 					[
-						AuthStyle::MakeSecondaryButton(
-							FText::FromString(TEXT("인증 코드 재전송")),
-							FOnClicked::CreateSP(this, &SEmailVerificationPanel::OnResendClicked))
+						SAssignNew(ResendButton, SButton)
+						.ButtonStyle(&SecondaryStyle)
+						.ButtonColorAndOpacity(AuthStyle::C::Secondary)
+						.OnClicked(FOnClicked::CreateSP(this, &SEmailVerificationPanel::OnResendClicked))
+						.ContentPadding(FMargin(0.0f, 12.0f))
+						[
+							SNew(STextBlock)
+							.Text(FText::FromString(TEXT("인증 코드 재전송")))
+							.Font(AuthStyle::SmallFont())
+							.ColorAndOpacity(AuthStyle::C::Body)
+							.Justification(ETextJustify::Center)
+						]
 					]
 
 					// Back to Login Button
@@ -96,6 +192,9 @@ void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 
 void SEmailVerificationPanel::ResetPanel(const FString& InStatusText, const FString& Email)
 {
+	SetVerifyLoading(false);
+	SetResendLoading(false);
+
 	if (StatusText.IsValid())
 	{
 		StatusText->SetText(FText::FromString(InStatusText));
@@ -130,6 +229,11 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 {
 	if (!EmailText.IsValid() || !VerifyCodeInput.IsValid())
 	{
+		SetStatus(TEXT("인증 UI 초기화에 실패했습니다. 다시 실행해주세요."), AuthStyle::C::Error);
+		return FReply::Handled();
+	}
+	if (bVerifyRequestInFlight)
+	{
 		return FReply::Handled();
 	}
 
@@ -146,8 +250,14 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 		SetStatus(TEXT("이메일 인증번호를 입력해주세요."), AuthStyle::C::Error);
 		return FReply::Handled();
 	}
+	if (!IsSixDigitCode(Code))
+	{
+		SetStatus(TEXT("인증번호는 6자리 숫자여야 합니다."), AuthStyle::C::Error);
+		return FReply::Handled();
+	}
 
 	SetStatus(TEXT("인증 확인 중..."), AuthStyle::C::Body);
+	SetVerifyLoading(true);
 
 	const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetStringField(TEXT("Email"), Email);
@@ -158,13 +268,25 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL(TEXT("https://localhost:5001/api/auth/verify-code"));
+	Request->SetURL(ResolveAuthEndpointUrl(TEXT("verify-code")));
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	Request->SetContentAsString(JsonString);
 
-	Request->OnProcessRequestComplete().BindRaw(this, &SEmailVerificationPanel::OnVerifyResponseReceived);
-	Request->ProcessRequest();
+	const TWeakPtr<SEmailVerificationPanel> WeakPanel = StaticCastSharedRef<SEmailVerificationPanel>(AsShared());
+	Request->OnProcessRequestComplete().BindLambda(
+		[WeakPanel](FHttpRequestPtr InRequest, FHttpResponsePtr InResponse, bool bInWasSuccessful)
+		{
+			if (const TSharedPtr<SEmailVerificationPanel> Pinned = WeakPanel.Pin())
+			{
+				Pinned->OnVerifyResponseReceived(InRequest, InResponse, bInWasSuccessful);
+			}
+		});
+	if (!Request->ProcessRequest())
+	{
+		SetVerifyLoading(false);
+		SetStatus(TEXT("인증 확인 요청 전송에 실패했습니다."), AuthStyle::C::Error);
+	}
 
 	return FReply::Handled();
 }
@@ -172,6 +294,10 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 FReply SEmailVerificationPanel::OnResendClicked()
 {
 	if (!EmailText.IsValid())
+	{
+		return FReply::Handled();
+	}
+	if (bResendRequestInFlight)
 	{
 		return FReply::Handled();
 	}
@@ -184,6 +310,7 @@ FReply SEmailVerificationPanel::OnResendClicked()
 	}
 
 	SetStatus(TEXT("인증 코드 재전송 중..."), AuthStyle::C::Body);
+	SetResendLoading(true);
 
 	const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetStringField(TEXT("Email"), Email);
@@ -193,13 +320,25 @@ FReply SEmailVerificationPanel::OnResendClicked()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL(TEXT("https://localhost:5001/api/auth/send-verify-code"));
+	Request->SetURL(ResolveAuthEndpointUrl(TEXT("send-verify-code")));
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	Request->SetContentAsString(JsonString);
 
-	Request->OnProcessRequestComplete().BindRaw(this, &SEmailVerificationPanel::OnResendResponseReceived);
-	Request->ProcessRequest();
+	const TWeakPtr<SEmailVerificationPanel> WeakPanel = StaticCastSharedRef<SEmailVerificationPanel>(AsShared());
+	Request->OnProcessRequestComplete().BindLambda(
+		[WeakPanel](FHttpRequestPtr InRequest, FHttpResponsePtr InResponse, bool bInWasSuccessful)
+		{
+			if (const TSharedPtr<SEmailVerificationPanel> Pinned = WeakPanel.Pin())
+			{
+				Pinned->OnResendResponseReceived(InRequest, InResponse, bInWasSuccessful);
+			}
+		});
+	if (!Request->ProcessRequest())
+	{
+		SetResendLoading(false);
+		SetStatus(TEXT("인증 코드 재전송 요청 전송에 실패했습니다."), AuthStyle::C::Error);
+	}
 
 	return FReply::Handled();
 }
@@ -212,6 +351,8 @@ FReply SEmailVerificationPanel::OnBackToLoginClicked()
 
 void SEmailVerificationPanel::OnVerifyResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
+	SetVerifyLoading(false);
+
 	if (!bWasSuccessful || !Response.IsValid())
 	{
 		SetStatus(TEXT("서버와 연결할 수 없습니다."), AuthStyle::C::Error);
@@ -238,12 +379,19 @@ void SEmailVerificationPanel::OnVerifyResponseReceived(FHttpRequestPtr Request, 
 	}
 	else
 	{
+		if (ResMessage.IsEmpty() || ResMessage == TEXT("서버 처리 중 오류가 발생했습니다."))
+		{
+			ResMessage = ExtractServerMessage(Response);
+		}
+		ResMessage = AuthErrorMapper::ResolveMessage(ResponseCode, TEXT(""), ResMessage);
 		SetStatus(ResMessage, AuthStyle::C::Error);
 	}
 }
 
 void SEmailVerificationPanel::OnResendResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
+	SetResendLoading(false);
+
 	if (!bWasSuccessful || !Response.IsValid())
 	{
 		SetStatus(TEXT("서버와 연결할 수 없습니다."), AuthStyle::C::Error);
@@ -268,6 +416,11 @@ void SEmailVerificationPanel::OnResendResponseReceived(FHttpRequestPtr Request, 
 	}
 	else
 	{
+		if (ServerMessage.IsEmpty() || ServerMessage == TEXT("서버 처리 중 오류가 발생했습니다."))
+		{
+			ServerMessage = ExtractServerMessage(Response);
+		}
+		ServerMessage = AuthErrorMapper::ResolveMessage(ResponseCode, TEXT(""), ServerMessage);
 		SetStatus(ServerMessage, AuthStyle::C::Error);
 	}
 }
@@ -278,5 +431,23 @@ void SEmailVerificationPanel::SetStatus(const FString& Text, const FLinearColor&
 	{
 		StatusText->SetText(FText::FromString(Text));
 		StatusText->SetColorAndOpacity(FSlateColor(Color));
+	}
+}
+
+void SEmailVerificationPanel::SetVerifyLoading(const bool bLoading)
+{
+	bVerifyRequestInFlight = bLoading;
+	if (VerifyButton.IsValid())
+	{
+		VerifyButton->SetEnabled(!bLoading);
+	}
+}
+
+void SEmailVerificationPanel::SetResendLoading(const bool bLoading)
+{
+	bResendRequestInFlight = bLoading;
+	if (ResendButton.IsValid())
+	{
+		ResendButton->SetEnabled(!bLoading);
 	}
 }

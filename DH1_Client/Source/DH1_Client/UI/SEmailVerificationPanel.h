@@ -8,6 +8,10 @@
 
 DECLARE_DELEGATE_TwoParams(FOnVerificationGoToLogin, const FString& /*StatusText*/, const FString& /*Email*/);
 
+class SButton;
+class SEditableTextBox;
+class STextBlock;
+
 class SEmailVerificationPanel : public SCompoundWidget
 {
 public:
@@ -33,10 +37,17 @@ private:
 	void OnResendResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	void SetStatus(const FString& Text, const FLinearColor& Color);
+	void SetVerifyLoading(bool bLoading);
+	void SetResendLoading(bool bLoading);
 
 	TSharedPtr<STextBlock> EmailText;
 	TSharedPtr<SEditableTextBox> VerifyCodeInput;
 	TSharedPtr<STextBlock> StatusText;
+	TSharedPtr<SButton> VerifyButton;
+	TSharedPtr<SButton> ResendButton;
+
+	bool bVerifyRequestInFlight = false;
+	bool bResendRequestInFlight = false;
 
 	FOnVerificationGoToLogin OnGoToLogin;
 };
