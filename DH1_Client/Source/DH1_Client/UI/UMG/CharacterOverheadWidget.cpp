@@ -7,6 +7,7 @@
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SSpacer.h"
 #include "Widgets/Notifications/SProgressBar.h"
 #include "Widgets/Text/STextBlock.h"
 #include "UI/GameWidgetStyle.h"
@@ -62,12 +63,86 @@ namespace
 		{
 			bInited = true;
 			Style.FillImage = *FCoreStyle::Get().GetBrush("WhiteBrush");
-			// 짙은 빨강 (밝은 코랄 톤보다 채도·어두움 유지)
-			Style.FillImage.TintColor = FSlateColor(FLinearColor(0.40f, 0.04f, 0.06f, 1.f));
+			Style.FillImage.SetResourceObject(nullptr);
+			Style.FillImage.DrawAs = ESlateBrushDrawType::RoundedBox;
+			Style.FillImage.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+			Style.FillImage.OutlineSettings.CornerRadii = FVector4(5.f, 5.f, 5.f, 5.f);
+			Style.FillImage.TintColor = FSlateColor(FLinearColor(0.55f, 0.16f, 0.22f, 0.92f));
 			Style.BackgroundImage = *FCoreStyle::Get().GetBrush("WhiteBrush");
-			Style.BackgroundImage.TintColor = FSlateColor(FLinearColor(0.07f, 0.07f, 0.09f));
+			Style.BackgroundImage.SetResourceObject(nullptr);
+			Style.BackgroundImage.DrawAs = ESlateBrushDrawType::RoundedBox;
+			Style.BackgroundImage.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+			Style.BackgroundImage.OutlineSettings.CornerRadii = FVector4(5.f, 5.f, 5.f, 5.f);
+			Style.BackgroundImage.TintColor = FSlateColor(FLinearColor(0.10f, 0.12f, 0.18f, 0.38f));
 		}
 		return Style;
+	}
+
+	void InitRoundedBrush(FSlateBrush& Brush, const FLinearColor& Fill, const FLinearColor& Outline,
+		const float Radius, const float OutlineWidth = 1.f)
+	{
+		Brush = FSlateBrush();
+		Brush.SetResourceObject(nullptr);
+		Brush.DrawAs = ESlateBrushDrawType::RoundedBox;
+		Brush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+		Brush.OutlineSettings.CornerRadii = FVector4(Radius, Radius, Radius, Radius);
+		Brush.OutlineSettings.Width = OutlineWidth;
+		Brush.OutlineSettings.Color = Outline;
+		Brush.OutlineSettings.bUseBrushTransparency = true;
+		Brush.TintColor = FSlateColor(Fill);
+	}
+
+	/** 바깥 링: 얇은 하이라이트 테두리 + 거의 투명한 채움 (글래스 외곽) */
+	const FSlateBrush* GetOverheadOuterBrush()
+	{
+		static FSlateBrush B;
+		static bool bOnce = false;
+		if (!bOnce)
+		{
+			bOnce = true;
+			InitRoundedBrush(
+				B,
+				FLinearColor(0.10f, 0.14f, 0.22f, 0.14f),
+				FLinearColor(0.88f, 0.92f, 1.00f, 0.42f),
+				14.f,
+				1.15f);
+		}
+		return &B;
+	}
+
+	/** 안쪽 패널: 반투명 냉색 글래스 + 은은한 내부 림 */
+	const FSlateBrush* GetOverheadInnerBrush()
+	{
+		static FSlateBrush B;
+		static bool bOnce = false;
+		if (!bOnce)
+		{
+			bOnce = true;
+			InitRoundedBrush(
+				B,
+				FLinearColor(0.06f, 0.09f, 0.14f, 0.48f),
+				FLinearColor(0.72f, 0.80f, 0.96f, 0.22f),
+				11.f,
+				0.85f);
+		}
+		return &B;
+	}
+
+	const FSlateBrush* GetLevelBadgeBrush()
+	{
+		static FSlateBrush B;
+		static bool bOnce = false;
+		if (!bOnce)
+		{
+			bOnce = true;
+			InitRoundedBrush(
+				B,
+				FLinearColor(0.12f, 0.16f, 0.24f, 0.42f),
+				FLinearColor(0.82f, 0.88f, 1.00f, 0.35f),
+				8.f,
+				0.9f);
+		}
+		return &B;
 	}
 }
 
@@ -80,66 +155,76 @@ TSharedRef<SWidget> UCharacterOverheadWidget::RebuildWidget()
 {
 	using namespace GameStyle;
 
-	const FSlateBrush* const WhiteBrush = FCoreStyle::Get().GetBrush("WhiteBrush");
-
 	return SNew(SBox)
-		.MinDesiredWidth(228.f)
-		.Padding(4.f)
+		.MinDesiredWidth(272.f)
+		.Padding(FMargin(3.f, 5.f))
 		[
 			SNew(SBorder)
-			.BorderImage(WhiteBrush)
-			.BorderBackgroundColor(C::PanelBorder)
-			.Padding(FMargin(1.f))
+			.BorderImage(GetOverheadOuterBrush())
+			.Padding(FMargin(4.f))
 			[
 				SNew(SBorder)
-				.BorderImage(WhiteBrush)
-				.BorderBackgroundColor(FLinearColor(0.02f, 0.02f, 0.03f, 0.88f))
-				.Padding(FMargin(12.f, 10.f, 12.f, 10.f))
+				.BorderImage(GetOverheadInnerBrush())
+				.Padding(FMargin(13.f, 11.f, 13.f, 12.f))
 				[
 					SNew(SVerticalBox)
 
 					+ SVerticalBox::Slot()
 					.AutoHeight()
+					.HAlign(HAlign_Center)
+					.Padding(0.f, 0.f, 0.f, 8.f)
 					[
-						SAssignNew(SlateNameText, STextBlock)
-						.Text(FText::FromString(CachedDisplayName))
-						.Font(GetOverheadTextFont(15))
-						.ColorAndOpacity(C::TextPrimary)
-						.Justification(ETextJustify::Center)
-					]
+						SNew(SHorizontalBox)
 
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(0.f, 8.f, 0.f, 8.f)
-					[
-						SNew(SBox)
-						.HeightOverride(1.f)
+						+ SHorizontalBox::Slot()
+						.FillWidth(1.f)
+						.VAlign(VAlign_Center)
+						[
+							SNew(SSpacer)
+						]
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.VAlign(VAlign_Center)
+						.Padding(0.f, 0.f, 10.f, 0.f)
 						[
 							SNew(SBorder)
-							.BorderImage(WhiteBrush)
-							.BorderBackgroundColor(C::Separator)
+							.BorderImage(GetLevelBadgeBrush())
+							.Padding(FMargin(8.f, 3.f, 8.f, 3.f))
+							[
+								SAssignNew(SlateLevelText, STextBlock)
+								.Text(FText::Format(NSLOCTEXT("DH1", "OverheadLevelFmt", "Lv. {0}"), FText::AsNumber(CachedLevel)))
+								.Font(GetOverheadTextFont(12))
+								.ColorAndOpacity(FLinearColor(0.78f, 0.82f, 0.92f, 1.f))
+								.Justification(ETextJustify::Center)
+							]
+						]
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.VAlign(VAlign_Center)
+						[
+							SAssignNew(SlateNameText, STextBlock)
+							.Text(FText::FromString(CachedDisplayName))
+							.Font(GetOverheadTextFont(16))
+							.ColorAndOpacity(FLinearColor(0.94f, 0.95f, 0.98f, 1.f))
+							.Justification(ETextJustify::Center)
+						]
+
+						+ SHorizontalBox::Slot()
+						.FillWidth(1.f)
+						.VAlign(VAlign_Center)
+						[
+							SNew(SSpacer)
 						]
 					]
 
 					+ SVerticalBox::Slot()
 					.AutoHeight()
-					.Padding(0.f, 0.f, 0.f, 6.f)
+					.Padding(0.f, 0.f, 0.f, 5.f)
 					[
-						SAssignNew(SlateLevelText, STextBlock)
-						.Text(FText::Format(NSLOCTEXT("DH1", "OverheadLevelFmt", "Lv. {0}"), FText::AsNumber(CachedLevel)))
-						.Font(GetOverheadTextFont(12))
-						.ColorAndOpacity(C::TextSecondary)
-						.Justification(ETextJustify::Center)
-					]
-
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(0.f, 0.f, 0.f, 4.f)
-					[
-						SNew(SBorder)
-						.BorderImage(WhiteBrush)
-						.BorderBackgroundColor(C::HealthBarTrack)
-						.Padding(FMargin(2.f))
+						SNew(SBox)
+						.HeightOverride(7.f)
 						[
 							SAssignNew(SlateHealthBar, SProgressBar)
 							.Style(&GetOverheadHealthBarStyle())
@@ -156,7 +241,7 @@ TSharedRef<SWidget> UCharacterOverheadWidget::RebuildWidget()
 							FText::AsNumber(FMath::RoundToInt(CachedCurrentHP)),
 							FText::AsNumber(FMath::RoundToInt(CachedMaxHP))))
 						.Font(GetOverheadTextFont(11))
-						.ColorAndOpacity(C::TextDim)
+						.ColorAndOpacity(FLinearColor(0.52f, 0.56f, 0.62f, 0.95f))
 						.Justification(ETextJustify::Center)
 					]
 				]

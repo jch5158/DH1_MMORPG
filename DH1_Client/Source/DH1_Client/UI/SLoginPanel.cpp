@@ -8,6 +8,7 @@
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
+#include "Styling/CoreStyle.h"
 
 namespace SLoginPanel_Local
 {
@@ -124,28 +125,32 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 							})
 					]
 
-					// Remember email
+					// Remember email — 오른쪽 정렬: [체크박스] 이메일 저장
 					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 20)
 					[
 						SNew(SHorizontalBox)
-						+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+						+ SHorizontalBox::Slot().FillWidth(1.f).HAlign(HAlign_Right).VAlign(VAlign_Center)
 						[
-							SNew(SBox)
-							.WidthOverride(22.0f)
-							.HeightOverride(22.0f)
+							SNew(SHorizontalBox)
+							+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
 							[
-								SAssignNew(RememberEmailCheckBox, SCheckBox)
-								.Style(&AuthStyle::RememberEmailCheckBoxStyle())
-								.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
-								.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+								SNew(SBox)
+								.WidthOverride(22.0f)
+								.HeightOverride(22.0f)
+								[
+									SAssignNew(RememberEmailCheckBox, SCheckBox)
+									.Style(&AuthStyle::RememberEmailCheckBoxStyle())
+									.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+									.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+								]
 							]
-						]
-						+ SHorizontalBox::Slot().AutoWidth().Padding(10.0f, 0.0f, 0.0f, 0.0f).VAlign(VAlign_Center)
-						[
-							SNew(STextBlock)
-							.Text(FText::FromString(TEXT("이메일 저장")))
-							.Font(AuthStyle::SmallFont())
-							.ColorAndOpacity(AuthStyle::C::Body)
+							+ SHorizontalBox::Slot().AutoWidth().Padding(10.0f, 0.0f, 0.0f, 0.0f).VAlign(VAlign_Center)
+							[
+								SNew(STextBlock)
+								.Text(FText::FromString(TEXT("이메일 저장")))
+								.Font(AuthStyle::SmallFont())
+								.ColorAndOpacity(AuthStyle::C::Body)
+							]
 						]
 					]
 
