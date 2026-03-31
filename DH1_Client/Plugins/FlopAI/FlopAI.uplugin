@@ -1,0 +1,73 @@
+﻿{
+    "FileVersion":  3,
+    "Version":  7,
+    "VersionName":  "0.8.0",
+    "FriendlyName":  "Flop AI",
+    "Description":  "Bridge between the Flop agent and the Unreal editor",
+    "Category":  "Other",
+    "CreatedBy":  "Flopperam LLC",
+    "CreatedByURL":  "www.flopperam.com",
+    "DocsURL":  "",
+    "MarketplaceURL":  "",
+    "SupportURL":  "",
+    "EngineVersion":  "5.7.0",
+    "CanContainContent":  true,
+    "IsBetaVersion":  true,
+    "Installed":  true,
+    "Modules":  [
+                    {
+                        "Name":  "FlopAI",
+                        "Type":  "Editor",
+                        "LoadingPhase":  "Default",
+                        "PlatformAllowList":  [
+                                                  "Win64",
+                                                  "Mac"
+                                              ]
+                    }
+                ],
+    "Plugins":  [
+                    {
+                        "Name":  "PythonScriptPlugin",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "SQLiteCore",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "SQLiteSupport",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "WebBrowserWidget",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "EnhancedInput",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "EditorScriptingUtilities",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "EnvironmentQueryEditor",
+                        "Enabled":  true
+                    },
+                    {
+                        "Name":  "SmartObjects",
+                        "Enabled":  true,
+                        "Optional":  true
+                    },
+                    {
+                        "Name":  "GameplayStateTree",
+                        "Enabled":  true,
+                        "Optional":  true
+                    },
+                    {
+                        "Name":  "GameplayAbilities",
+                        "Enabled":  true,
+                        "Optional":  true
+                    }
+                ]
+}
