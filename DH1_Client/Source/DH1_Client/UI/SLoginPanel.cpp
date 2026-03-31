@@ -55,7 +55,7 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 				SNew(SBorder)
 				.BorderImage(AuthStyle::GlassCardFillBrush())
 				.BorderBackgroundColor(AuthStyle::C::CardBg)
-				.Padding(FMargin(64.0f, 64.0f))
+				.Padding(FMargin(64.0f, 34.0f, 64.0f, 64.0f))
 				[
 					SNew(SVerticalBox)
 
@@ -66,16 +66,8 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 						.Size(FVector2D(1.0f, 0.0f))
 					]
 
-					// Crimson separator
-					+ SVerticalBox::Slot().AutoHeight().MaxHeight(1.0f).Padding(0, 0, 0, 28)
-					[
-						SNew(SBorder)
-						.BorderImage(FCoreStyle::Get().GetBrush("GenericWhiteBox"))
-						.BorderBackgroundColor(AuthStyle::C::CrimsonDim)
-					]
-
 					// Status text
-					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 20)
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 10)
 					[
 						SAssignNew(StatusText, STextBlock)
 						.Font(AuthStyle::SmallFont())
