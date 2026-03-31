@@ -27,7 +27,17 @@ DH1_MMORPG/
 ```bash
 # .env.example을 복사해 값을 채워주세요
 cp .env.example .env
+
+# 민감값/개인 오버라이드는 .env.local 사용
+cp .env.local.example .env.local
 ```
+
+환경 변수 로드 우선순위는 `default -> .env -> .env.local` 입니다.  
+즉, 같은 키가 있으면 `.env.local` 값이 최종 적용됩니다.
+
+- `.env`: 팀 공용 기본값(비민감)
+- `.env.local`: 개인/민감값(커밋 금지, `.gitignore` 적용)
+- `.env.example`, `.env.local.example`: 템플릿(커밋 대상)
 
 | 변수 | 설명 |
 |------|------|

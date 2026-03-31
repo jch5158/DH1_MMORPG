@@ -149,7 +149,10 @@ vcpkg-manifest-install.log
 # Environment & secrets
 # =============================================================================
 .env
-*.env.local
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
 appsettings.Development.json
 
 # =============================================================================

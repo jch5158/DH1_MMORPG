@@ -32,8 +32,8 @@
         "navMeshRequireSuccess": true,
         "navMeshS3Region": "${DH1_S3_REGION}",
         "navMeshCacheFilePath": "${DH1_NAVMESH_CACHE_PATH}",
-        "navMeshDownloadRetryCount": 3,
-        "navMeshDownloadRetryDelayMs": 500
+        "navMeshDownloadRetryCount": 8,
+        "navMeshDownloadRetryDelayMs": 1500
     },
     "realmServer": {
         "ip": "127.0.0.1",

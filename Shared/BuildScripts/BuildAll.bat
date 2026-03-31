@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
 
@@ -72,18 +72,9 @@ echo.
 
 :: ──────────────────────────────────────────────────────────────
 
-:: .env 파일 로드 (루트 디렉토리)
-if exist "%ROOT_DIR%\.env" (
-    for /f "usebackq tokens=1,* delims==" %%A in ("%ROOT_DIR%\.env") do (
-        set "LINE=%%A"
-        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
-            set "%%A=%%B"
-        )
-    )
-    echo [Info] Loaded .env
-) else (
-    echo [Warning] .env not found, skipping
-)
+:: 환경 변수 로드 (local > env > default)
+call :load_env_file "%ROOT_DIR%\.env" ".env"
+call :load_env_file "%ROOT_DIR%\.env.local" ".env.local"
 echo.
 
 :: Find MSBuild via vswhere
@@ -185,3 +176,20 @@ echo ============================================================
 echo.
 echo [Info] Run StartServers.bat to launch servers + client.
 echo.
+exit /b 0
+
+:load_env_file
+set "ENV_FILE=%~1"
+set "ENV_LABEL=%~2"
+if exist "%ENV_FILE%" (
+    for /f "usebackq tokens=1,* delims==" %%A in ("%ENV_FILE%") do (
+        set "LINE=%%A"
+        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
+            set "%%A=%%B"
+        )
+    )
+    echo [Info] Loaded %ENV_LABEL%
+) else (
+    echo [Info] %ENV_LABEL% not found, skipping
+)
+exit /b 0

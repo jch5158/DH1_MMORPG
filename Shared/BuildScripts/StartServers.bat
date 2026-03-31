@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
@@ -13,18 +13,9 @@ echo ============================================
 echo  DH1 MMORPG Server Launcher [%CONFIG%]
 echo ============================================
 
-:: .env 파일 로드 (루트 디렉토리)
-if exist "%BASE_DIR%\.env" (
-    for /f "usebackq tokens=1,* delims==" %%A in ("%BASE_DIR%\.env") do (
-        set "LINE=%%A"
-        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
-            set "%%A=%%B"
-        )
-    )
-    echo [Info] Loaded .env
-) else (
-    echo [Warning] .env not found, using defaults
-)
+:: 환경 변수 로드 (local > env > default)
+call :load_env_file "%BASE_DIR%\.env" ".env"
+call :load_env_file "%BASE_DIR%\.env.local" ".env.local"
 
 set "SERVER_DIR=%BASE_DIR%\Binaries\Server\%CONFIG%"
 
@@ -67,3 +58,19 @@ taskkill /IM GatewayServer.exe /F >nul 2>&1
 taskkill /IM dotnet.exe /F >nul 2>&1
 
 echo All servers stopped.
+
+:load_env_file
+set "ENV_FILE=%~1"
+set "ENV_LABEL=%~2"
+if exist "%ENV_FILE%" (
+    for /f "usebackq tokens=1,* delims==" %%A in ("%ENV_FILE%") do (
+        set "LINE=%%A"
+        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
+            set "%%A=%%B"
+        )
+    )
+    echo [Info] Loaded %ENV_LABEL%
+) else (
+    echo [Info] %ENV_LABEL% not found, skipping
+)
+exit /b 0

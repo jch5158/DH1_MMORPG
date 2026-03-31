@@ -22,6 +22,8 @@
 #include "PlayerObject.h"
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <thread>
 
 namespace
@@ -83,6 +85,25 @@ namespace
 		return "aws";
 	}
 
+	std::string ReadTextFileLimited(const std::string& path, const size_t maxBytes)
+	{
+		std::ifstream file(path, std::ios::binary);
+		if (!file.is_open())
+		{
+			return {};
+		}
+
+		std::ostringstream oss;
+		oss << file.rdbuf();
+		std::string text = oss.str();
+		if (text.size() <= maxBytes)
+		{
+			return text;
+		}
+
+		return text.substr(text.size() - maxBytes);
+	}
+
 	bool DownloadS3UriToFile(const std::string& s3Uri, const std::string& targetPath, const std::string& s3Region,
 		const int32 retryCount, const int32 retryDelayMs)
 	{
@@ -98,25 +119,35 @@ namespace
 
 		const int32 attempts = std::max(1, retryCount);
 		const std::string awsExe = ResolveAwsCliExecutable();
+		const uint64 commandSeed = static_cast<uint64>(std::chrono::steady_clock::now().time_since_epoch().count());
 		for (int32 attempt = 1; attempt <= attempts; ++attempt)
 		{
+			const std::filesystem::path commandLogPath = std::filesystem::temp_directory_path() /
+				("dh1_world_aws_s3cp_" + std::to_string(commandSeed) + "_" + std::to_string(attempt) + ".log");
+
 			std::string command = "cmd /c \"\"" + EscapeDoubleQuotes(awsExe) + "\" s3 cp \"" +
 				EscapeDoubleQuotes(s3Uri) + "\" \"" + EscapeDoubleQuotes(targetPath) + "\" --only-show-errors";
 			if (IsResolvedConfigValue(s3Region))
 			{
 				command += " --region \"" + EscapeDoubleQuotes(s3Region) + "\"";
 			}
-			command += "\"";
+			command += " > \"" + EscapeDoubleQuotes(commandLogPath.string()) + "\" 2>&1\"";
 
 			const int32 exitCode = std::system(command.c_str());
 			if (exitCode == 0)
 			{
+				std::error_code removeEc;
+				std::filesystem::remove(commandLogPath, removeEc);
 				return true;
 			}
 
+			const std::string commandOutput = ReadTextFileLimited(commandLogPath.string(), 4096);
+			std::error_code removeEc;
+			std::filesystem::remove(commandLogPath, removeEc);
+
 			NET_ENGINE_LOG_WARN(
-				"WorldService::Initialize - S3 navmesh download failed, uri: {}, attempt: {}/{}, exitCode: {}",
-				s3Uri, attempt, attempts, exitCode);
+				"WorldService::Initialize - S3 navmesh download failed, uri: {}, attempt: {}/{}, exitCode: {}, awsExe: {}, output: {}",
+				s3Uri, attempt, attempts, exitCode, awsExe, commandOutput.empty() ? "<empty>" : commandOutput);
 
 			if (attempt < attempts && retryDelayMs > 0)
 			{
