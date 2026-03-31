@@ -2,15 +2,26 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-set "BASE_DIR=%~dp0..\.."
-set "CONFIG=%~1"
-
-if "%CONFIG%"=="" (
-    set "CONFIG=Debug"
+:: --worker: 실제 서버 대기/기동 (별도 cmd 창에서만 진입)
+if /i "%~1"=="--worker" (
+    set "CONFIG=%~2"
+    if "!CONFIG!"=="" set "CONFIG=Debug"
+    set "BASE_DIR=%~dp0..\.."
+    goto :worker_main
 )
+
+set "CONFIG=%~1"
+if "%CONFIG%"=="" set "CONFIG=Debug"
 
 echo ============================================
 echo  DH1 MMORPG Game Launcher [%CONFIG%]
+echo ============================================
+start "DH1 MMORPG Stack" cmd /q /c call "%~f0" --worker %CONFIG% ^& if errorlevel 1 pause
+exit /b 0
+
+:worker_main
+echo ============================================
+echo  DH1 MMORPG Game Launcher (worker^) [%CONFIG%]
 echo ============================================
 
 :: 환경 변수 로드 (local > env > default)
@@ -24,7 +35,7 @@ set "CLIENT_ARGS=-game -windowed"
 set "LOGIN_HTTP_HOST=127.0.0.1"
 set "LOGIN_HTTP_PORT=5000"
 set "LOGIN_HEALTH_PATH=/health"
-set "WORLD_STABLE_SECONDS=30"
+set "WORLD_STABLE_SECONDS=15"
 set "AWS_CMD=aws"
 
 :: AWS CLI 경로 보정 (WorldServer의 `aws s3 cp` 실행 보장)
