@@ -51,7 +51,18 @@ public:
 
 	static bool HandlePacketServiceType(const uint16 len, const byte* pBuffer, const PacketSessionRef& pSession)
 	{
+		if (len < static_cast<uint16>(sizeof(PacketHeader)))
+		{
+			return false;
+		}
+
 		const auto [packetSize, headerId] = *(reinterpret_cast<const PacketHeader*>(pBuffer));
+
+		// 프레이밍: 실제 수신 길이와 헤더의 size 필드가 다르면 잘못된 파싱으로 힙 손상 가능
+		if (packetSize != len)
+		{
+			return false;
+		}
 
 		const uint16 serviceType = GET_SERVICE_TYPE(headerId);
 		const uint16 packetId = GET_PACKET_ID(headerId);

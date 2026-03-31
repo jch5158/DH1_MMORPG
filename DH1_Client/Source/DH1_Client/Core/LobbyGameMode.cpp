@@ -45,7 +45,7 @@ void ALobbyGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("LobbyGameMode - HandleStartingNewPlayer, Pawn: %s"),
-		NewPlayer->GetPawn() ? *NewPlayer->GetPawn()->GetName() : TEXT("None"));
+		NewPlayer ? (NewPlayer->GetPawn() ? *NewPlayer->GetPawn()->GetName() : TEXT("None")) : TEXT("None"));
 }
 
 void ALobbyGameMode::SpawnFloor()

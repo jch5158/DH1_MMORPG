@@ -14,7 +14,7 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 
-namespace
+namespace SSignUpPanel_Local
 {
 	FString ResolveAuthEndpointUrl(const FString& Path)
 	{
@@ -257,7 +257,7 @@ FReply SSignUpPanel::OnSignUpClicked()
 		return FReply::Handled();
 	}
 
-	const FString Email = NormalizeEmail(EmailInput->GetText().ToString());
+	const FString Email = SSignUpPanel_Local::NormalizeEmail(EmailInput->GetText().ToString());
 	const FString Password = PasswordInput->GetText().ToString();
 	const FString PasswordConfirm = PasswordConfirmInput->GetText().ToString();
 
@@ -267,7 +267,7 @@ FReply SSignUpPanel::OnSignUpClicked()
 		return FReply::Handled();
 	}
 
-	if (!IsLikelyValidEmail(Email))
+	if (!SSignUpPanel_Local::IsLikelyValidEmail(Email))
 	{
 		SetStatus(TEXT("유효한 이메일 형식이 아닙니다."), AuthStyle::C::Error);
 		return FReply::Handled();
@@ -296,7 +296,7 @@ FReply SSignUpPanel::OnSignUpClicked()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL(ResolveAuthEndpointUrl(TEXT("register")));
+	Request->SetURL(SSignUpPanel_Local::ResolveAuthEndpointUrl(TEXT("register")));
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	Request->SetContentAsString(JsonString);
@@ -365,7 +365,7 @@ void SSignUpPanel::OnSignUpResponseReceived(FHttpRequestPtr Request, FHttpRespon
 	{
 		if (ResMessage.IsEmpty() || ResMessage == TEXT("서버 처리 중 오류가 발생했습니다."))
 		{
-			ResMessage = ExtractServerMessage(Response);
+			ResMessage = SSignUpPanel_Local::ExtractServerMessage(Response);
 		}
 		ResMessage = AuthErrorMapper::ResolveMessage(ResponseCode, ResCode, ResMessage);
 		SetStatus(ResMessage, AuthStyle::C::Error);

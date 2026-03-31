@@ -9,6 +9,8 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UClientNetSubsystem;
+class UWidgetComponent;
+class UCharacterOverheadWidget;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
@@ -31,6 +33,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
+	/** 머리 위 이름·레벨·체력 (로그인 HUD와 별개) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWidgetComponent> OverheadWidgetComponent;
 
 public:
 
@@ -39,6 +44,8 @@ public:
 
 	/** Initialization */
 	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/** Input Setup */
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -52,6 +59,10 @@ public:
 	/** Returns the Camera Boom component **/
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom.Get(); }
 
+	/** 오버헤드 표시 데이터 (서버 연동 전 목업 / NotifyCharacterOverheadData로 갱신) */
+	UFUNCTION(BlueprintCallable, Category = "Overhead")
+	void SetOverheadDisplayData(const FString& DisplayName, int32 Level, float CurrentHP, float MaxHP);
+
 private:
 
 	void CreateInputAssets();
@@ -62,6 +73,21 @@ private:
 	void OnRightMouseReleased(const FInputActionValue& Value);
 
 	UClientNetSubsystem* GetNetSubsystem() const;
+
+	void SetupCharacterOverhead();
+	void PushOverheadToWidget();
+	void OnCharacterOverheadDataFromNet(const FString& Name, int32 Level, float CurrentHP, float MaxHP);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Overhead")
+	TSubclassOf<UCharacterOverheadWidget> OverheadWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UCharacterOverheadWidget> OverheadWidgetInstance;
+
+	FString OverheadDisplayName = TEXT("Adventurer");
+	int32 OverheadLevel = 1;
+	float OverheadCurrentHP = 100.f;
+	float OverheadMaxHP = 100.f;
 
 	// Enhanced Input (런타임 생성)
 	UPROPERTY()

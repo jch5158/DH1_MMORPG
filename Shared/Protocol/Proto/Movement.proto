@@ -81,6 +81,11 @@ message S2C_SPAWN_POSITION_RES
 
     Vector3 position = 1;
     float rotationYaw = 2;
+    // 캐릭터 시트 (오버헤드 HUD). 미전송 시 클라는 기본값 유지.
+    string displayName = 3;
+    int32 level = 4;
+    float currentHp = 5;
+    float maxHp = 6;
 }
 
 // Client -> Gateway -> World: 클릭 이동 (목적지 전송, 서버가 경로 계산)

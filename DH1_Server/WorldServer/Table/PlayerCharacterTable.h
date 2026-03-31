@@ -99,6 +99,42 @@ namespace db
 			using _traits = sqlpp::make_traits<sqlpp::bigint>;
 		};
 
+		struct CurrentHp
+		{
+			struct _alias_t
+			{
+				static constexpr const char _literal[] = "current_hp";
+				using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+
+				template<typename T>
+				struct _member_t
+				{
+					T currentHp;
+					T& operator()() { return currentHp; }
+					const T& operator()() const { return currentHp; }
+				};
+			};
+			using _traits = sqlpp::make_traits<sqlpp::floating_point>;
+		};
+
+		struct MaxHp
+		{
+			struct _alias_t
+			{
+				static constexpr const char _literal[] = "max_hp";
+				using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+
+				template<typename T>
+				struct _member_t
+				{
+					T maxHp;
+					T& operator()() { return maxHp; }
+					const T& operator()() const { return maxHp; }
+				};
+			};
+			using _traits = sqlpp::make_traits<sqlpp::floating_point>;
+		};
+
 		struct PositionX
 		{
 			struct _alias_t
@@ -231,6 +267,8 @@ namespace db
 		player_character_::AccountId,
 		player_character_::CharacterName,
 		player_character_::Level,
+		player_character_::CurrentHp,
+		player_character_::MaxHp,
 		player_character_::Experience,
 		player_character_::PositionX,
 		player_character_::PositionY,

@@ -7,7 +7,7 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 
-namespace
+namespace SLoginPanel_Local
 {
 	FString NormalizeEmail(const FString& InEmail)
 	{
@@ -231,7 +231,7 @@ FReply SLoginPanel::OnLoginClicked()
 		return FReply::Handled();
 	}
 
-	const FString Email = NormalizeEmail(EmailInput->GetText().ToString());
+	const FString Email = SLoginPanel_Local::NormalizeEmail(EmailInput->GetText().ToString());
 	const FString Password = PasswordInput->GetText().ToString();
 
 	if (Email.IsEmpty() || Password.IsEmpty())
@@ -240,7 +240,7 @@ FReply SLoginPanel::OnLoginClicked()
 		return FReply::Handled();
 	}
 
-	if (!IsLikelyValidEmail(Email))
+	if (!SLoginPanel_Local::IsLikelyValidEmail(Email))
 	{
 		SetStatus(TEXT("유효한 이메일 형식이 아닙니다."), AuthStyle::C::Error);
 		return FReply::Handled();

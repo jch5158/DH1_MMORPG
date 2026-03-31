@@ -13,7 +13,7 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 
-namespace
+namespace SEmailVerificationPanel_Local
 {
 	FString ResolveAuthEndpointUrl(const FString& Path)
 	{
@@ -250,7 +250,7 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 		SetStatus(TEXT("이메일 인증번호를 입력해주세요."), AuthStyle::C::Error);
 		return FReply::Handled();
 	}
-	if (!IsSixDigitCode(Code))
+	if (!SEmailVerificationPanel_Local::IsSixDigitCode(Code))
 	{
 		SetStatus(TEXT("인증번호는 6자리 숫자여야 합니다."), AuthStyle::C::Error);
 		return FReply::Handled();
@@ -268,7 +268,7 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL(ResolveAuthEndpointUrl(TEXT("verify-code")));
+	Request->SetURL(SEmailVerificationPanel_Local::ResolveAuthEndpointUrl(TEXT("verify-code")));
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	Request->SetContentAsString(JsonString);
@@ -320,7 +320,7 @@ FReply SEmailVerificationPanel::OnResendClicked()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL(ResolveAuthEndpointUrl(TEXT("send-verify-code")));
+	Request->SetURL(SEmailVerificationPanel_Local::ResolveAuthEndpointUrl(TEXT("send-verify-code")));
 	Request->SetVerb(TEXT("POST"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	Request->SetContentAsString(JsonString);
@@ -381,7 +381,7 @@ void SEmailVerificationPanel::OnVerifyResponseReceived(FHttpRequestPtr Request, 
 	{
 		if (ResMessage.IsEmpty() || ResMessage == TEXT("서버 처리 중 오류가 발생했습니다."))
 		{
-			ResMessage = ExtractServerMessage(Response);
+			ResMessage = SEmailVerificationPanel_Local::ExtractServerMessage(Response);
 		}
 		ResMessage = AuthErrorMapper::ResolveMessage(ResponseCode, TEXT(""), ResMessage);
 		SetStatus(ResMessage, AuthStyle::C::Error);
@@ -418,7 +418,7 @@ void SEmailVerificationPanel::OnResendResponseReceived(FHttpRequestPtr Request, 
 	{
 		if (ServerMessage.IsEmpty() || ServerMessage == TEXT("서버 처리 중 오류가 발생했습니다."))
 		{
-			ServerMessage = ExtractServerMessage(Response);
+			ServerMessage = SEmailVerificationPanel_Local::ExtractServerMessage(Response);
 		}
 		ServerMessage = AuthErrorMapper::ResolveMessage(ResponseCode, TEXT(""), ServerMessage);
 		SetStatus(ServerMessage, AuthStyle::C::Error);

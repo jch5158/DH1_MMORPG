@@ -4,6 +4,7 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Network/CppNetEngine/NetEngineWrapper.h"
 #include "Network/CppNetEngine/NetSession.h"
+#include "Templates/Function.h"
 
 #include "NetEngineInit.h"
 
@@ -17,6 +18,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnRealmSelectResultDelegate, int32 /*eRealm
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPositionReceivedDelegate, const FVector& /*Position*/, float /*Yaw*/);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnMovePathReceivedDelegate, uint32 /*SeqId*/, const TArray<FVector>& /*Waypoints*/, float /*MoveSpeed*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPositionCorrectionDelegate, const FVector& /*CorrectedPosition*/);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnCharacterOverheadDataDelegate, const FString& /*DisplayName*/, int32 /*Level*/, float /*CurrentHP*/, float /*MaxHP*/);
 
 USTRUCT(BlueprintType)
 struct FRealmServerInfo
@@ -88,11 +90,36 @@ public:
     void NotifyMovePath(uint32 SeqId, const TArray<FVector>& Waypoints, float MoveSpeed);
     void NotifyPositionCorrection(const FVector& CorrectedPosition);
 
+    /** 서버(패킷 핸들러)에서 캐릭터 오버헤드 갱신 시 호출 — 클라 UI만 갱신 */
+    void NotifyCharacterOverheadData(const FString& DisplayName, int32 Level, float CurrentHP, float MaxHP);
+
+    /**
+     * S2C_SPAWN_POSITION_RES 한 번 처리 시 사용. 게임 스레드에서 오버헤드 → 스폰 순으로 동기 브로드캐스트
+     * (별도 AsyncTask 두 번이면 델리게이트 순서가 뒤바뀌어 기본값/깨진 값이 잠깐 또는 계속 보일 수 있음).
+     */
+    void NotifySpawnPositionWithCharacterSheet(const FVector& Position, float Yaw, const FString& DisplayName, int32 Level, float CurrentHP, float MaxHP);
+
     void RequestRealmList();
     void RequestRealmSelect(int32 RealmId);
 
+    /** 렐름 진입 직후·스폰 요청 시 월드 로딩 오버레이 (뷰포트 전역, GameMode와 무관) */
+    void ShowEnterWorldLoadingOverlay();
+    void HideEnterWorldLoadingOverlay();
+
+    /**
+     * PIE/Game 플레이 월드의 NetSubsystem만 순회 (에디터 등 다른 WorldContext가 먼저 오면 break로 게임 쪽을 건너뛰던 문제 방지).
+     * 동일 GameInstance는 한 번만 호출.
+     */
+    static void ForEachPlayClientNetSubsystem(TFunction<void(UClientNetSubsystem*)> Fn);
+
     // 스폰 위치 요청
     void RequestSpawnPosition();
+
+    /**
+     * S2C_SPAWN_POSITION_RES 직후 OnSpawnPositionReceived에서 한 번 호출.
+     * 스폰 패킷에 실린 캐릭터 시트를 적용한다. (델리게이트만 쓰면 IsLocallyControlled 타이밍에 이름이 안 바뀌는 경우가 있음)
+     */
+    bool ConsumePendingSpawnCharacterSheet(FString& OutDisplayName, int32& OutLevel, float& OutCurrentHP, float& OutMaxHP);
 
     // 클릭 이동 (목적지 → 서버 경로 계산, 현재 위치도 함께 전송)
     void SendMoveToPosition(const FVector& CurrentPosition, const FVector& Destination);
@@ -106,6 +133,7 @@ public:
     FOnSpawnPositionReceivedDelegate OnSpawnPositionReceived;
     FOnMovePathReceivedDelegate OnMovePathReceived;
     FOnPositionCorrectionDelegate OnPositionCorrection;
+    FOnCharacterOverheadDataDelegate OnCharacterOverheadData;
 
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
@@ -124,4 +152,10 @@ private:
 
     UPROPERTY(Config)
     bool bUseHttps = true;
+
+    bool bHasPendingSpawnCharacterSheet = false;
+    FString PendingSpawnDisplayName;
+    int32 PendingSpawnLevel = 1;
+    float PendingSpawnCurrentHP = 100.f;
+    float PendingSpawnMaxHP = 100.f;
 };

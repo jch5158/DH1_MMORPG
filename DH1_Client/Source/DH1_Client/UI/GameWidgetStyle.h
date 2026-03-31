@@ -38,6 +38,10 @@ namespace GameStyle
 		// 구분선
 		inline const FLinearColor Separator    = FLinearColor(0.40f, 0.40f, 0.40f, 0.35f);
 
+		// 체력 바 (인게임 오버헤드 등)
+		inline const FLinearColor HealthBarFill  = FLinearColor(0.40f, 0.04f, 0.06f, 1.0f);
+		inline const FLinearColor HealthBarTrack = FLinearColor(0.06f, 0.06f, 0.08f, 0.92f);
+
 		// 버튼
 		inline const FLinearColor ButtonBg     = FLinearColor(0.12f, 0.12f, 0.12f, 0.90f);
 		inline const FLinearColor ButtonHover  = FLinearColor(0.22f, 0.22f, 0.22f, 0.90f);

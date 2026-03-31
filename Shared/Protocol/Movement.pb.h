@@ -1255,9 +1255,27 @@ class S2C_SPAWN_POSITION_RES final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kDisplayNameFieldNumber = 3,
     kPositionFieldNumber = 1,
     kRotationYawFieldNumber = 2,
+    kLevelFieldNumber = 4,
+    kCurrentHpFieldNumber = 5,
+    kMaxHpFieldNumber = 6,
   };
+  // string displayName = 3;
+  void clear_displayname();
+  const std::string& displayname() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_displayname(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_displayname();
+  PROTOBUF_NODISCARD std::string* release_displayname();
+  void set_allocated_displayname(std::string* displayname);
+  private:
+  const std::string& _internal_displayname() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_displayname(const std::string& value);
+  std::string* _internal_mutable_displayname();
+  public:
+
   // .Protocol.Vector3 position = 1;
   bool has_position() const;
   private:
@@ -1285,6 +1303,33 @@ class S2C_SPAWN_POSITION_RES final :
   void _internal_set_rotationyaw(float value);
   public:
 
+  // int32 level = 4;
+  void clear_level();
+  int32_t level() const;
+  void set_level(int32_t value);
+  private:
+  int32_t _internal_level() const;
+  void _internal_set_level(int32_t value);
+  public:
+
+  // float currentHp = 5;
+  void clear_currenthp();
+  float currenthp() const;
+  void set_currenthp(float value);
+  private:
+  float _internal_currenthp() const;
+  void _internal_set_currenthp(float value);
+  public:
+
+  // float maxHp = 6;
+  void clear_maxhp();
+  float maxhp() const;
+  void set_maxhp(float value);
+  private:
+  float _internal_maxhp() const;
+  void _internal_set_maxhp(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.S2C_SPAWN_POSITION_RES)
  private:
   class _Internal;
@@ -1293,8 +1338,12 @@ class S2C_SPAWN_POSITION_RES final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr displayname_;
     ::Protocol::Vector3* position_;
     float rotationyaw_;
+    int32_t level_;
+    float currenthp_;
+    float maxhp_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2571,6 +2620,116 @@ inline void S2C_SPAWN_POSITION_RES::_internal_set_rotationyaw(float value) {
 inline void S2C_SPAWN_POSITION_RES::set_rotationyaw(float value) {
   _internal_set_rotationyaw(value);
   // @@protoc_insertion_point(field_set:Protocol.S2C_SPAWN_POSITION_RES.rotationYaw)
+}
+
+// string displayName = 3;
+inline void S2C_SPAWN_POSITION_RES::clear_displayname() {
+  _impl_.displayname_.ClearToEmpty();
+}
+inline const std::string& S2C_SPAWN_POSITION_RES::displayname() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_SPAWN_POSITION_RES.displayName)
+  return _internal_displayname();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S2C_SPAWN_POSITION_RES::set_displayname(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.displayname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S2C_SPAWN_POSITION_RES.displayName)
+}
+inline std::string* S2C_SPAWN_POSITION_RES::mutable_displayname() {
+  std::string* _s = _internal_mutable_displayname();
+  // @@protoc_insertion_point(field_mutable:Protocol.S2C_SPAWN_POSITION_RES.displayName)
+  return _s;
+}
+inline const std::string& S2C_SPAWN_POSITION_RES::_internal_displayname() const {
+  return _impl_.displayname_.Get();
+}
+inline void S2C_SPAWN_POSITION_RES::_internal_set_displayname(const std::string& value) {
+  
+  _impl_.displayname_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S2C_SPAWN_POSITION_RES::_internal_mutable_displayname() {
+  
+  return _impl_.displayname_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S2C_SPAWN_POSITION_RES::release_displayname() {
+  // @@protoc_insertion_point(field_release:Protocol.S2C_SPAWN_POSITION_RES.displayName)
+  return _impl_.displayname_.Release();
+}
+inline void S2C_SPAWN_POSITION_RES::set_allocated_displayname(std::string* displayname) {
+  if (displayname != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.displayname_.SetAllocated(displayname, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.displayname_.IsDefault()) {
+    _impl_.displayname_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S2C_SPAWN_POSITION_RES.displayName)
+}
+
+// int32 level = 4;
+inline void S2C_SPAWN_POSITION_RES::clear_level() {
+  _impl_.level_ = 0;
+}
+inline int32_t S2C_SPAWN_POSITION_RES::_internal_level() const {
+  return _impl_.level_;
+}
+inline int32_t S2C_SPAWN_POSITION_RES::level() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_SPAWN_POSITION_RES.level)
+  return _internal_level();
+}
+inline void S2C_SPAWN_POSITION_RES::_internal_set_level(int32_t value) {
+  
+  _impl_.level_ = value;
+}
+inline void S2C_SPAWN_POSITION_RES::set_level(int32_t value) {
+  _internal_set_level(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_SPAWN_POSITION_RES.level)
+}
+
+// float currentHp = 5;
+inline void S2C_SPAWN_POSITION_RES::clear_currenthp() {
+  _impl_.currenthp_ = 0;
+}
+inline float S2C_SPAWN_POSITION_RES::_internal_currenthp() const {
+  return _impl_.currenthp_;
+}
+inline float S2C_SPAWN_POSITION_RES::currenthp() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_SPAWN_POSITION_RES.currentHp)
+  return _internal_currenthp();
+}
+inline void S2C_SPAWN_POSITION_RES::_internal_set_currenthp(float value) {
+  
+  _impl_.currenthp_ = value;
+}
+inline void S2C_SPAWN_POSITION_RES::set_currenthp(float value) {
+  _internal_set_currenthp(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_SPAWN_POSITION_RES.currentHp)
+}
+
+// float maxHp = 6;
+inline void S2C_SPAWN_POSITION_RES::clear_maxhp() {
+  _impl_.maxhp_ = 0;
+}
+inline float S2C_SPAWN_POSITION_RES::_internal_maxhp() const {
+  return _impl_.maxhp_;
+}
+inline float S2C_SPAWN_POSITION_RES::maxhp() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_SPAWN_POSITION_RES.maxHp)
+  return _internal_maxhp();
+}
+inline void S2C_SPAWN_POSITION_RES::_internal_set_maxhp(float value) {
+  
+  _impl_.maxhp_ = value;
+}
+inline void S2C_SPAWN_POSITION_RES::set_maxhp(float value) {
+  _internal_set_maxhp(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_SPAWN_POSITION_RES.maxHp)
 }
 
 // -------------------------------------------------------------------

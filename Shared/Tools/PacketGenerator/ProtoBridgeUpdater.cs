@@ -272,8 +272,13 @@ namespace PacketGenerator
                 }
             }
 
-            // 기존 .pb.h 및 .pb.cc 삭제
+            // 기존 복사본 삭제 (클라 모듈이 Shared의 생성물을 직접 컴파일)
             foreach (var file in Directory.GetFiles(clientProtocolDir, "*.pb.h"))
+            {
+                File.Delete(file);
+            }
+
+            foreach (var file in Directory.GetFiles(clientProtocolDir, "*.pb.cpp"))
             {
                 File.Delete(file);
             }
@@ -283,18 +288,25 @@ namespace PacketGenerator
                 File.Delete(file);
             }
 
-            // 필요한 .pb.h만 복사
+            var copiedSources = 0;
             foreach (var protoFile in usedProtoFiles)
             {
-                var sourceFile = Path.Combine(protoSourceDir, $"{protoFile}.pb.h");
-                if (File.Exists(sourceFile))
+                var sourceHeader = Path.Combine(protoSourceDir, $"{protoFile}.pb.h");
+                if (File.Exists(sourceHeader))
                 {
-                    var destFile = Path.Combine(clientProtocolDir, $"{protoFile}.pb.h");
-                    File.Copy(sourceFile, destFile, true);
+                    File.Copy(sourceHeader, Path.Combine(clientProtocolDir, $"{protoFile}.pb.h"), true);
+                }
+
+                // .pb.cc → .pb.cpp : UBT가 모듈 트리에서 .cpp를 스캔하며, ProtoBridge.lib와 이중 링크 방지
+                var sourceCc = Path.Combine(protoSourceDir, $"{protoFile}.pb.cc");
+                if (File.Exists(sourceCc))
+                {
+                    File.Copy(sourceCc, Path.Combine(clientProtocolDir, $"{protoFile}.pb.cpp"), true);
+                    copiedSources++;
                 }
             }
 
-            Console.WriteLine($"[ClientProtocol] Copied {usedProtoFiles.Count} headers to: {clientProtocolDir}");
+            Console.WriteLine($"[ClientProtocol] Copied {usedProtoFiles.Count} headers and {copiedSources} generated sources to: {clientProtocolDir}");
         }
     }
 }

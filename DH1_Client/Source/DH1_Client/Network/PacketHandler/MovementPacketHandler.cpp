@@ -1,7 +1,11 @@
 #include "MovementPacketHandler.h"
-#include "Engine/GameInstance.h"
+#include "Async/Async.h"
 #include "Engine/Engine.h"
+#include "Math/UnrealMathUtility.h"
+#include "Network/Dh1StringConv.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
+
+#include <string>
 
 DEFINE_LOG_CATEGORY_STATIC(LogMovement, Log, All);
 
@@ -54,37 +58,71 @@ bool MovementPacketHandler::HANDLE_S2C_ENTITY_LEAVE_NOT(const Protocol::S2C_ENTI
 
 bool MovementPacketHandler::HANDLE_S2C_SPAWN_POSITION_RES(const Protocol::S2C_SPAWN_POSITION_RES& packet, const PacketSessionRef& pSession)
 {
-	const float posX = packet.position().x();
-	const float posY = packet.position().y();
-	const float posZ = packet.position().z();
-	const float rotYaw = packet.rotationyaw();
-
-	UE_LOG(LogMovement, Warning, TEXT("SPAWN_POSITION_RES - pos: (%.1f, %.1f, %.1f), yaw: %.1f"),
-		posX, posY, posZ, rotYaw);
-
-	if (GEngine == nullptr)
+	float posX = 0.f;
+	float posY = 0.f;
+	float posZ = 0.f;
+	if (packet.has_position())
 	{
-		return false;
+		const auto& p = packet.position();
+		posX = p.x();
+		posY = p.y();
+		posZ = p.z();
 	}
 
-	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	float rotYaw = packet.rotationyaw();
+	if (!FMath::IsFinite(posX) || !FMath::IsFinite(posY) || !FMath::IsFinite(posZ) || !FMath::IsFinite(rotYaw))
 	{
-		UGameInstance* GameInstance = Context.OwningGameInstance;
-		if (GameInstance == nullptr)
-		{
-			continue;
-		}
-
-		UClientNetSubsystem* NetSubsystem = GameInstance->GetSubsystem<UClientNetSubsystem>();
-		if (NetSubsystem == nullptr)
-		{
-			continue;
-		}
-
-		NetSubsystem->NotifySpawnPosition(FVector(posX, posY, posZ), rotYaw);
-		break;
+		UE_LOG(LogMovement, Error, TEXT("SPAWN_POSITION_RES: non-finite pos or yaw; using (0,0,0) yaw 0"));
+		posX = posY = posZ = 0.f;
+		rotYaw = 0.f;
 	}
 
+	const std::string displayNameUtf8 = packet.displayname();
+
+	int32 Level = static_cast<int32>(packet.level());
+	if (Level < 1)
+	{
+		Level = 1;
+	}
+	Level = FMath::Clamp(Level, 1, 9999);
+
+	float MaxHP = 100.f;
+	if (FMath::IsFinite(packet.maxhp()) && packet.maxhp() > 0.f)
+	{
+		MaxHP = packet.maxhp();
+	}
+	float CurHP = FMath::IsFinite(packet.currenthp()) ? packet.currenthp() : MaxHP;
+	CurHP = FMath::Clamp(CurHP, 0.f, MaxHP);
+
+	const int32 RawNameBytes = static_cast<int32>(displayNameUtf8.size());
+	const FVector Pos(posX, posY, posZ);
+
+	AsyncTask(ENamedThreads::GameThread,
+		[Pos, rotYaw, displayNameUtf8, Level, CurHP, MaxHP, RawNameBytes]()
+		{
+			FString DisplayName = Dh1Utf8StdStringToFString(displayNameUtf8);
+			DisplayName.TrimStartAndEndInline();
+			if (DisplayName.IsEmpty())
+			{
+				DisplayName = TEXT("Adventurer");
+			}
+
+			UE_LOG(LogMovement, Log, TEXT("SPAWN_POSITION_RES pos=(%.1f,%.1f,%.1f) yaw=%.1f rawNameBytes=%d name=%s Lv=%d HP=%.1f/%.1f"),
+				Pos.X, Pos.Y, Pos.Z, rotYaw, RawNameBytes, *DisplayName, Level, CurHP, MaxHP);
+
+			if (GEngine == nullptr)
+			{
+				return;
+			}
+
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[Pos, rotYaw, DisplayName, Level, CurHP, MaxHP](UClientNetSubsystem* NetSubsystem)
+				{
+					NetSubsystem->NotifySpawnPositionWithCharacterSheet(Pos, rotYaw, DisplayName, Level, CurHP, MaxHP);
+				});
+		});
+
+	(void)pSession;
 	return true;
 }
 

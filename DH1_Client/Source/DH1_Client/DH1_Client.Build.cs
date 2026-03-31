@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 using System;
 using System.IO;
@@ -52,8 +52,7 @@ public class DH1_Client : ModuleRules
             Path.Combine(VcpkgLibPath, ProtobufLibName),
             Path.Combine(VcpkgLibPath, "redis++_static.lib"),
             Path.Combine(VcpkgLibPath, HiredisLibName),
-            Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/CppNetEngine/{ConfigName}/CppNetEngine.lib")),
-            Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/ProtoBridge/{ConfigName}/ProtoBridge.lib"))
+            Path.GetFullPath(Path.Combine(SharedPath, $"Libraries/CppNetEngine/{ConfigName}/CppNetEngine.lib"))
         ]);
 
         // protobuf 3.21.x has no abseil dependency - remove absl linking if upgrading to 4.x+
@@ -66,6 +65,7 @@ public class DH1_Client : ModuleRules
         bEnableExceptions = true;
         CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off; // 최신 5.6+ 문법 적용
 
+        // Protocol .pb.cpp files live under this module (copied by PacketGenerator) — same compile env as handlers.
         PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
         PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0");
         PublicDefinitions.Add("_UNREAL_=1");

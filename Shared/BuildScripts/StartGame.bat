@@ -48,7 +48,7 @@ if "%AWS_CMD%"=="aws" if exist "C:\Program Files\Amazon\AWSCLIV2\aws.exe" (
 
 if not "%DH1_AWS_PROFILE%"=="" (
     set "AWS_PROFILE=%DH1_AWS_PROFILE%"
-    echo [Info] AWS profile override from .env: %AWS_PROFILE%
+    echo [Info] AWS profile override from .env: !AWS_PROFILE!
 )
 
 if "%AWS_PROFILE%"=="" (

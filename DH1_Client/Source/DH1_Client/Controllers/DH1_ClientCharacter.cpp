@@ -13,8 +13,11 @@
 #include "InputActionValue.h"
 #include "Engine/World.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
+#include "UI/UMG/CharacterOverheadWidget.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacterMove, Log, All);
 
@@ -28,8 +31,8 @@ ADH1_ClientCharacter::ADH1_ClientCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	GetCharacterMovement()->bConstrainToPlane = false;
+	GetCharacterMovement()->bSnapToPlaneAtStart = false;
 
 	// 마네킹 스켈레탈 메쉬
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannequinMesh(
@@ -62,6 +65,15 @@ ADH1_ClientCharacter::ADH1_ClientCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false;
 
+	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	OverheadWidgetComponent->SetupAttachment(GetCapsuleComponent());
+	OverheadWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 92.f));
+	OverheadWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	OverheadWidgetComponent->SetDrawAtDesiredSize(true);
+	OverheadWidgetComponent->SetPivot(FVector2D(0.5f, 1.f));
+	OverheadWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	OverheadWidgetComponent->SetVisibility(false);
+
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
@@ -79,8 +91,8 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	// 매핑 컨텍스트
 	DefaultMappingContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Default"));
 
-	// 우클릭 → 클릭 이동
 	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
+	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::LeftMouseButton);
 
 	// 카메라 회전 액션 (미사용 - 우클릭은 클릭 이동으로 예약)
 	RightMouseAction = NewObject<UInputAction>(this, TEXT("IA_RightMouse"));
@@ -95,6 +107,7 @@ void ADH1_ClientCharacter::BeginPlay()
 		*GetActorLocation().ToString(), Controller ? *Controller->GetName() : TEXT("None"));
 
 	CreateInputAssets();
+	SetupCharacterOverhead();
 
 	if (const APlayerController* PC = Cast<APlayerController>(Controller))
 	{
@@ -265,15 +278,47 @@ void ADH1_ClientCharacter::OnClickMove()
 
 void ADH1_ClientCharacter::OnSpawnPositionReceived(const FVector& Position, const float Yaw)
 {
-	SetActorLocation(Position);
+	const APlayerController* PC = Cast<APlayerController>(Controller);
+	if (PC != nullptr && !PC->IsLocalPlayerController())
+	{
+		return;
+	}
+
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		FString SheetName;
+		int32 SheetLevel = 1;
+		float SheetCur = 100.f;
+		float SheetMax = 100.f;
+		if (NetSub->ConsumePendingSpawnCharacterSheet(SheetName, SheetLevel, SheetCur, SheetMax))
+		{
+			SetOverheadDisplayData(SheetName, SheetLevel, SheetCur, SheetMax);
+		}
+	}
+
+	FVector Loc = Position;
+	if (UCapsuleComponent* Cap = GetCapsuleComponent())
+	{
+		const float HalfH = Cap->GetScaledCapsuleHalfHeight();
+		if (Position.Z < HalfH + 10.f)
+		{
+			Loc.Z = Position.Z + HalfH;
+		}
+	}
+
+	SetActorLocation(Loc);
 	SetActorRotation(FRotator(0.0f, Yaw, 0.0f));
 
-	// 캐릭터 표시 + 물리 복원
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 	GetCharacterMovement()->GravityScale = 1.0f;
 
-	// 1회만 수신
+	if (OverheadWidgetComponent)
+	{
+		OverheadWidgetComponent->SetVisibility(true);
+	}
+	PushOverheadToWidget();
+
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 	{
 		NetSub->OnSpawnPositionReceived.RemoveAll(this);
@@ -391,4 +436,70 @@ UClientNetSubsystem* ADH1_ClientCharacter::GetNetSubsystem() const
 	}
 
 	return GameInstance->GetSubsystem<UClientNetSubsystem>();
+}
+
+void ADH1_ClientCharacter::SetupCharacterOverhead()
+{
+	if (OverheadWidgetComponent == nullptr || GetWorld() == nullptr)
+	{
+		return;
+	}
+
+	const TSubclassOf<UCharacterOverheadWidget> ClassToUse =
+		OverheadWidgetClass ? OverheadWidgetClass.Get() : UCharacterOverheadWidget::StaticClass();
+
+	OverheadWidgetInstance = CreateWidget<UCharacterOverheadWidget>(GetWorld(), ClassToUse);
+	if (OverheadWidgetInstance == nullptr)
+	{
+		return;
+	}
+
+	OverheadWidgetComponent->SetWidget(OverheadWidgetInstance);
+	PushOverheadToWidget();
+
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->OnCharacterOverheadData.AddUObject(this, &ADH1_ClientCharacter::OnCharacterOverheadDataFromNet);
+	}
+}
+
+void ADH1_ClientCharacter::PushOverheadToWidget()
+{
+	if (OverheadWidgetInstance == nullptr)
+	{
+		return;
+	}
+
+	OverheadWidgetInstance->SetOverheadData(OverheadDisplayName, OverheadLevel, OverheadCurrentHP, OverheadMaxHP);
+}
+
+void ADH1_ClientCharacter::SetOverheadDisplayData(const FString& DisplayName, const int32 Level, const float CurrentHP, const float MaxHP)
+{
+	OverheadDisplayName = DisplayName.IsEmpty() ? TEXT("Adventurer") : DisplayName;
+	OverheadLevel = FMath::Clamp(FMath::Max(1, Level), 1, 9999);
+	OverheadMaxHP = FMath::Max(1.f, MaxHP);
+	OverheadCurrentHP = FMath::Clamp(CurrentHP, 0.f, OverheadMaxHP);
+	PushOverheadToWidget();
+}
+
+void ADH1_ClientCharacter::OnCharacterOverheadDataFromNet(const FString& Name, const int32 Level, const float CurrentHP, const float MaxHP)
+{
+	const APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC == nullptr || !PC->IsLocalPlayerController())
+	{
+		return;
+	}
+
+	SetOverheadDisplayData(Name, Level, CurrentHP, MaxHP);
+}
+
+void ADH1_ClientCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->OnCharacterOverheadData.RemoveAll(this);
+		NetSub->OnSpawnPositionReceived.RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }

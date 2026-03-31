@@ -1,16 +1,27 @@
 #include "ClientNetSubsystem.h"
 
 #include "Async/Async.h"
+#include "Dom/JsonValue.h"
+#include "Engine/Engine.h"
+#include "Engine/EngineTypes.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/World.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
-#include "Dom/JsonValue.h"
 #include "Network/CppNetEngine/NetSession.h"
+#include "Network/Dh1StringConv.h"
+#include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Network/PacketHandler/RealmPacketHandler.h"
-#include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
+#include "Styling/CoreStyle.h"
 #include "UI/AuthErrorMapper.h"
+#include "UI/AuthWidgetStyle.h"
+#include "Widgets/Layout/SBorder.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/SOverlay.h"
+#include "Widgets/Text/STextBlock.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
 
@@ -90,13 +101,123 @@ namespace
 
 }
 
+namespace
+{
+	TSharedPtr<SWidget> GEnterWorldLoadingViewportWidget;
+
+	static void RemoveEnterWorldLoadingFromViewport()
+	{
+		if (GEnterWorldLoadingViewportWidget.IsValid() && GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->RemoveViewportWidgetContent(GEnterWorldLoadingViewportWidget.ToSharedRef());
+		}
+		GEnterWorldLoadingViewportWidget.Reset();
+	}
+
+	static void AddEnterWorldLoadingToViewport()
+	{
+		if (!GEngine || !GEngine->GameViewport || GEnterWorldLoadingViewportWidget.IsValid())
+		{
+			return;
+		}
+
+		// 로그인과 같은 팔레트만 사용. T_LoginBg 텍스처는 PNG 디코드·CreateTransient·UpdateResource를
+		// Slate/뷰포트 초기화와 겹치면 크래시할 수 있어 여기서는 쓰지 않음.
+		GEnterWorldLoadingViewportWidget = SNew(SOverlay)
+			+ SOverlay::Slot()
+			[
+				SNew(SBorder)
+				.Padding(FMargin(0))
+				.BorderImage(AuthStyle::FlatBrush())
+				.BorderBackgroundColor(AuthStyle::C::ScreenBg)
+				[
+					SNew(SBox)
+				]
+			]
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			[
+				SNew(STextBlock)
+				.Text(NSLOCTEXT("DH1", "EnterWorldLoadingOverlay", "캐릭터 정보를 불러오는 중..."))
+				.Font(FCoreStyle::GetDefaultFontStyle("Regular", 22))
+				.ColorAndOpacity(AuthStyle::C::Title)
+				.Justification(ETextJustify::Center)
+			];
+		GEngine->GameViewport->AddViewportWidgetContent(GEnterWorldLoadingViewportWidget.ToSharedRef(), 2147483000);
+	}
+}
+
+void UClientNetSubsystem::ForEachPlayClientNetSubsystem(TFunction<void(UClientNetSubsystem*)> Fn)
+{
+	if (!GEngine || !Fn)
+	{
+		return;
+	}
+
+	TSet<UGameInstance*> Seen;
+	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	{
+		UWorld* World = Context.World();
+		if (World == nullptr)
+		{
+			continue;
+		}
+
+		const EWorldType::Type WT = Context.WorldType;
+		if (WT != EWorldType::PIE && WT != EWorldType::Game)
+		{
+			continue;
+		}
+
+		if (!World->IsGameWorld())
+		{
+			continue;
+		}
+
+		UGameInstance* GI = Context.OwningGameInstance;
+		if (GI == nullptr || Seen.Contains(GI))
+		{
+			continue;
+		}
+
+		if (UClientNetSubsystem* Net = GI->GetSubsystem<UClientNetSubsystem>())
+		{
+			Seen.Add(GI);
+			Fn(Net);
+		}
+	}
+}
+
+void UClientNetSubsystem::ShowEnterWorldLoadingOverlay()
+{
+	const auto Add = []() { AddEnterWorldLoadingToViewport(); };
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, Add);
+		return;
+	}
+	Add();
+}
+
+void UClientNetSubsystem::HideEnterWorldLoadingOverlay()
+{
+	const auto Remove = []() { RemoveEnterWorldLoadingFromViewport(); };
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, Remove);
+		return;
+	}
+	Remove();
+}
+
 void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
 	NetEngineLogger::SetLogCallback([](const eNetLogLevel Level, const char* Message)
 	{
-		const FString Msg = UTF8_TO_TCHAR(Message);
+		const FString Msg = Dh1Utf8CStringToFString(Message);
 		switch (Level)
 		{
 		case eNetLogLevel::Trace:
@@ -134,6 +255,7 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UClientNetSubsystem::Deinitialize()
 {
+	RemoveEnterWorldLoadingFromViewport();
 	ServiceRef.reset();
 	EngineInit.Reset();
 	Super::Deinitialize();
@@ -360,6 +482,10 @@ void UClientNetSubsystem::NotifyRealmSelectResult(const int32 Result)
 	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifyRealmSelectResult: %d"), Result);
 	AsyncTask(ENamedThreads::GameThread, [this, Result]()
 		{
+			if (Result == 0)
+			{
+				AddEnterWorldLoadingToViewport();
+			}
 			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting RealmSelectResult: %d, Bound: %d"), Result, OnRealmSelectResult.IsBound());
 			OnRealmSelectResult.Broadcast(Result);
 		});
@@ -406,9 +532,52 @@ void UClientNetSubsystem::NotifySpawnPosition(const FVector& Position, const flo
 	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifySpawnPosition: pos=%s, yaw=%.1f"), *Position.ToString(), Yaw);
 	AsyncTask(ENamedThreads::GameThread, [this, Position, Yaw]()
 		{
+			bHasPendingSpawnCharacterSheet = false;
 			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting SpawnPosition, Bound: %d"), OnSpawnPositionReceived.IsBound());
 			OnSpawnPositionReceived.Broadcast(Position, Yaw);
 		});
+}
+
+void UClientNetSubsystem::NotifySpawnPositionWithCharacterSheet(
+	const FVector& Position,
+	const float Yaw,
+	const FString& DisplayName,
+	const int32 Level,
+	const float CurrentHP,
+	const float MaxHP)
+{
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] NotifySpawnPositionWithCharacterSheet: pos=%s, yaw=%.1f, name=%s, Lv=%d, HP=%.1f/%.1f"),
+		*Position.ToString(), Yaw, *DisplayName, Level, CurrentHP, MaxHP);
+	AsyncTask(ENamedThreads::GameThread, [this, Position, Yaw, DisplayName, Level, CurrentHP, MaxHP]()
+		{
+			RemoveEnterWorldLoadingFromViewport();
+			PendingSpawnDisplayName = DisplayName;
+			PendingSpawnLevel = Level;
+			PendingSpawnCurrentHP = CurrentHP;
+			PendingSpawnMaxHP = MaxHP;
+			bHasPendingSpawnCharacterSheet = true;
+			OnCharacterOverheadData.Broadcast(DisplayName, Level, CurrentHP, MaxHP);
+			OnSpawnPositionReceived.Broadcast(Position, Yaw);
+		});
+}
+
+bool UClientNetSubsystem::ConsumePendingSpawnCharacterSheet(
+	FString& OutDisplayName,
+	int32& OutLevel,
+	float& OutCurrentHP,
+	float& OutMaxHP)
+{
+	if (!bHasPendingSpawnCharacterSheet)
+	{
+		return false;
+	}
+
+	bHasPendingSpawnCharacterSheet = false;
+	OutDisplayName = PendingSpawnDisplayName;
+	OutLevel = PendingSpawnLevel;
+	OutCurrentHP = PendingSpawnCurrentHP;
+	OutMaxHP = PendingSpawnMaxHP;
+	return true;
 }
 
 void UClientNetSubsystem::RequestSpawnPosition()
@@ -417,6 +586,12 @@ void UClientNetSubsystem::RequestSpawnPosition()
 
 	const auto pSession = ServiceRef->GetFirstSessionRef();
 	if (pSession == nullptr) return;
+
+	// BeginPlay 직후에는 GameViewport·Slate 상태가 아직 안정적이지 않을 수 있어 오버레이는 다음 게임 스레드 틱으로 미룸.
+	AsyncTask(ENamedThreads::GameThread, []()
+	{
+		AddEnterWorldLoadingToViewport();
+	});
 
 	Protocol::C2S_SPAWN_POSITION_REQ packet;
 	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
@@ -465,5 +640,13 @@ void UClientNetSubsystem::NotifyPositionCorrection(const FVector& CorrectedPosit
 	AsyncTask(ENamedThreads::GameThread, [this, CorrectedPosition]()
 		{
 			OnPositionCorrection.Broadcast(CorrectedPosition);
+		});
+}
+
+void UClientNetSubsystem::NotifyCharacterOverheadData(const FString& DisplayName, const int32 Level, const float CurrentHP, const float MaxHP)
+{
+	AsyncTask(ENamedThreads::GameThread, [this, DisplayName, Level, CurrentHP, MaxHP]()
+		{
+			OnCharacterOverheadData.Broadcast(DisplayName, Level, CurrentHP, MaxHP);
 		});
 }

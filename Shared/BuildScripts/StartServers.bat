@@ -17,6 +17,43 @@ echo ============================================
 call :load_env_file "%BASE_DIR%\.env" ".env"
 call :load_env_file "%BASE_DIR%\.env.local" ".env.local"
 
+set "AWS_CMD=aws"
+if not "%DH1_AWS_CLI_PATH%"=="" (
+    if exist "%DH1_AWS_CLI_PATH%" (
+        for %%D in ("%DH1_AWS_CLI_PATH%") do set "PATH=%%~dpD;%PATH%"
+        set "AWS_CMD=%DH1_AWS_CLI_PATH%"
+        echo [Info] Using AWS CLI from DH1_AWS_CLI_PATH
+    ) else (
+        echo [Warning] DH1_AWS_CLI_PATH does not exist: %DH1_AWS_CLI_PATH%
+    )
+)
+if "%AWS_CMD%"=="aws" if exist "C:\Program Files\Amazon\AWSCLIV2\aws.exe" (
+    set "PATH=C:\Program Files\Amazon\AWSCLIV2;%PATH%"
+    set "DH1_AWS_CLI_PATH=C:\Program Files\Amazon\AWSCLIV2\aws.exe"
+    set "AWS_CMD=!DH1_AWS_CLI_PATH!"
+    echo [Info] AWS CLI path added for server processes
+)
+if not "%DH1_AWS_PROFILE%"=="" (
+    set "AWS_PROFILE=%DH1_AWS_PROFILE%"
+    echo [Info] AWS profile from .env: !AWS_PROFILE!
+)
+if "%AWS_PROFILE%"=="" (
+    if exist "%USERPROFILE%\.aws\credentials" (
+        findstr /B /C:"[dh1]" "%USERPROFILE%\.aws\credentials" >nul 2>&1
+        if not errorlevel 1 (
+            set "AWS_PROFILE=dh1"
+            echo [Info] AWS profile auto-selected: dh1
+        )
+    )
+)
+call :check_aws_credentials
+if errorlevel 1 (
+    echo [Error] WorldServer loads NavMesh from S3; AWS credentials are required.
+    echo [Error] Set DH1_AWS_PROFILE or default credentials, or use StartGame.bat checks as reference.
+    pause
+    exit /b 1
+)
+
 set "SERVER_DIR=%BASE_DIR%\Binaries\Server\%CONFIG%"
 
 if not exist "%SERVER_DIR%\RealmServer\RealmServer.exe" (
@@ -58,6 +95,35 @@ taskkill /IM GatewayServer.exe /F >nul 2>&1
 taskkill /IM dotnet.exe /F >nul 2>&1
 
 echo All servers stopped.
+
+:check_aws_credentials
+if "%AWS_CMD%"=="aws" (
+    where aws >nul 2>&1
+    if errorlevel 1 (
+        echo [Error] AWS CLI not found in PATH.
+        echo [Error] Install AWS CLI v2 or set DH1_AWS_CLI_PATH in .env
+        exit /b 1
+    )
+) else (
+    if not exist "%AWS_CMD%" (
+        echo [Error] AWS CLI path is invalid: %AWS_CMD%
+        echo [Error] Update DH1_AWS_CLI_PATH in .env
+        exit /b 1
+    )
+)
+if "%AWS_PROFILE%"=="" (
+    "%AWS_CMD%" sts get-caller-identity --output json >nul 2>&1
+) else (
+    "%AWS_CMD%" sts get-caller-identity --output json --profile "%AWS_PROFILE%" >nul 2>&1
+)
+if errorlevel 1 (
+    echo [Error] AWS credentials are not available for this terminal/session.
+    echo [Error] Fix AWS login/profile first, then run StartServers.bat again.
+    if not "%AWS_PROFILE%"=="" echo [Error] Current AWS_PROFILE: %AWS_PROFILE%
+    exit /b 1
+)
+echo [Info] AWS credentials check passed.
+exit /b 0
 
 :load_env_file
 set "ENV_FILE=%~1"

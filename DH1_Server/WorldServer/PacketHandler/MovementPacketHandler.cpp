@@ -85,6 +85,7 @@ bool MovementPacketHandler::HANDLE_C2S_SPAWN_POSITION_REQ(const Protocol::C2S_SP
 	response.mutable_position()->set_y(posY);
 	response.mutable_position()->set_z(posZ);
 	response.set_rotationyaw(rotYaw);
+	pPlayer->WriteCharacterSheetTo(response);
 
 	auto innerBuffer = MakeMovementSendBuffer(response, packet_id::S2C_SPAWN_POSITION_RES);
 
@@ -94,8 +95,8 @@ bool MovementPacketHandler::HANDLE_C2S_SPAWN_POSITION_REQ(const Protocol::C2S_SP
 
 	pSession->Send(GameSessionPacketHandler::MakeSendBuffer(relayPacket));
 
-	NET_ENGINE_LOG_INFO("MovementPacketHandler - SPAWN_POSITION_RES sent, accountId: {}, pos: ({}, {}, {}), yaw: {}",
-		accountId, posX, posY, posZ, rotYaw);
+	NET_ENGINE_LOG_INFO("MovementPacketHandler - SPAWN_POSITION_RES sent, accountId: {}, displayNameLen: {}, pos: ({}, {}, {}), yaw: {}",
+		accountId, pPlayer->GetDisplayName().size(), posX, posY, posZ, rotYaw);
 
 	return true;
 }

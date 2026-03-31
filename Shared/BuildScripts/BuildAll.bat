@@ -99,6 +99,11 @@ echo.
 :: Step 1: PacketGenerator
 if "%SKIP_PROTO%"=="0" (
     echo [1/4] Running PacketGenerator...
+    dotnet build "%ROOT_DIR%\Shared\Tools\PacketGenerator\PacketGenerator.csproj" -c Release --verbosity quiet
+    if !errorlevel! neq 0 (
+        echo [FAILED] PacketGenerator.csproj build failed
+        exit /b 1
+    )
     call "%BASE_DIR%PacketGenerator.bat"
     if !errorlevel! neq 0 (
         echo [FAILED] PacketGenerator failed

@@ -85,6 +85,34 @@ namespace
 		return "aws";
 	}
 
+	std::string ResolveAwsCliProfileForS3()
+	{
+		const char* envNames[] = { "AWS_PROFILE", "DH1_AWS_PROFILE" };
+		for (const char* name : envNames)
+		{
+			char* raw = nullptr;
+			size_t len = 0;
+			if (_dupenv_s(&raw, &len, name) != 0 || raw == nullptr)
+			{
+				continue;
+			}
+			std::string v(raw);
+			free(raw);
+			const size_t start = v.find_first_not_of(" \t\r\n");
+			if (start == std::string::npos)
+			{
+				continue;
+			}
+			const size_t end = v.find_last_not_of(" \t\r\n");
+			v = v.substr(start, end - start + 1);
+			if (!v.empty())
+			{
+				return v;
+			}
+		}
+		return {};
+	}
+
 	std::string ReadTextFileLimited(const std::string& path, const size_t maxBytes)
 	{
 		std::ifstream file(path, std::ios::binary);
@@ -130,6 +158,11 @@ namespace
 			if (IsResolvedConfigValue(s3Region))
 			{
 				command += " --region \"" + EscapeDoubleQuotes(s3Region) + "\"";
+			}
+			const std::string awsProfile = ResolveAwsCliProfileForS3();
+			if (!awsProfile.empty())
+			{
+				command += " --profile \"" + EscapeDoubleQuotes(awsProfile) + "\"";
 			}
 			command += " > \"" + EscapeDoubleQuotes(commandLogPath.string()) + "\" 2>&1\"";
 

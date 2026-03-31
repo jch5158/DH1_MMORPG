@@ -25,6 +25,12 @@ namespace DbMigration.Data.Table
         [Column("level")]
         public int Level { get; set; } = 1;
 
+        [Column("current_hp")]
+        public double CurrentHp { get; set; } = 100.0;
+
+        [Column("max_hp")]
+        public double MaxHp { get; set; } = 100.0;
+
         [Column("experience")]
         public long Experience { get; set; } = 0;
 

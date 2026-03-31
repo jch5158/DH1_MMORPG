@@ -1,4 +1,4 @@
-﻿namespace PacketGenerator
+namespace PacketGenerator
 {
     internal static class PacketFormatter
     {
@@ -50,7 +50,18 @@ public:
 
 	static bool HandlePacketServiceType(const uint16 len, const byte* pBuffer, const PacketSessionRef& pSession)
 	{{
+		if (len < static_cast<uint16>(sizeof(PacketHeader)))
+		{{
+			return false;
+		}}
+
 		const auto [packetSize, headerId] = *(reinterpret_cast<const PacketHeader*>(pBuffer));
+
+		// 프레이밍: 실제 수신 길이와 헤더의 size 필드가 다르면 잘못된 파싱으로 힙 손상 가능
+		if (packetSize != len)
+		{{
+			return false;
+		}}
 
 		const uint16 serviceType = GET_SERVICE_TYPE(headerId);
 		const uint16 packetId = GET_PACKET_ID(headerId);
@@ -99,6 +110,9 @@ private:
 // =============================================================================
 // ReSharper disable CppInconsistentNaming
 #pragma once
+
+#include <cstring>
+#include <vector>
 
 #ifdef _UNREAL_
 
@@ -158,8 +172,27 @@ private:
 	template<typename PacketType, typename Handle>
 	static bool HandlePacket(const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession, Handle handlePacket)
 	{{
+		const int32 headerBytes = static_cast<int32>(sizeof(PacketHeader));
+		const int32 bodyBytes = static_cast<int32>(size) - headerBytes;
+		if (bodyBytes < 0)
+		{{
+			return false;
+		}}
+
+		if (pBuffer == nullptr)
+		{{
+			return false;
+		}}
+
+		// IOCP 수신 버퍼를 직접 Parse 대상으로 쓰지 않음 — 릴레이/재사용 경계에서 힙·별칭 이슈로 AV 방지
+		std::vector<byte> body(static_cast<size_t>(bodyBytes));
+		if (bodyBytes > 0)
+		{{
+			std::memcpy(body.data(), pBuffer + headerBytes, static_cast<size_t>(bodyBytes));
+		}}
+
 		PacketType packet{{}};
-		if (packet.ParseFromArray(pBuffer + SIZE_OF_16(PacketHeader), size - SIZE_OF_16(PacketHeader)) == false)
+		if (packet.ParseFromArray(body.data(), bodyBytes) == false)
 		{{
 			return false;
 		}}

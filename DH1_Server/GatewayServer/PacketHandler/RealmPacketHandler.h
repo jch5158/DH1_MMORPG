@@ -5,6 +5,9 @@
 // ReSharper disable CppInconsistentNaming
 #pragma once
 
+#include <cstring>
+#include <vector>
+
 #ifdef _UNREAL_
 
 #include "Network/CppNetEngine/NetEngineWrapper.h"
@@ -75,8 +78,27 @@ private:
 	template<typename PacketType, typename Handle>
 	static bool HandlePacket(const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession, Handle handlePacket)
 	{
+		const int32 headerBytes = static_cast<int32>(sizeof(PacketHeader));
+		const int32 bodyBytes = static_cast<int32>(size) - headerBytes;
+		if (bodyBytes < 0)
+		{
+			return false;
+		}
+
+		if (pBuffer == nullptr)
+		{
+			return false;
+		}
+
+		// IOCP 수신 버퍼를 직접 Parse 대상으로 쓰지 않음 — 릴레이/재사용 경계에서 힙·별칭 이슈로 AV 방지
+		std::vector<byte> body(static_cast<size_t>(bodyBytes));
+		if (bodyBytes > 0)
+		{
+			std::memcpy(body.data(), pBuffer + headerBytes, static_cast<size_t>(bodyBytes));
+		}
+
 		PacketType packet{};
-		if (packet.ParseFromArray(pBuffer + SIZE_OF_16(PacketHeader), size - SIZE_OF_16(PacketHeader)) == false)
+		if (packet.ParseFromArray(body.data(), bodyBytes) == false)
 		{
 			return false;
 		}
