@@ -65,6 +65,9 @@ public class DH1_Client : ModuleRules
         bEnableExceptions = true;
         CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off; // 최신 5.6+ 문법 적용
 
+        // Generated protobuf .pb.cpp each define file-scope symbols with identical names; unity merge breaks ODR.
+        bUseUnity = false;
+
         // Protocol .pb.cpp files live under this module (copied by PacketGenerator) — same compile env as handlers.
         PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
         PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE=0");

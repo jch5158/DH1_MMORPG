@@ -1,5 +1,7 @@
 # Network / Spawn Crash — Residual Risks (Beyond ProtoBridge) Implementation Plan
 
+> **Note (2026-03):** The separate `ProtoBridge` MSBuild target was removed; the UE client compiles `Shared/Protocol` outputs under `DH1_Client/.../Network/Protocol`. Tasks below that mention `ProtoBridge.vcxproj` are obsolete.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** After ruling out ProtoBridge header/`.pb` skew, systematically eliminate or instrument the **remaining** failure modes for `S2C_SPAWN_POSITION_RES` AV and related net-stack instability (relay, framing, UE threading, diagnostics).

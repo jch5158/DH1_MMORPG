@@ -1,4 +1,4 @@
-﻿using PacketGenerator;
+using PacketGenerator;
 
 string configPath;
 string protoPath;
@@ -52,19 +52,12 @@ foreach (var prjConfig in resultConfig.Projects)
     Generator.GenerateCpps(handlers, prjConfig.Role, outputPath);
 }
 
-// ProtoBridge vcxproj 업데이트
-if (!string.IsNullOrEmpty(resultConfig.ProtoBridgePath))
-{
-    var protoBridgeFullPath = Path.Combine(prjBasePath, resultConfig.ProtoBridgePath);
-    ProtoBridgeUpdater.UpdateVcxproj(protoBridgeFullPath, handlers, "CLIENT");
-}
-
-// 클라이언트 프로토콜 헤더 복사 (.pb.h + PacketId.h)
+// 클라이언트 프로토콜 복사 (.pb.h / .pb.cpp → UE 모듈)
 if (!string.IsNullOrEmpty(resultConfig.ClientProtocolPath))
 {
     var protoSourceDir = Path.Combine(prjBasePath, @"Shared\Protocol");
     var clientProtocolDir = Path.Combine(prjBasePath, resultConfig.ClientProtocolPath);
-    ProtoBridgeUpdater.CopyClientProtocolHeaders(protoSourceDir, clientProtocolDir, handlers, "CLIENT");
+    ClientProtocolCopier.CopyClientProtocolHeaders(protoSourceDir, clientProtocolDir, handlers, "CLIENT");
 
     // PacketId.h도 클라이언트에 복사
     var packetIdSource = Path.Combine(prjBasePath, @"Shared\Protocol\PacketId\PacketId.h");

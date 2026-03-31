@@ -1,5 +1,4 @@
 {
-  "protoBridgePath": "DH1_Client\\ProtoBridge\\ProtoBridge.vcxproj",
   "clientProtocolPath": "DH1_Client\\Source\\DH1_Client\\Network\\Protocol",
   "projects": [
     {

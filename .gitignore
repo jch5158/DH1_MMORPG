@@ -127,10 +127,13 @@ DH1_Server/**/obj/
 # =============================================================================
 # Shared libraries (tracked exceptions)
 # =============================================================================
-# CppNetEngine.lib, ProtoBridge.lib은 커밋 대상
+# CppNetEngine.lib 등 Shared/Libraries 산출물은 커밋 대상(아래 예외)
 !Shared/Libraries/**/*.lib
 !Shared/Libraries/**/*.pdb
 Shared/Libraries/**/*.idb
+# Removed ProtoBridge static lib; ignore if recreated locally
+Shared/Libraries/ProtoBridge/
+DH1_Client/ProtoBridge/
 
 # =============================================================================
 # vcpkg

@@ -92,7 +92,7 @@ aws s3 cp s3://dh1-navmesh-prod/navmesh/L_GameWorld.bin C:/Temp/L_GameWorld.bin 
 
 ## 빌드
 
-**전체 빌드** (Engine → Server → ProtoBridge)
+**전체 빌드** (PacketGenerator → Engine → Server → UE 클라이언트)
 ```batch
 Shared\BuildScripts\BuildAll.bat           # Debug
 Shared\BuildScripts\BuildAll.bat Release   # Release
@@ -104,6 +104,12 @@ Shared\BuildScripts\PacketGenerator.bat
 ```
 
 > VS Code에서는 `Ctrl+Shift+B` → 빌드 태스크 선택
+
+**검증(테스트)** — CI와 동일한 최소 점검 (로컬, .NET SDK 10.0.201)
+```batch
+Shared\BuildScripts\RunValidationTests.bat
+```
+`--full` 옵션은 vcpkg `protoc`가 있을 때 proto 컴파일·패킷 생성·Echo 엔진 빌드까지 수행합니다.
 
 ## 서버 실행
 

@@ -6,7 +6,7 @@
 
 **Architecture:** The client parses the movement packet body with `google::protobuf` on the IOCP/network dispatch thread (`NetSession::OnReceivePacket` → `PacketServiceTypeHandler` → `MovementPacketHandler::HandlePacket` → `HANDLE_S2C_SPAWN_POSITION_RES`). The crash stack points at the first read of the nested `position` submessage (`packet.position().x()`), i.e. **inside or immediately after** `has_position()` being true and dereferencing the embedded `Vector3`. Buffer lifetime is synchronous for the duration of `OnReceivePacket`, so **post-parse ownership of scalar/submessage data should not alias the receive buffer**; a fault here strongly suggests **invalid protobuf object state after `ParseFromArray` returned true** (wire interpreted under the wrong schema, partial/corrupt payload, or unrelated heap corruption).
 
-**Tech Stack:** Unreal Engine 5.7 (DH1_Client), C++ NetEngine (IOCP), protobuf (ProtoBridge / generated `Movement.pb`), Gateway relay (`S2S_RELAY_TO_CLIENT_NOT`), World `S2C_SPAWN_POSITION_RES` build path.
+**Tech Stack:** Unreal Engine 5.7 (DH1_Client), C++ NetEngine (IOCP), protobuf (client in-module `.pb.cpp` from `Shared/Protocol`), Gateway relay (`S2S_RELAY_TO_CLIENT_NOT`), World `S2C_SPAWN_POSITION_RES` build path.
 
 ---
 

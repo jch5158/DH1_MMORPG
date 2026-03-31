@@ -1,0 +1,28 @@
+# Minimal CI: .NET tools + LoginServer unit tests (matches RunValidationTests.bat core path).
+# UE / vcpkg / full native build: run locally with BuildAll.bat or RunValidationTests.bat --full.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate-dotnet:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Build PacketGenerator
+        run: dotnet build Shared/Tools/PacketGenerator/PacketGenerator.csproj -c Release
+
+      - name: Test LoginServer.Tests
+        run: dotnet test DH1_Server/LoginServer.Tests/LoginServer.Tests.csproj -c Release --verbosity minimal
