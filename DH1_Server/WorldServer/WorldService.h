@@ -98,6 +98,7 @@ private:
 	float mAoiCellSize;
 	int32 mAoiRange;
 	std::string mNavMeshFilePath;
+	std::string mNavMeshCacheFilePath;
 	std::string mListenIp;
 	uint16 mListenPort;
 

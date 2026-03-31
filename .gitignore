@@ -156,6 +156,11 @@ appsettings.Development.json
 # Claude Code
 # =============================================================================
 .claude/worktrees/
+.claude/settings.local.json
+
+# Cursor local workspace artifacts
+.cursor/
+.mcp.json
 
 # =============================================================================
 # JetBrains
@@ -168,7 +173,6 @@ appsettings.Development.json
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
-!.vscode/launch.json
 !.vscode/extensions.json
 
 # =============================================================================
@@ -183,6 +187,16 @@ Desktop.ini
 # =============================================================================
 *.log
 !DH1_Client/**/*.log
+# MCP/agent runtime logs are always local-only
+DH1_Client/Plugins/UmgMcp/**/*.log
+logs/
+debug-*.log
+
+# Local MCP tool workspaces (not part of game source)
+DH1_Client/Plugins/UmgMcp/
+Shared/Tools/MCP/
+# Local NavMesh cache downloaded at runtime
+Shared/NavMesh/Downloaded/
 
 # =============================================================================
 # Misc
@@ -192,4 +206,3 @@ __pycache__/
 *.pyc
 cmake-build-*/
 build_log.txt
-.claude/settings.local.json

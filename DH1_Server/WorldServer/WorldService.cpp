@@ -18,7 +18,115 @@
 #include "PacketHandler/ServerHeartbeatPacketHandler.h"
 #include "Enum.pb.h"
 #include "Table/PlayerCharacterTable.h"
+#include "Table/NavMeshSourceTable.h"
 #include "PlayerObject.h"
+#include <cstdlib>
+#include <filesystem>
+#include <thread>
+
+namespace
+{
+	bool IsS3Uri(const std::string& value)
+	{
+		return value.rfind("s3://", 0) == 0;
+	}
+
+	bool IsResolvedConfigValue(const std::string& value)
+	{
+		return !value.empty() && value.find("${") == std::string::npos;
+	}
+
+	std::string EscapeDoubleQuotes(const std::string& value)
+	{
+		std::string out;
+		out.reserve(value.size());
+		for (const char ch : value)
+		{
+			if (ch == '"')
+			{
+				out += "\\\"";
+			}
+			else
+			{
+				out.push_back(ch);
+			}
+		}
+		return out;
+	}
+
+	std::string ResolveAwsCliExecutable()
+	{
+		char* envAwsPathRaw = nullptr;
+		size_t envAwsPathLen = 0;
+		if (_dupenv_s(&envAwsPathRaw, &envAwsPathLen, "DH1_AWS_CLI_PATH") == 0 && envAwsPathRaw != nullptr)
+		{
+			const std::string configuredPath(envAwsPathRaw);
+			free(envAwsPathRaw);
+			if (!configuredPath.empty() && std::filesystem::exists(configuredPath))
+			{
+				return configuredPath;
+			}
+		}
+
+		constexpr const char* shortAwsPath = "C:\\Progra~1\\Amazon\\AWSCLIV2\\aws.exe";
+		if (std::filesystem::exists(shortAwsPath))
+		{
+			return shortAwsPath;
+		}
+
+		constexpr const char* defaultAwsPath = "C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe";
+		if (std::filesystem::exists(defaultAwsPath))
+		{
+			return defaultAwsPath;
+		}
+
+		return "aws";
+	}
+
+	bool DownloadS3UriToFile(const std::string& s3Uri, const std::string& targetPath, const std::string& s3Region,
+		const int32 retryCount, const int32 retryDelayMs)
+	{
+		std::error_code ec;
+		const std::filesystem::path outPath(targetPath);
+		std::filesystem::create_directories(outPath.parent_path(), ec);
+		if (ec)
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - Failed to create navmesh cache directory for S3 download: {}, ec={}",
+				outPath.parent_path().string(), ec.value());
+			return false;
+		}
+
+		const int32 attempts = std::max(1, retryCount);
+		const std::string awsExe = ResolveAwsCliExecutable();
+		for (int32 attempt = 1; attempt <= attempts; ++attempt)
+		{
+			std::string command = "cmd /c \"\"" + EscapeDoubleQuotes(awsExe) + "\" s3 cp \"" +
+				EscapeDoubleQuotes(s3Uri) + "\" \"" + EscapeDoubleQuotes(targetPath) + "\" --only-show-errors";
+			if (IsResolvedConfigValue(s3Region))
+			{
+				command += " --region \"" + EscapeDoubleQuotes(s3Region) + "\"";
+			}
+			command += "\"";
+
+			const int32 exitCode = std::system(command.c_str());
+			if (exitCode == 0)
+			{
+				return true;
+			}
+
+			NET_ENGINE_LOG_WARN(
+				"WorldService::Initialize - S3 navmesh download failed, uri: {}, attempt: {}/{}, exitCode: {}",
+				s3Uri, attempt, attempts, exitCode);
+
+			if (attempt < attempts && retryDelayMs > 0)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(retryDelayMs));
+			}
+		}
+
+		return false;
+	}
+}
 
 BOOL WINAPI WorldService::ConsoleCtrlHandler(const DWORD ctrlType)
 {
@@ -146,6 +254,9 @@ bool WorldService::Initialize(const JsonConfig& config)
 	mGatewayHeartbeatTimeoutMs = worldServerConfig.GetInt64("gatewayHeartbeatTimeoutMs");
 	mRealmHeartbeatTimeoutMs = worldServerConfig.GetInt64("realmHeartbeatTimeoutMs");
 	mRedisTtlSeconds = worldServerConfig.GetInt64("redisTtlSeconds");
+	const std::string navMeshMapCode = worldServerConfig.HasKey("navMeshMapCode")
+		? worldServerConfig.GetString("navMeshMapCode")
+		: mWorldName;
 
 	// GameTick config
 	if (config.HasKey("gameTick"))
@@ -168,14 +279,135 @@ bool WorldService::Initialize(const JsonConfig& config)
 	if (config.HasKey("gameTick"))
 	{
 		const JsonConfig gameTickConfig = config.GetSection("gameTick");
-		if (gameTickConfig.HasKey("navMeshFilePath"))
+		const bool navMeshRequireSuccess = gameTickConfig.GetBool("navMeshRequireSuccess", true);
+		if (mpMySqlService == nullptr)
 		{
-			mNavMeshFilePath = gameTickConfig.GetString("navMeshFilePath");
-			if (!mpNavMeshManager->LoadFromFile(mNavMeshFilePath))
-			{
-				NET_ENGINE_LOG_WARN("WorldService::Initialize - NavMesh not loaded ({}), pathfinding disabled", mNavMeshFilePath);
-			}
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - MySQL service is required for DB-backed NavMesh source");
+			return false;
 		}
+		if (navMeshMapCode.empty())
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - worldServer.navMeshMapCode is required");
+			return false;
+		}
+
+		mNavMeshFilePath.clear();
+		try
+		{
+			mpMySqlService->ExecuteSync([this, &navMeshMapCode](sqlpp::mysql::connection& db)
+				{
+					const db::WorldNavmeshSource table{};
+					const auto result = db(sqlpp::select(sqlpp::all_of(table))
+						.from(table)
+						.where((table.worldServerId == mWorldServerId)
+							and (table.mapCode == navMeshMapCode)
+							and (table.isActive == true)));
+
+					if (!result.empty())
+					{
+						const auto& row = result.front();
+						const std::string pathFromDb = row.navmeshPath;
+						if (!pathFromDb.empty())
+						{
+							mNavMeshFilePath = pathFromDb;
+						}
+					}
+				});
+		}
+		catch (const std::exception& ex)
+		{
+			NET_ENGINE_LOG_ERROR(
+				"WorldService::Initialize - NavMesh DB lookup failed, worldServerId: {}, mapCode: {}, error: {}",
+				mWorldServerId, navMeshMapCode, ex.what());
+			return false;
+		}
+
+		if (mNavMeshFilePath.empty())
+		{
+			NET_ENGINE_LOG_ERROR(
+				"WorldService::Initialize - NavMesh source is missing in DB, worldServerId: {}, mapCode: {}",
+				mWorldServerId, navMeshMapCode);
+			return false;
+		}
+
+		NET_ENGINE_LOG_INFO(
+			"WorldService::Initialize - NavMesh source resolved from DB, worldServerId: {}, mapCode: {}, path: {}",
+			mWorldServerId, navMeshMapCode, mNavMeshFilePath);
+
+		std::string resolvedNavMeshPath = mNavMeshFilePath;
+		if (!IsS3Uri(mNavMeshFilePath))
+		{
+			NET_ENGINE_LOG_ERROR(
+				"WorldService::Initialize - Only S3 URI is supported for NavMesh source. path: {}",
+				mNavMeshFilePath);
+			return false;
+		}
+
+		if (gameTickConfig.HasKey("navMeshCacheFilePath"))
+		{
+			mNavMeshCacheFilePath = gameTickConfig.GetString("navMeshCacheFilePath");
+		}
+
+		if (!IsResolvedConfigValue(mNavMeshCacheFilePath))
+		{
+			const std::filesystem::path defaultCachePath =
+				std::filesystem::temp_directory_path() / "DH1_MMORPG" / "NavMesh" /
+				("world_" + std::to_string(mWorldServerId) + ".bin");
+			mNavMeshCacheFilePath = defaultCachePath.string();
+		}
+
+		const std::string s3Region = gameTickConfig.HasKey("navMeshS3Region")
+			? gameTickConfig.GetString("navMeshS3Region")
+			: std::string();
+		const int32 retryCount = gameTickConfig.HasKey("navMeshDownloadRetryCount")
+			? gameTickConfig.GetInt32("navMeshDownloadRetryCount")
+			: 3;
+		const int32 retryDelayMs = gameTickConfig.HasKey("navMeshDownloadRetryDelayMs")
+			? gameTickConfig.GetInt32("navMeshDownloadRetryDelayMs")
+			: 500;
+
+		if (DownloadS3UriToFile(mNavMeshFilePath, mNavMeshCacheFilePath, s3Region, retryCount, retryDelayMs))
+		{
+			resolvedNavMeshPath = mNavMeshCacheFilePath;
+			NET_ENGINE_LOG_INFO("WorldService::Initialize - NavMesh downloaded from S3 URI to cache path: {}",
+				resolvedNavMeshPath);
+		}
+		else
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - Failed to download NavMesh from S3 URI, source: {}",
+				mNavMeshFilePath);
+			if (navMeshRequireSuccess)
+			{
+				return false;
+			}
+
+			NET_ENGINE_LOG_WARN("WorldService::Initialize - NavMesh requireSuccess disabled, pathfinding disabled");
+			resolvedNavMeshPath.clear();
+		}
+
+		if (resolvedNavMeshPath.empty() || !IsResolvedConfigValue(resolvedNavMeshPath))
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - NavMesh path is empty or unresolved: {}", resolvedNavMeshPath);
+			if (navMeshRequireSuccess)
+			{
+				return false;
+			}
+			NET_ENGINE_LOG_WARN("WorldService::Initialize - NavMesh requireSuccess disabled, pathfinding disabled");
+		}
+		else if (!mpNavMeshManager->LoadFromFile(resolvedNavMeshPath))
+		{
+			NET_ENGINE_LOG_ERROR("WorldService::Initialize - NavMesh load failed ({})", resolvedNavMeshPath);
+			if (navMeshRequireSuccess)
+			{
+				return false;
+			}
+			NET_ENGINE_LOG_WARN("WorldService::Initialize - NavMesh requireSuccess disabled, pathfinding disabled");
+		}
+	}
+	else
+	{
+		NET_ENGINE_LOG_ERROR("WorldService::Initialize - gameTick section is required");
+		return false;
 	}
 
 	// GameTickProcessor

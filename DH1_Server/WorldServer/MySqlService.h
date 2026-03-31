@@ -42,6 +42,26 @@ public:
 	// 유저 로그아웃 시 배정 해제 (카운트 감소)
 	void ReleaseRoutingKey(const uint64 routingKey);
 
+	// 초기화 단계 등 동기 컨텍스트에서 즉시 단건 쿼리 실행
+	template<typename Func>
+	bool ExecuteSync(Func&& func)
+	{
+		if (!mbInitialized || mpLoadBalancer == nullptr)
+		{
+			return false;
+		}
+
+		const uint64 actorId = mpLoadBalancer->GetNextRoundRobin();
+		const MySqlActorRef pMySql = GetMySqlActorRef(actorId);
+		if (pMySql == nullptr)
+		{
+			return false;
+		}
+
+		func(pMySql->GetConnection());
+		return true;
+	}
+
 private:
 	template<typename Func>
 	void PostToActor(const uint64 actorId, Func&& func)

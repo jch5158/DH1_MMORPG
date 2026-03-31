@@ -37,10 +37,49 @@ cp .env.example .env
 | `DH1_MYSQL_PASSWORD` | MySQL 비밀번호 |
 | `DH1_REDIS_HOST` | Redis 호스트 (기본: 127.0.0.1) |
 | `DH1_REDIS_PORT` | Redis 포트 (기본: 6379) |
-| `DH1_NAVMESH_PATH` | NavMesh 바이너리 절대 경로 |
+| `DH1_S3_REGION` | `s3://` 사용 시 AWS 리전 (`ap-northeast-2` 등) |
+| `DH1_NAVMESH_CACHE_PATH` | S3에서 내려받은 NavMesh 로컬 캐시 경로 |
 | `DH1_SMTP_HOST` | SMTP 서버 주소 (예: smtp.gmail.com) |
 | `DH1_SMTP_SENDER_EMAIL` | 발신자 이메일 주소 |
 | `DH1_SMTP_APP_PASSWORD` | SMTP 앱 비밀번호 (Gmail 기준: 앱 비밀번호) |
+
+`Shared/Config/Server/WorldServerConfig.json`의 `gameTick.navMeshRequireSuccess`가 `true`이면(기본값)  
+NavMesh 다운로드/로딩 실패 시 WorldServer는 fail-fast로 기동을 중단합니다.
+
+### NavMesh 소스 DB (필수)
+
+WorldServer는 `world_navmesh_source` 테이블이 있으면 `world_server_id + map_code` 기준으로 NavMesh 경로를 먼저 조회합니다.  
+NavMesh 소스는 `s3://bucket/key`만 지원합니다.
+
+```sql
+CREATE TABLE world_navmesh_source (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  world_server_id INT NOT NULL,
+  map_code VARCHAR(64) NOT NULL,
+  navmesh_path VARCHAR(1024) NOT NULL,  -- s3://bucket/key
+  navmesh_version INT NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  UNIQUE KEY uq_world_map (world_server_id, map_code, is_active)
+);
+```
+
+### 권장 운영 방식 (IAM)
+
+- EC2(또는 서버)에 IAM Role 부여 (`s3:GetObject`)
+- 서버에 AWS CLI 설치
+- `world_navmesh_source.navmesh_path`를 `s3://...`로 관리
+- WorldServer 시작 시 `aws s3 cp`로 캐시에 내려받아 로드
+
+#### 최소 권한 정책 예시
+
+- 파일: `Shared/Config/Server/IamPolicy.NavMeshReadOnly.example.json`
+- 버킷명/접두어를 실제 운영 값으로 바꿔서 IAM Role에 연결
+
+```bash
+# 권한 연결 후 테스트 (서버 머신)
+aws s3 ls s3://dh1-navmesh-prod/navmesh/ --region ap-northeast-2
+aws s3 cp s3://dh1-navmesh-prod/navmesh/L_GameWorld.bin C:/Temp/L_GameWorld.bin --region ap-northeast-2
+```
 
 ## 빌드
 

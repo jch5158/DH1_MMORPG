@@ -27,6 +27,9 @@ SAuthMasterWidget::~SAuthMasterWidget()
 
 void SAuthMasterWidget::Construct(const FArguments& InArgs)
 {
+	// Keep auth card slightly below DH1 logo with a consistent offset.
+	constexpr float AuthTopPadding = 295.0f;
+
 	SAssignNew(PanelSwitcher, SWidgetSwitcher)
 
 			// 0: Login
@@ -92,7 +95,7 @@ void SAuthMasterWidget::Construct(const FArguments& InArgs)
 			PanelSwitcher.ToSharedRef(),
 			HAlign_Center,
 			VAlign_Top,
-			FMargin(0.0f, 280.0f, 0.0f, 0.0f))
+			FMargin(0.0f, AuthTopPadding, 0.0f, 0.0f))
 	];
 
 	// Bind ClientNetSubsystem delegates

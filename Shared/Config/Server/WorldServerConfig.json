@@ -17,6 +17,7 @@
     "worldServer": {
         "worldServerId": 1,
         "worldName": "World-1",
+        "navMeshMapCode": "L_GameWorld",
         "maxPlayers": 1000,
         "heartbeatIntervalMs": 5000,
         "gatewayHeartbeatTimeoutMs": 15000,
@@ -28,7 +29,11 @@
         "moveSpeed": 600,
         "aoiCellSize": 2000,
         "aoiRange": 1,
-        "navMeshFilePath": "${DH1_NAVMESH_PATH}"
+        "navMeshRequireSuccess": true,
+        "navMeshS3Region": "${DH1_S3_REGION}",
+        "navMeshCacheFilePath": "${DH1_NAVMESH_CACHE_PATH}",
+        "navMeshDownloadRetryCount": 3,
+        "navMeshDownloadRetryDelayMs": 500
     },
     "realmServer": {
         "ip": "127.0.0.1",
