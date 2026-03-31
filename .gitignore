@@ -216,3 +216,9 @@ __pycache__/
 *.pyc
 cmake-build-*/
 build_log.txt
+
+# =============================================================================
+# FlopAI 프리빌트 — Plugins/**/Binaries 및 Binaries/ 무시를 이 경로만 해제 (git add -f 불필요)
+# =============================================================================
+!DH1_Client/Plugins/FlopAI/Binaries/
+!DH1_Client/Plugins/FlopAI/Binaries/**
