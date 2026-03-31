@@ -354,12 +354,13 @@ void SSignUpPanel::OnSignUpResponseReceived(FHttpRequestPtr Request, FHttpRespon
 	AuthErrorMapper::ReportUnknownCodeIfAny(ResCode, TEXT("RegisterResponse"));
 	if (ResponseCode == 200)
 	{
-		OnGoToEmailVerification.ExecuteIfBound(TEXT("이메일 인증이 필요합니다."), ResEmail);
+		// 서버가 회원가입 처리 시 이미 인증 메일을 발송함 — 자동 재전송 시 쿨다운(30초)에 걸릴 수 있음
+		OnGoToEmailVerification.ExecuteIfBound(TEXT("이메일 인증이 필요합니다."), ResEmail, true);
 	}
 	else if (ResponseCode == 403 && AuthErrorMapper::IsEmailUnverifiedCode(ResCode))
 	{
 		const FString FinalMessage = AuthErrorMapper::ResolveMessage(ResponseCode, ResCode, ResMessage);
-		OnGoToEmailVerification.ExecuteIfBound(FinalMessage, ResEmail);
+		OnGoToEmailVerification.ExecuteIfBound(FinalMessage, ResEmail, false);
 	}
 	else
 	{

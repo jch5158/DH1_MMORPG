@@ -7,7 +7,7 @@
 DECLARE_DELEGATE(FOnGoToSignUp);
 DECLARE_DELEGATE(FOnGoToResetPassword);
 DECLARE_DELEGATE(FOnLoginSuccess);
-DECLARE_DELEGATE_TwoParams(FOnGoToEmailVerification, const FString& /*StatusText*/, const FString& /*Email*/);
+DECLARE_DELEGATE_ThreeParams(FOnGoToEmailVerification, const FString& /*StatusText*/, const FString& /*Email*/, bool /*bSkipAutoSendVerifyCode*/);
 
 class SLoginPanel : public SCompoundWidget
 {

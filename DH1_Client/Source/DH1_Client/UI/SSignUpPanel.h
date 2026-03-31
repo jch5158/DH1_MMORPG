@@ -7,7 +7,7 @@
 #include "Interfaces/IHttpResponse.h"
 
 DECLARE_DELEGATE_TwoParams(FOnSignUpGoToLogin, const FString& /*StatusText*/, const FString& /*Email*/);
-DECLARE_DELEGATE_TwoParams(FOnSignUpGoToEmailVerification, const FString& /*StatusText*/, const FString& /*Email*/);
+DECLARE_DELEGATE_ThreeParams(FOnSignUpGoToEmailVerification, const FString& /*StatusText*/, const FString& /*Email*/, bool /*bSkipAutoSendVerifyCode*/);
 
 class SSignUpPanel : public SCompoundWidget
 {

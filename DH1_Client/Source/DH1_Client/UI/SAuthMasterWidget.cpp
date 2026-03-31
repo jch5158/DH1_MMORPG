@@ -48,9 +48,9 @@ void SAuthMasterWidget::Construct(const FArguments& InArgs)
 				{
 					HandleLoginSuccess();
 				})
-				.OnGoToEmailVerification_Lambda([this](const FString& StatusText, const FString& Email)
+				.OnGoToEmailVerification_Lambda([this](const FString& StatusText, const FString& Email, bool bSkipAutoSend)
 				{
-					SwitchToEmailVerification(StatusText, Email);
+					SwitchToEmailVerification(StatusText, Email, bSkipAutoSend);
 				})
 			]
 
@@ -62,9 +62,9 @@ void SAuthMasterWidget::Construct(const FArguments& InArgs)
 				{
 					SwitchToLogin(StatusText, Email);
 				})
-				.OnGoToEmailVerification_Lambda([this](const FString& StatusText, const FString& Email)
+				.OnGoToEmailVerification_Lambda([this](const FString& StatusText, const FString& Email, bool bSkipAutoSend)
 				{
-					SwitchToEmailVerification(StatusText, Email);
+					SwitchToEmailVerification(StatusText, Email, bSkipAutoSend);
 				})
 			]
 
@@ -139,11 +139,11 @@ void SAuthMasterWidget::SwitchToSignUp()
 	}
 }
 
-void SAuthMasterWidget::SwitchToEmailVerification(const FString& StatusText, const FString& Email)
+void SAuthMasterWidget::SwitchToEmailVerification(const FString& StatusText, const FString& Email, const bool bSkipAutoSendVerifyCode)
 {
 	if (EmailVerificationPanel.IsValid())
 	{
-		EmailVerificationPanel->ResetPanel(StatusText, Email);
+		EmailVerificationPanel->ResetPanel(StatusText, Email, bSkipAutoSendVerifyCode);
 	}
 
 	if (PanelSwitcher.IsValid())

@@ -35,7 +35,7 @@ private:
 	// Panel switching
 	void SwitchToLogin(const FString& StatusText, const FString& Email);
 	void SwitchToSignUp();
-	void SwitchToEmailVerification(const FString& StatusText, const FString& Email);
+	void SwitchToEmailVerification(const FString& StatusText, const FString& Email, bool bSkipAutoSendVerifyCode = false);
 	void SwitchToResetPassword();
 
 	// Login success flow

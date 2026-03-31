@@ -292,6 +292,47 @@ namespace AuthStyle
 		return Style;
 	}
 
+	// 로그인 패널 전용 — FCoreStyle "Checkbox"는 게임 Slate에서 그려지지 않거나 대비가 없을 수 있음
+	inline const FCheckBoxStyle& RememberEmailCheckBoxStyle()
+	{
+		static FCheckBoxStyle Style;
+		static bool bInitialized = false;
+		if (!bInitialized)
+		{
+			bInitialized = true;
+			Style = FCoreStyle::Get().GetWidgetStyle<FCheckBoxStyle>(TEXT("Checkbox"));
+			auto ApplyRoundedBox = [](FSlateBrush& Img, const FLinearColor& Fill, const FLinearColor& Border,
+									   float BorderW = 1.25f)
+			{
+				Img.SetResourceObject(nullptr);
+				Img.DrawAs = ESlateBrushDrawType::RoundedBox;
+				Img.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+				Img.OutlineSettings.CornerRadii = FVector4(4.0f, 4.0f, 4.0f, 4.0f);
+				Img.OutlineSettings.Width = BorderW;
+				Img.OutlineSettings.Color = Border;
+				Img.OutlineSettings.bUseBrushTransparency = true;
+				Img.TintColor = FSlateColor(Fill);
+			};
+
+			const FLinearColor UncheckedFill(0.07f, 0.09f, 0.14f, 0.94f);
+			const FLinearColor UncheckedBorder(0.58f, 0.62f, 0.74f, 0.78f);
+			const FLinearColor UncheckedHoverFill(0.10f, 0.12f, 0.18f, 0.96f);
+			const FLinearColor CheckedFill(0.38f, 0.46f, 0.62f, 0.98f);
+			const FLinearColor CheckedBorder(0.82f, 0.86f, 0.96f, 0.92f);
+			const FLinearColor CheckedHoverFill(0.44f, 0.52f, 0.68f, 0.99f);
+
+			ApplyRoundedBox(Style.UncheckedImage, UncheckedFill, UncheckedBorder);
+			ApplyRoundedBox(Style.UncheckedHoveredImage, UncheckedHoverFill, UncheckedBorder);
+			ApplyRoundedBox(Style.UncheckedPressedImage, UncheckedFill, UncheckedBorder);
+			ApplyRoundedBox(Style.CheckedImage, CheckedFill, CheckedBorder);
+			ApplyRoundedBox(Style.CheckedHoveredImage, CheckedHoverFill, CheckedBorder);
+			ApplyRoundedBox(Style.CheckedPressedImage, CheckedFill, CheckedBorder);
+			ApplyRoundedBox(Style.UndeterminedImage, UncheckedFill, UncheckedBorder);
+			Style.Padding = FMargin(0.0f);
+		}
+		return Style;
+	}
+
 	// =========================================================================
 	// Composite helpers
 	// =========================================================================

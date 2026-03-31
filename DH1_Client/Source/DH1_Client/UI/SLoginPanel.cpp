@@ -130,10 +130,15 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 						SNew(SHorizontalBox)
 						+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
 						[
-							SAssignNew(RememberEmailCheckBox, SCheckBox)
-							.Style(&FCoreStyle::Get().GetWidgetStyle<FCheckBoxStyle>("Checkbox"))
-							.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
-							.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+							SNew(SBox)
+							.WidthOverride(22.0f)
+							.HeightOverride(22.0f)
+							[
+								SAssignNew(RememberEmailCheckBox, SCheckBox)
+								.Style(&AuthStyle::RememberEmailCheckBoxStyle())
+								.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+								.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+							]
 						]
 						+ SHorizontalBox::Slot().AutoWidth().Padding(10.0f, 0.0f, 0.0f, 0.0f).VAlign(VAlign_Center)
 						[
@@ -374,5 +379,5 @@ void SLoginPanel::HandleHttpLoginError(const int32 StatusCode, const FString& Me
 void SLoginPanel::HandleEmailVerificationRequired(const FString& Message, const FString& Email)
 {
 	SetLoading(false);
-	OnGoToEmailVerification.ExecuteIfBound(Message, Email);
+	OnGoToEmailVerification.ExecuteIfBound(Message, Email, false);
 }

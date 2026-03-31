@@ -339,7 +339,7 @@ void UAuthMasterWidget::HandleHttpLoginError(int32 StatusCode, const FString& Me
 
 void UAuthMasterWidget::HandleEmailVerificationRequired(const FString& Message, const FString& Email)
 {
-	OnEmailVerificationRequired(Message, Email);
+	OnEmailVerificationRequired(Message, Email, false);
 }
 
 void UAuthMasterWidget::HandleRealmListReceived(const TArray<FRealmServerInfo>& RealmList)

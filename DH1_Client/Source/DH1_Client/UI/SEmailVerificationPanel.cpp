@@ -190,7 +190,7 @@ void SEmailVerificationPanel::Construct(const FArguments& InArgs)
 	];
 }
 
-void SEmailVerificationPanel::ResetPanel(const FString& InStatusText, const FString& Email)
+void SEmailVerificationPanel::ResetPanel(const FString& InStatusText, const FString& Email, const bool bSkipAutoSendVerifyCode)
 {
 	SetVerifyLoading(false);
 	SetResendLoading(false);
@@ -198,6 +198,7 @@ void SEmailVerificationPanel::ResetPanel(const FString& InStatusText, const FStr
 	if (StatusText.IsValid())
 	{
 		StatusText->SetText(FText::FromString(InStatusText));
+		StatusText->SetColorAndOpacity(FSlateColor(AuthStyle::C::Dim));
 	}
 
 	if (EmailText.IsValid())
@@ -208,6 +209,21 @@ void SEmailVerificationPanel::ResetPanel(const FString& InStatusText, const FStr
 	if (VerifyCodeInput.IsValid())
 	{
 		VerifyCodeInput->SetText(FText::GetEmpty());
+	}
+
+	const FString Trimmed = Email.TrimStartAndEnd();
+	if (!bSkipAutoSendVerifyCode && !Trimmed.IsEmpty())
+	{
+		FString PendingStatus;
+		if (InStatusText.IsEmpty())
+		{
+			PendingStatus = TEXT("인증 코드를 이메일로 보내는 중...");
+		}
+		else
+		{
+			PendingStatus = FString::Printf(TEXT("%s\n\n%s"), *InStatusText, TEXT("인증 코드를 이메일로 보내는 중..."));
+		}
+		StartSendVerifyCode(false, PendingStatus);
 	}
 }
 
@@ -291,25 +307,32 @@ FReply SEmailVerificationPanel::OnVerifyClicked()
 	return FReply::Handled();
 }
 
-FReply SEmailVerificationPanel::OnResendClicked()
+void SEmailVerificationPanel::StartSendVerifyCode(const bool bManualResend, const FString& PendingStatus)
 {
 	if (!EmailText.IsValid())
 	{
-		return FReply::Handled();
+		return;
 	}
 	if (bResendRequestInFlight)
 	{
-		return FReply::Handled();
+		return;
 	}
 
-	const FString Email = EmailText->GetText().ToString();
+	const FString Email = EmailText->GetText().ToString().TrimStartAndEnd();
 	if (Email.IsEmpty())
 	{
 		SetStatus(TEXT("이메일 인증에 문제가 발생되었습니다."), AuthStyle::C::Error);
-		return FReply::Handled();
+		return;
 	}
 
-	SetStatus(TEXT("인증 코드 재전송 중..."), AuthStyle::C::Body);
+	if (PendingStatus.IsEmpty())
+	{
+		SetStatus(bManualResend ? TEXT("인증 코드 재전송 중...") : TEXT("인증 코드를 이메일로 보내는 중..."), AuthStyle::C::Body);
+	}
+	else
+	{
+		SetStatus(PendingStatus, AuthStyle::C::Body);
+	}
 	SetResendLoading(true);
 
 	const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
@@ -337,9 +360,15 @@ FReply SEmailVerificationPanel::OnResendClicked()
 	if (!Request->ProcessRequest())
 	{
 		SetResendLoading(false);
-		SetStatus(TEXT("인증 코드 재전송 요청 전송에 실패했습니다."), AuthStyle::C::Error);
+		SetStatus(
+			bManualResend ? TEXT("인증 코드 재전송 요청 전송에 실패했습니다.") : TEXT("인증 코드 발송 요청 전송에 실패했습니다."),
+			AuthStyle::C::Error);
 	}
+}
 
+FReply SEmailVerificationPanel::OnResendClicked()
+{
+	StartSendVerifyCode(true);
 	return FReply::Handled();
 }
 

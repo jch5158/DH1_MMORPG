@@ -26,9 +26,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Auth|Events")
 	void OnHttpLoginError(int32 StatusCode, const FString& Message);
 
-	// 이메일 인증 필요
+	// 이메일 인증 필요 (bSkipAutoSendVerifyCode: 서버가 이미 인증 메일을 보낸 경우 true — UMG에서 자동 재전송 생략)
 	UFUNCTION(BlueprintImplementableEvent, Category = "Auth|Events")
-	void OnEmailVerificationRequired(const FString& Message, const FString& Email);
+	void OnEmailVerificationRequired(const FString& Message, const FString& Email, bool bSkipAutoSendVerifyCode);
 
 	// 렐름 목록 수신
 	UFUNCTION(BlueprintImplementableEvent, Category = "Auth|Events")
