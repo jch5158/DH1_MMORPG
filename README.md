@@ -27,17 +27,12 @@ DH1_MMORPG/
 ```bash
 # .env.example을 복사해 값을 채워주세요
 cp .env.example .env
-
-# 민감값/개인 오버라이드는 .env.local 사용
-cp .env.local.example .env.local
 ```
 
-환경 변수 로드 우선순위는 `default -> .env -> .env.local` 입니다.  
-즉, 같은 키가 있으면 `.env.local` 값이 최종 적용됩니다.
+환경 설정은 `.env` 단일 파일 기준으로 운영합니다.
 
-- `.env`: 팀 공용 기본값(비민감)
-- `.env.local`: 개인/민감값(커밋 금지, `.gitignore` 적용)
-- `.env.example`, `.env.local.example`: 템플릿(커밋 대상)
+- `.env`: 로컬 실행용 환경 변수(커밋 금지, `.gitignore` 적용)
+- `.env.example`: 템플릿(커밋 대상)
 
 | 변수 | 설명 |
 |------|------|
@@ -52,6 +47,10 @@ cp .env.local.example .env.local
 | `DH1_SMTP_HOST` | SMTP 서버 주소 (예: smtp.gmail.com) |
 | `DH1_SMTP_SENDER_EMAIL` | 발신자 이메일 주소 |
 | `DH1_SMTP_APP_PASSWORD` | SMTP 앱 비밀번호 (Gmail 기준: 앱 비밀번호) |
+| `BRAVE_API_KEY` | Brave Search MCP API 키 |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | GitHub MCP용 Personal Access Token |
+| `FLOPPERAM_API_KEY` | Flopperam Unreal MCP API 키 |
+| `FIRECRAWL_API_KEY` | Firecrawl MCP API 키 |
 
 `Shared/Config/Server/WorldServerConfig.json`의 `gameTick.navMeshRequireSuccess`가 `true`이면(기본값)  
 NavMesh 다운로드/로딩 실패 시 WorldServer는 fail-fast로 기동을 중단합니다.

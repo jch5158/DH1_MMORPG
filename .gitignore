@@ -152,7 +152,6 @@ vcpkg-manifest-install.log
 .env.local
 .env.*.local
 !.env.example
-!.env.local.example
 appsettings.Development.json
 
 # =============================================================================
@@ -163,6 +162,7 @@ appsettings.Development.json
 
 # Cursor local workspace artifacts
 .cursor/
+.cursor/mcp.json
 .mcp.json
 
 # =============================================================================
