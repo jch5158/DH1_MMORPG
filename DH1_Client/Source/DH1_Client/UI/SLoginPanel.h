@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Widgets/Input/SCheckBox.h"
 #include "Widgets/SCompoundWidget.h"
 
 DECLARE_DELEGATE(FOnGoToSignUp);
@@ -36,14 +37,19 @@ private:
 	FReply OnLoginClicked();
 	FReply OnSignUpClicked();
 	FReply OnResetPasswordClicked();
+	void OnRememberEmailCheckChanged(ECheckBoxState NewState);
 
 	void SetStatus(const FString& Text, const FLinearColor& Color);
 	void SetLoading(bool bLoading);
 
 	TSharedPtr<SEditableTextBox> EmailInput;
 	TSharedPtr<SEditableTextBox> PasswordInput;
+	TSharedPtr<SCheckBox> RememberEmailCheckBox;
 	TSharedPtr<STextBlock> StatusText;
 	TSharedPtr<SButton> LoginButton;
+
+	bool bRememberEmail = false;
+	FString LastSubmittedLoginEmail;
 
 	FOnGoToSignUp OnGoToSignUp;
 	FOnGoToResetPassword OnGoToResetPassword;

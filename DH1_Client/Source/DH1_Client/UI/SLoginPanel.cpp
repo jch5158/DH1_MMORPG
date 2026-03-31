@@ -1,7 +1,9 @@
 #include "SLoginPanel.h"
+#include "AuthLocalPreferences.h"
 #include "AuthWidgetStyle.h"
 #include "AuthErrorMapper.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
+#include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
@@ -39,6 +41,9 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 	OnGoToResetPassword = InArgs._OnGoToResetPassword;
 	OnLoginSuccess = InArgs._OnLoginSuccess;
 	OnGoToEmailVerification = InArgs._OnGoToEmailVerification;
+
+	FString SavedEmailFromDisk;
+	AuthLocalPreferences::LoadLoginRemember(bRememberEmail, SavedEmailFromDisk);
 
 	ChildSlot
 	[
@@ -107,7 +112,7 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 					]
 
 					// Password input
-					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 36)
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 16)
 					[
 						AuthStyle::MakeInput(PasswordInput, FText::GetEmpty(), true,
 							[this](const FText&, ETextCommit::Type CommitType)
@@ -117,6 +122,26 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 									OnLoginClicked();
 								}
 							})
+					]
+
+					// Remember email
+					+ SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 20)
+					[
+						SNew(SHorizontalBox)
+						+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+						[
+							SAssignNew(RememberEmailCheckBox, SCheckBox)
+							.Style(&FCoreStyle::Get().GetWidgetStyle<FCheckBoxStyle>("Checkbox"))
+							.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+							.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+						]
+						+ SHorizontalBox::Slot().AutoWidth().Padding(10.0f, 0.0f, 0.0f, 0.0f).VAlign(VAlign_Center)
+						[
+							SNew(STextBlock)
+							.Text(FText::FromString(TEXT("이메일 저장")))
+							.Font(AuthStyle::SmallFont())
+							.ColorAndOpacity(AuthStyle::C::Body)
+						]
 					]
 
 					// Login Button
@@ -163,6 +188,11 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 			]
 		]
 	];
+
+	if (EmailInput.IsValid() && bRememberEmail && !SavedEmailFromDisk.IsEmpty())
+	{
+		EmailInput->SetText(FText::FromString(SavedEmailFromDisk));
+	}
 
 	// 이메일 입력란에 자동 포커스
 	if (EmailInput.IsValid())
@@ -253,6 +283,7 @@ FReply SLoginPanel::OnLoginClicked()
 
 	SetStatus(TEXT("로그인 중..."), AuthStyle::C::Body);
 	SetLoading(true);
+	LastSubmittedLoginEmail = Email;
 
 	if (GEngine && GEngine->GameViewport)
 	{
@@ -286,6 +317,11 @@ FReply SLoginPanel::OnResetPasswordClicked()
 	return FReply::Handled();
 }
 
+void SLoginPanel::OnRememberEmailCheckChanged(const ECheckBoxState NewState)
+{
+	bRememberEmail = (NewState == ECheckBoxState::Checked);
+}
+
 void SLoginPanel::SetStatus(const FString& Text, const FLinearColor& Color)
 {
 	if (StatusText.IsValid())
@@ -301,6 +337,10 @@ void SLoginPanel::SetLoading(const bool bLoading)
 	{
 		LoginButton->SetEnabled(!bLoading);
 	}
+	if (RememberEmailCheckBox.IsValid())
+	{
+		RememberEmailCheckBox->SetEnabled(!bLoading);
+	}
 }
 
 void SLoginPanel::HandleGatewayLoginResult(const int32 Result)
@@ -309,6 +349,7 @@ void SLoginPanel::HandleGatewayLoginResult(const int32 Result)
 
 	if (Result == 0)
 	{
+		AuthLocalPreferences::SaveLoginRemember(bRememberEmail, LastSubmittedLoginEmail);
 		OnLoginSuccess.ExecuteIfBound();
 	}
 	else
