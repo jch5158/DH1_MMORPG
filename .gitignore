@@ -139,8 +139,9 @@ Shared/vcpkg/vcpkg_installed/
 vcpkg-manifest-install.log
 
 # =============================================================================
-# Runtime generated output (logs, crashes, crashpad copies)
+# Runtime generated output (Logs, crashes, crashpad copies)
 # =============================================================================
+**/Logs/
 **/logs/
 **/crashes/
 **/crashpad_handler.exe

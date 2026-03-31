@@ -7,7 +7,8 @@ struct NetEngineLoggerConfig
 	bool bIsUnrealClient = false;
 	bool bEnableConsole = true;
 	bool bEnableFile = true;
-	std::string logDirectory = "logs";
+	/** 파일 싱크 사용 시 NetEngineInit에서 DH1_LOG_DIR 기준으로 덮어씀 */
+	std::string logDirectory;
 	std::string logFileName = "NetEngine.log";
 	uint32 asyncQueueSize = 8192;
 	uint32 asyncThreadCount = 1;
