@@ -125,15 +125,18 @@ DH1_Server/**/bin/
 DH1_Server/**/obj/
 
 # =============================================================================
-# Shared libraries (tracked exceptions)
+# Shared — CppNetEngine / 도구 로컬 빌드 산출물 (커밋 제외)
 # =============================================================================
-# CppNetEngine.lib 등 Shared/Libraries 산출물은 커밋 대상(아래 예외)
-!Shared/Libraries/**/*.lib
-!Shared/Libraries/**/*.pdb
+Shared/Libraries/CppNetEngine/**/*.lib
+Shared/Libraries/CppNetEngine/**/*.pdb
 Shared/Libraries/**/*.idb
 # Removed ProtoBridge static lib; ignore if recreated locally
 Shared/Libraries/ProtoBridge/
 DH1_Client/ProtoBridge/
+
+Shared/Tools/PacketGenerator/Binaries/PacketGenerator.exe
+Shared/Tools/PacketGenerator/Binaries/PacketGenerator.dll
+Shared/Tools/PacketGenerator/Binaries/PacketGenerator.pdb
 
 # =============================================================================
 # vcpkg
@@ -202,7 +205,6 @@ debug-*.log
 # Local MCP tool workspaces (not part of game source)
 DH1_Client/Plugins/UmgMcp/
 Shared/Tools/MCP/
-Shared/Tools/PacketGenerator/Binaries/*.pdb
 # Local NavMesh cache downloaded at runtime
 Shared/NavMesh/Downloaded/
 
