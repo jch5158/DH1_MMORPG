@@ -199,6 +199,7 @@ debug-*.log
 # Local MCP tool workspaces (not part of game source)
 DH1_Client/Plugins/UmgMcp/
 Shared/Tools/MCP/
+Shared/Tools/PacketGenerator/Binaries/*.pdb
 # Local NavMesh cache downloaded at runtime
 Shared/NavMesh/Downloaded/
 
