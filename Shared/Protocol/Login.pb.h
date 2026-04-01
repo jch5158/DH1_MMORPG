@@ -50,12 +50,16 @@ namespace Protocol {
 class C2S_LOGIN_REQ;
 struct C2S_LOGIN_REQDefaultTypeInternal;
 extern C2S_LOGIN_REQDefaultTypeInternal _C2S_LOGIN_REQ_default_instance_;
+class S2C_KICK_NOT;
+struct S2C_KICK_NOTDefaultTypeInternal;
+extern S2C_KICK_NOTDefaultTypeInternal _S2C_KICK_NOT_default_instance_;
 class S2C_LOGIN_RES;
 struct S2C_LOGIN_RESDefaultTypeInternal;
 extern S2C_LOGIN_RESDefaultTypeInternal _S2C_LOGIN_RES_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
 template<> ::Protocol::C2S_LOGIN_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_LOGIN_REQ>(Arena*);
+template<> ::Protocol::S2C_KICK_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_KICK_NOT>(Arena*);
 template<> ::Protocol::S2C_LOGIN_RES* Arena::CreateMaybeMessage<::Protocol::S2C_LOGIN_RES>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Protocol {
@@ -372,6 +376,159 @@ class S2C_LOGIN_RES final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Login_2eproto;
 };
+// -------------------------------------------------------------------
+
+class S2C_KICK_NOT final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S2C_KICK_NOT) */ {
+ public:
+  inline S2C_KICK_NOT() : S2C_KICK_NOT(nullptr) {}
+  ~S2C_KICK_NOT() override;
+  explicit PROTOBUF_CONSTEXPR S2C_KICK_NOT(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S2C_KICK_NOT(const S2C_KICK_NOT& from);
+  S2C_KICK_NOT(S2C_KICK_NOT&& from) noexcept
+    : S2C_KICK_NOT() {
+    *this = ::std::move(from);
+  }
+
+  inline S2C_KICK_NOT& operator=(const S2C_KICK_NOT& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S2C_KICK_NOT& operator=(S2C_KICK_NOT&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S2C_KICK_NOT& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S2C_KICK_NOT* internal_default_instance() {
+    return reinterpret_cast<const S2C_KICK_NOT*>(
+               &_S2C_KICK_NOT_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(S2C_KICK_NOT& a, S2C_KICK_NOT& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S2C_KICK_NOT* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S2C_KICK_NOT* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S2C_KICK_NOT* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S2C_KICK_NOT>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S2C_KICK_NOT& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S2C_KICK_NOT& from) {
+    S2C_KICK_NOT::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S2C_KICK_NOT* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S2C_KICK_NOT";
+  }
+  protected:
+  explicit S2C_KICK_NOT(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kReasonFieldNumber = 1,
+  };
+  // string reason = 1;
+  void clear_reason();
+  const std::string& reason() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_reason(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_reason();
+  PROTOBUF_NODISCARD std::string* release_reason();
+  void set_allocated_reason(std::string* reason);
+  private:
+  const std::string& _internal_reason() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_reason(const std::string& value);
+  std::string* _internal_mutable_reason();
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.S2C_KICK_NOT)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr reason_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Login_2eproto;
+};
 // ===================================================================
 
 
@@ -477,9 +634,65 @@ inline void S2C_LOGIN_RES::set_result(::Protocol::eLoginResult value) {
   // @@protoc_insertion_point(field_set:Protocol.S2C_LOGIN_RES.result)
 }
 
+// -------------------------------------------------------------------
+
+// S2C_KICK_NOT
+
+// string reason = 1;
+inline void S2C_KICK_NOT::clear_reason() {
+  _impl_.reason_.ClearToEmpty();
+}
+inline const std::string& S2C_KICK_NOT::reason() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_KICK_NOT.reason)
+  return _internal_reason();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S2C_KICK_NOT::set_reason(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.reason_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S2C_KICK_NOT.reason)
+}
+inline std::string* S2C_KICK_NOT::mutable_reason() {
+  std::string* _s = _internal_mutable_reason();
+  // @@protoc_insertion_point(field_mutable:Protocol.S2C_KICK_NOT.reason)
+  return _s;
+}
+inline const std::string& S2C_KICK_NOT::_internal_reason() const {
+  return _impl_.reason_.Get();
+}
+inline void S2C_KICK_NOT::_internal_set_reason(const std::string& value) {
+  
+  _impl_.reason_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S2C_KICK_NOT::_internal_mutable_reason() {
+  
+  return _impl_.reason_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S2C_KICK_NOT::release_reason() {
+  // @@protoc_insertion_point(field_release:Protocol.S2C_KICK_NOT.reason)
+  return _impl_.reason_.Release();
+}
+inline void S2C_KICK_NOT::set_allocated_reason(std::string* reason) {
+  if (reason != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.reason_.SetAllocated(reason, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.reason_.IsDefault()) {
+    _impl_.reason_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S2C_KICK_NOT.reason)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

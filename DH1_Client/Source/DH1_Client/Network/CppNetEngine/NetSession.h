@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "CoreMinimal.h"
 #include "Network/CppNetEngine/NetEngineWrapper.h"
 #include <PacketSession.h>
@@ -24,6 +24,7 @@ public:
 private:
 
 	AuthData mAuthData;
+	eDisconnectReason mbDisconnectReason = eDisconnectReason::Closed;
 };
 
 DECLARE_SMART_PTR(NetSession);

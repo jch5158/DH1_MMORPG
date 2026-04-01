@@ -101,6 +101,11 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 					}
 				}
 
+				{
+					Protocol::S2C_KICK_NOT kickPacket;
+					kickPacket.set_reason("다른 기기에서 로그인되어 연결이 종료되었습니다.");
+					pExistingSession->Send(LoginPacketHandler::MakeSendBuffer(kickPacket));
+				}
 				pExistingSession->SetDuplicateLoginHandled();
 				pExistingSession->Disconnect(eDisconnectReason::DuplicateLogin);
 				(void)pManager->RemoveClientSession(argAccountId);

@@ -1,4 +1,4 @@
-﻿syntax = "proto3";
+syntax = "proto3";
 package Protocol;
 
 import "Enum.proto";
@@ -22,4 +22,12 @@ message S2C_LOGIN_RES
     option (receiver) = CLIENT;
 
     eLoginResult result = 1;
+}
+
+message S2C_KICK_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    string reason = 1;
 }

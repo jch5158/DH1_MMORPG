@@ -4,6 +4,7 @@
 #include "ClientSessionManager.h"
 #include "GatewayService.h"
 #include "PacketHandler/GameSessionPacketHandler.h"
+#include "PacketHandler/LoginPacketHandler.h"
 #include "ThreadManager.h"
 
 void RedisSubscriber::Start(const std::string& connectionUri, const int32 gatewayId)
@@ -134,7 +135,11 @@ void RedisSubscriber::onKickMessage(const std::string& message)
 			}
 		}
 
-		// 세션 킥 (OnDisconnected에서 LEAVE_NOT 중복 전송 방지)
+		{
+			Protocol::S2C_KICK_NOT kickPacket;
+			kickPacket.set_reason("다른 기기에서 로그인되어 연결이 종료되었습니다.");
+			pExistingSession->Send(LoginPacketHandler::MakeSendBuffer(kickPacket));
+		}
 		pExistingSession->SetDuplicateLoginHandled();
 		pExistingSession->Disconnect(eDisconnectReason::DuplicateLogin);
 		(void)pManager->RemoveClientSession(accountId);

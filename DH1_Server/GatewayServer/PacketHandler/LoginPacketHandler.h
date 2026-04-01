@@ -65,6 +65,7 @@ public:
 	
 
 	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_LOGIN_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_LOGIN_RES); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_KICK_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2C_KICK_NOT); }
 	
 
 private:
