@@ -228,7 +228,24 @@ void SLoginPanel::ResetPanel(const FString& InStatusText, const FString& Email)
 		StatusText->SetText(FText::FromString(InStatusText));
 	}
 
-	if (EmailInput.IsValid())
+	if (Email.IsEmpty())
+	{
+		bool bRememberFromDisk = false;
+		FString SavedEmailFromDisk;
+		AuthLocalPreferences::LoadLoginRemember(bRememberFromDisk, SavedEmailFromDisk);
+		bRememberEmail = bRememberFromDisk;
+		if (RememberEmailCheckBox.IsValid())
+		{
+			RememberEmailCheckBox->SetIsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+		}
+		if (EmailInput.IsValid())
+		{
+			const FString EmailToShow =
+				(bRememberEmail && !SavedEmailFromDisk.IsEmpty()) ? SavedEmailFromDisk : FString();
+			EmailInput->SetText(FText::FromString(EmailToShow));
+		}
+	}
+	else if (EmailInput.IsValid())
 	{
 		EmailInput->SetText(FText::FromString(Email));
 	}

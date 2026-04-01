@@ -28,7 +28,7 @@ SAuthMasterWidget::~SAuthMasterWidget()
 void SAuthMasterWidget::Construct(const FArguments& InArgs)
 {
 	// Keep auth card slightly below DH1 logo with a consistent offset.
-	constexpr float AuthTopPadding = 295.0f;
+	constexpr float AuthTopPadding = 282.0f;
 
 	SAssignNew(PanelSwitcher, SWidgetSwitcher)
 
