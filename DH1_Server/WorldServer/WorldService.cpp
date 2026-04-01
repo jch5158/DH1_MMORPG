@@ -788,12 +788,16 @@ void WorldService::cleanupPendingSessions()
 	{
 		NET_ENGINE_LOG_WARN("WorldService::cleanupPendingSessions - Pending session expired, accountId: {}", accountId);
 
-		// PlayerObject 제거
+		// PlayerObject 제거 (주변 플레이어에게 LEAVE 전송 후)
 		if (mpGridManager != nullptr)
 		{
 			const auto pObject = mpGridManager->GetObjectByAccountId(accountId);
 			if (pObject != nullptr)
 			{
+				if (mpGameTickProcessor != nullptr)
+				{
+					mpGameTickProcessor->NotifyNearbyPlayersAboutEntityLeave(pObject);
+				}
 				mpGridManager->RemoveObject(pObject->GetId());
 			}
 		}

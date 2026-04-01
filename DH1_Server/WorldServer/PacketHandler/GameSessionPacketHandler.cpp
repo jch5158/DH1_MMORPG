@@ -399,6 +399,16 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 			}
 		}
 
+		const auto pGameTickProcessor = worldService.GetGameTickProcessorRef();
+		if (pGameTickProcessor != nullptr)
+		{
+			const auto pLeaveObject = pGridManager != nullptr ? pGridManager->GetObjectByAccountId(accountId) : nullptr;
+			if (pLeaveObject != nullptr)
+			{
+				pGameTickProcessor->NotifyNearbyPlayersAboutEntityLeave(pLeaveObject);
+			}
+		}
+
 		if (pGameSessionManager->SetSessionPending(accountId))
 		{
 			NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Session set to Pending (DuplicateLogin), accountId: {}", accountId);
