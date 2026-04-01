@@ -56,12 +56,13 @@ enum eServiceType : int {
   SERVICE_TYPE_REALM = 5,
   SERVICE_TYPE_GAME_SESSION = 6,
   SERVICE_TYPE_MOVEMENT = 7,
+  SERVICE_TYPE_CHAT = 8,
   eServiceType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   eServiceType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool eServiceType_IsValid(int value);
 constexpr eServiceType eServiceType_MIN = SERVICE_TYPE_NONE;
-constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_MOVEMENT;
+constexpr eServiceType eServiceType_MAX = SERVICE_TYPE_CHAT;
 constexpr int eServiceType_ARRAYSIZE = eServiceType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eServiceType_descriptor();
@@ -217,6 +218,32 @@ inline bool eSessionLeaveReason_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eSessionLeaveReason>(
     eSessionLeaveReason_descriptor(), name, value);
 }
+enum eChatChannel : int {
+  CHAT_CHANNEL_LOCAL = 0,
+  CHAT_CHANNEL_WORLD = 1,
+  CHAT_CHANNEL_REALM = 2,
+  eChatChannel_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  eChatChannel_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool eChatChannel_IsValid(int value);
+constexpr eChatChannel eChatChannel_MIN = CHAT_CHANNEL_LOCAL;
+constexpr eChatChannel eChatChannel_MAX = CHAT_CHANNEL_REALM;
+constexpr int eChatChannel_ARRAYSIZE = eChatChannel_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eChatChannel_descriptor();
+template<typename T>
+inline const std::string& eChatChannel_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, eChatChannel>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function eChatChannel_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    eChatChannel_descriptor(), enum_t_value);
+}
+inline bool eChatChannel_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, eChatChannel* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eChatChannel>(
+    eChatChannel_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -268,6 +295,11 @@ template <> struct is_proto_enum< ::Protocol::eSessionLeaveReason> : ::std::true
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eSessionLeaveReason>() {
   return ::Protocol::eSessionLeaveReason_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::eChatChannel> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eChatChannel>() {
+  return ::Protocol::eChatChannel_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

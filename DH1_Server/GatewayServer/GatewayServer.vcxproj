@@ -271,8 +271,15 @@
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\RealmPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
+    <ClCompile Include="PacketHandler\ChatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\MovementPacketHandler.cpp" />
     <ClCompile Include="$(SharedDir)Protocol\Movement.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(SharedDir)Protocol\Chat.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -304,6 +311,8 @@
     <ClInclude Include="$(SharedDir)Protocol\Struct.pb.h" />
     <ClInclude Include="$(SharedDir)Protocol\GameSession.pb.h" />
     <ClInclude Include="$(SharedDir)Protocol\Movement.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\Chat.pb.h" />
+    <ClInclude Include="PacketHandler\ChatPacketHandler.h" />
     <ClInclude Include="PacketHandler\MovementPacketHandler.h" />
     <ClInclude Include="EnumType.h" />
     <ClInclude Include="ClientSession.h" />
@@ -336,6 +345,7 @@
     <None Include="$(SharedDir)Protocol\Proto\Struct.proto" />
     <None Include="$(SharedDir)Protocol\Proto\Realm.proto" />
     <None Include="$(SharedDir)Protocol\Proto\GameSession.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\Chat.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

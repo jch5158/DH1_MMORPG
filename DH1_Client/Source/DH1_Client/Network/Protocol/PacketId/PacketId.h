@@ -6,6 +6,15 @@
 
 namespace packet_id
 {
+	enum eChatPacketId : uint16
+	{
+        C2S_CHAT_REQ = 1,
+        S2C_CHAT_NOT = 2,
+        S2S_REALM_CHAT_SUBMIT_NOT = 3,
+        S2S_REALM_CHAT_DELIVER_NOT = 4,
+	};
+
+
 	enum eEchoPacketId : uint16
 	{
         C2S_ECHO_REQ = 1,

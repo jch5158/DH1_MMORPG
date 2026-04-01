@@ -57,6 +57,12 @@ struct FNetworkEntitySpawnData
 	float YawDegrees = 0.f;
 };
 
+struct FNetworkEntityMoveState
+{
+	FVector TargetPosition = FVector::ZeroVector;
+	float TargetYaw = 0.f;
+};
+
 UCLASS(Config = Game)
 class DH1_CLIENT_API UClientNetSubsystem : public UGameInstanceSubsystem, public FTickableGameObject
 {
@@ -230,4 +236,5 @@ private:
     bool bClientWorldChatAllowed = false;
 
     TMap<uint64, TWeakObjectPtr<AActor>> NetworkEntityActors;
+	TMap<uint64, FNetworkEntityMoveState> NetworkEntityMoveStates;
 };

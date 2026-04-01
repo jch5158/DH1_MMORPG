@@ -14,6 +14,7 @@ class UCharacterOverheadWidget;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
+class UUserWidget;
 
 /**
  *  A controllable top-down perspective character
@@ -77,6 +78,11 @@ private:
 	void SetupCharacterOverhead();
 	void PushOverheadToWidget();
 	void OnCharacterOverheadDataFromNet(const FString& Name, int32 Level, float CurrentHP, float MaxHP);
+
+	void CreateAndRegisterChatWidget();
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> ChatWidgetInstance;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Overhead")
 	TSubclassOf<UCharacterOverheadWidget> OverheadWidgetClass;

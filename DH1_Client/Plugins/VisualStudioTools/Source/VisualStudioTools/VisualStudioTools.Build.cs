@@ -28,7 +28,11 @@ public class VisualStudioTools : ModuleRules
         }
         else
         {
-            PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+            // Live Coding patch link often fails with LNK2011 ("precompiled object not linked in") for editor
+            // plugin modules that use shared PCH. NoPCHs trades compile time for reliable Live Coding here.
+            PCHUsage = Target.bBuildEditor
+                ? ModuleRules.PCHUsageMode.NoPCHs
+                : ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
         }
 
         // To support UE5.1+, the code is using the new FTopLevelAssetPath API

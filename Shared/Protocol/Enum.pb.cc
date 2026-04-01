@@ -22,41 +22,44 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[6];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[7];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nEnum.proto\022\010Protocol*\345\001\n\014eServiceType\022"
+  "\n\nEnum.proto\022\010Protocol*\374\001\n\014eServiceType\022"
   "\025\n\021SERVICE_TYPE_NONE\020\000\022\025\n\021SERVICE_TYPE_E"
   "CHO\020\001\022\026\n\022SERVICE_TYPE_LOGIN\020\002\022\032\n\026SERVICE"
   "_TYPE_HEARTBEAT\020\003\022!\n\035SERVICE_TYPE_SERVER"
   "_HEARTBEAT\020\004\022\026\n\022SERVICE_TYPE_REALM\020\005\022\035\n\031"
   "SERVICE_TYPE_GAME_SESSION\020\006\022\031\n\025SERVICE_T"
-  "YPE_MOVEMENT\020\007*\233\001\n\005eRole\022\r\n\tROLE_NONE\020\000\022"
-  "\n\n\006CLIENT\020\001\022\017\n\013ECHO_CLIENT\020\002\022\017\n\013ECHO_SER"
-  "VER\020\003\022\022\n\016GATEWAY_SERVER\020\004\022\020\n\014WORLD_SERVE"
-  "R\020\005\022\021\n\rCENTER_SERVER\020\006\022\n\n\006SERVER\020\007\022\020\n\014RE"
-  "ALM_SERVER\020\010*\227\001\n\014eLoginResult\022\021\n\rLOGIN_S"
-  "UCCESS\020\000\022\035\n\031LOGIN_FAIL_INVALID_TICKET\020\001\022"
-  "\032\n\026LOGIN_FAIL_SERVER_FULL\020\002\022\032\n\026LOGIN_FAI"
-  "L_MAINTENANCE\020\003\022\035\n\031LOGIN_FAIL_INTERNAL_E"
-  "RROR\020\004*\216\001\n\022eRealmSelectResult\022\030\n\024REALM_S"
-  "ELECT_SUCCESS\020\000\022\037\n\033REALM_SELECT_FAIL_NOT"
-  "_FOUND\020\001\022\032\n\026REALM_SELECT_FAIL_FULL\020\002\022!\n\035"
-  "REALM_SELECT_FAIL_MAINTENANCE\020\003*\213\001\n\022eGam"
-  "eSessionResult\022\030\n\024GAME_SESSION_SUCCESS\020\000"
-  "\022\032\n\026GAME_SESSION_FAIL_FULL\020\001\022\037\n\033GAME_SES"
-  "SION_FAIL_DUPLICATE\020\002\022\036\n\032GAME_SESSION_FA"
-  "IL_INTERNAL\020\003*R\n\023eSessionLeaveReason\022\030\n\024"
-  "SESSION_LEAVE_NORMAL\020\000\022!\n\035SESSION_LEAVE_"
-  "DUPLICATE_LOGIN\020\001b\006proto3"
+  "YPE_MOVEMENT\020\007\022\025\n\021SERVICE_TYPE_CHAT\020\010*\233\001"
+  "\n\005eRole\022\r\n\tROLE_NONE\020\000\022\n\n\006CLIENT\020\001\022\017\n\013EC"
+  "HO_CLIENT\020\002\022\017\n\013ECHO_SERVER\020\003\022\022\n\016GATEWAY_"
+  "SERVER\020\004\022\020\n\014WORLD_SERVER\020\005\022\021\n\rCENTER_SER"
+  "VER\020\006\022\n\n\006SERVER\020\007\022\020\n\014REALM_SERVER\020\010*\227\001\n\014"
+  "eLoginResult\022\021\n\rLOGIN_SUCCESS\020\000\022\035\n\031LOGIN"
+  "_FAIL_INVALID_TICKET\020\001\022\032\n\026LOGIN_FAIL_SER"
+  "VER_FULL\020\002\022\032\n\026LOGIN_FAIL_MAINTENANCE\020\003\022\035"
+  "\n\031LOGIN_FAIL_INTERNAL_ERROR\020\004*\216\001\n\022eRealm"
+  "SelectResult\022\030\n\024REALM_SELECT_SUCCESS\020\000\022\037"
+  "\n\033REALM_SELECT_FAIL_NOT_FOUND\020\001\022\032\n\026REALM"
+  "_SELECT_FAIL_FULL\020\002\022!\n\035REALM_SELECT_FAIL"
+  "_MAINTENANCE\020\003*\213\001\n\022eGameSessionResult\022\030\n"
+  "\024GAME_SESSION_SUCCESS\020\000\022\032\n\026GAME_SESSION_"
+  "FAIL_FULL\020\001\022\037\n\033GAME_SESSION_FAIL_DUPLICA"
+  "TE\020\002\022\036\n\032GAME_SESSION_FAIL_INTERNAL\020\003*R\n\023"
+  "eSessionLeaveReason\022\030\n\024SESSION_LEAVE_NOR"
+  "MAL\020\000\022!\n\035SESSION_LEAVE_DUPLICATE_LOGIN\020\001"
+  "*V\n\014eChatChannel\022\026\n\022CHAT_CHANNEL_LOCAL\020\000"
+  "\022\026\n\022CHAT_CHANNEL_WORLD\020\001\022\026\n\022CHAT_CHANNEL"
+  "_REALM\020\002b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 945, descriptor_table_protodef_Enum_2eproto,
+    false, false, 1056, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -84,6 +87,7 @@ bool eServiceType_IsValid(int value) {
     case 5:
     case 6:
     case 7:
+    case 8:
       return true;
     default:
       return false;
@@ -168,6 +172,21 @@ bool eSessionLeaveReason_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eChatChannel_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[6];
+}
+bool eChatChannel_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
       return true;
     default:
       return false;

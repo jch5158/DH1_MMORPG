@@ -15,9 +15,24 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
+#include "Components/Border.h"
+#include "Components/Button.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/ComboBoxString.h"
+#include "Components/EditableTextBox.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+#include "Components/ScrollBox.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
+#include "Styling/CoreStyle.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Network/Subsystem/ClientNetSubsystem.h"
 #include "UI/UMG/CharacterOverheadWidget.h"
+#include "UI/UMG/ChatPanelWidget.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacterMove, Log, All);
 
@@ -319,6 +334,8 @@ void ADH1_ClientCharacter::OnSpawnPositionReceived(const FVector& Position, cons
 	}
 	PushOverheadToWidget();
 
+	CreateAndRegisterChatWidget();
+
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 	{
 		NetSub->OnSpawnPositionReceived.RemoveAll(this);
@@ -493,12 +510,127 @@ void ADH1_ClientCharacter::OnCharacterOverheadDataFromNet(const FString& Name, c
 	SetOverheadDisplayData(Name, Level, CurrentHP, MaxHP);
 }
 
+void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
+{
+	if (ChatWidgetInstance != nullptr)
+	{
+		UE_LOG(LogCharacterMove, Warning, TEXT("CreateChat: already exists"));
+		return;
+	}
+
+	UWorld* W = GetWorld();
+	if (W == nullptr)
+	{
+		UE_LOG(LogCharacterMove, Error, TEXT("CreateChat: World is null"));
+		return;
+	}
+
+	UClientNetSubsystem* NetSub = GetNetSubsystem();
+	if (NetSub == nullptr)
+	{
+		UE_LOG(LogCharacterMove, Error, TEXT("CreateChat: NetSub is null"));
+		return;
+	}
+
+	ChatWidgetInstance = CreateWidget<UChatPanelWidget>(W);
+	if (ChatWidgetInstance == nullptr)
+	{
+		UE_LOG(LogCharacterMove, Error, TEXT("CreateChat: CreateWidget<UChatPanelWidget> returned null"));
+		return;
+	}
+	if (ChatWidgetInstance->WidgetTree == nullptr)
+	{
+		UE_LOG(LogCharacterMove, Error, TEXT("CreateChat: WidgetTree is null"));
+		return;
+	}
+	UE_LOG(LogCharacterMove, Warning, TEXT("CreateChat: widget created, building tree..."));
+
+	UWidgetTree* Tree = ChatWidgetInstance->WidgetTree;
+
+	UCanvasPanel* Root = Tree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), TEXT("ChatRoot"));
+	Tree->RootWidget = Root;
+
+	UBorder* BgBorder = Tree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("ChatBg"));
+	Root->AddChildToCanvas(BgBorder);
+	BgBorder->SetBrushColor(FLinearColor(0.02f, 0.03f, 0.06f, 0.72f));
+	BgBorder->SetPadding(FMargin(6.f));
+	if (UCanvasPanelSlot* BgSlot = Cast<UCanvasPanelSlot>(BgBorder->Slot))
+	{
+		BgSlot->SetAnchors(FAnchors(0.f, 1.f, 0.f, 1.f));
+		BgSlot->SetAlignment(FVector2D(0.f, 1.f));
+		BgSlot->SetPosition(FVector2D(12.f, -12.f));
+		BgSlot->SetSize(FVector2D(420.f, 260.f));
+		BgSlot->SetAutoSize(false);
+	}
+
+	UVerticalBox* MainVBox = Tree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("ChatMainVBox"));
+	BgBorder->SetContent(MainVBox);
+
+	UScrollBox* ScrollLog = Tree->ConstructWidget<UScrollBox>(UScrollBox::StaticClass(), TEXT("Scroll_Log"));
+	MainVBox->AddChildToVerticalBox(ScrollLog);
+	if (UVerticalBoxSlot* ScrollSlot = Cast<UVerticalBoxSlot>(ScrollLog->Slot))
+	{
+		ScrollSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+	}
+
+	UVerticalBox* LogLines = Tree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("VBox_LogLines"));
+	ScrollLog->AddChild(LogLines);
+
+	UHorizontalBox* InputRow = Tree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("InputRow"));
+	MainVBox->AddChildToVerticalBox(InputRow);
+	if (UVerticalBoxSlot* InputSlot = Cast<UVerticalBoxSlot>(InputRow->Slot))
+	{
+		InputSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+		InputSlot->SetPadding(FMargin(0.f, 4.f, 0.f, 0.f));
+	}
+
+	UComboBoxString* Combo = Tree->ConstructWidget<UComboBoxString>(UComboBoxString::StaticClass(), TEXT("Combo_Channel"));
+	InputRow->AddChildToHorizontalBox(Combo);
+	if (UHorizontalBoxSlot* ComboSlot = Cast<UHorizontalBoxSlot>(Combo->Slot))
+	{
+		ComboSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+		ComboSlot->SetPadding(FMargin(0.f, 0.f, 4.f, 0.f));
+	}
+
+	UEditableTextBox* Edit = Tree->ConstructWidget<UEditableTextBox>(UEditableTextBox::StaticClass(), TEXT("EditableText_Message"));
+	InputRow->AddChildToHorizontalBox(Edit);
+	if (UHorizontalBoxSlot* EditSlot = Cast<UHorizontalBoxSlot>(Edit->Slot))
+	{
+		EditSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+	}
+
+	UButton* SendBtn = Tree->ConstructWidget<UButton>(UButton::StaticClass(), TEXT("Btn_Send"));
+	InputRow->AddChildToHorizontalBox(SendBtn);
+	UTextBlock* SendLabel = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("SendLabel"));
+	SendBtn->SetContent(SendLabel);
+	SendLabel->SetText(FText::FromString(TEXT("전송")));
+	FSlateFontInfo BtnFont = FCoreStyle::GetDefaultFontStyle("Regular", 12);
+	SendLabel->SetFont(BtnFont);
+	if (UHorizontalBoxSlot* BtnSlot = Cast<UHorizontalBoxSlot>(SendBtn->Slot))
+	{
+		BtnSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+		BtnSlot->SetPadding(FMargin(4.f, 0.f, 0.f, 0.f));
+	}
+
+	ChatWidgetInstance->AddToViewport(50);
+	NetSub->RegisterChatUi(ChatWidgetInstance);
+
+	UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Chat widget created and registered"));
+}
+
 void ADH1_ClientCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 	{
+		NetSub->UnregisterChatUi();
 		NetSub->OnCharacterOverheadData.RemoveAll(this);
 		NetSub->OnSpawnPositionReceived.RemoveAll(this);
+	}
+
+	if (ChatWidgetInstance != nullptr)
+	{
+		ChatWidgetInstance->RemoveFromParent();
+		ChatWidgetInstance = nullptr;
 	}
 
 	Super::EndPlay(EndPlayReason);

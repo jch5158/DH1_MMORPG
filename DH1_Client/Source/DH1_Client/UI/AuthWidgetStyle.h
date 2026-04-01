@@ -292,7 +292,47 @@ namespace AuthStyle
 		return Style;
 	}
 
-	// 로그인 패널 전용 — FCoreStyle "Checkbox"는 게임 Slate에서 그려지지 않거나 대비가 없을 수 있음
+	inline const FSlateBrush& RememberEmailToggleUncheckedBoxBrush()
+	{
+		static FSlateBrush B;
+		static bool bInit = false;
+		if (!bInit)
+		{
+			bInit = true;
+			B.SetResourceObject(nullptr);
+			B.DrawAs = ESlateBrushDrawType::RoundedBox;
+			B.ImageSize = FVector2D(20.0f, 20.0f);
+			B.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+			B.OutlineSettings.CornerRadii = FVector4(5.0f, 5.0f, 5.0f, 5.0f);
+			B.OutlineSettings.Width = 1.4f;
+			B.OutlineSettings.Color = FLinearColor(0.52f, 0.56f, 0.68f, 0.60f);
+			B.OutlineSettings.bUseBrushTransparency = true;
+			B.TintColor = FSlateColor(FLinearColor(0.08f, 0.10f, 0.16f, 0.50f));
+		}
+		return B;
+	}
+
+	inline const FSlateBrush& RememberEmailToggleCheckedBoxBrush()
+	{
+		static FSlateBrush B;
+		static bool bInit = false;
+		if (!bInit)
+		{
+			bInit = true;
+			B.SetResourceObject(nullptr);
+			B.DrawAs = ESlateBrushDrawType::RoundedBox;
+			B.ImageSize = FVector2D(20.0f, 20.0f);
+			B.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+			B.OutlineSettings.CornerRadii = FVector4(5.0f, 5.0f, 5.0f, 5.0f);
+			B.OutlineSettings.Width = 1.2f;
+			B.OutlineSettings.Color = FLinearColor(0.78f, 0.82f, 0.94f, 0.50f);
+			B.OutlineSettings.bUseBrushTransparency = true;
+			B.TintColor = FSlateColor(FLinearColor(0.70f, 0.76f, 0.88f, 0.28f));
+		}
+		return B;
+	}
+
+	// 로그인 패널 전용 — 실제 박스/✓는 SLoginPanel SOverlay로 그림. 여기서는 22×22 히트 영역만 투명 브러시로 제공.
 	inline const FCheckBoxStyle& RememberEmailCheckBoxStyle()
 	{
 		static FCheckBoxStyle Style;
@@ -300,34 +340,24 @@ namespace AuthStyle
 		if (!bInitialized)
 		{
 			bInitialized = true;
-			Style = FCoreStyle::Get().GetWidgetStyle<FCheckBoxStyle>(TEXT("Checkbox"));
-			auto ApplyRoundedBox = [](FSlateBrush& Img, const FLinearColor& Fill, const FLinearColor& Border,
-									   float BorderW = 1.25f)
+			Style = FCheckBoxStyle();
+			Style.CheckBoxType = ESlateCheckBoxType::CheckBox;
+			auto Hit = [](FSlateBrush& Img)
 			{
-				Img.SetResourceObject(nullptr);
-				Img.DrawAs = ESlateBrushDrawType::RoundedBox;
-				Img.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
-				Img.OutlineSettings.CornerRadii = FVector4(4.0f, 4.0f, 4.0f, 4.0f);
-				Img.OutlineSettings.Width = BorderW;
-				Img.OutlineSettings.Color = Border;
-				Img.OutlineSettings.bUseBrushTransparency = true;
-				Img.TintColor = FSlateColor(Fill);
+				Img = FSlateBrush();
+				Img.DrawAs = ESlateBrushDrawType::Box;
+				Img.TintColor = FSlateColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+				Img.ImageSize = FVector2D(22.0f, 22.0f);
 			};
-
-			const FLinearColor UncheckedFill(0.07f, 0.09f, 0.14f, 0.94f);
-			const FLinearColor UncheckedBorder(0.58f, 0.62f, 0.74f, 0.78f);
-			const FLinearColor UncheckedHoverFill(0.10f, 0.12f, 0.18f, 0.96f);
-			const FLinearColor CheckedFill(0.38f, 0.46f, 0.62f, 0.98f);
-			const FLinearColor CheckedBorder(0.82f, 0.86f, 0.96f, 0.92f);
-			const FLinearColor CheckedHoverFill(0.44f, 0.52f, 0.68f, 0.99f);
-
-			ApplyRoundedBox(Style.UncheckedImage, UncheckedFill, UncheckedBorder);
-			ApplyRoundedBox(Style.UncheckedHoveredImage, UncheckedHoverFill, UncheckedBorder);
-			ApplyRoundedBox(Style.UncheckedPressedImage, UncheckedFill, UncheckedBorder);
-			ApplyRoundedBox(Style.CheckedImage, CheckedFill, CheckedBorder);
-			ApplyRoundedBox(Style.CheckedHoveredImage, CheckedHoverFill, CheckedBorder);
-			ApplyRoundedBox(Style.CheckedPressedImage, CheckedFill, CheckedBorder);
-			ApplyRoundedBox(Style.UndeterminedImage, UncheckedFill, UncheckedBorder);
+			Hit(Style.UncheckedImage);
+			Hit(Style.UncheckedHoveredImage);
+			Hit(Style.UncheckedPressedImage);
+			Hit(Style.CheckedImage);
+			Hit(Style.CheckedHoveredImage);
+			Hit(Style.CheckedPressedImage);
+			Hit(Style.UndeterminedImage);
+			Hit(Style.UndeterminedHoveredImage);
+			Hit(Style.UndeterminedPressedImage);
 			Style.Padding = FMargin(0.0f);
 		}
 		return Style;

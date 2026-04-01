@@ -18,10 +18,15 @@
 #include "Engine/Engine.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/GameViewportClient.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/World.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Network/CppNetEngine/NetSession.h"
@@ -369,6 +374,48 @@ void UClientNetSubsystem::Tick(float DeltaTime)
 	}
 
 	ServiceRef->Dispatch();
+
+	for (auto It = NetworkEntityMoveStates.CreateIterator(); It; ++It)
+	{
+		const TWeakObjectPtr<AActor>* const ActorPtr = NetworkEntityActors.Find(It.Key());
+		if (ActorPtr == nullptr || !ActorPtr->IsValid())
+		{
+			It.RemoveCurrent();
+			continue;
+		}
+
+		ACharacter* const Ch = Cast<ACharacter>(ActorPtr->Get());
+		if (Ch == nullptr)
+		{
+			continue;
+		}
+
+		const FVector Current = Ch->GetActorLocation();
+		const FVector Target = It.Value().TargetPosition;
+		const FVector Delta = Target - Current;
+		const float Dist2D = Delta.Size2D();
+
+		UCharacterMovementComponent* const Mv = Ch->GetCharacterMovement();
+
+		if (Dist2D > 5.f && Mv != nullptr)
+		{
+			const FVector Dir = Delta.GetSafeNormal2D();
+			Ch->AddMovementInput(Dir, 1.f);
+
+			const float DesiredYaw = FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X));
+			const float NewYaw = FMath::FInterpTo(Ch->GetActorRotation().Yaw, DesiredYaw, DeltaTime, 10.f);
+			Ch->SetActorRotation(FRotator(0.f, NewYaw, 0.f));
+
+			if (Dist2D > 300.f)
+			{
+				Ch->SetActorLocation(FMath::VInterpTo(Current, Target, DeltaTime, 4.f));
+			}
+		}
+		else if (Mv != nullptr)
+		{
+			Mv->StopMovementImmediately();
+		}
+	}
 }
 
 TStatId UClientNetSubsystem::GetStatId() const
@@ -792,6 +839,17 @@ void UClientNetSubsystem::RegisterChatUi(UUserWidget* ChatRoot)
 	Combo->AddOption(TEXT("렐름"));
 	Combo->SetSelectedIndex(0);
 
+	Combo->SetContentPadding(FMargin(6.f, 3.f, 6.f, 3.f));
+
+	{
+		FComboBoxStyle WS = Combo->GetWidgetStyle();
+		WS.ComboButtonStyle.ButtonStyle.NormalForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
+		WS.ComboButtonStyle.ButtonStyle.HoveredForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
+		WS.ComboButtonStyle.ButtonStyle.PressedForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
+		WS.ComboButtonStyle.ButtonStyle.DisabledForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 0.5f));
+		Combo->SetWidgetStyle(WS);
+	}
+
 	ApplyDarkChatComboDropdownStyle(Combo);
 
 	Combo->OnGenerateWidgetEvent.BindDynamic(this, &UClientNetSubsystem::HandleChatComboGenerateItem);
@@ -915,30 +973,14 @@ void UClientNetSubsystem::HandleChatChannelComboOpening()
 
 UWidget* UClientNetSubsystem::HandleChatComboGenerateItem(FString Item)
 {
-	// #region agent log
-	{
-		const FString Line = FString::Printf(
-			TEXT("{\"sessionId\":\"ab4bf2\",\"hypothesisId\":\"H3\",\"location\":\"ClientNetSubsystem:HandleChatComboGenerateItem\",\"message\":\"item\",\"data\":{\"len\":%d},\"timestamp\":%lld}\n"),
-			Item.Len(), static_cast<int64>(FDateTime::UtcNow().ToUnixTimestamp() * 1000LL));
-		const FString Path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../debug-ab4bf2.log"));
-		FFileHelper::SaveStringToFile(Line, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM, &IFileManager::Get(), FILEWRITE_Append);
-	}
-	// #endregion
 	UObject* const Outer = ChatChannelCombo.Get() ? static_cast<UObject*>(ChatChannelCombo.Get()) : static_cast<UObject*>(this);
-	UBorder* const Border = NewObject<UBorder>(Outer);
-	Border->SetPadding(FMargin(10.f, 8.f, 10.f, 8.f));
-	// 커스텀 행은 ItemStyle 행 배경이 칠해지지 않는 경우가 많음 — 불투명 어두운 틴트(ApplyDarkChatComboDropdownStyle RowEven 톤)
-	Border->SetBrushColor(FLinearColor(0.11f, 0.15f, 0.24f, 1.f));
-
-	UTextBlock* const Text = NewObject<UTextBlock>(Border);
+	UTextBlock* const Text = NewObject<UTextBlock>(Outer);
 	Text->SetText(FText::FromString(Item));
-	FSlateFontInfo FontInfo = Text->GetFont();
-	FontInfo.Size = 13;
+	FSlateFontInfo FontInfo = FCoreStyle::GetDefaultFontStyle("Regular", 13);
 	Text->SetFont(FontInfo);
 	Text->SetColorAndOpacity(FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f)));
-
-	Border->SetContent(Text);
-	return Border;
+	Text->SetMargin(FMargin(6.f, 4.f, 6.f, 4.f));
+	return Text;
 }
 
 UWorld* UClientNetSubsystem::ResolveGameWorldForSpawning() const
@@ -988,25 +1030,17 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 {
 	UWorld* const PrimaryWorld = GetWorld();
 	UWorld* const World = PrimaryWorld != nullptr ? PrimaryWorld : ResolveGameWorldForSpawning();
-	// #region agent log
-	{
-		const int32 Fallback = (PrimaryWorld == nullptr && World != nullptr) ? 1 : 0;
-		const FString Line = FString::Printf(
-			TEXT("{\"sessionId\":\"ab4bf2\",\"hypothesisId\":\"H2\",\"location\":\"ClientNetSubsystem:ApplyNetworkEntitiesEntered\",\"message\":\"enter\",\"data\":{\"count\":%d,\"hasWorld\":%d,\"worldFallback\":%d},\"timestamp\":%lld}\n"),
-			Entities.Num(), World != nullptr ? 1 : 0, Fallback, static_cast<int64>(FDateTime::UtcNow().ToUnixTimestamp() * 1000LL));
-		const FString Path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../debug-ab4bf2.log"));
-		FFileHelper::SaveStringToFile(Line, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM, &IFileManager::Get(), FILEWRITE_Append);
-	}
-	// #endregion
 	if (World == nullptr)
 	{
 		return;
 	}
 
-	static UStaticMesh* CubeMesh = nullptr;
-	if (CubeMesh == nullptr)
+	static USkeletalMesh* MannequinMesh = nullptr;
+	static UClass* AnimBPClass = nullptr;
+	if (MannequinMesh == nullptr)
 	{
-		CubeMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+		MannequinMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
+		AnimBPClass = LoadObject<UClass>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.ABP_Unarmed_C"));
 	}
 
 	for (const FNetworkEntitySpawnData& E : Entities)
@@ -1020,36 +1054,54 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 		{
 			if (Found->IsValid())
 			{
-				if (AActor* const A = Found->Get())
-				{
-					A->SetActorLocationAndRotation(E.Position, FRotator(0.f, E.YawDegrees, 0.f));
-				}
+				FNetworkEntityMoveState& Ms = NetworkEntityMoveStates.FindOrAdd(E.EntityId);
+				Ms.TargetPosition = E.Position;
+				Ms.TargetYaw = E.YawDegrees;
 				continue;
 			}
 			NetworkEntityActors.Remove(E.EntityId);
+			NetworkEntityMoveStates.Remove(E.EntityId);
 		}
 
 		FActorSpawnParameters Sp;
 		Sp.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		AStaticMeshActor* const MeshActor = World->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), E.Position,
+		ACharacter* const ProxyChar = World->SpawnActor<ACharacter>(ACharacter::StaticClass(), E.Position,
 			FRotator(0.f, E.YawDegrees, 0.f), Sp);
-		if (MeshActor == nullptr)
+		if (ProxyChar == nullptr)
 		{
 			continue;
 		}
 
-		MeshActor->SetActorLabel(FString::Printf(TEXT("NetEntity_%llu"), E.EntityId));
-		if (UStaticMeshComponent* const Mc = MeshActor->GetStaticMeshComponent())
+#if WITH_EDITOR
+		ProxyChar->SetActorLabel(FString::Printf(TEXT("NetEntity_%llu"), E.EntityId));
+#endif
+		if (USkeletalMeshComponent* const Mc = ProxyChar->GetMesh())
 		{
-			if (CubeMesh != nullptr)
+			if (MannequinMesh != nullptr)
 			{
-				Mc->SetStaticMesh(CubeMesh);
+				Mc->SetSkeletalMesh(MannequinMesh);
+				Mc->SetRelativeLocation(FVector(0.f, 0.f, -90.f));
+				Mc->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+			}
+			if (AnimBPClass != nullptr)
+			{
+				Mc->SetAnimInstanceClass(AnimBPClass);
 			}
 			Mc->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
-		MeshActor->SetActorScale3D(FVector(0.45f, 0.45f, 0.9f));
+		if (UCharacterMovementComponent* const Mv = ProxyChar->GetCharacterMovement())
+		{
+			Mv->GravityScale = 0.f;
+			Mv->SetMovementMode(EMovementMode::MOVE_Walking);
+			Mv->bOrientRotationToMovement = true;
+			Mv->MaxWalkSpeed = 600.f;
+		}
 
-		NetworkEntityActors.Add(E.EntityId, MeshActor);
+		NetworkEntityActors.Add(E.EntityId, ProxyChar);
+		FNetworkEntityMoveState Ms;
+		Ms.TargetPosition = E.Position;
+		Ms.TargetYaw = E.YawDegrees;
+		NetworkEntityMoveStates.Add(E.EntityId, Ms);
 	}
 }
 
@@ -1065,6 +1117,7 @@ void UClientNetSubsystem::ApplyNetworkEntitiesLeft(const TArray<uint64>& EntityI
 			}
 			NetworkEntityActors.Remove(Id);
 		}
+		NetworkEntityMoveStates.Remove(Id);
 	}
 }
 
@@ -1078,6 +1131,7 @@ void UClientNetSubsystem::ClearNetworkSpawnedEntities()
 		}
 	}
 	NetworkEntityActors.Empty();
+	NetworkEntityMoveStates.Empty();
 }
 
 void UClientNetSubsystem::HandleChatTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)

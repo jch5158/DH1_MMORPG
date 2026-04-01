@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Main">
@@ -66,6 +66,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Shared\Protocol\Movement.pb.cc">
       <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Shared\Protocol\Chat.pb.cc">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler\ChatPacketHandler.cpp">
+      <Filter>Core\Network\PacketHandler</Filter>
     </ClCompile>
     <ClCompile Include="PacketHandler\MovementPacketHandler.cpp">
       <Filter>Core\Network\PacketHandler</Filter>
@@ -152,6 +158,12 @@
     </ClInclude>
     <ClInclude Include="..\..\Shared\Protocol\Movement.pb.h">
       <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Shared\Protocol\Chat.pb.h">
+      <Filter>Core\Network\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler\ChatPacketHandler.h">
+      <Filter>Core\Network\PacketHandler</Filter>
     </ClInclude>
     <ClInclude Include="PacketHandler\MovementPacketHandler.h">
       <Filter>Core\Network\PacketHandler</Filter>
@@ -252,6 +264,9 @@
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
     <None Include="..\..\Shared\Protocol\Proto\GameSession.proto">
+      <Filter>Core\Network\Protocol\Proto</Filter>
+    </None>
+    <None Include="..\..\Shared\Protocol\Proto\Chat.proto">
       <Filter>Core\Network\Protocol\Proto</Filter>
     </None>
   </ItemGroup>

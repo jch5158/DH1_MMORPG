@@ -29,7 +29,33 @@ bool MovementPacketHandler::HANDLE_S2C_ENTITY_SNAPSHOT_NOT(const Protocol::S2C_E
 	UE_LOG(LogMovement, Log, TEXT("ENTITY_SNAPSHOT - entityCount: %d, timestamp: %lld"),
 		packet.entities_size(), packet.servertimestamp());
 
-	// TODO: Entity interpolation update
+	if (packet.entities_size() == 0)
+	{
+		return true;
+	}
+
+	TArray<FNetworkEntitySpawnData> Entities;
+	Entities.Reserve(packet.entities_size());
+	for (int32 i = 0; i < packet.entities_size(); ++i)
+	{
+		const auto& e = packet.entities(i);
+		FNetworkEntitySpawnData Data;
+		Data.EntityId = e.entityid();
+		Data.Position = FVector(e.position().x(), e.position().y(), e.position().z());
+		Data.YawDegrees = e.rotationyaw();
+		Entities.Add(MoveTemp(Data));
+	}
+
+	AsyncTask(ENamedThreads::GameThread, [Entities = MoveTemp(Entities)]()
+		{
+			if (GEngine == nullptr) { return; }
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[&Entities](UClientNetSubsystem* Net)
+				{
+					Net->ApplyNetworkEntitiesEntered(Entities);
+				});
+		});
+
 	return true;
 }
 
@@ -37,14 +63,36 @@ bool MovementPacketHandler::HANDLE_S2C_ENTITY_ENTER_NOT(const Protocol::S2C_ENTI
 {
 	UE_LOG(LogMovement, Log, TEXT("ENTITY_ENTER - entityCount: %d"), packet.entities_size());
 
-	for (int32 i = 0; i < packet.entities_size(); ++i)
+	if (packet.entities_size() == 0)
 	{
-		const auto& entity = packet.entities(i);
-		UE_LOG(LogMovement, Log, TEXT("  entity: %llu, pos: (%.1f, %.1f, %.1f)"),
-			entity.entityid(), entity.position().x(), entity.position().y(), entity.position().z());
+		return true;
 	}
 
-	// TODO: Spawn nearby entities
+	TArray<FNetworkEntitySpawnData> Entities;
+	Entities.Reserve(packet.entities_size());
+	for (int32 i = 0; i < packet.entities_size(); ++i)
+	{
+		const auto& e = packet.entities(i);
+		FNetworkEntitySpawnData Data;
+		Data.EntityId = e.entityid();
+		Data.Position = FVector(e.position().x(), e.position().y(), e.position().z());
+		Data.YawDegrees = e.rotationyaw();
+		Entities.Add(MoveTemp(Data));
+
+		UE_LOG(LogMovement, Log, TEXT("  entity: %llu, pos: (%.1f, %.1f, %.1f)"),
+			e.entityid(), e.position().x(), e.position().y(), e.position().z());
+	}
+
+	AsyncTask(ENamedThreads::GameThread, [Entities = MoveTemp(Entities)]()
+		{
+			if (GEngine == nullptr) { return; }
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[&Entities](UClientNetSubsystem* Net)
+				{
+					Net->ApplyNetworkEntitiesEntered(Entities);
+				});
+		});
+
 	return true;
 }
 
@@ -52,7 +100,28 @@ bool MovementPacketHandler::HANDLE_S2C_ENTITY_LEAVE_NOT(const Protocol::S2C_ENTI
 {
 	UE_LOG(LogMovement, Log, TEXT("ENTITY_LEAVE - entityCount: %d"), packet.entityids_size());
 
-	// TODO: Despawn entities
+	if (packet.entityids_size() == 0)
+	{
+		return true;
+	}
+
+	TArray<uint64> EntityIds;
+	EntityIds.Reserve(packet.entityids_size());
+	for (int32 i = 0; i < packet.entityids_size(); ++i)
+	{
+		EntityIds.Add(packet.entityids(i));
+	}
+
+	AsyncTask(ENamedThreads::GameThread, [EntityIds = MoveTemp(EntityIds)]()
+		{
+			if (GEngine == nullptr) { return; }
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[&EntityIds](UClientNetSubsystem* Net)
+				{
+					Net->ApplyNetworkEntitiesLeft(EntityIds);
+				});
+		});
+
 	return true;
 }
 

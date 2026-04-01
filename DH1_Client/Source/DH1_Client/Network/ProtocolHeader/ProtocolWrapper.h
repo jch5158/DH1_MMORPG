@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 
@@ -24,6 +24,7 @@ THIRD_PARTY_INCLUDES_START
 #include "Heartbeat.pb.h"
 #include "Realm.pb.h"
 #include "Movement.pb.h"
+#include "Chat.pb.h"
 #include "Echo.pb.h"
 
 #pragma pop_macro("cast")

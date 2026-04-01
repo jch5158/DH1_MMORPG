@@ -4,17 +4,20 @@
 #include "RealmSession.h"
 #include "GameSessionManager.h"
 #include "GridManager.h"
+#include "GameTickProcessor.h"
 #include "PlayerObject.h"
 #include "WorldService.h"
 #include "MySqlService.h"
 #include "Table/PlayerCharacterTable.h"
 #include "PacketHandler/PacketServiceTypeHandler.h"
+#include "PacketHandler/ChatPacketHandler.h"
 #include "PacketHandler/MovementPacketHandler.h"
 #include "Movement.pb.h"
 #include "RelayContext.h"
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cmath>
 #include <string>
 
@@ -291,6 +294,12 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 					const int32 spawnCellY = pGridManager->ComputeCellY(posY);
 					pGridManager->AddObject(pPlayerObject, spawnCellX, spawnCellY);
 
+					if (const auto pTick = ISingleton<WorldService>::GetInstance().GetGameTickProcessorRef())
+					{
+						pTick->NotifySpawnedPlayerVisibleEntities(pPlayerObject);
+						pTick->NotifyNearbyPlayersAboutEntity(pPlayerObject);
+					}
+
 					NET_ENGINE_LOG_INFO("GameSessionPacketHandler - PlayerObject created, accountId: {}, actorId: {}, pos: ({}, {}, {})",
 						accountId, pPlayerObject->GetId(), posX, posY, posZ);
 
@@ -510,10 +519,20 @@ bool GameSessionPacketHandler::HANDLE_S2S_RELAY_TO_WORLD_NOT(const Protocol::S2S
 	// RelayContext에 accountId 설정 후 자동 생성된 핸들러 호출
 	RelayContext::SetAccountId(accountId);
 
+	if (serviceType == static_cast<uint16>(Protocol::eServiceType::SERVICE_TYPE_CHAT))
+	{
+		NET_ENGINE_LOG_WARN("[CHAT] World S2S_RELAY_TO_WORLD_NOT accountId={} inner_packetId={} payloadBytes={}",
+			accountId, packetId, payload.size());
+	}
+
 	switch (serviceType)
 	{
 	case static_cast<uint16>(Protocol::eServiceType::SERVICE_TYPE_MOVEMENT):
 		MovementPacketHandler::HandlePacket(payloadSize, packetId,
+			reinterpret_cast<const byte*>(payload.data()), pSession);
+		break;
+	case static_cast<uint16>(Protocol::eServiceType::SERVICE_TYPE_CHAT):
+		ChatPacketHandler::HandlePacket(payloadSize, packetId,
 			reinterpret_cast<const byte*>(payload.data()), pSession);
 		break;
 	default:

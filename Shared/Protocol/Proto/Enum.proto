@@ -1,4 +1,4 @@
-﻿syntax = "proto3";
+syntax = "proto3";
 package Protocol;
 
 enum eServiceType 
@@ -11,6 +11,7 @@ enum eServiceType
     SERVICE_TYPE_REALM = 5;
     SERVICE_TYPE_GAME_SESSION = 6;
     SERVICE_TYPE_MOVEMENT = 7;
+    SERVICE_TYPE_CHAT = 8;
 }
 
 enum eRole
@@ -55,4 +56,11 @@ enum eSessionLeaveReason
 {
     SESSION_LEAVE_NORMAL = 0;
     SESSION_LEAVE_DUPLICATE_LOGIN = 1;
+}
+
+enum eChatChannel
+{
+    CHAT_CHANNEL_LOCAL = 0;
+    CHAT_CHANNEL_WORLD = 1;
+    CHAT_CHANNEL_REALM = 2;
 }

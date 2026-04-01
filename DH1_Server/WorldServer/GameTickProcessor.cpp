@@ -211,6 +211,93 @@ void GameTickProcessor::sendRelayToClient(const uint64 gatewaySessionId, const i
 	}
 }
 
+void GameTickProcessor::RelayChatToGatewayClient(const uint64 gatewaySessionId, const int32 gatewayServerId, const NetSendBufferRef& pInnerPacket)
+{
+	sendRelayToClient(gatewaySessionId, gatewayServerId, pInnerPacket);
+}
+
+void GameTickProcessor::NotifySpawnedPlayerVisibleEntities(const PlayerObjectRef& pPlayer)
+{
+	if (pPlayer == nullptr || mpGridManager == nullptr)
+	{
+		return;
+	}
+
+	const int32 cellX = mpGridManager->ComputeCellX(pPlayer->GetPositionX());
+	const int32 cellY = mpGridManager->ComputeCellY(pPlayer->GetPositionY());
+	const auto nearbyObjects = mpGridManager->GetObjectsInRange(cellX, cellY);
+
+	Protocol::S2C_ENTITY_ENTER_NOT enterPacket;
+	for (const auto& pNearby : nearbyObjects)
+	{
+		if (pNearby->GetId() == pPlayer->GetId())
+		{
+			continue;
+		}
+
+		auto* pEntity = enterPacket.add_entities();
+		pEntity->set_entityid(pNearby->GetId());
+		pEntity->mutable_position()->set_x(pNearby->GetPositionX());
+		pEntity->mutable_position()->set_y(pNearby->GetPositionY());
+		pEntity->mutable_position()->set_z(pNearby->GetPositionZ());
+		pEntity->mutable_velocity()->set_x(pNearby->GetVelocityX());
+		pEntity->mutable_velocity()->set_y(pNearby->GetVelocityY());
+		pEntity->mutable_velocity()->set_z(pNearby->GetVelocityZ());
+		pEntity->set_rotationyaw(pNearby->GetRotationYaw());
+	}
+
+	if (enterPacket.entities_size() > 0)
+	{
+		sendRelayToClient(pPlayer->GetGatewaySessionId(), pPlayer->GetGatewayServerId(),
+			MakeMovementSendBuffer(enterPacket, packet_id::S2C_ENTITY_ENTER_NOT));
+	}
+}
+
+void GameTickProcessor::NotifyNearbyPlayersAboutEntity(const GameObjectRef& pSubject)
+{
+	if (pSubject == nullptr || mpGridManager == nullptr)
+	{
+		return;
+	}
+
+	const int32 cellX = mpGridManager->ComputeCellX(pSubject->GetPositionX());
+	const int32 cellY = mpGridManager->ComputeCellY(pSubject->GetPositionY());
+	const auto nearbyObjects = mpGridManager->GetObjectsInRange(cellX, cellY);
+
+	Protocol::S2C_ENTITY_ENTER_NOT enterPacket;
+	auto* pEntity = enterPacket.add_entities();
+	pEntity->set_entityid(pSubject->GetId());
+	pEntity->mutable_position()->set_x(pSubject->GetPositionX());
+	pEntity->mutable_position()->set_y(pSubject->GetPositionY());
+	pEntity->mutable_position()->set_z(pSubject->GetPositionZ());
+	pEntity->mutable_velocity()->set_x(pSubject->GetVelocityX());
+	pEntity->mutable_velocity()->set_y(pSubject->GetVelocityY());
+	pEntity->mutable_velocity()->set_z(pSubject->GetVelocityZ());
+	pEntity->set_rotationyaw(pSubject->GetRotationYaw());
+
+	const auto enterBuffer = MakeMovementSendBuffer(enterPacket, packet_id::S2C_ENTITY_ENTER_NOT);
+	if (enterBuffer == nullptr)
+	{
+		return;
+	}
+
+	for (const auto& pNearby : nearbyObjects)
+	{
+		if (pNearby->GetId() == pSubject->GetId() || pNearby->GetObjectType() != eGameObjectType::Player)
+		{
+			continue;
+		}
+		const auto pNearbyPlayer = std::static_pointer_cast<PlayerObject>(pNearby);
+		sendRelayToClient(pNearbyPlayer->GetGatewaySessionId(), pNearbyPlayer->GetGatewayServerId(), enterBuffer);
+	}
+}
+
+void GameTickProcessor::sendAoiLeavesAfterCellChange(const GameObjectRef& pSubject,
+	const int32 oldCellX, const int32 oldCellY, const int32 newCellX, const int32 newCellY)
+{
+	(void)pSubject; (void)oldCellX; (void)oldCellY; (void)newCellX; (void)newCellY;
+}
+
 void GameTickProcessor::processMoveToPositionRequests()
 {
 	{

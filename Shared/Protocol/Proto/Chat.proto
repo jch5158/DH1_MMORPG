@@ -1,0 +1,60 @@
+syntax = "proto3";
+package Protocol;
+
+import "Enum.proto";
+import "PacketOption.proto";
+
+option (service_type) = SERVICE_TYPE_CHAT;
+option (handler_name) = "ChatPacketHandler";
+
+// Client -> Gateway -> World
+message C2S_CHAT_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    eChatChannel channel = 1;
+    string message = 2;
+}
+
+// Gateway -> Client (본인·주변·렐름 브로드캐스트 공통 페이로드)
+message S2C_CHAT_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    eChatChannel channel = 1;
+    uint64 sender_account_id = 2;
+    string sender_display_name = 3;
+    string message = 4;
+    int64 server_timestamp_ms = 5;
+}
+
+message ChatRelayTarget
+{
+    uint64 gateway_session_id = 1;
+    int32 gateway_server_id = 2;
+}
+
+// World -> Realm (렐름 채널 집계·팬아웃 요청)
+message S2S_REALM_CHAT_SUBMIT_NOT
+{
+    option (sender) = WORLD_SERVER;
+    option (receiver) = REALM_SERVER;
+
+    uint64 sender_account_id = 1;
+    string sender_display_name = 2;
+    string message = 3;
+    int64 server_timestamp_ms = 4;
+}
+
+// Realm -> World (게이트웨이별 S2C_CHAT_NOT 직렬화 페이로드 + 수신 대상)
+message S2S_REALM_CHAT_DELIVER_NOT
+{
+    option (sender) = REALM_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    bytes s2c_payload = 1;
+    repeated ChatRelayTarget targets = 2;
+}

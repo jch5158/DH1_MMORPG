@@ -4,6 +4,8 @@
 #include "Widgets/Input/SCheckBox.h"
 #include "Widgets/SCompoundWidget.h"
 
+class SOverlay;
+
 DECLARE_DELEGATE(FOnGoToSignUp);
 DECLARE_DELEGATE(FOnGoToResetPassword);
 DECLARE_DELEGATE(FOnLoginSuccess);
@@ -38,6 +40,7 @@ private:
 	FReply OnSignUpClicked();
 	FReply OnResetPasswordClicked();
 	void OnRememberEmailCheckChanged(ECheckBoxState NewState);
+	void InvalidateRememberEmailToggleVisual();
 
 	void SetStatus(const FString& Text, const FLinearColor& Color);
 	void SetLoading(bool bLoading);
@@ -45,6 +48,7 @@ private:
 	TSharedPtr<SEditableTextBox> EmailInput;
 	TSharedPtr<SEditableTextBox> PasswordInput;
 	TSharedPtr<SCheckBox> RememberEmailCheckBox;
+	TSharedPtr<SOverlay> RememberEmailToggleRoot;
 	TSharedPtr<STextBlock> StatusText;
 	TSharedPtr<SButton> LoginButton;
 

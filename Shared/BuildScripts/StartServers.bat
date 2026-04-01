@@ -30,7 +30,7 @@ if not "%DH1_AWS_CLI_PATH%"=="" (
 if "%AWS_CMD%"=="aws" if exist "C:\Program Files\Amazon\AWSCLIV2\aws.exe" (
     set "PATH=C:\Program Files\Amazon\AWSCLIV2;%PATH%"
     set "DH1_AWS_CLI_PATH=C:\Program Files\Amazon\AWSCLIV2\aws.exe"
-    set "AWS_CMD=!DH1_AWS_CLI_PATH!"
+    set "AWS_CMD=C:\Program Files\Amazon\AWSCLIV2\aws.exe"
     echo [Info] AWS CLI path added for server processes
 )
 if not "%DH1_AWS_PROFILE%"=="" (

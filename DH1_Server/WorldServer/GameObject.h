@@ -28,9 +28,15 @@ public:
 	void SetMoveSpeed(const float speed) { mMoveSpeed = speed; }
 	void SetMoving(const bool moving) { mbMoving = moving; }
 
-	// AOI
+	// AOI — GridCell::Actor id (디버그·기존 코드) + 논리 셀 좌표 (Remove/Move 시 O(1) 조회)
 	[[nodiscard]] uint64 GetGridCellId() const { return mGridCellId; }
 	void SetGridCellId(const uint64 cellId) { mGridCellId = cellId; }
+
+	[[nodiscard]] bool IsRegisteredInGrid() const { return mbRegisteredInGrid; }
+	[[nodiscard]] int32 GetOccupiedCellX() const { return mOccupiedCellX; }
+	[[nodiscard]] int32 GetOccupiedCellY() const { return mOccupiedCellY; }
+	void SetOccupiedGridCoords(const int32 cellX, const int32 cellY);
+	void ClearOccupiedGridCoords();
 
 protected:
 
@@ -48,4 +54,8 @@ protected:
 	bool mbMoving = false;
 
 	uint64 mGridCellId = 0;
+
+	bool mbRegisteredInGrid = false;
+	int32 mOccupiedCellX = 0;
+	int32 mOccupiedCellY = 0;
 };

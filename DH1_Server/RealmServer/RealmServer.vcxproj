@@ -226,9 +226,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="$(SharedDir)Protocol\Chat.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="WorldServerSession.cpp" />
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp" />
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
+    <ClCompile Include="PacketHandler\ChatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
     <ClCompile Include="RedisActor.cpp" />
     <ClCompile Include="RedisService.cpp" />
@@ -258,9 +265,11 @@
     <ClInclude Include="$(SharedDir)Protocol\Struct.pb.h" />
     <ClInclude Include="$(SharedDir)Protocol\ServerHeartbeat.pb.h" />
     <ClInclude Include="$(SharedDir)Protocol\GameSession.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\Chat.pb.h" />
     <ClInclude Include="WorldServerSession.h" />
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
+    <ClInclude Include="PacketHandler\ChatPacketHandler.h" />
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h" />
     <ClInclude Include="RedisActor.h" />
     <ClInclude Include="RedisService.h" />
@@ -275,6 +284,7 @@
     <None Include="$(SharedDir)Protocol\Proto\ServerHeartbeat.proto" />
     <None Include="$(SharedDir)Protocol\Proto\Struct.proto" />
     <None Include="$(SharedDir)Protocol\Proto\GameSession.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\Chat.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

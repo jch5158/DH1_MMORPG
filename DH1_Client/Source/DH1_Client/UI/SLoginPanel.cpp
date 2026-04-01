@@ -7,11 +7,23 @@
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SBorder.h"
+#include "Widgets/SOverlay.h"
 #include "Widgets/SBoxPanel.h"
+#include "Widgets/Text/STextBlock.h"
 #include "Styling/CoreStyle.h"
+#include "Styling/SlateTypes.h"
 
 namespace SLoginPanel_Local
 {
+	FSlateFontInfo RememberEmailCheckGlyphFont()
+	{
+		FSlateFontInfo FI = FCoreStyle::GetDefaultFontStyle(TEXT("Bold"), 15);
+		FI.OutlineSettings.OutlineSize = 1;
+		FI.OutlineSettings.OutlineColor = FLinearColor(0.02f, 0.02f, 0.04f, 0.9f);
+		return FI;
+	}
+
 	FString NormalizeEmail(const FString& InEmail)
 	{
 		return InEmail.TrimStartAndEnd().ToLower();
@@ -135,13 +147,49 @@ void SLoginPanel::Construct(const FArguments& InArgs)
 							+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
 							[
 								SNew(SBox)
-								.WidthOverride(22.0f)
-								.HeightOverride(22.0f)
+								.WidthOverride(20.0f)
+								.HeightOverride(20.0f)
 								[
-									SAssignNew(RememberEmailCheckBox, SCheckBox)
-									.Style(&AuthStyle::RememberEmailCheckBoxStyle())
-									.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
-									.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+									SAssignNew(RememberEmailToggleRoot, SOverlay)
+									+ SOverlay::Slot()
+									[
+										SNew(SBorder)
+										.Visibility_Lambda([this]()
+										{
+											return bRememberEmail ? EVisibility::Collapsed : EVisibility::HitTestInvisible;
+										})
+										.BorderImage(&AuthStyle::RememberEmailToggleUncheckedBoxBrush())
+									]
+									+ SOverlay::Slot()
+									[
+										SNew(SBorder)
+										.Visibility_Lambda([this]()
+										{
+											return bRememberEmail ? EVisibility::HitTestInvisible : EVisibility::Collapsed;
+										})
+										.BorderImage(&AuthStyle::RememberEmailToggleCheckedBoxBrush())
+									]
+									+ SOverlay::Slot()
+									.HAlign(HAlign_Center)
+									.VAlign(VAlign_Center)
+									[
+										SNew(STextBlock)
+										.Visibility_Lambda([this]()
+										{
+											return bRememberEmail ? EVisibility::HitTestInvisible : EVisibility::Collapsed;
+										})
+										.Text(FText::FromString(TEXT("\u2713")))
+										.Font(SLoginPanel_Local::RememberEmailCheckGlyphFont())
+										.ColorAndOpacity(FLinearColor(0.05f, 0.05f, 0.08f, 1.f))
+										.Justification(ETextJustify::Center)
+									]
+									+ SOverlay::Slot()
+									[
+										SAssignNew(RememberEmailCheckBox, SCheckBox)
+										.Style(&AuthStyle::RememberEmailCheckBoxStyle())
+										.IsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
+										.OnCheckStateChanged(FOnCheckStateChanged::CreateSP(this, &SLoginPanel::OnRememberEmailCheckChanged))
+									]
 								]
 							]
 							+ SHorizontalBox::Slot().AutoWidth().Padding(10.0f, 0.0f, 0.0f, 0.0f).VAlign(VAlign_Center)
@@ -238,6 +286,7 @@ void SLoginPanel::ResetPanel(const FString& InStatusText, const FString& Email)
 		{
 			RememberEmailCheckBox->SetIsChecked(bRememberEmail ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
 		}
+		InvalidateRememberEmailToggleVisual();
 		if (EmailInput.IsValid())
 		{
 			const FString EmailToShow =
@@ -347,6 +396,15 @@ FReply SLoginPanel::OnResetPasswordClicked()
 void SLoginPanel::OnRememberEmailCheckChanged(const ECheckBoxState NewState)
 {
 	bRememberEmail = (NewState == ECheckBoxState::Checked);
+	InvalidateRememberEmailToggleVisual();
+}
+
+void SLoginPanel::InvalidateRememberEmailToggleVisual()
+{
+	if (RememberEmailToggleRoot.IsValid())
+	{
+		RememberEmailToggleRoot->Invalidate(EInvalidateWidgetReason::Paint);
+	}
 }
 
 void SLoginPanel::SetStatus(const FString& Text, const FLinearColor& Color)

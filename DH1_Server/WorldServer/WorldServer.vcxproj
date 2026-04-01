@@ -237,6 +237,7 @@
     <ClCompile Include="PacketHandler\PacketServiceTypeHandler.cpp" />
     <ClCompile Include="PacketHandler\ServerHeartbeatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\GameSessionPacketHandler.cpp" />
+    <ClCompile Include="PacketHandler\ChatPacketHandler.cpp" />
     <ClCompile Include="PacketHandler\MovementPacketHandler.cpp" />
     <ClCompile Include="GameSessionManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -281,6 +282,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="$(SharedDir)Protocol\Chat.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="WorldServer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -307,6 +314,7 @@
     <ClInclude Include="$(SharedDir)Protocol\ServerHeartbeat.pb.h" />
     <ClInclude Include="$(SharedDir)Protocol\GameSession.pb.h" />
     <ClInclude Include="$(SharedDir)Protocol\Movement.pb.h" />
+    <ClInclude Include="$(SharedDir)Protocol\Chat.pb.h" />
     <ClInclude Include="GameObjectType.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="PlayerObject.h" />
@@ -325,6 +333,7 @@
     <ClInclude Include="PacketHandler\PacketServiceTypeHandler.h" />
     <ClInclude Include="PacketHandler\ServerHeartbeatPacketHandler.h" />
     <ClInclude Include="PacketHandler\GameSessionPacketHandler.h" />
+    <ClInclude Include="PacketHandler\ChatPacketHandler.h" />
     <ClInclude Include="PacketHandler\MovementPacketHandler.h" />
     <ClInclude Include="RelayContext.h" />
     <ClInclude Include="GameSessionInfo.h" />
@@ -339,6 +348,7 @@
     <None Include="$(SharedDir)Protocol\Proto\ServerHeartbeat.proto" />
     <None Include="$(SharedDir)Protocol\Proto\Struct.proto" />
     <None Include="$(SharedDir)Protocol\Proto\GameSession.proto" />
+    <None Include="$(SharedDir)Protocol\Proto\Chat.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
