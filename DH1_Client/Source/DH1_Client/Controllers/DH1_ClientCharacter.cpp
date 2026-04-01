@@ -25,6 +25,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/ScrollBox.h"
+#include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
@@ -584,15 +585,19 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 		InputSlot->SetPadding(FMargin(0.f, 4.f, 0.f, 0.f));
 	}
 
-	UComboBoxString* Combo = Tree->ConstructWidget<UComboBoxString>(UComboBoxString::StaticClass(), TEXT("Combo_Channel"));
-	Combo->Font = FCoreStyle::GetDefaultFontStyle("Regular", 12);
-	Combo->ForegroundColor = FSlateColor(FLinearColor::White);
-	InputRow->AddChildToHorizontalBox(Combo);
-	if (UHorizontalBoxSlot* ComboSlot = Cast<UHorizontalBoxSlot>(Combo->Slot))
+	USizeBox* ComboSizeBox = Tree->ConstructWidget<USizeBox>(USizeBox::StaticClass(), TEXT("ComboSizeBox"));
+	ComboSizeBox->SetWidthOverride(82.f);
+	InputRow->AddChildToHorizontalBox(ComboSizeBox);
+	if (UHorizontalBoxSlot* ComboSlot = Cast<UHorizontalBoxSlot>(ComboSizeBox->Slot))
 	{
 		ComboSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
 		ComboSlot->SetPadding(FMargin(0.f, 0.f, 4.f, 0.f));
 	}
+
+	UComboBoxString* Combo = Tree->ConstructWidget<UComboBoxString>(UComboBoxString::StaticClass(), TEXT("Combo_Channel"));
+	Combo->Font = FCoreStyle::GetDefaultFontStyle("Regular", 12);
+	Combo->ForegroundColor = FSlateColor(FLinearColor::White);
+	ComboSizeBox->AddChild(Combo);
 
 	UEditableTextBox* Edit = Tree->ConstructWidget<UEditableTextBox>(UEditableTextBox::StaticClass(), TEXT("EditableText_Message"));
 	InputRow->AddChildToHorizontalBox(Edit);
