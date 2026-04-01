@@ -248,13 +248,28 @@ bool NavMeshManager::FindPath(const Vector3f& start, const Vector3f& end, Vector
 	mpNavMeshQuery->findNearestPoly(startPos, halfExtents, &filter, &startRef, nearestStart);
 	mpNavMeshQuery->findNearestPoly(endPos, halfExtents, &filter, &endRef, nearestEnd);
 
-	// 목적지가 NavMesh 밖인 경우 → 전체 NavMesh 범위에서 가장 가까운 폴리곤으로 스냅
-	// (클릭 위치가 NavMesh 커버리지 밖이어도 경계 지점까지 경로 탐색)
-	if (endRef == 0)
+	// 목적지가 NavMesh 밖인 경우 → 시작점에서 목적지 방향으로 레이캐스트하여 경계점 사용
+	if (endRef == 0 && startRef != 0)
 	{
-		constexpr dtReal kWideExtent = 15000.0;
-		const dtReal halfExtentsWide[3] = { kWideExtent, kWideExtent, kWideExtent };
-		mpNavMeshQuery->findNearestPoly(endPos, halfExtentsWide, &filter, &endRef, nearestEnd);
+		dtReal hitT = 0.f;
+		dtReal hitNormal[3] = {};
+
+		const dtStatus rayStatus = mpNavMeshQuery->raycast(
+			startRef, nearestStart, endPos, &filter,
+			&hitT, hitNormal, nullptr, nullptr, 0);
+
+		if (dtStatusSucceed(rayStatus) && hitT < 1.0f && hitT > 0.01f)
+		{
+			nearestEnd[0] = nearestStart[0] + (endPos[0] - nearestStart[0]) * hitT;
+			nearestEnd[1] = nearestStart[1] + (endPos[1] - nearestStart[1]) * hitT;
+			nearestEnd[2] = nearestStart[2] + (endPos[2] - nearestStart[2]) * hitT;
+			mpNavMeshQuery->findNearestPoly(nearestEnd, halfExtents, &filter, &endRef, nearestEnd);
+		}
+
+		if (endRef == 0)
+		{
+			return false;
+		}
 	}
 
 	NET_ENGINE_LOG_INFO("[NavMesh] FindPath: startRC=({:.1f},{:.1f},{:.1f}) ref={}, endRC=({:.1f},{:.1f},{:.1f}) ref={}",
@@ -293,9 +308,11 @@ bool NavMeshManager::FindPath(const Vector3f& start, const Vector3f& end, Vector
 	}
 
 	// Recast 좌표 → UE5 좌표 변환 후 반환
+	// wp[0]은 항상 nearestStart(스냅된 시작점)이므로 건너뜀 — 플레이어는 이미 거기 있음
 	const int32 straightPathCount = straightResult.size();
-	outWaypoints.reserve(straightPathCount);
-	for (int32 i = 0; i < straightPathCount; ++i)
+	const int32 startIdx = (straightPathCount > 1) ? 1 : 0;
+	outWaypoints.reserve(straightPathCount - startIdx);
+	for (int32 i = startIdx; i < straightPathCount; ++i)
 	{
 		const dtReal* pos = straightResult.getPos(i);
 		outWaypoints.emplace_back(RecastToUE5(pos[0], pos[1], pos[2]));

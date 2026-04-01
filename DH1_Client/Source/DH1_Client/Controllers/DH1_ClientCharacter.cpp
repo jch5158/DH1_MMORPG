@@ -108,7 +108,6 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	DefaultMappingContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Default"));
 
 	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
-	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::LeftMouseButton);
 
 	// 카메라 회전 액션 (미사용 - 우클릭은 클릭 이동으로 예약)
 	RightMouseAction = NewObject<UInputAction>(this, TEXT("IA_RightMouse"));
@@ -359,8 +358,10 @@ void ADH1_ClientCharacter::OnMovePathReceived(const uint32 SeqId, const TArray<F
 {
 	if (Waypoints.Num() == 0)
 	{
-		// 서버 경로 없음 — 로컬 예측 유지하여 이동 계속
-		UE_LOG(LogCharacterMove, Warning, TEXT("OnMovePathReceived - Empty path, seq: %u"), SeqId);
+		bIsClickMoving = false;
+		bIsServerPathMoving = false;
+		CurrentMoveDirection = FVector::ZeroVector;
+		UE_LOG(LogCharacterMove, Warning, TEXT("OnMovePathReceived - Empty path (no valid route), stopping. seq: %u"), SeqId);
 		return;
 	}
 
@@ -371,6 +372,11 @@ void ADH1_ClientCharacter::OnMovePathReceived(const uint32 SeqId, const TArray<F
 	ServerPath = Waypoints;
 	CurrentPathIndex = 0;
 	bIsServerPathMoving = true;
+
+	if (Waypoints.Num() > 0)
+	{
+		ClickMoveTarget = Waypoints.Last();
+	}
 
 	// 서버 이동 속도 적용 (0이면 기본값 유지)
 	if (MoveSpeed > 0.0f)
