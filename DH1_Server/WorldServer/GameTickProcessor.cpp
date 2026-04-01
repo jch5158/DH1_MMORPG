@@ -311,6 +311,39 @@ void GameTickProcessor::NotifyNearbyPlayersAboutEntity(const GameObjectRef& pSub
 	}
 }
 
+void GameTickProcessor::NotifyNearbyPlayersAboutEntityLeave(const GameObjectRef& pSubject)
+{
+	if (pSubject == nullptr || mpGridManager == nullptr)
+	{
+		return;
+	}
+
+	const int32 cellX = mpGridManager->ComputeCellX(pSubject->GetPositionX());
+	const int32 cellY = mpGridManager->ComputeCellY(pSubject->GetPositionY());
+	const auto nearbyObjects = mpGridManager->GetObjectsInRange(cellX, cellY);
+
+	Protocol::S2C_ENTITY_LEAVE_NOT leavePacket;
+	leavePacket.add_entityids(pSubject->GetId());
+
+	const auto leaveBuffer = MakeMovementSendBuffer(leavePacket, packet_id::S2C_ENTITY_LEAVE_NOT);
+	if (leaveBuffer == nullptr)
+	{
+		return;
+	}
+
+	for (const auto& pNearby : nearbyObjects)
+	{
+		if (pNearby->GetId() == pSubject->GetId() || pNearby->GetObjectType() != eGameObjectType::Player)
+		{
+			continue;
+		}
+		const auto pNearbyPlayer = std::static_pointer_cast<PlayerObject>(pNearby);
+		sendRelayToClient(pNearbyPlayer->GetGatewaySessionId(), pNearbyPlayer->GetGatewayServerId(), leaveBuffer);
+	}
+
+	NET_ENGINE_LOG_INFO("[AOI] EntityLeave broadcast for entityId={}, nearby_count={}", pSubject->GetId(), nearbyObjects.size());
+}
+
 void GameTickProcessor::sendAoiLeavesAfterCellChange(const GameObjectRef& pSubject,
 	const int32 oldCellX, const int32 oldCellY, const int32 newCellX, const int32 newCellY)
 {

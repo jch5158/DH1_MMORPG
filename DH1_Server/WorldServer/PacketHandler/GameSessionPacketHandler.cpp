@@ -456,6 +456,11 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_LEAVE_NOT(const Protocol:
 					});
 			}
 
+			const auto pGameTickProcessor = worldService.GetGameTickProcessorRef();
+			if (pGameTickProcessor != nullptr)
+			{
+				pGameTickProcessor->NotifyNearbyPlayersAboutEntityLeave(pObject);
+			}
 			pGridManager->RemoveObject(pObject->GetId());
 		}
 	}

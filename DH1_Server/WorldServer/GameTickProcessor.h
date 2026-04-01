@@ -24,6 +24,9 @@ public:
 	/** 엔터티가 셀에 들어왔을 때(비플레이어 이동·다른 플레이어 스폰 등): AOI 내 플레이어들에게 단일 ENTER */
 	void NotifyNearbyPlayersAboutEntity(const GameObjectRef& pSubject);
 
+	/** 엔터티 제거 직전: AOI 내 플레이어들에게 S2C_ENTITY_LEAVE_NOT 전송 */
+	void NotifyNearbyPlayersAboutEntityLeave(const GameObjectRef& pSubject);
+
 private:
 	void processMoveToPositionRequests();
 	void updatePathFollowing(const float deltaSec);
