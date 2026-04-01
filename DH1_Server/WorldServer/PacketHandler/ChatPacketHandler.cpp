@@ -101,7 +101,6 @@ bool ChatPacketHandler::HANDLE_C2S_CHAT_REQ(const Protocol::C2S_CHAT_REQ& packet
 	switch (packet.channel())
 	{
 	case Protocol::CHAT_CHANNEL_LOCAL:
-	case Protocol::CHAT_CHANNEL_WORLD:
 	{
 		const int32 cellX = pGridManager->ComputeCellX(pSender->GetPositionX());
 		const int32 cellY = pGridManager->ComputeCellY(pSender->GetPositionY());
@@ -120,6 +119,24 @@ bool ChatPacketHandler::HANDLE_C2S_CHAT_REQ(const Protocol::C2S_CHAT_REQ& packet
 			}
 			pGameTickProcessor->RelayChatToGatewayClient(pNearbyPlayer->GetGatewaySessionId(),
 				pNearbyPlayer->GetGatewayServerId(), inner);
+		}
+		break;
+	}
+	case Protocol::CHAT_CHANNEL_WORLD:
+	{
+		for (const auto& pGo : pGridManager->GetAllObjects())
+		{
+			if (pGo == nullptr || pGo->GetObjectType() != eGameObjectType::Player)
+			{
+				continue;
+			}
+			const auto pPlayer = std::static_pointer_cast<PlayerObject>(pGo);
+			if (pPlayer->GetAccountId() == accountId)
+			{
+				continue;
+			}
+			pGameTickProcessor->RelayChatToGatewayClient(pPlayer->GetGatewaySessionId(),
+				pPlayer->GetGatewayServerId(), inner);
 		}
 		break;
 	}
