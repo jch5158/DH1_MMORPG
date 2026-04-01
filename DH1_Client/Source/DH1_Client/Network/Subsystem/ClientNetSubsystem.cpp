@@ -48,6 +48,7 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Components/WidgetComponent.h"
 #include "UI/UMG/CharacterOverheadWidget.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Types/SlateEnums.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
@@ -928,6 +929,15 @@ bool UClientNetSubsystem::SendChatRequest(const int32 ChannelEnumValue, const FS
 	return true;
 }
 
+void UClientNetSubsystem::FocusChatInput()
+{
+	if (!ChatMessageEdit.IsValid())
+	{
+		return;
+	}
+	ChatMessageEdit->SetKeyboardFocus();
+}
+
 uint64 UClientNetSubsystem::GetParsedLocalAccountId() const
 {
 	if (ClientAuthData.AccountId.IsEmpty())
@@ -1181,6 +1191,20 @@ void UClientNetSubsystem::TrySendChatFromInput()
 	Msg.TrimStartAndEndInline();
 	if (Msg.IsEmpty())
 	{
+		if (const UGameInstance* GI = GetGameInstance())
+		{
+			if (const UWorld* W = GI->GetWorld())
+			{
+				if (APlayerController* PC = W->GetFirstPlayerController())
+				{
+					FInputModeGameAndUI Mode;
+					Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+					Mode.SetHideCursorDuringCapture(false);
+					PC->SetInputMode(Mode);
+					FSlateApplication::Get().SetUserFocusToGameViewport(0);
+				}
+			}
+		}
 		return;
 	}
 
@@ -1202,6 +1226,21 @@ void UClientNetSubsystem::TrySendChatFromInput()
 	AppendChatLine(Ch, LocalAccountId, SenderName, Msg, TsMs);
 
 	ChatMessageEdit->SetText(FText::GetEmpty());
+
+	if (const UGameInstance* GI = GetGameInstance())
+	{
+		if (const UWorld* W = GI->GetWorld())
+		{
+			if (APlayerController* PC = W->GetFirstPlayerController())
+			{
+				FInputModeGameAndUI Mode;
+				Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				Mode.SetHideCursorDuringCapture(false);
+				PC->SetInputMode(Mode);
+				FSlateApplication::Get().SetUserFocusToGameViewport(0);
+			}
+		}
+	}
 }
 
 void UClientNetSubsystem::AppendChatLine(const int32 ChannelEnumValue, const uint64 SenderAccountId,

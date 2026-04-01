@@ -113,6 +113,10 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	// 카메라 회전 액션 (미사용 - 우클릭은 클릭 이동으로 예약)
 	RightMouseAction = NewObject<UInputAction>(this, TEXT("IA_RightMouse"));
 	RightMouseAction->ValueType = EInputActionValueType::Boolean;
+
+	ChatFocusAction = NewObject<UInputAction>(this, TEXT("IA_ChatFocus"));
+	ChatFocusAction->ValueType = EInputActionValueType::Boolean;
+	DefaultMappingContext->MapKey(ChatFocusAction, EKeys::Enter);
 }
 
 void ADH1_ClientCharacter::BeginPlay()
@@ -186,6 +190,11 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 			EnhancedInput->BindAction(RightMouseAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnRightMousePressed);
 			EnhancedInput->BindAction(RightMouseAction, ETriggerEvent::Completed, this, &ADH1_ClientCharacter::OnRightMouseReleased);
 			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - RightMouseAction bound"));
+		}
+
+		if (ChatFocusAction != nullptr)
+		{
+			EnhancedInput->BindAction(ChatFocusAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatFocusPressed);
 		}
 	}
 }
@@ -442,6 +451,14 @@ void ADH1_ClientCharacter::OnRightMouseReleased(const FInputActionValue& Value)
 	if (APlayerController* PC = Cast<APlayerController>(Controller))
 	{
 		PC->bShowMouseCursor = true;
+	}
+}
+
+void ADH1_ClientCharacter::OnChatFocusPressed()
+{
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->FocusChatInput();
 	}
 }
 

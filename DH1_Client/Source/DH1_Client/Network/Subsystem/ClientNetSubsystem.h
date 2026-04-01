@@ -157,6 +157,8 @@ public:
     /** @return true if a non-empty message was queued on the session */
     bool SendChatRequest(int32 ChannelEnumValue, const FString& Message);
 
+    void FocusChatInput();
+
     void NotifyChatMessageReceived(int32 ChannelEnumValue, uint64 SenderAccountId, const FString& SenderDisplayName,
         const FString& Message, int64 ServerTimestampMs);
 
