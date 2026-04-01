@@ -852,6 +852,10 @@ void UClientNetSubsystem::RegisterChatUi(UUserWidget* ChatRoot)
 
 	ApplyDarkChatComboDropdownStyle(Combo);
 
+	Combo->Font = FCoreStyle::GetDefaultFontStyle("Regular", 12);
+	Combo->ForegroundColor = FSlateColor(FLinearColor::White);
+	Combo->SynchronizeProperties();
+
 	Combo->OnGenerateWidgetEvent.BindDynamic(this, &UClientNetSubsystem::HandleChatComboGenerateItem);
 	Combo->OnOpening.AddDynamic(this, &UClientNetSubsystem::HandleChatChannelComboOpening);
 
