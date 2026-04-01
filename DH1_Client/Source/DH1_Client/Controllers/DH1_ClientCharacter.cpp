@@ -608,11 +608,23 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 
 	UButton* SendBtn = Tree->ConstructWidget<UButton>(UButton::StaticClass(), TEXT("Btn_Send"));
 	InputRow->AddChildToHorizontalBox(SendBtn);
+	{
+		FButtonStyle BtnStyle = SendBtn->GetStyle();
+		BtnStyle.Normal.TintColor  = FSlateColor(FLinearColor(0.12f, 0.20f, 0.38f, 1.f));
+		BtnStyle.Hovered.TintColor = FSlateColor(FLinearColor(0.18f, 0.28f, 0.50f, 1.f));
+		BtnStyle.Pressed.TintColor = FSlateColor(FLinearColor(0.10f, 0.16f, 0.32f, 1.f));
+		BtnStyle.NormalForeground  = FSlateColor(FLinearColor::White);
+		BtnStyle.HoveredForeground = FSlateColor(FLinearColor::White);
+		BtnStyle.PressedForeground = FSlateColor(FLinearColor::White);
+		BtnStyle.NormalPadding  = FMargin(10.f, 4.f);
+		BtnStyle.PressedPadding = FMargin(10.f, 5.f);
+		SendBtn->SetStyle(BtnStyle);
+	}
 	UTextBlock* SendLabel = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("SendLabel"));
 	SendBtn->SetContent(SendLabel);
 	SendLabel->SetText(FText::FromString(TEXT("전송")));
-	FSlateFontInfo BtnFont = FCoreStyle::GetDefaultFontStyle("Regular", 12);
-	SendLabel->SetFont(BtnFont);
+	SendLabel->SetFont(FCoreStyle::GetDefaultFontStyle("Regular", 12));
+	SendLabel->SetColorAndOpacity(FSlateColor(FLinearColor::White));
 	if (UHorizontalBoxSlot* BtnSlot = Cast<UHorizontalBoxSlot>(SendBtn->Slot))
 	{
 		BtnSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
