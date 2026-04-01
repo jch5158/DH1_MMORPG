@@ -1,29 +1,97 @@
 #include "ClientNetSubsystem.h"
 
 #include "Async/Async.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/Border.h"
+#include "Components/Button.h"
+#include "Components/ComboBoxString.h"
+#include "Components/EditableTextBox.h"
+#include "Components/ScrollBox.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
+#include "Misc/DateTime.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "Styling/SlateTypes.h"
 #include "Dom/JsonValue.h"
 #include "Engine/Engine.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/GameViewportClient.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
 #include "Engine/World.h"
+#include "Components/StaticMeshComponent.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/Dh1StringConv.h"
+#include "Network/PacketHandler/ChatPacketHandler.h"
 #include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Network/PacketHandler/RealmPacketHandler.h"
+#include "Enum.pb.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "Styling/CoreStyle.h"
 #include "UI/AuthErrorMapper.h"
 #include "UI/AuthWidgetStyle.h"
+#include "Widgets/Input/SComboBox.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SOverlay.h"
 #include "Widgets/Text/STextBlock.h"
+#include "Types/SlateEnums.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
+
+namespace
+{
+	void ApplyDarkChatComboDropdownStyle(UComboBoxString* Combo)
+	{
+		if (Combo == nullptr)
+		{
+			return;
+		}
+
+		// 채팅 패널(회색 톤)과 구분: 드롭다운은 남청 계열 + 테두리, 행은 짝/홀 미세 대비
+		FComboBoxStyle WidgetStyle = Combo->GetWidgetStyle();
+
+		// 펼친 목록 외곽(메뉴 배경 느낌 + 가장자리 구분)
+		WidgetStyle.ComboButtonStyle.MenuBorderBrush.TintColor =
+			FSlateColor(FLinearColor(0.06f, 0.09f, 0.16f, 0.99f));
+		WidgetStyle.ComboButtonStyle.MenuBorderPadding = FMargin(2.f, 2.f, 2.f, 2.f);
+
+		// 닫힌 상태 채널 버튼 — 로그 영역보다 살짝 푸른 톤
+		FButtonStyle& Btn = WidgetStyle.ComboButtonStyle.ButtonStyle;
+		const FSlateColor BtnIdle(FLinearColor(0.10f, 0.13f, 0.20f, 0.95f));
+		const FSlateColor BtnHover(FLinearColor(0.14f, 0.18f, 0.28f, 0.98f));
+		const FSlateColor BtnPress(FLinearColor(0.12f, 0.16f, 0.26f, 1.f));
+		Btn.Normal.TintColor = BtnIdle;
+		Btn.Hovered.TintColor = BtnHover;
+		Btn.Pressed.TintColor = BtnPress;
+		Btn.Disabled.TintColor = FSlateColor(FLinearColor(0.08f, 0.08f, 0.10f, 0.7f));
+
+		Combo->SetWidgetStyle(WidgetStyle);
+
+		FTableRowStyle ItemStyle = Combo->GetItemStyle();
+		const FSlateColor RowEven(FLinearColor(0.11f, 0.15f, 0.24f, 1.f));
+		const FSlateColor RowOdd(FLinearColor(0.09f, 0.13f, 0.21f, 1.f));
+		const FSlateColor RowHoverEven(FLinearColor(0.18f, 0.24f, 0.36f, 1.f));
+		const FSlateColor RowHoverOdd(FLinearColor(0.16f, 0.22f, 0.34f, 1.f));
+		const FSlateColor RowSelected(FLinearColor(0.22f, 0.32f, 0.48f, 1.f));
+		ItemStyle.EvenRowBackgroundBrush.TintColor = RowEven;
+		ItemStyle.OddRowBackgroundBrush.TintColor = RowOdd;
+		ItemStyle.EvenRowBackgroundHoveredBrush.TintColor = RowHoverEven;
+		ItemStyle.OddRowBackgroundHoveredBrush.TintColor = RowHoverOdd;
+		ItemStyle.ActiveBrush.TintColor = RowSelected;
+		ItemStyle.ActiveHoveredBrush.TintColor = RowSelected;
+		ItemStyle.InactiveBrush.TintColor = RowSelected;
+		ItemStyle.InactiveHoveredBrush.TintColor = RowSelected;
+		ItemStyle.TextColor = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
+		Combo->SetItemStyle(ItemStyle);
+	}
+}
 
 namespace
 {
@@ -99,6 +167,35 @@ namespace
 		return TEXT("");
 	}
 
+	constexpr int32 kMaxChatLogLines = 120;
+
+	const TCHAR* ChatChannelTag(const int32 Ch)
+	{
+		using namespace Protocol;
+		switch (Ch)
+		{
+		case CHAT_CHANNEL_WORLD:
+			return TEXT("월드");
+		case CHAT_CHANNEL_REALM:
+			return TEXT("렐름");
+		default:
+			return TEXT("일반");
+		}
+	}
+
+	int32 ChatChannelFromComboIndex(const int32 Idx)
+	{
+		using namespace Protocol;
+		switch (Idx)
+		{
+		case 1:
+			return CHAT_CHANNEL_WORLD;
+		case 2:
+			return CHAT_CHANNEL_REALM;
+		default:
+			return CHAT_CHANNEL_LOCAL;
+		}
+	}
 }
 
 namespace
@@ -255,7 +352,10 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UClientNetSubsystem::Deinitialize()
 {
+	UnregisterChatUi();
+	ClearNetworkSpawnedEntities();
 	RemoveEnterWorldLoadingFromViewport();
+	bClientWorldChatAllowed = false;
 	ServiceRef.reset();
 	EngineInit.Reset();
 	Super::Deinitialize();
@@ -416,11 +516,14 @@ bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 		return false;
 	}
 
+	ClearNetworkSpawnedEntities();
+	bClientWorldChatAllowed = false;
 	return true;
 }
 
 void UClientNetSubsystem::Disconnect()
 {
+	ClearNetworkSpawnedEntities();
 }
 
 void UClientNetSubsystem::SendPacket(const uint8* PacketData, int32 Size)
@@ -521,6 +624,8 @@ void UClientNetSubsystem::RequestRealmSelect(const int32 RealmId)
 		return;
 	}
 
+	bClientWorldChatAllowed = false;
+
 	Protocol::C2S_REALM_SELECT_REQ packet;
 	packet.set_realmid(RealmId);
 	pSession->Send(RealmPacketHandler::MakeSendBuffer(packet));
@@ -533,6 +638,7 @@ void UClientNetSubsystem::NotifySpawnPosition(const FVector& Position, const flo
 	AsyncTask(ENamedThreads::GameThread, [this, Position, Yaw]()
 		{
 			bHasPendingSpawnCharacterSheet = false;
+			bClientWorldChatAllowed = true;
 			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Broadcasting SpawnPosition, Bound: %d"), OnSpawnPositionReceived.IsBound());
 			OnSpawnPositionReceived.Broadcast(Position, Yaw);
 		});
@@ -551,11 +657,13 @@ void UClientNetSubsystem::NotifySpawnPositionWithCharacterSheet(
 	AsyncTask(ENamedThreads::GameThread, [this, Position, Yaw, DisplayName, Level, CurrentHP, MaxHP]()
 		{
 			RemoveEnterWorldLoadingFromViewport();
+			bClientWorldChatAllowed = true;
 			PendingSpawnDisplayName = DisplayName;
 			PendingSpawnLevel = Level;
 			PendingSpawnCurrentHP = CurrentHP;
 			PendingSpawnMaxHP = MaxHP;
 			bHasPendingSpawnCharacterSheet = true;
+			CachedLocalChatDisplayName = DisplayName;
 			OnCharacterOverheadData.Broadcast(DisplayName, Level, CurrentHP, MaxHP);
 			OnSpawnPositionReceived.Broadcast(Position, Yaw);
 		});
@@ -649,4 +757,411 @@ void UClientNetSubsystem::NotifyCharacterOverheadData(const FString& DisplayName
 		{
 			OnCharacterOverheadData.Broadcast(DisplayName, Level, CurrentHP, MaxHP);
 		});
+}
+
+void UClientNetSubsystem::RegisterChatUi(UUserWidget* ChatRoot)
+{
+	UnregisterChatUi();
+	if (ChatRoot == nullptr)
+	{
+		return;
+	}
+
+	UButton* Btn = Cast<UButton>(ChatRoot->GetWidgetFromName(TEXT("Btn_Send")));
+	UComboBoxString* Combo = Cast<UComboBoxString>(ChatRoot->GetWidgetFromName(TEXT("Combo_Channel")));
+	UEditableTextBox* Edit = Cast<UEditableTextBox>(ChatRoot->GetWidgetFromName(TEXT("EditableText_Message")));
+	UScrollBox* Scroll = Cast<UScrollBox>(ChatRoot->GetWidgetFromName(TEXT("Scroll_Log")));
+	UVerticalBox* Box = Cast<UVerticalBox>(ChatRoot->GetWidgetFromName(TEXT("VBox_LogLines")));
+
+	if (Btn == nullptr || Combo == nullptr || Edit == nullptr || Scroll == nullptr || Box == nullptr)
+	{
+		UE_LOG(LogNetEngine, Warning, TEXT("RegisterChatUi: missing named widgets (Btn_Send, Combo_Channel, EditableText_Message, Scroll_Log, VBox_LogLines)"));
+		return;
+	}
+
+	ChatRootWidget = ChatRoot;
+	ChatSendButton = Btn;
+	ChatChannelCombo = Combo;
+	ChatMessageEdit = Edit;
+	ChatScrollLog = Scroll;
+	ChatLogLinesBox = Box;
+
+	Combo->ClearOptions();
+	Combo->AddOption(TEXT("일반"));
+	Combo->AddOption(TEXT("월드"));
+	Combo->AddOption(TEXT("렐름"));
+	Combo->SetSelectedIndex(0);
+
+	ApplyDarkChatComboDropdownStyle(Combo);
+
+	Combo->OnGenerateWidgetEvent.BindDynamic(this, &UClientNetSubsystem::HandleChatComboGenerateItem);
+	Combo->OnOpening.AddDynamic(this, &UClientNetSubsystem::HandleChatChannelComboOpening);
+
+	if (UVerticalBoxSlot* const ScrollSlot = Cast<UVerticalBoxSlot>(Scroll->Slot))
+	{
+		ScrollSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+	}
+
+	Btn->OnClicked.AddDynamic(this, &UClientNetSubsystem::HandleChatSendClicked);
+
+	Edit->OnTextCommitted.AddDynamic(this, &UClientNetSubsystem::HandleChatTextCommitted);
+}
+
+void UClientNetSubsystem::UnregisterChatUi()
+{
+	if (ChatSendButton.IsValid())
+	{
+		ChatSendButton->OnClicked.RemoveDynamic(this, &UClientNetSubsystem::HandleChatSendClicked);
+	}
+	if (ChatChannelCombo.IsValid())
+	{
+		ChatChannelCombo->OnGenerateWidgetEvent.Clear();
+		ChatChannelCombo->OnOpening.RemoveDynamic(this, &UClientNetSubsystem::HandleChatChannelComboOpening);
+	}
+	if (ChatMessageEdit.IsValid())
+	{
+		ChatMessageEdit->OnTextCommitted.RemoveDynamic(this, &UClientNetSubsystem::HandleChatTextCommitted);
+	}
+
+	ChatSendButton = nullptr;
+	ChatChannelCombo = nullptr;
+	ChatMessageEdit = nullptr;
+	ChatScrollLog = nullptr;
+	ChatLogLinesBox = nullptr;
+	ChatRootWidget = nullptr;
+}
+
+bool UClientNetSubsystem::SendChatRequest(const int32 ChannelEnumValue, const FString& Message)
+{
+	if (!bClientWorldChatAllowed)
+	{
+		return false;
+	}
+
+	if (!ServiceRef)
+	{
+		return false;
+	}
+
+	const SessionRef Session = ServiceRef->GetFirstSessionRef();
+	if (Session == nullptr)
+	{
+		return false;
+	}
+
+	FString Trimmed = Message;
+	Trimmed.TrimStartAndEndInline();
+	if (Trimmed.IsEmpty())
+	{
+		return false;
+	}
+
+	const int32 Ch = FMath::Clamp(ChannelEnumValue, static_cast<int32>(Protocol::CHAT_CHANNEL_LOCAL),
+		static_cast<int32>(Protocol::CHAT_CHANNEL_REALM));
+
+	Protocol::C2S_CHAT_REQ Packet;
+	Packet.set_channel(static_cast<Protocol::eChatChannel>(Ch));
+	Packet.set_message(std::string(TCHAR_TO_UTF8(*Trimmed)));
+
+	Session->Send(ChatPacketHandler::MakeSendBuffer(Packet));
+	return true;
+}
+
+uint64 UClientNetSubsystem::GetParsedLocalAccountId() const
+{
+	if (ClientAuthData.AccountId.IsEmpty())
+	{
+		return 0;
+	}
+	return FCString::Strtoui64(*ClientAuthData.AccountId, nullptr, 10);
+}
+
+void UClientNetSubsystem::NotifyChatMessageReceived(const int32 ChannelEnumValue, const uint64 SenderAccountId,
+	const FString& SenderDisplayName, const FString& Message, const int64 ServerTimestampMs)
+{
+	// 호출부(ChatPacketHandler)에서 게임 스레드로 디스패치함.
+	// 로컬 전송 에코와 동일한 본인 S2C 알림은 한 줄만 남기기 위해 제외
+	const uint64 LocalAccountId = GetParsedLocalAccountId();
+	if (LocalAccountId != 0 && SenderAccountId == LocalAccountId)
+	{
+		return;
+	}
+	AppendChatLine(ChannelEnumValue, SenderAccountId, SenderDisplayName, Message, ServerTimestampMs);
+}
+
+void UClientNetSubsystem::HandleChatSendClicked()
+{
+	TrySendChatFromInput();
+}
+
+void UClientNetSubsystem::HandleChatChannelComboOpening()
+{
+	UComboBoxString* Combo = ChatChannelCombo.Get();
+	if (Combo == nullptr)
+	{
+		return;
+	}
+	const TSharedPtr<SWidget> Cached = Combo->GetCachedWidget();
+	if (!Cached.IsValid())
+	{
+		return;
+	}
+	const TSharedPtr<SComboBox<TSharedPtr<FString>>> SComboWidget = StaticCastSharedPtr<SComboBox<TSharedPtr<FString>>>(Cached);
+	if (SComboWidget.IsValid())
+	{
+		SComboWidget->SetMenuPlacement(EMenuPlacement::MenuPlacement_CenteredAboveAnchor);
+	}
+}
+
+UWidget* UClientNetSubsystem::HandleChatComboGenerateItem(FString Item)
+{
+	// #region agent log
+	{
+		const FString Line = FString::Printf(
+			TEXT("{\"sessionId\":\"ab4bf2\",\"hypothesisId\":\"H3\",\"location\":\"ClientNetSubsystem:HandleChatComboGenerateItem\",\"message\":\"item\",\"data\":{\"len\":%d},\"timestamp\":%lld}\n"),
+			Item.Len(), static_cast<int64>(FDateTime::UtcNow().ToUnixTimestamp() * 1000LL));
+		const FString Path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../debug-ab4bf2.log"));
+		FFileHelper::SaveStringToFile(Line, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM, &IFileManager::Get(), FILEWRITE_Append);
+	}
+	// #endregion
+	UObject* const Outer = ChatChannelCombo.Get() ? static_cast<UObject*>(ChatChannelCombo.Get()) : static_cast<UObject*>(this);
+	UBorder* const Border = NewObject<UBorder>(Outer);
+	Border->SetPadding(FMargin(10.f, 8.f, 10.f, 8.f));
+	// 커스텀 행은 ItemStyle 행 배경이 칠해지지 않는 경우가 많음 — 불투명 어두운 틴트(ApplyDarkChatComboDropdownStyle RowEven 톤)
+	Border->SetBrushColor(FLinearColor(0.11f, 0.15f, 0.24f, 1.f));
+
+	UTextBlock* const Text = NewObject<UTextBlock>(Border);
+	Text->SetText(FText::FromString(Item));
+	FSlateFontInfo FontInfo = Text->GetFont();
+	FontInfo.Size = 13;
+	Text->SetFont(FontInfo);
+	Text->SetColorAndOpacity(FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f)));
+
+	Border->SetContent(Text);
+	return Border;
+}
+
+UWorld* UClientNetSubsystem::ResolveGameWorldForSpawning() const
+{
+	if (UWorld* const W = GetWorld())
+	{
+		return W;
+	}
+	if (UGameInstance* const GI = GetGameInstance())
+	{
+		if (UWorld* const W = GI->GetWorld())
+		{
+			return W;
+		}
+	}
+	if (GEngine == nullptr)
+	{
+		return nullptr;
+	}
+	UGameInstance* const MyGI = GetGameInstance();
+	if (MyGI == nullptr)
+	{
+		return nullptr;
+	}
+	for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
+	{
+		if (Ctx.OwningGameInstance != MyGI)
+		{
+			continue;
+		}
+		UWorld* const W = Ctx.World();
+		if (W == nullptr || !W->IsGameWorld())
+		{
+			continue;
+		}
+		const EWorldType::Type WT = Ctx.WorldType;
+		if (WT != EWorldType::PIE && WT != EWorldType::Game)
+		{
+			continue;
+		}
+		return W;
+	}
+	return nullptr;
+}
+
+void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntitySpawnData>& Entities)
+{
+	UWorld* const PrimaryWorld = GetWorld();
+	UWorld* const World = PrimaryWorld != nullptr ? PrimaryWorld : ResolveGameWorldForSpawning();
+	// #region agent log
+	{
+		const int32 Fallback = (PrimaryWorld == nullptr && World != nullptr) ? 1 : 0;
+		const FString Line = FString::Printf(
+			TEXT("{\"sessionId\":\"ab4bf2\",\"hypothesisId\":\"H2\",\"location\":\"ClientNetSubsystem:ApplyNetworkEntitiesEntered\",\"message\":\"enter\",\"data\":{\"count\":%d,\"hasWorld\":%d,\"worldFallback\":%d},\"timestamp\":%lld}\n"),
+			Entities.Num(), World != nullptr ? 1 : 0, Fallback, static_cast<int64>(FDateTime::UtcNow().ToUnixTimestamp() * 1000LL));
+		const FString Path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../debug-ab4bf2.log"));
+		FFileHelper::SaveStringToFile(Line, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM, &IFileManager::Get(), FILEWRITE_Append);
+	}
+	// #endregion
+	if (World == nullptr)
+	{
+		return;
+	}
+
+	static UStaticMesh* CubeMesh = nullptr;
+	if (CubeMesh == nullptr)
+	{
+		CubeMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	}
+
+	for (const FNetworkEntitySpawnData& E : Entities)
+	{
+		if (E.EntityId == 0)
+		{
+			continue;
+		}
+
+		if (TWeakObjectPtr<AActor>* const Found = NetworkEntityActors.Find(E.EntityId))
+		{
+			if (Found->IsValid())
+			{
+				if (AActor* const A = Found->Get())
+				{
+					A->SetActorLocationAndRotation(E.Position, FRotator(0.f, E.YawDegrees, 0.f));
+				}
+				continue;
+			}
+			NetworkEntityActors.Remove(E.EntityId);
+		}
+
+		FActorSpawnParameters Sp;
+		Sp.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		AStaticMeshActor* const MeshActor = World->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), E.Position,
+			FRotator(0.f, E.YawDegrees, 0.f), Sp);
+		if (MeshActor == nullptr)
+		{
+			continue;
+		}
+
+		MeshActor->SetActorLabel(FString::Printf(TEXT("NetEntity_%llu"), E.EntityId));
+		if (UStaticMeshComponent* const Mc = MeshActor->GetStaticMeshComponent())
+		{
+			if (CubeMesh != nullptr)
+			{
+				Mc->SetStaticMesh(CubeMesh);
+			}
+			Mc->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		MeshActor->SetActorScale3D(FVector(0.45f, 0.45f, 0.9f));
+
+		NetworkEntityActors.Add(E.EntityId, MeshActor);
+	}
+}
+
+void UClientNetSubsystem::ApplyNetworkEntitiesLeft(const TArray<uint64>& EntityIds)
+{
+	for (const uint64 Id : EntityIds)
+	{
+		if (TWeakObjectPtr<AActor>* const Found = NetworkEntityActors.Find(Id))
+		{
+			if (Found->IsValid())
+			{
+				Found->Get()->Destroy();
+			}
+			NetworkEntityActors.Remove(Id);
+		}
+	}
+}
+
+void UClientNetSubsystem::ClearNetworkSpawnedEntities()
+{
+	for (auto It = NetworkEntityActors.CreateIterator(); It; ++It)
+	{
+		if (It.Value().IsValid())
+		{
+			It.Value()->Destroy();
+		}
+	}
+	NetworkEntityActors.Empty();
+}
+
+void UClientNetSubsystem::HandleChatTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	(void)Text;
+	if (CommitMethod == ETextCommit::OnEnter)
+	{
+		TrySendChatFromInput();
+	}
+}
+
+void UClientNetSubsystem::TrySendChatFromInput()
+{
+	if (!ChatMessageEdit.IsValid() || !ChatChannelCombo.IsValid())
+	{
+		return;
+	}
+
+	FString Msg = ChatMessageEdit->GetText().ToString();
+	Msg.TrimStartAndEndInline();
+	if (Msg.IsEmpty())
+	{
+		return;
+	}
+
+	if (!bClientWorldChatAllowed)
+	{
+		UE_LOG(LogNetEngine, Warning, TEXT("채팅은 월드(캐릭터 스폰) 완료 후 전송할 수 있습니다."));
+		return;
+	}
+
+	const int32 Ch = ChatChannelFromComboIndex(ChatChannelCombo->GetSelectedIndex());
+	if (!SendChatRequest(Ch, Msg))
+	{
+		return;
+	}
+
+	const uint64 LocalAccountId = GetParsedLocalAccountId();
+	const FString SenderName = CachedLocalChatDisplayName.IsEmpty() ? TEXT("나") : CachedLocalChatDisplayName;
+	const int64 TsMs = static_cast<int64>(FDateTime::UtcNow().GetTicks() / ETimespan::TicksPerMillisecond);
+	AppendChatLine(Ch, LocalAccountId, SenderName, Msg, TsMs);
+
+	ChatMessageEdit->SetText(FText::GetEmpty());
+}
+
+void UClientNetSubsystem::AppendChatLine(const int32 ChannelEnumValue, const uint64 SenderAccountId,
+	const FString& SenderDisplayName, const FString& Message, const int64 ServerTimestampMs)
+{
+	(void)SenderAccountId;
+	(void)ServerTimestampMs;
+
+	if (!ChatLogLinesBox.IsValid() || !ChatScrollLog.IsValid() || !ChatRootWidget.IsValid())
+	{
+		return;
+	}
+
+	UVerticalBox* const Box = ChatLogLinesBox.Get();
+	UScrollBox* const Scroll = ChatScrollLog.Get();
+	UUserWidget* const Root = ChatRootWidget.Get();
+
+	while (Box->GetChildrenCount() >= kMaxChatLogLines)
+	{
+		if (UWidget* Oldest = Box->GetChildAt(0))
+		{
+			Box->RemoveChild(Oldest);
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	UTextBlock* Line = NewObject<UTextBlock>(Root);
+	const FString DisplayName = SenderDisplayName.IsEmpty() ? TEXT("?") : SenderDisplayName;
+	Line->SetText(FText::FromString(FString::Printf(TEXT("[%s] %s: %s"), ChatChannelTag(ChannelEnumValue), *DisplayName,
+		*Message)));
+
+	FSlateFontInfo FontInfo = FCoreStyle::GetDefaultFontStyle("Regular", 11);
+	Line->SetFont(FontInfo);
+	Line->SetColorAndOpacity(FSlateColor(FLinearColor(0.88f, 0.92f, 1.0f, 1.0f)));
+	Line->SetAutoWrapText(true);
+
+	Box->AddChildToVerticalBox(Line);
+
+	Scroll->InvalidateLayoutAndVolatility();
+	Scroll->ScrollToEnd();
 }

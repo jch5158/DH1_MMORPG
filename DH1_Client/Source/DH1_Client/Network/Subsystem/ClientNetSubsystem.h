@@ -41,6 +41,22 @@ struct FRealmServerInfo
 	int32 Status = 0;
 };
 
+class UUserWidget;
+class UButton;
+class UComboBoxString;
+class UEditableTextBox;
+class UScrollBox;
+class UVerticalBox;
+class UWidget;
+
+/** 서버 S2C_ENTITY_ENTER / 스냅샷용 — 월드에 스폰할 원격 엔터티 한 줄 */
+struct FNetworkEntitySpawnData
+{
+	uint64 EntityId = 0;
+	FVector Position = FVector::ZeroVector;
+	float YawDegrees = 0.f;
+};
+
 UCLASS(Config = Game)
 class DH1_CLIENT_API UClientNetSubsystem : public UGameInstanceSubsystem, public FTickableGameObject
 {
@@ -124,6 +140,21 @@ public:
     // 클릭 이동 (목적지 → 서버 경로 계산, 현재 위치도 함께 전송)
     void SendMoveToPosition(const FVector& CurrentPosition, const FVector& Destination);
 
+    /** Flop MCP로 만든 WBP_Chat(UserWidget) 등 — 이름으로 자식 위젯을 찾아 송수신 바인딩 */
+    void RegisterChatUi(UUserWidget* ChatRoot);
+    void UnregisterChatUi();
+
+    /** @return true if a non-empty message was queued on the session */
+    bool SendChatRequest(int32 ChannelEnumValue, const FString& Message);
+
+    void NotifyChatMessageReceived(int32 ChannelEnumValue, uint64 SenderAccountId, const FString& SenderDisplayName,
+        const FString& Message, int64 ServerTimestampMs);
+
+    /** S2C_ENTITY_ENTER_NOT / SNAPSHOT — 주변 엔터티 메시(큐브 프록시) 스폰·위치 갱신 */
+    void ApplyNetworkEntitiesEntered(const TArray<FNetworkEntitySpawnData>& Entities);
+    void ApplyNetworkEntitiesLeft(const TArray<uint64>& EntityIds);
+    void ClearNetworkSpawnedEntities();
+
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;
@@ -137,6 +168,36 @@ public:
 
 private:
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+    UFUNCTION()
+    void HandleChatSendClicked();
+
+    UFUNCTION()
+    void HandleChatTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
+
+    /** 채널 콤보 드롭다운을 앵커 위쪽으로 열기 (콘텐츠 브라우저 가림 방지) */
+    UFUNCTION()
+    void HandleChatChannelComboOpening();
+
+    UFUNCTION()
+    UWidget* HandleChatComboGenerateItem(FString Item);
+
+    /** GetWorld()가 비어 있을 때(틱/패킷 타이밍) PIE·Game 월드 해상도 */
+    UWorld* ResolveGameWorldForSpawning() const;
+
+    void TrySendChatFromInput();
+    void AppendChatLine(int32 ChannelEnumValue, uint64 SenderAccountId, const FString& SenderDisplayName,
+        const FString& Message, int64 ServerTimestampMs);
+
+    /** HTTP 로그인 후 설정된 AccountId 문자열 → uint64 (실패·빈 값이면 0) */
+    uint64 GetParsedLocalAccountId() const;
+
+    TWeakObjectPtr<UUserWidget> ChatRootWidget;
+    TWeakObjectPtr<UButton> ChatSendButton;
+    TWeakObjectPtr<UComboBoxString> ChatChannelCombo;
+    TWeakObjectPtr<UEditableTextBox> ChatMessageEdit;
+    TWeakObjectPtr<UScrollBox> ChatScrollLog;
+    TWeakObjectPtr<UVerticalBox> ChatLogLinesBox;
 
     uint32 MoveSequenceId = 0;
     bool bIsConnected = false;
@@ -158,4 +219,15 @@ private:
     int32 PendingSpawnLevel = 1;
     float PendingSpawnCurrentHP = 100.f;
     float PendingSpawnMaxHP = 100.f;
+
+    /** 로컬 채팅 에코용 (스폰 시트에서 설정) */
+    FString CachedLocalChatDisplayName;
+
+    /**
+     * 게이트웨이 Chat Validate(IsInWorld)와 맞춤: 스폰 위치 응답 전에는 C2S_CHAT_REQ를 보내지 않음(B1).
+     * 연결·렐름 재선택 시 false로 리셋.
+     */
+    bool bClientWorldChatAllowed = false;
+
+    TMap<uint64, TWeakObjectPtr<AActor>> NetworkEntityActors;
 };
