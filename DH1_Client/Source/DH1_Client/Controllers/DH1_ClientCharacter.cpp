@@ -496,6 +496,7 @@ void ADH1_ClientCharacter::SetupCharacterOverhead()
 	}
 
 	OverheadWidgetComponent->SetWidget(OverheadWidgetInstance);
+	OverheadWidgetInstance->SetIsLocalPlayer(true);
 	PushOverheadToWidget();
 
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())

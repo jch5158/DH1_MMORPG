@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Overhead")
 	void SetOverheadData(const FString& InName, int32 InLevel, float CurrentHP, float MaxHP);
 
+	UFUNCTION(BlueprintCallable, Category = "Overhead")
+	void SetIsLocalPlayer(bool bLocal);
+
 protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
@@ -41,6 +44,7 @@ private:
 	int32 CachedLevel = 1;
 	float CachedCurrentHP = 100.f;
 	float CachedMaxHP = 100.f;
+	bool bCachedIsLocal = false;
 
 	TSharedPtr<STextBlock> SlateNameText;
 	TSharedPtr<STextBlock> SlateLevelText;

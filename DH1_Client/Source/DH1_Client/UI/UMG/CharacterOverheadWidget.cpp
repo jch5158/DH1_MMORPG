@@ -254,6 +254,10 @@ void UCharacterOverheadWidget::RefreshOverheadSlate()
 	if (SlateNameText.IsValid())
 	{
 		SlateNameText->SetText(FText::FromString(CachedDisplayName));
+		const FLinearColor NameColor = bCachedIsLocal
+			? FLinearColor(0.0f, 1.0f, 0.4f, 1.f)
+			: FLinearColor(1.0f, 0.35f, 0.2f, 1.f);
+		SlateNameText->SetColorAndOpacity(NameColor);
 	}
 	if (SlateLevelText.IsValid())
 	{
@@ -306,5 +310,11 @@ void UCharacterOverheadWidget::SetOverheadData(const FString& InName, const int3
 	CachedLevel = FMath::Clamp(FMath::Max(1, InLevel), 1, 9999);
 	CachedMaxHP = FMath::Max(1.f, MaxHP);
 	CachedCurrentHP = FMath::Clamp(CurrentHP, 0.f, CachedMaxHP);
+	RefreshOverheadSlate();
+}
+
+void UCharacterOverheadWidget::SetIsLocalPlayer(const bool bLocal)
+{
+	bCachedIsLocal = bLocal;
 	RefreshOverheadSlate();
 }
