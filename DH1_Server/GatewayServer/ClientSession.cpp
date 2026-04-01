@@ -28,61 +28,66 @@ void ClientSession::OnDisconnected()
 
 	if (mAccountId != 0)
 	{
-		// DuplicateLogin으로 이미 처리된 경우 LEAVE_NOT 중복 전송 방지
-		if (mWorldServerId != 0 && !mbDuplicateLoginHandled)
+		if (mbDuplicateLoginHandled)
 		{
-			const auto pWorldClientService = ISingleton<GatewayService>::GetInstance().GetWorldClientServiceRef();
-			if (pWorldClientService != nullptr)
+			NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - DuplicateLogin already handled, skipping cleanup, accountId: {}", mAccountId);
+			mAccountId = 0;
+		}
+		else
+		{
+			if (mWorldServerId != 0)
 			{
-				const auto pWorldSession = pWorldClientService->GetFirstSessionRef();
-				if (pWorldSession != nullptr)
+				const auto pWorldClientService = ISingleton<GatewayService>::GetInstance().GetWorldClientServiceRef();
+				if (pWorldClientService != nullptr)
 				{
-					Protocol::S2S_GAME_SESSION_LEAVE_NOT leavePacket;
-					leavePacket.set_accountid(mAccountId);
-					leavePacket.set_gatewaysessionid(GetSessionId());
+					const auto pWorldSession = pWorldClientService->GetFirstSessionRef();
+					if (pWorldSession != nullptr)
+					{
+						Protocol::S2S_GAME_SESSION_LEAVE_NOT leavePacket;
+						leavePacket.set_accountid(mAccountId);
+						leavePacket.set_gatewaysessionid(GetSessionId());
 
-					pWorldSession->Send(GameSessionPacketHandler::MakeSendBuffer(leavePacket));
+						pWorldSession->Send(GameSessionPacketHandler::MakeSendBuffer(leavePacket));
 
-					NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - LEAVE_NOT sent, accountId: {}, worldServerId: {}", mAccountId, mWorldServerId);
+						NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - LEAVE_NOT sent, accountId: {}, worldServerId: {}", mAccountId, mWorldServerId);
+					}
 				}
+
+				mWorldServerId = 0;
 			}
 
-			mWorldServerId = 0;
-		}
+			const auto pManager = ISingleton<GatewayService>::GetInstance().GetClientSessionManagerRef();
+			if (pManager != nullptr)
+			{
+				(void)pManager->RemoveClientSession(mAccountId);
+			}
 
-		const auto pManager = ISingleton<GatewayService>::GetInstance().GetClientSessionManagerRef();
-		if (pManager != nullptr)
-		{
-			(void)pManager->RemoveClientSession(mAccountId);
-		}
+			auto& gw = ISingleton<GatewayService>::GetInstance();
+			if (const auto pMySql = gw.GetMySqlServiceRef())
+			{
+				pMySql->ReleaseRoutingKey(mAccountId);
+			}
+			if (const auto pAccountMySql = gw.GetAccountMySqlServiceRef())
+			{
+				pAccountMySql->ReleaseRoutingKey(mAccountId);
+			}
 
-		// MySQL 로드밸런서 배정 해제
-		auto& gw = ISingleton<GatewayService>::GetInstance();
-		if (const auto pMySql = gw.GetMySqlServiceRef())
-		{
-			pMySql->ReleaseRoutingKey(mAccountId);
-		}
-		if (const auto pAccountMySql = gw.GetAccountMySqlServiceRef())
-		{
-			pAccountMySql->ReleaseRoutingKey(mAccountId);
-		}
-
-		// Redis: 내 GW가 마지막 관리자일 때만 세션 삭제 (다른 GW에 재접속했으면 무시)
-		const int32 gatewayId = ISingleton<GatewayService>::GetInstance().GetGatewayId();
-		RedisServiceRef pRedisService = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
-		if (pRedisService != nullptr)
-		{
-			const uint64 accountId = mAccountId;
-			pRedisService->CheckAndDeleteSessionAsync(accountId, gatewayId, [accountId](const bool isDeleted)
-				{
-					if (isDeleted)
+			const int32 gatewayId = ISingleton<GatewayService>::GetInstance().GetGatewayId();
+			RedisServiceRef pRedisService = ISingleton<GatewayService>::GetInstance().GetRedisServiceRef();
+			if (pRedisService != nullptr)
+			{
+				const uint64 accountId = mAccountId;
+				pRedisService->CheckAndDeleteSessionAsync(accountId, gatewayId, [accountId](const bool isDeleted)
 					{
-						NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - Redis session cleared, accountId: {}", accountId);
-					}
-				});
-		}
+						if (isDeleted)
+						{
+							NET_ENGINE_LOG_INFO("ClientSession::OnDisconnected - Redis session cleared, accountId: {}", accountId);
+						}
+					});
+			}
 
-		mAccountId = 0;
+			mAccountId = 0;
+		}
 	}
 }
 
