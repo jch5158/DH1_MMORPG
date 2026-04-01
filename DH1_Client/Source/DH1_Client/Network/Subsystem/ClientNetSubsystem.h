@@ -158,6 +158,7 @@ public:
     bool SendChatRequest(int32 ChannelEnumValue, const FString& Message);
 
     void FocusChatInput();
+    void CycleChatChannel();
 
     void NotifyChatMessageReceived(int32 ChannelEnumValue, uint64 SenderAccountId, const FString& SenderDisplayName,
         const FString& Message, int64 ServerTimestampMs);

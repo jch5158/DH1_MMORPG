@@ -938,6 +938,21 @@ void UClientNetSubsystem::FocusChatInput()
 	ChatMessageEdit->SetKeyboardFocus();
 }
 
+void UClientNetSubsystem::CycleChatChannel()
+{
+	if (!ChatChannelCombo.IsValid())
+	{
+		return;
+	}
+	const int32 Current = ChatChannelCombo->GetSelectedIndex();
+	const int32 Count = ChatChannelCombo->GetOptionCount();
+	if (Count <= 0)
+	{
+		return;
+	}
+	ChatChannelCombo->SetSelectedIndex((Current + 1) % Count);
+}
+
 uint64 UClientNetSubsystem::GetParsedLocalAccountId() const
 {
 	if (ClientAuthData.AccountId.IsEmpty())
@@ -989,7 +1004,7 @@ UWidget* UClientNetSubsystem::HandleChatComboGenerateItem(FString Item)
 	UObject* const Outer = ChatChannelCombo.Get() ? static_cast<UObject*>(ChatChannelCombo.Get()) : static_cast<UObject*>(this);
 	UTextBlock* const Text = NewObject<UTextBlock>(Outer);
 	Text->SetText(FText::FromString(Item));
-	Text->SetFont(FCoreStyle::GetDefaultFontStyle("Regular", 11));
+	Text->SetFont(FCoreStyle::GetDefaultFontStyle("Regular", 12));
 	Text->SetColorAndOpacity(FSlateColor(FLinearColor(0.92f, 0.94f, 1.f, 1.f)));
 	return Text;
 }

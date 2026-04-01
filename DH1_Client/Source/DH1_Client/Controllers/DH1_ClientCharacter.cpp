@@ -116,6 +116,10 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	ChatFocusAction = NewObject<UInputAction>(this, TEXT("IA_ChatFocus"));
 	ChatFocusAction->ValueType = EInputActionValueType::Boolean;
 	DefaultMappingContext->MapKey(ChatFocusAction, EKeys::Enter);
+
+	ChatChannelCycleAction = NewObject<UInputAction>(this, TEXT("IA_ChatChannelCycle"));
+	ChatChannelCycleAction->ValueType = EInputActionValueType::Boolean;
+	DefaultMappingContext->MapKey(ChatChannelCycleAction, EKeys::Tab);
 }
 
 void ADH1_ClientCharacter::BeginPlay()
@@ -194,6 +198,11 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		if (ChatFocusAction != nullptr)
 		{
 			EnhancedInput->BindAction(ChatFocusAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatFocusPressed);
+		}
+
+		if (ChatChannelCycleAction != nullptr)
+		{
+			EnhancedInput->BindAction(ChatChannelCycleAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatChannelCycle);
 		}
 	}
 }
@@ -465,6 +474,14 @@ void ADH1_ClientCharacter::OnChatFocusPressed()
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 	{
 		NetSub->FocusChatInput();
+	}
+}
+
+void ADH1_ClientCharacter::OnChatChannelCycle()
+{
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->CycleChatChannel();
 	}
 }
 

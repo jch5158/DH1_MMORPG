@@ -73,6 +73,7 @@ private:
 	void OnRightMousePressed(const FInputActionValue& Value);
 	void OnRightMouseReleased(const FInputActionValue& Value);
 	void OnChatFocusPressed();
+	void OnChatChannelCycle();
 
 	UClientNetSubsystem* GetNetSubsystem() const;
 
@@ -111,6 +112,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> ChatFocusAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> ChatChannelCycleAction;
 
 	// 마우스 클릭 이동 (좌클릭)
 	FVector ClickMoveTarget = FVector::ZeroVector;
