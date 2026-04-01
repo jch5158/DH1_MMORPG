@@ -1,7 +1,8 @@
-﻿{
-    "BuildId":  "47537391",
-    "Modules":  {
-                    "FlopAI":  "UnrealEditor-FlopAI.dll",
-                    "FlopAIPluginModule":  "UnrealEditor-FlopAIPluginModule.dll"
-                }
+{
+	"BuildId": "47537391",
+	"Modules": 
+	{
+		"FlopAI": "UnrealEditor-FlopAI.dll",
+		"FlopAIPluginModule": "UnrealEditor-FlopAIPluginModule.dll"
+	}
 }
