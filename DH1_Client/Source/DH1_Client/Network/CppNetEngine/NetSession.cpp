@@ -102,18 +102,33 @@ void NetSession::OnDisconnected()
 				]
 			];
 
+		TSharedPtr<SWidget> OverlayPtr = Overlay;
 		GEngine->GameViewport->AddViewportWidgetContent(Overlay, 2147483000);
 
 		UE_LOG(LogDH1_Client, Warning, TEXT("Disconnected: %s"), *Message.ToString());
 
-		if (UWorld* World = GEngine->GetCurrentPlayWorld())
+		UWorld* World = nullptr;
+		for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
+		{
+			if (Ctx.WorldType == EWorldType::Game || Ctx.WorldType == EWorldType::PIE)
+			{
+				World = Ctx.World();
+				break;
+			}
+		}
+
+		if (World != nullptr)
 		{
 			FTimerHandle TimerHandle;
-			World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([]()
+			World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([OverlayPtr]()
 			{
 				if (GEngine == nullptr)
 				{
 					return;
+				}
+				if (OverlayPtr.IsValid() && GEngine->GameViewport != nullptr)
+				{
+					GEngine->GameViewport->RemoveViewportWidgetContent(OverlayPtr.ToSharedRef());
 				}
 				for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
 				{

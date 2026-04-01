@@ -111,16 +111,31 @@ bool LoginPacketHandler::HANDLE_S2C_KICK_NOT(const Protocol::S2C_KICK_NOT& packe
 				]
 			];
 
+		TSharedPtr<SWidget> OverlayPtr = Overlay;
 		GEngine->GameViewport->AddViewportWidgetContent(Overlay, 2147483000);
 
-		if (UWorld* World = GEngine->GetCurrentPlayWorld())
+		UWorld* World = nullptr;
+		for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
+		{
+			if (Ctx.WorldType == EWorldType::Game || Ctx.WorldType == EWorldType::PIE)
+			{
+				World = Ctx.World();
+				break;
+			}
+		}
+
+		if (World != nullptr)
 		{
 			FTimerHandle TimerHandle;
-			World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([]()
+			World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([OverlayPtr]()
 			{
 				if (GEngine == nullptr)
 				{
 					return;
+				}
+				if (OverlayPtr.IsValid() && GEngine->GameViewport != nullptr)
+				{
+					GEngine->GameViewport->RemoveViewportWidgetContent(OverlayPtr.ToSharedRef());
 				}
 				for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
 				{
@@ -134,6 +149,5 @@ bool LoginPacketHandler::HANDLE_S2C_KICK_NOT(const Protocol::S2C_KICK_NOT& packe
 		}
 	});
 
-	pSession->Disconnect(eDisconnectReason::DuplicateLogin);
 	return true;
 }
