@@ -1096,6 +1096,7 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 		if (UCharacterMovementComponent* const Mv = ProxyChar->GetCharacterMovement())
 		{
 			Mv->GravityScale = 1.f;
+			Mv->bRunPhysicsWithNoController = true;
 			Mv->SetMovementMode(EMovementMode::MOVE_Walking);
 			Mv->bOrientRotationToMovement = false;
 			Mv->MaxWalkSpeed = 600.f;
