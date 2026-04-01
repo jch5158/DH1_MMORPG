@@ -585,6 +585,8 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 	}
 
 	UComboBoxString* Combo = Tree->ConstructWidget<UComboBoxString>(UComboBoxString::StaticClass(), TEXT("Combo_Channel"));
+	Combo->Font = FCoreStyle::GetDefaultFontStyle("Regular", 12);
+	Combo->ForegroundColor = FSlateColor(FLinearColor::White);
 	InputRow->AddChildToHorizontalBox(Combo);
 	if (UHorizontalBoxSlot* ComboSlot = Cast<UHorizontalBoxSlot>(Combo->Slot))
 	{

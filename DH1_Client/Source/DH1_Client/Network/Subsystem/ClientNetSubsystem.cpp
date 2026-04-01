@@ -93,7 +93,7 @@ namespace
 		ItemStyle.ActiveHoveredBrush.TintColor = RowSelected;
 		ItemStyle.InactiveBrush.TintColor = RowSelected;
 		ItemStyle.InactiveHoveredBrush.TintColor = RowSelected;
-		ItemStyle.TextColor = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
+		ItemStyle.TextColor = FSlateColor(FLinearColor::White);
 		Combo->SetItemStyle(ItemStyle);
 	}
 }
@@ -843,10 +843,10 @@ void UClientNetSubsystem::RegisterChatUi(UUserWidget* ChatRoot)
 
 	{
 		FComboBoxStyle WS = Combo->GetWidgetStyle();
-		WS.ComboButtonStyle.ButtonStyle.NormalForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
-		WS.ComboButtonStyle.ButtonStyle.HoveredForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
-		WS.ComboButtonStyle.ButtonStyle.PressedForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f));
-		WS.ComboButtonStyle.ButtonStyle.DisabledForeground = FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 0.5f));
+		WS.ComboButtonStyle.ButtonStyle.NormalForeground = FSlateColor(FLinearColor::White);
+		WS.ComboButtonStyle.ButtonStyle.HoveredForeground = FSlateColor(FLinearColor::White);
+		WS.ComboButtonStyle.ButtonStyle.PressedForeground = FSlateColor(FLinearColor::White);
+		WS.ComboButtonStyle.ButtonStyle.DisabledForeground = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.5f));
 		Combo->SetWidgetStyle(WS);
 	}
 
@@ -976,9 +976,9 @@ UWidget* UClientNetSubsystem::HandleChatComboGenerateItem(FString Item)
 	UObject* const Outer = ChatChannelCombo.Get() ? static_cast<UObject*>(ChatChannelCombo.Get()) : static_cast<UObject*>(this);
 	UTextBlock* const Text = NewObject<UTextBlock>(Outer);
 	Text->SetText(FText::FromString(Item));
-	FSlateFontInfo FontInfo = FCoreStyle::GetDefaultFontStyle("Regular", 13);
+	FSlateFontInfo FontInfo = FCoreStyle::GetDefaultFontStyle("Regular", 12);
 	Text->SetFont(FontInfo);
-	Text->SetColorAndOpacity(FSlateColor(FLinearColor(0.92f, 0.95f, 1.f, 1.f)));
+	Text->SetColorAndOpacity(FSlateColor(FLinearColor::White));
 	Text->SetMargin(FMargin(6.f, 4.f, 6.f, 4.f));
 	return Text;
 }
@@ -1091,9 +1091,9 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 		}
 		if (UCharacterMovementComponent* const Mv = ProxyChar->GetCharacterMovement())
 		{
-			Mv->GravityScale = 0.f;
+			Mv->GravityScale = 1.f;
 			Mv->SetMovementMode(EMovementMode::MOVE_Walking);
-			Mv->bOrientRotationToMovement = true;
+			Mv->bOrientRotationToMovement = false;
 			Mv->MaxWalkSpeed = 600.f;
 		}
 
