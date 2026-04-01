@@ -46,6 +46,8 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SOverlay.h"
 #include "Widgets/Text/STextBlock.h"
+#include "Components/WidgetComponent.h"
+#include "UI/UMG/CharacterOverheadWidget.h"
 #include "Types/SlateEnums.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNetEngine, Log, All);
@@ -59,15 +61,12 @@ namespace
 			return;
 		}
 
-		// 채팅 패널(회색 톤)과 구분: 드롭다운은 남청 계열 + 테두리, 행은 짝/홀 미세 대비
 		FComboBoxStyle WidgetStyle = Combo->GetWidgetStyle();
 
-		// 펼친 목록 외곽(메뉴 배경 느낌 + 가장자리 구분)
 		WidgetStyle.ComboButtonStyle.MenuBorderBrush.TintColor =
-			FSlateColor(FLinearColor(0.06f, 0.09f, 0.16f, 0.99f));
-		WidgetStyle.ComboButtonStyle.MenuBorderPadding = FMargin(2.f, 2.f, 2.f, 2.f);
+			FSlateColor(FLinearColor(0.08f, 0.10f, 0.16f, 1.f));
+		WidgetStyle.ComboButtonStyle.MenuBorderPadding = FMargin(1.f);
 
-		// 닫힌 상태 채널 버튼 — 로그 영역보다 살짝 푸른 톤
 		FButtonStyle& Btn = WidgetStyle.ComboButtonStyle.ButtonStyle;
 		const FSlateColor BtnIdle(FLinearColor(0.10f, 0.13f, 0.20f, 0.95f));
 		const FSlateColor BtnHover(FLinearColor(0.14f, 0.18f, 0.28f, 0.98f));
@@ -79,21 +78,21 @@ namespace
 
 		Combo->SetWidgetStyle(WidgetStyle);
 
+		const FSlateColor RowBg(FLinearColor(0.12f, 0.14f, 0.22f, 1.f));
+		const FSlateColor RowHover(FLinearColor(0.20f, 0.28f, 0.44f, 1.f));
+		const FSlateColor RowActive(FLinearColor(0.24f, 0.34f, 0.52f, 1.f));
+
 		FTableRowStyle ItemStyle = Combo->GetItemStyle();
-		const FSlateColor RowEven(FLinearColor(0.11f, 0.15f, 0.24f, 1.f));
-		const FSlateColor RowOdd(FLinearColor(0.09f, 0.13f, 0.21f, 1.f));
-		const FSlateColor RowHoverEven(FLinearColor(0.18f, 0.24f, 0.36f, 1.f));
-		const FSlateColor RowHoverOdd(FLinearColor(0.16f, 0.22f, 0.34f, 1.f));
-		const FSlateColor RowSelected(FLinearColor(0.22f, 0.32f, 0.48f, 1.f));
-		ItemStyle.EvenRowBackgroundBrush.TintColor = RowEven;
-		ItemStyle.OddRowBackgroundBrush.TintColor = RowOdd;
-		ItemStyle.EvenRowBackgroundHoveredBrush.TintColor = RowHoverEven;
-		ItemStyle.OddRowBackgroundHoveredBrush.TintColor = RowHoverOdd;
-		ItemStyle.ActiveBrush.TintColor = RowSelected;
-		ItemStyle.ActiveHoveredBrush.TintColor = RowSelected;
-		ItemStyle.InactiveBrush.TintColor = RowSelected;
-		ItemStyle.InactiveHoveredBrush.TintColor = RowSelected;
-		ItemStyle.TextColor = FSlateColor(FLinearColor::White);
+		ItemStyle.EvenRowBackgroundBrush.TintColor = RowBg;
+		ItemStyle.OddRowBackgroundBrush.TintColor = RowBg;
+		ItemStyle.EvenRowBackgroundHoveredBrush.TintColor = RowHover;
+		ItemStyle.OddRowBackgroundHoveredBrush.TintColor = RowHover;
+		ItemStyle.ActiveBrush.TintColor = RowActive;
+		ItemStyle.ActiveHoveredBrush.TintColor = RowActive;
+		ItemStyle.InactiveBrush.TintColor = RowBg;
+		ItemStyle.InactiveHoveredBrush.TintColor = RowHover;
+		ItemStyle.TextColor = FSlateColor(FLinearColor(0.92f, 0.94f, 1.f));
+		ItemStyle.SelectedTextColor = FSlateColor(FLinearColor::White);
 		Combo->SetItemStyle(ItemStyle);
 	}
 }
@@ -839,7 +838,7 @@ void UClientNetSubsystem::RegisterChatUi(UUserWidget* ChatRoot)
 	Combo->AddOption(TEXT("렐름"));
 	Combo->SetSelectedIndex(0);
 
-	Combo->SetContentPadding(FMargin(6.f, 3.f, 6.f, 3.f));
+	Combo->SetContentPadding(FMargin(8.f, 4.f, 8.f, 4.f));
 
 	{
 		FComboBoxStyle WS = Combo->GetWidgetStyle();
@@ -980,10 +979,8 @@ UWidget* UClientNetSubsystem::HandleChatComboGenerateItem(FString Item)
 	UObject* const Outer = ChatChannelCombo.Get() ? static_cast<UObject*>(ChatChannelCombo.Get()) : static_cast<UObject*>(this);
 	UTextBlock* const Text = NewObject<UTextBlock>(Outer);
 	Text->SetText(FText::FromString(Item));
-	FSlateFontInfo FontInfo = FCoreStyle::GetDefaultFontStyle("Regular", 12);
-	Text->SetFont(FontInfo);
-	Text->SetColorAndOpacity(FSlateColor(FLinearColor::White));
-	Text->SetMargin(FMargin(6.f, 4.f, 6.f, 4.f));
+	Text->SetFont(FCoreStyle::GetDefaultFontStyle("Regular", 11));
+	Text->SetColorAndOpacity(FSlateColor(FLinearColor(0.92f, 0.94f, 1.f, 1.f)));
 	return Text;
 }
 
@@ -1100,6 +1097,31 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 			Mv->SetMovementMode(EMovementMode::MOVE_Walking);
 			Mv->bOrientRotationToMovement = false;
 			Mv->MaxWalkSpeed = 600.f;
+		}
+
+		{
+			UWidgetComponent* const Wc = NewObject<UWidgetComponent>(ProxyChar);
+			if (Wc != nullptr)
+			{
+				Wc->SetupAttachment(ProxyChar->GetCapsuleComponent());
+				Wc->SetRelativeLocation(FVector(0.f, 0.f, 92.f));
+				Wc->SetWidgetSpace(EWidgetSpace::Screen);
+				Wc->SetDrawAtDesiredSize(true);
+				Wc->SetPivot(FVector2D(0.5f, 1.f));
+				Wc->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Wc->RegisterComponent();
+
+				UCharacterOverheadWidget* const Overhead = CreateWidget<UCharacterOverheadWidget>(World, UCharacterOverheadWidget::StaticClass());
+				if (Overhead != nullptr)
+				{
+					const FString Name = E.DisplayName.IsEmpty() ? TEXT("Adventurer") : E.DisplayName;
+					const int32 Lv = E.Level > 0 ? E.Level : 1;
+					const float Mhp = E.MaxHP > 0.f ? E.MaxHP : 100.f;
+					const float Chp = E.CurrentHP > 0.f ? E.CurrentHP : Mhp;
+					Overhead->SetOverheadData(Name, Lv, Chp, Mhp);
+					Wc->SetWidget(Overhead);
+				}
+			}
 		}
 
 		NetworkEntityActors.Add(E.EntityId, ProxyChar);

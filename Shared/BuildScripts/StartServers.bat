@@ -13,7 +13,7 @@ echo ============================================
 echo  DH1 MMORPG Server Launcher [%CONFIG%]
 echo ============================================
 
-:: 환경 변수 로드 (local > env > default)
+REM 환경 변수 로드 (local, env, default 순)
 call :load_env_file "%BASE_DIR%\.env" ".env"
 call :load_env_file "%BASE_DIR%\.env.local" ".env.local"
 

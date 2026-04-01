@@ -55,6 +55,10 @@ struct FNetworkEntitySpawnData
 	uint64 EntityId = 0;
 	FVector Position = FVector::ZeroVector;
 	float YawDegrees = 0.f;
+	FString DisplayName;
+	int32 Level = 0;
+	float CurrentHP = 0.f;
+	float MaxHP = 0.f;
 };
 
 struct FNetworkEntityMoveState

@@ -1,10 +1,12 @@
 @echo off
 setlocal
 
+set "BASE_DIR=%~dp0..\.."
+
 REM Usage:
 REM   SetupS3NavMesh.bat <BucketName> [Region] [NavMeshFilePath] [WorldServerId] [MapCode] [EnvPath]
 REM Example:
-REM   SetupS3NavMesh.bat dh1-navmesh-567017110299 ap-northeast-2 E:/Projects/DH1_MMORPG/Shared/NavMesh/L_GameWorld.bin 1 L_GameWorld E:/Projects/DH1_MMORPG/.env
+REM   SetupS3NavMesh.bat dh1-navmesh-567017110299 ap-northeast-2
 
 if "%~1"=="" (
     echo [Error] BucketName is required.
@@ -20,10 +22,10 @@ set "MAP_CODE=%~5"
 set "ENV_PATH=%~6"
 
 if "%REGION%"=="" set "REGION=ap-northeast-2"
-if "%NAVMESH_FILE%"=="" set "NAVMESH_FILE=E:/Projects/DH1_MMORPG/Shared/NavMesh/L_GameWorld.bin"
+if "%NAVMESH_FILE%"=="" set "NAVMESH_FILE=%BASE_DIR%\Shared\NavMesh\L_GameWorld.bin"
 if "%WORLD_SERVER_ID%"=="" set "WORLD_SERVER_ID=1"
 if "%MAP_CODE%"=="" set "MAP_CODE=L_GameWorld"
-if "%ENV_PATH%"=="" set "ENV_PATH=E:/Projects/DH1_MMORPG/.env"
+if "%ENV_PATH%"=="" set "ENV_PATH=%BASE_DIR%\.env"
 
 if not exist "%NAVMESH_FILE%" (
     echo [Error] NavMesh file not found: %NAVMESH_FILE%

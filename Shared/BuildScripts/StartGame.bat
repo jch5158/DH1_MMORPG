@@ -24,12 +24,18 @@ echo ============================================
 echo  DH1 MMORPG Game Launcher (worker^) [%CONFIG%]
 echo ============================================
 
-:: 환경 변수 로드 (local > env > default)
+REM 환경 변수 로드 (local, env, default 순)
 call :load_env_file "%BASE_DIR%\.env" ".env"
 call :load_env_file "%BASE_DIR%\.env.local" ".env.local"
 
 set "SERVER_DIR=%BASE_DIR%\Binaries\Server\%CONFIG%"
-set "UE5_EDITOR=C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe"
+set "UE5_EDITOR="
+if not "%DH1_UE5_EDITOR%"=="" (
+    set "UE5_EDITOR=%DH1_UE5_EDITOR%"
+) else (
+    for /f "tokens=2,*" %%A in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Engine\5.7" /v InstalledDirectory 2^>nul') do set "UE5_EDITOR=%%B\Engine\Binaries\Win64\UnrealEditor.exe"
+)
+if "!UE5_EDITOR!"=="" set "UE5_EDITOR=C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe"
 set "UPROJECT=%BASE_DIR%\DH1_Client\DH1_Client.uproject"
 set "CLIENT_ARGS=-game -windowed"
 set "LOGIN_HTTP_HOST=127.0.0.1"

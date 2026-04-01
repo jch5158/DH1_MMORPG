@@ -1,5 +1,5 @@
 
-Ó
+¿
 Struct.protoProtocol"©
 RealmServerInfo
 realmId (RrealmId
@@ -16,10 +16,14 @@ maxPlayers
 Vector3
 x (Rx
 y (Ry
-z (Rz"Ç
+z (Rz"³
 EntityState
 entityId (RentityId-
 position (2.Protocol.Vector3Rposition-
 velocity (2.Protocol.Vector3Rvelocity 
 rotationYaw (RrotationYaw
-	timestamp (R	timestampbproto3
+	timestamp (R	timestamp 
+displayName (	RdisplayName
+level (Rlevel
+	currentHp (R	currentHp
+maxHp	 (RmaxHpbproto3

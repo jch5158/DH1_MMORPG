@@ -57,8 +57,10 @@ if !VS_MAJOR! lss 18 (
     exit /b 1
 )
 
-:: UE5 버전 확인 (UE_5.7)
-set "UE5_ROOT=C:\Program Files\Epic Games\UE_5.7"
+:: UE5 버전 확인 (레지스트리에서 설치 경로 자동 감지, 폴백: 기본 경로)
+set "UE5_ROOT="
+for /f "tokens=2,*" %%A in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Engine\5.7" /v InstalledDirectory 2^>nul') do set "UE5_ROOT=%%B"
+if "!UE5_ROOT!"=="" set "UE5_ROOT=C:\Program Files\Epic Games\UE_5.7"
 if not exist "!UE5_ROOT!\Engine\Build\BatchFiles\Build.bat" (
     echo [Error] Unreal Engine 5.7 not found at: !UE5_ROOT!
     echo         Install UE 5.7 via Epic Games Launcher.
@@ -72,7 +74,7 @@ echo.
 
 :: ──────────────────────────────────────────────────────────────
 
-:: 환경 변수 로드 (local > env > default)
+REM 환경 변수 로드 (local, env, default 순)
 call :load_env_file "%ROOT_DIR%\.env" ".env"
 call :load_env_file "%ROOT_DIR%\.env.local" ".env.local"
 echo.
@@ -138,7 +140,7 @@ echo [3/5] DH1_Server done
 echo.
 
 :: Step 4: UE5 Client (Game + Editor targets)
-set "UBT_DLL=C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll"
+set "UBT_DLL=!UE5_ROOT!\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll"
 if not exist "%UBT_DLL%" (
     echo [Error] UnrealBuildTool.dll not found: %UBT_DLL%
     exit /b 1

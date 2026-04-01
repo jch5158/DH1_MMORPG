@@ -726,12 +726,30 @@ class EntityState final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kDisplayNameFieldNumber = 6,
     kPositionFieldNumber = 2,
     kVelocityFieldNumber = 3,
     kEntityIdFieldNumber = 1,
     kTimestampFieldNumber = 5,
     kRotationYawFieldNumber = 4,
+    kLevelFieldNumber = 7,
+    kCurrentHpFieldNumber = 8,
+    kMaxHpFieldNumber = 9,
   };
+  // string displayName = 6;
+  void clear_displayname();
+  const std::string& displayname() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_displayname(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_displayname();
+  PROTOBUF_NODISCARD std::string* release_displayname();
+  void set_allocated_displayname(std::string* displayname);
+  private:
+  const std::string& _internal_displayname() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_displayname(const std::string& value);
+  std::string* _internal_mutable_displayname();
+  public:
+
   // .Protocol.Vector3 position = 2;
   bool has_position() const;
   private:
@@ -795,6 +813,33 @@ class EntityState final :
   void _internal_set_rotationyaw(float value);
   public:
 
+  // int32 level = 7;
+  void clear_level();
+  int32_t level() const;
+  void set_level(int32_t value);
+  private:
+  int32_t _internal_level() const;
+  void _internal_set_level(int32_t value);
+  public:
+
+  // float currentHp = 8;
+  void clear_currenthp();
+  float currenthp() const;
+  void set_currenthp(float value);
+  private:
+  float _internal_currenthp() const;
+  void _internal_set_currenthp(float value);
+  public:
+
+  // float maxHp = 9;
+  void clear_maxhp();
+  float maxhp() const;
+  void set_maxhp(float value);
+  private:
+  float _internal_maxhp() const;
+  void _internal_set_maxhp(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.EntityState)
  private:
   class _Internal;
@@ -803,11 +848,15 @@ class EntityState final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr displayname_;
     ::Protocol::Vector3* position_;
     ::Protocol::Vector3* velocity_;
     uint64_t entityid_;
     int64_t timestamp_;
     float rotationyaw_;
+    int32_t level_;
+    float currenthp_;
+    float maxhp_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1324,6 +1373,116 @@ inline void EntityState::_internal_set_timestamp(int64_t value) {
 inline void EntityState::set_timestamp(int64_t value) {
   _internal_set_timestamp(value);
   // @@protoc_insertion_point(field_set:Protocol.EntityState.timestamp)
+}
+
+// string displayName = 6;
+inline void EntityState::clear_displayname() {
+  _impl_.displayname_.ClearToEmpty();
+}
+inline const std::string& EntityState::displayname() const {
+  // @@protoc_insertion_point(field_get:Protocol.EntityState.displayName)
+  return _internal_displayname();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void EntityState::set_displayname(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.displayname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.EntityState.displayName)
+}
+inline std::string* EntityState::mutable_displayname() {
+  std::string* _s = _internal_mutable_displayname();
+  // @@protoc_insertion_point(field_mutable:Protocol.EntityState.displayName)
+  return _s;
+}
+inline const std::string& EntityState::_internal_displayname() const {
+  return _impl_.displayname_.Get();
+}
+inline void EntityState::_internal_set_displayname(const std::string& value) {
+  
+  _impl_.displayname_.Set(value, GetArenaForAllocation());
+}
+inline std::string* EntityState::_internal_mutable_displayname() {
+  
+  return _impl_.displayname_.Mutable(GetArenaForAllocation());
+}
+inline std::string* EntityState::release_displayname() {
+  // @@protoc_insertion_point(field_release:Protocol.EntityState.displayName)
+  return _impl_.displayname_.Release();
+}
+inline void EntityState::set_allocated_displayname(std::string* displayname) {
+  if (displayname != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.displayname_.SetAllocated(displayname, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.displayname_.IsDefault()) {
+    _impl_.displayname_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.EntityState.displayName)
+}
+
+// int32 level = 7;
+inline void EntityState::clear_level() {
+  _impl_.level_ = 0;
+}
+inline int32_t EntityState::_internal_level() const {
+  return _impl_.level_;
+}
+inline int32_t EntityState::level() const {
+  // @@protoc_insertion_point(field_get:Protocol.EntityState.level)
+  return _internal_level();
+}
+inline void EntityState::_internal_set_level(int32_t value) {
+  
+  _impl_.level_ = value;
+}
+inline void EntityState::set_level(int32_t value) {
+  _internal_set_level(value);
+  // @@protoc_insertion_point(field_set:Protocol.EntityState.level)
+}
+
+// float currentHp = 8;
+inline void EntityState::clear_currenthp() {
+  _impl_.currenthp_ = 0;
+}
+inline float EntityState::_internal_currenthp() const {
+  return _impl_.currenthp_;
+}
+inline float EntityState::currenthp() const {
+  // @@protoc_insertion_point(field_get:Protocol.EntityState.currentHp)
+  return _internal_currenthp();
+}
+inline void EntityState::_internal_set_currenthp(float value) {
+  
+  _impl_.currenthp_ = value;
+}
+inline void EntityState::set_currenthp(float value) {
+  _internal_set_currenthp(value);
+  // @@protoc_insertion_point(field_set:Protocol.EntityState.currentHp)
+}
+
+// float maxHp = 9;
+inline void EntityState::clear_maxhp() {
+  _impl_.maxhp_ = 0;
+}
+inline float EntityState::_internal_maxhp() const {
+  return _impl_.maxhp_;
+}
+inline float EntityState::maxhp() const {
+  // @@protoc_insertion_point(field_get:Protocol.EntityState.maxHp)
+  return _internal_maxhp();
+}
+inline void EntityState::_internal_set_maxhp(float value) {
+  
+  _impl_.maxhp_ = value;
+}
+inline void EntityState::set_maxhp(float value) {
+  _internal_set_maxhp(value);
+  // @@protoc_insertion_point(field_set:Protocol.EntityState.maxHp)
 }
 
 #ifdef __GNUC__

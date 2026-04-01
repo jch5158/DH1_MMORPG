@@ -560,7 +560,7 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 		BgSlot->SetAnchors(FAnchors(0.f, 1.f, 0.f, 1.f));
 		BgSlot->SetAlignment(FVector2D(0.f, 1.f));
 		BgSlot->SetPosition(FVector2D(12.f, -12.f));
-		BgSlot->SetSize(FVector2D(420.f, 260.f));
+		BgSlot->SetSize(FVector2D(540.f, 260.f));
 		BgSlot->SetAutoSize(false);
 	}
 
@@ -600,6 +600,21 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 	ComboSizeBox->AddChild(Combo);
 
 	UEditableTextBox* Edit = Tree->ConstructWidget<UEditableTextBox>(UEditableTextBox::StaticClass(), TEXT("EditableText_Message"));
+	{
+		FEditableTextBoxStyle EditStyle = Edit->GetWidgetStyle();
+		const FSlateColor InputBg(FLinearColor(0.06f, 0.07f, 0.12f, 0.9f));
+		const FSlateColor InputBgFocus(FLinearColor(0.08f, 0.10f, 0.18f, 0.95f));
+		EditStyle.BackgroundImageNormal.TintColor = InputBg;
+		EditStyle.BackgroundImageHovered.TintColor = InputBg;
+		EditStyle.BackgroundImageFocused.TintColor = InputBgFocus;
+		EditStyle.BackgroundImageReadOnly.TintColor = InputBg;
+		EditStyle.SetFont(FCoreStyle::GetDefaultFontStyle("Regular", 11));
+		EditStyle.ForegroundColor = FSlateColor(FLinearColor(0.92f, 0.94f, 1.f));
+		EditStyle.TextStyle.ColorAndOpacity = FSlateColor(FLinearColor(0.92f, 0.94f, 1.f));
+		EditStyle.Padding = FMargin(6.f, 4.f);
+		Edit->SetWidgetStyle(EditStyle);
+		Edit->SetHintText(FText::FromString(TEXT("메시지를 입력하세요...")));
+	}
 	InputRow->AddChildToHorizontalBox(Edit);
 	if (UHorizontalBoxSlot* EditSlot = Cast<UHorizontalBoxSlot>(Edit->Slot))
 	{

@@ -40,6 +40,22 @@ namespace
 	}
 }
 
+namespace
+{
+	void FillEntityCharacterSheet(Protocol::EntityState* pEntity, const GameObjectRef& pObject)
+	{
+		if (pObject->GetObjectType() != eGameObjectType::Player)
+		{
+			return;
+		}
+		const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
+		pEntity->set_displayname(pPlayer->GetDisplayName());
+		pEntity->set_level(pPlayer->GetLevel());
+		pEntity->set_currenthp(pPlayer->GetCurrentHp());
+		pEntity->set_maxhp(pPlayer->GetMaxHp());
+	}
+}
+
 GameTickProcessor::GameTickProcessor(GridManagerRef pGridManager, NavMeshManagerRef pNavMeshManager, const float moveSpeed)
 	: mpGridManager(std::move(pGridManager))
 	, mpNavMeshManager(std::move(pNavMeshManager))
@@ -123,6 +139,7 @@ void GameTickProcessor::processVisibilityChanges()
 				pEntity->mutable_velocity()->set_y(pNearby->GetVelocityY());
 				pEntity->mutable_velocity()->set_z(pNearby->GetVelocityZ());
 				pEntity->set_rotationyaw(pNearby->GetRotationYaw());
+				FillEntityCharacterSheet(pEntity, pNearby);
 			}
 
 			if (enterPacket.entities_size() > 0)
@@ -244,6 +261,7 @@ void GameTickProcessor::NotifySpawnedPlayerVisibleEntities(const PlayerObjectRef
 		pEntity->mutable_velocity()->set_y(pNearby->GetVelocityY());
 		pEntity->mutable_velocity()->set_z(pNearby->GetVelocityZ());
 		pEntity->set_rotationyaw(pNearby->GetRotationYaw());
+		FillEntityCharacterSheet(pEntity, pNearby);
 	}
 
 	if (enterPacket.entities_size() > 0)
@@ -274,6 +292,7 @@ void GameTickProcessor::NotifyNearbyPlayersAboutEntity(const GameObjectRef& pSub
 	pEntity->mutable_velocity()->set_y(pSubject->GetVelocityY());
 	pEntity->mutable_velocity()->set_z(pSubject->GetVelocityZ());
 	pEntity->set_rotationyaw(pSubject->GetRotationYaw());
+	FillEntityCharacterSheet(pEntity, pSubject);
 
 	const auto enterBuffer = MakeMovementSendBuffer(enterPacket, packet_id::S2C_ENTITY_ENTER_NOT);
 	if (enterBuffer == nullptr)

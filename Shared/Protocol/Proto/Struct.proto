@@ -31,4 +31,8 @@ message EntityState
     Vector3 velocity = 3;
     float rotationYaw = 4;
     int64 timestamp = 5;
+    string displayName = 6;
+    int32 level = 7;
+    float currentHp = 8;
+    float maxHp = 9;
 }

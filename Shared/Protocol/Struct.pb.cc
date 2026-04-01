@@ -70,11 +70,15 @@ struct Vector3DefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 Vector3DefaultTypeInternal _Vector3_default_instance_;
 PROTOBUF_CONSTEXPR EntityState::EntityState(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.position_)*/nullptr
+    /*decltype(_impl_.displayname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.position_)*/nullptr
   , /*decltype(_impl_.velocity_)*/nullptr
   , /*decltype(_impl_.entityid_)*/uint64_t{0u}
   , /*decltype(_impl_.timestamp_)*/int64_t{0}
   , /*decltype(_impl_.rotationyaw_)*/0
+  , /*decltype(_impl_.level_)*/0
+  , /*decltype(_impl_.currenthp_)*/0
+  , /*decltype(_impl_.maxhp_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct EntityStateDefaultTypeInternal {
   PROTOBUF_CONSTEXPR EntityStateDefaultTypeInternal()
@@ -131,6 +135,10 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.velocity_),
   PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.rotationyaw_),
   PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.timestamp_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.displayname_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.level_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.currenthp_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::EntityState, _impl_.maxhp_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::RealmServerInfo)},
@@ -153,15 +161,17 @@ const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(
   "\001(\005\022\016\n\006status\030\005 \001(\005\"W\n\017GameSessionInfo\022\021"
   "\n\taccountId\030\001 \001(\004\022\030\n\020gatewaySessionId\030\002 "
   "\001(\004\022\027\n\017gatewayServerId\030\003 \001(\005\"*\n\007Vector3\022"
-  "\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\"\221\001\n\013Ent"
+  "\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002\022\t\n\001z\030\003 \001(\002\"\327\001\n\013Ent"
   "ityState\022\020\n\010entityId\030\001 \001(\004\022#\n\010position\030\002"
   " \001(\0132\021.Protocol.Vector3\022#\n\010velocity\030\003 \001("
   "\0132\021.Protocol.Vector3\022\023\n\013rotationYaw\030\004 \001("
-  "\002\022\021\n\ttimestamp\030\005 \001(\003b\006proto3"
+  "\002\022\021\n\ttimestamp\030\005 \001(\003\022\023\n\013displayName\030\006 \001("
+  "\t\022\r\n\005level\030\007 \001(\005\022\021\n\tcurrentHp\030\010 \001(\002\022\r\n\005m"
+  "axHp\030\t \001(\002b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Struct_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Struct_2eproto = {
-    false, false, 428, descriptor_table_protodef_Struct_2eproto,
+    false, false, 498, descriptor_table_protodef_Struct_2eproto,
     "Struct.proto",
     &descriptor_table_Struct_2eproto_once, nullptr, 0, 4,
     schemas, file_default_instances, TableStruct_Struct_2eproto::offsets,
@@ -1019,14 +1029,26 @@ EntityState::EntityState(const EntityState& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   EntityState* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.position_){nullptr}
+      decltype(_impl_.displayname_){}
+    , decltype(_impl_.position_){nullptr}
     , decltype(_impl_.velocity_){nullptr}
     , decltype(_impl_.entityid_){}
     , decltype(_impl_.timestamp_){}
     , decltype(_impl_.rotationyaw_){}
+    , decltype(_impl_.level_){}
+    , decltype(_impl_.currenthp_){}
+    , decltype(_impl_.maxhp_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.displayname_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.displayname_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_displayname().empty()) {
+    _this->_impl_.displayname_.Set(from._internal_displayname(), 
+      _this->GetArenaForAllocation());
+  }
   if (from._internal_has_position()) {
     _this->_impl_.position_ = new ::Protocol::Vector3(*from._impl_.position_);
   }
@@ -1034,8 +1056,8 @@ EntityState::EntityState(const EntityState& from)
     _this->_impl_.velocity_ = new ::Protocol::Vector3(*from._impl_.velocity_);
   }
   ::memcpy(&_impl_.entityid_, &from._impl_.entityid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.rotationyaw_) -
-    reinterpret_cast<char*>(&_impl_.entityid_)) + sizeof(_impl_.rotationyaw_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.maxhp_) -
+    reinterpret_cast<char*>(&_impl_.entityid_)) + sizeof(_impl_.maxhp_));
   // @@protoc_insertion_point(copy_constructor:Protocol.EntityState)
 }
 
@@ -1044,13 +1066,21 @@ inline void EntityState::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.position_){nullptr}
+      decltype(_impl_.displayname_){}
+    , decltype(_impl_.position_){nullptr}
     , decltype(_impl_.velocity_){nullptr}
     , decltype(_impl_.entityid_){uint64_t{0u}}
     , decltype(_impl_.timestamp_){int64_t{0}}
     , decltype(_impl_.rotationyaw_){0}
+    , decltype(_impl_.level_){0}
+    , decltype(_impl_.currenthp_){0}
+    , decltype(_impl_.maxhp_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
+  _impl_.displayname_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.displayname_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 EntityState::~EntityState() {
@@ -1064,6 +1094,7 @@ EntityState::~EntityState() {
 
 inline void EntityState::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.displayname_.Destroy();
   if (this != internal_default_instance()) delete _impl_.position_;
   if (this != internal_default_instance()) delete _impl_.velocity_;
 }
@@ -1078,6 +1109,7 @@ void EntityState::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.displayname_.ClearToEmpty();
   if (GetArenaForAllocation() == nullptr && _impl_.position_ != nullptr) {
     delete _impl_.position_;
   }
@@ -1087,8 +1119,8 @@ void EntityState::Clear() {
   }
   _impl_.velocity_ = nullptr;
   ::memset(&_impl_.entityid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.rotationyaw_) -
-      reinterpret_cast<char*>(&_impl_.entityid_)) + sizeof(_impl_.rotationyaw_));
+      reinterpret_cast<char*>(&_impl_.maxhp_) -
+      reinterpret_cast<char*>(&_impl_.entityid_)) + sizeof(_impl_.maxhp_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1135,6 +1167,40 @@ const char* EntityState::_InternalParse(const char* ptr, ::_pbi::ParseContext* c
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _impl_.timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string displayName = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          auto str = _internal_mutable_displayname();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.EntityState.displayName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 level = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
+          _impl_.level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // float currentHp = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 69)) {
+          _impl_.currenthp_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else
+          goto handle_unusual;
+        continue;
+      // float maxHp = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 77)) {
+          _impl_.maxhp_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
         } else
           goto handle_unusual;
         continue;
@@ -1203,6 +1269,42 @@ uint8_t* EntityState::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteInt64ToArray(5, this->_internal_timestamp(), target);
   }
 
+  // string displayName = 6;
+  if (!this->_internal_displayname().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_displayname().data(), static_cast<int>(this->_internal_displayname().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.EntityState.displayName");
+    target = stream->WriteStringMaybeAliased(
+        6, this->_internal_displayname(), target);
+  }
+
+  // int32 level = 7;
+  if (this->_internal_level() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(7, this->_internal_level(), target);
+  }
+
+  // float currentHp = 8;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_currenthp = this->_internal_currenthp();
+  uint32_t raw_currenthp;
+  memcpy(&raw_currenthp, &tmp_currenthp, sizeof(tmp_currenthp));
+  if (raw_currenthp != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteFloatToArray(8, this->_internal_currenthp(), target);
+  }
+
+  // float maxHp = 9;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_maxhp = this->_internal_maxhp();
+  uint32_t raw_maxhp;
+  memcpy(&raw_maxhp, &tmp_maxhp, sizeof(tmp_maxhp));
+  if (raw_maxhp != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteFloatToArray(9, this->_internal_maxhp(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1218,6 +1320,13 @@ size_t EntityState::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string displayName = 6;
+  if (!this->_internal_displayname().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_displayname());
+  }
 
   // .Protocol.Vector3 position = 2;
   if (this->_internal_has_position()) {
@@ -1252,6 +1361,29 @@ size_t EntityState::ByteSizeLong() const {
     total_size += 1 + 4;
   }
 
+  // int32 level = 7;
+  if (this->_internal_level() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_level());
+  }
+
+  // float currentHp = 8;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_currenthp = this->_internal_currenthp();
+  uint32_t raw_currenthp;
+  memcpy(&raw_currenthp, &tmp_currenthp, sizeof(tmp_currenthp));
+  if (raw_currenthp != 0) {
+    total_size += 1 + 4;
+  }
+
+  // float maxHp = 9;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_maxhp = this->_internal_maxhp();
+  uint32_t raw_maxhp;
+  memcpy(&raw_maxhp, &tmp_maxhp, sizeof(tmp_maxhp));
+  if (raw_maxhp != 0) {
+    total_size += 1 + 4;
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -1270,6 +1402,9 @@ void EntityState::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (!from._internal_displayname().empty()) {
+    _this->_internal_set_displayname(from._internal_displayname());
+  }
   if (from._internal_has_position()) {
     _this->_internal_mutable_position()->::Protocol::Vector3::MergeFrom(
         from._internal_position());
@@ -1291,6 +1426,23 @@ void EntityState::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   if (raw_rotationyaw != 0) {
     _this->_internal_set_rotationyaw(from._internal_rotationyaw());
   }
+  if (from._internal_level() != 0) {
+    _this->_internal_set_level(from._internal_level());
+  }
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_currenthp = from._internal_currenthp();
+  uint32_t raw_currenthp;
+  memcpy(&raw_currenthp, &tmp_currenthp, sizeof(tmp_currenthp));
+  if (raw_currenthp != 0) {
+    _this->_internal_set_currenthp(from._internal_currenthp());
+  }
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_maxhp = from._internal_maxhp();
+  uint32_t raw_maxhp;
+  memcpy(&raw_maxhp, &tmp_maxhp, sizeof(tmp_maxhp));
+  if (raw_maxhp != 0) {
+    _this->_internal_set_maxhp(from._internal_maxhp());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1307,10 +1459,16 @@ bool EntityState::IsInitialized() const {
 
 void EntityState::InternalSwap(EntityState* other) {
   using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.displayname_, lhs_arena,
+      &other->_impl_.displayname_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(EntityState, _impl_.rotationyaw_)
-      + sizeof(EntityState::_impl_.rotationyaw_)
+      PROTOBUF_FIELD_OFFSET(EntityState, _impl_.maxhp_)
+      + sizeof(EntityState::_impl_.maxhp_)
       - PROTOBUF_FIELD_OFFSET(EntityState, _impl_.position_)>(
           reinterpret_cast<char*>(&_impl_.position_),
           reinterpret_cast<char*>(&other->_impl_.position_));

@@ -77,10 +77,18 @@ bool MovementPacketHandler::HANDLE_S2C_ENTITY_ENTER_NOT(const Protocol::S2C_ENTI
 		Data.EntityId = e.entityid();
 		Data.Position = FVector(e.position().x(), e.position().y(), e.position().z());
 		Data.YawDegrees = e.rotationyaw();
+		if (!e.displayname().empty())
+		{
+			Data.DisplayName = UTF8_TO_TCHAR(e.displayname().c_str());
+			Data.Level = e.level();
+			Data.CurrentHP = e.currenthp();
+			Data.MaxHP = e.maxhp();
+		}
 		Entities.Add(MoveTemp(Data));
 
-		UE_LOG(LogMovement, Log, TEXT("  entity: %llu, pos: (%.1f, %.1f, %.1f)"),
-			e.entityid(), e.position().x(), e.position().y(), e.position().z());
+		UE_LOG(LogMovement, Log, TEXT("  entity: %llu, pos: (%.1f, %.1f, %.1f), name: %s"),
+			e.entityid(), e.position().x(), e.position().y(), e.position().z(),
+			Data.DisplayName.IsEmpty() ? TEXT("(none)") : *Data.DisplayName);
 	}
 
 	AsyncTask(ENamedThreads::GameThread, [Entities = MoveTemp(Entities)]()
