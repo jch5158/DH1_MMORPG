@@ -53,37 +53,42 @@ flowchart TB
 
 ## 스레드 모델
 
-각 C++ 서버 프로세스는 **두 개의 독립 IOCP 스케줄러**로 나뉩니다.
+각 C++ 서버 프로세스는 **두 개의 완전 독립 IOCP 스케줄러**를 사용합니다. 각 스케줄러는 자체 IOCP 핸들과 스레드 풀을 가지며, 서로 직접 연결되지 않습니다.
+
+### NetworkScheduler
+
+소켓 I/O 전담. Overlapped I/O 완료를 GQCS로 수신하여 처리합니다.
 
 ```mermaid
-flowchart LR
-    subgraph NET["NetworkScheduler — 독립 IOCP"]
-        direction TB
-        N1["running × R\nGQCS 완료 감지"]
-        N2["dispatch × N\nRecv · Send · 역직렬화"]
-        N3["TimingWheel"]
-        N1 --> N2 --> N3
-    end
+flowchart TB
+    S["소켓 I/O\nRecv · Send · Accept"]
+    S -->|"Overlapped 완료"| IOCP["IOCP\n(runningThreadCount 동시성)"]
+    IOCP -->|"GQCS"| D["dispatch 스레드 × N"]
+    D --> P["IocpObject::Dispatch\n패킷 역직렬화 · Send 완료 처리"]
+    D --> TW["TimingWheel.Tick()"]
+```
 
-    subgraph ACT["ActorScheduler — 독립 IOCP"]
-        direction TB
-        A1["running × R\nGQCS 완료 감지"]
-        A2["dispatch × M\nActor 로직 · DB · Redis"]
-        A3["TimingWheel"]
-        A1 --> A2 --> A3
-    end
+### ActorScheduler
 
-    N2 -- "ActorMailbox\n(LockFreeQueue)" --> A1
-    A2 -- "SendBuffer\n→ IOCP 송신" --> N1
+게임 로직 전담. 소켓을 사용하지 않고, `PostQueuedCompletionStatus`로 Actor를 깨웁니다.
+
+```mermaid
+flowchart TB
+    Post["IActor::Post(message)"]
+    Post --> MB["ActorMailbox\n(LockFreeQueue · Actor별 개별 소유)"]
+    MB -->|"PQCS"| IOCP["IOCP\n(runningThreadCount 동시성)"]
+    IOCP -->|"GQCS"| D["dispatch 스레드 × M"]
+    D --> A["Actor::Dispatch\nTryAcquire → Mailbox.Process → Release"]
+    D --> TW["TimingWheel.Tick()"]
 ```
 
 | 컴포넌트 | 설명 |
 |----------|------|
-| **NetworkScheduler** | IOCP 기반. Recv/Send 완료 처리, 소켓 I/O 디스패치 |
-| **ActorScheduler** | IOCP 기반. Actor 메일박스 메시지를 워커 스레드에서 처리 |
-| **ActorMailbox** | `LockFreeQueue` 기반 메일박스. `TryAcquire/Release`로 단일 스레드 점유 보장 |
-| **TimingWheel** | 계층형 타이밍 휠. 하트비트·세션 타임아웃·재연결 지연 등 스케줄링 |
-| **SessionReaper** | 비활성 세션 주기적 정리 (서버측 타임아웃 감지) |
+| **NetworkScheduler** | 독립 IOCP. 소켓 핸들을 IOCP에 등록, Overlapped Recv/Send/Accept 완료 디스패치 |
+| **ActorScheduler** | 독립 IOCP. 소켓 없음. PQCS로 Actor 워크 아이템을 전달하는 수동 완료 큐 |
+| **ActorMailbox** | Actor별 `LockFreeQueue<MessageRef>`. 메시지 Post 시 PQCS로 ActorScheduler에 통지 |
+| **TryAcquire/Release** | Actor 단일 스레드 점유 보장. 한 번에 하나의 dispatch 스레드만 Actor를 처리 |
+| **TimingWheel** | 각 스케줄러에 독립 존재. Dispatch() 루프마다 Tick(), 하트비트·타임아웃 등 스케줄링 |
 
 스레드 수는 `*ServerConfig.json`에서 설정합니다 (`runningThreadCount: 0` → CPU 코어 자동 산정).
 
