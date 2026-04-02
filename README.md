@@ -127,7 +127,10 @@ sequenceDiagram
     participant C as Client
     participant L as LoginServer
     participant G as GatewayServer
+    participant R as RealmServer
     participant W as WorldServer
+
+    Note over R: 기동 시 Redis에 Realm 정보 등록
 
     C->>L: POST /auth/login
     L-->>C: 200 OK (ticket)
@@ -137,12 +140,15 @@ sequenceDiagram
     G-->>C: S2C_LOGIN_RES
 
     C->>G: C2S_REALM_LIST_REQ
+    G->>G: Redis Realm:* 조회
     G-->>C: S2C_REALM_LIST_RES
 
     C->>G: C2S_REALM_SELECT_REQ
-    G->>W: S2S_GAME_SESSION_ENTER
-    W-->>G: RES
+    G->>G: Redis Realm:{id} 검증
+    G->>W: S2S_GAME_SESSION_ENTER_NOT
+    W-->>G: S2S_GAME_SESSION_ENTER_RES
     G-->>C: S2C_REALM_SELECT_RES
+    W->>R: S2S_GAME_SESSION_SYNC_ENTER_NOT
 
     C->>G: C2S_SPAWN_POSITION_REQ
     G->>W: RELAY_TO_WORLD
