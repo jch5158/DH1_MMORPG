@@ -57,21 +57,24 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    IOCP(["IOCP"])
-
-    subgraph NET["NetworkScheduler"]
-        NW["워커 × N\nRecv · Send · 역직렬화\nTimingWheel"]
+    subgraph NET["NetworkScheduler — 독립 IOCP"]
+        direction TB
+        N1["running × R\nGQCS 완료 감지"]
+        N2["dispatch × N\nRecv · Send · 역직렬화"]
+        N3["TimingWheel"]
+        N1 --> N2 --> N3
     end
 
-    MB[["ActorMailbox\n(LockFreeQueue)"]]
-
-    subgraph ACT["ActorScheduler"]
-        AW["워커 × M\nActor 로직 · DB · Redis\nTimingWheel"]
+    subgraph ACT["ActorScheduler — 독립 IOCP"]
+        direction TB
+        A1["running × R\nGQCS 완료 감지"]
+        A2["dispatch × M\nActor 로직 · DB · Redis"]
+        A3["TimingWheel"]
+        A1 --> A2 --> A3
     end
 
-    SB["SendBuffer"]
-
-    IOCP --> NW --> MB --> AW --> SB --> IOCP
+    N2 -- "ActorMailbox\n(LockFreeQueue)" --> A1
+    A2 -- "SendBuffer\n→ IOCP 송신" --> N1
 ```
 
 | 컴포넌트 | 설명 |
