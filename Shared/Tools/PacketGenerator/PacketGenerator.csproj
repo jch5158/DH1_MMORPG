@@ -19,8 +19,4 @@
     <PackageReference Include="Google.Protobuf.Tools" Version="3.33.5" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(SolutionDir)' != '' AND '$(SolutionDir)' != '*Undefined*'">
-    <Exec Command="call &quot;$(SolutionDir)..\..\BuildScripts\Protoc.bat&quot;" />
-  </Target>
-
 </Project>

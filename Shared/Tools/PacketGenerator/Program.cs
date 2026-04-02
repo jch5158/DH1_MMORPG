@@ -54,7 +54,7 @@ foreach (var prjConfig in resultConfig.Projects)
 {
     var outputPath = Path.Combine(prjBasePath, prjConfig.Name, "PacketHandler");
 
-    Generator.GenerateCpps(handlers, prjConfig.Role, outputPath);
+    HandlerGenerator.GenerateCpps(handlers, prjConfig.Role, outputPath);
 }
 
 // 클라이언트 프로토콜 복사 (.pb.h / .pb.cpp → UE 모듈)
