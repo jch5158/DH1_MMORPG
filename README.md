@@ -31,13 +31,19 @@
 flowchart TB
     C["DH1_Client (UE5)\nCppNetEngine.lib"]
 
-    C -->|"TCP · 게임 패킷"| G["GatewayServer\nC++ IOCP"]
-    C -.->|"HTTP · 로그인 API"| L["LoginServer\nASP.NET Core"]
+    C -->|"TCP"| G["GatewayServer\nC++ IOCP"]
+    C -.->|"HTTP"| L["LoginServer\nASP.NET Core"]
 
-    G -->|"TCP · 릴레이"| W["WorldServer\nC++ IOCP"]
-    W -->|"TCP · 등록 · 하트비트"| R["RealmServer\nC++ IOCP"]
+    G -->|"TCP"| W["WorldServer\nC++ IOCP"]
+    W -->|"TCP"| R["RealmServer\nC++ IOCP"]
 
-    G & W & L -.-> D[(MySQL · Redis · S3)]
+    DB[(MySQL)]
+    RD[(Redis)]
+    S3[(AWS S3)]
+
+    L -.-> DB
+    G -.-> RD
+    W -.-> DB & RD & S3
 ```
 
 | 서버 | 역할 |
