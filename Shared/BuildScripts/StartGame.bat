@@ -145,7 +145,10 @@ if errorlevel 1 goto :launch_error
 
 echo [5/5] Starting DH1_Client (UnrealEditor -game)...
 if exist "%UE5_EDITOR%" (
-    start "DH1_Client" "%UE5_EDITOR%" "%UPROJECT%" %CLIENT_ARGS%
+    set "CLIENT_LOG_DIR=%BASE_DIR%\Logs\Client"
+    if not exist "!CLIENT_LOG_DIR!" mkdir "!CLIENT_LOG_DIR!"
+    set "CLIENT_ABSLOG=!CLIENT_LOG_DIR!\DH1_Client.log"
+    start "DH1_Client" "%UE5_EDITOR%" "%UPROJECT%" %CLIENT_ARGS% -ABSLOG="!CLIENT_ABSLOG!" -CrashForceLogFlush
     call :wait_process "UnrealEditor.exe" 20
 ) else (
     echo [Warning] UnrealEditor.exe not found: %UE5_EDITOR%

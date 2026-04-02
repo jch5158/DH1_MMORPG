@@ -118,17 +118,20 @@ if "%SKIP_BUILD%"=="1" (
 )
 
 REM ── 클라이언트 실행 ─────────────────────────────────────────
+set "CLIENT_LOG_DIR=%BASE_DIR%\Logs\Client"
+if not exist "%CLIENT_LOG_DIR%" mkdir "%CLIENT_LOG_DIR%"
+
 for /L %%i in (1,1,%INSTANCE_COUNT%) do (
     set /a "OFFX=48 + (%%i-1)*56"
     set /a "OFFY=40 + (%%i-1)*40"
-    set "ABSLOG=%TEMP%\DH1_Client_%%i.log"
+    set "ABSLOG=%CLIENT_LOG_DIR%\DH1_Client_%%i.log"
     echo [Start] #%%i / %INSTANCE_COUNT%   -WinX=!OFFX! -WinY=!OFFY!   log: !ABSLOG!
-    start "DH1_Client #%%i" "!UE5_EDITOR!" "%UPROJECT%" -game -windowed -ResX=%RESX% -ResY=%RESY% -WinX=!OFFX! -WinY=!OFFY! -ABSLOG="!ABSLOG!"
+    start "DH1_Client #%%i" "!UE5_EDITOR!" "%UPROJECT%" -game -windowed -ResX=%RESX% -ResY=%RESY% -WinX=!OFFX! -WinY=!OFFY! -ABSLOG="!ABSLOG!" -CrashForceLogFlush
     if %%i LSS %INSTANCE_COUNT% call :sleep_seconds %STAGGER_SEC%
 )
 
 echo.
-echo [Done] Per-instance log: %TEMP%\DH1_Client_1.log … #%INSTANCE_COUNT%
+echo [Done] Per-instance log: %CLIENT_LOG_DIR%\DH1_Client_1.log … #%INSTANCE_COUNT%
 exit /b 0
 
 :sleep_seconds
