@@ -69,9 +69,9 @@ public:
 	static bool HANDLE_S2S_RELAY_TO_CLIENT_NOT(const Protocol::S2S_RELAY_TO_CLIENT_NOT& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_GAME_SESSION_ENTER_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2S_GAME_SESSION_ENTER_NOT); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_GAME_SESSION_LEAVE_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2S_GAME_SESSION_LEAVE_NOT); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_RELAY_TO_WORLD_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2S_RELAY_TO_WORLD_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_GAME_SESSION_ENTER_NOT& packet) { return MakeSendBuffer(packet, packet_id::eGameSessionPacketId::S2S_GAME_SESSION_ENTER_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_GAME_SESSION_LEAVE_NOT& packet) { return MakeSendBuffer(packet, packet_id::eGameSessionPacketId::S2S_GAME_SESSION_LEAVE_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_RELAY_TO_WORLD_NOT& packet) { return MakeSendBuffer(packet, packet_id::eGameSessionPacketId::S2S_RELAY_TO_WORLD_NOT); }
 	
 
 private:

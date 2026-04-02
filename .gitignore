@@ -227,3 +227,6 @@ build_log.txt
 # =============================================================================
 !DH1_Client/Plugins/FlopAI/Binaries/
 !DH1_Client/Plugins/FlopAI/Binaries/**
+
+# Snapshot directory for regression comparison
+.snapshot/

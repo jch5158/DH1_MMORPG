@@ -64,7 +64,7 @@ public:
 	static bool HANDLE_C2S_ECHO_REQ(const Protocol::C2S_ECHO_REQ& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_ECHO_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_ECHO_RES); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_ECHO_RES& packet) { return MakeSendBuffer(packet, packet_id::eEchoPacketId::S2C_ECHO_RES); }
 	
 
 private:

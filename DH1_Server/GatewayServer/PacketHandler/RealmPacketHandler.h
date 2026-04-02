@@ -69,8 +69,8 @@ public:
 	static bool HANDLE_C2S_REALM_SELECT_REQ(const Protocol::C2S_REALM_SELECT_REQ& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_REALM_LIST_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_REALM_LIST_RES); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_REALM_SELECT_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_REALM_SELECT_RES); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_REALM_LIST_RES& packet) { return MakeSendBuffer(packet, packet_id::eRealmPacketId::S2C_REALM_LIST_RES); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_REALM_SELECT_RES& packet) { return MakeSendBuffer(packet, packet_id::eRealmPacketId::S2C_REALM_SELECT_RES); }
 	
 
 private:

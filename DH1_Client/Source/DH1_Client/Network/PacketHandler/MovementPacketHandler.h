@@ -109,11 +109,11 @@ public:
 	static bool HANDLE_S2C_JUMP_NOT(const Protocol::S2C_JUMP_NOT& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_MOVE_INPUT_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_MOVE_INPUT_NOT); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_SPAWN_POSITION_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_SPAWN_POSITION_REQ); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_MOVE_TO_POSITION_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_MOVE_TO_POSITION_REQ); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_CREATE_CHARACTER_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_CREATE_CHARACTER_REQ); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_JUMP_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_JUMP_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_MOVE_INPUT_NOT& packet) { return MakeSendBuffer(packet, packet_id::eMovementPacketId::C2S_MOVE_INPUT_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_SPAWN_POSITION_REQ& packet) { return MakeSendBuffer(packet, packet_id::eMovementPacketId::C2S_SPAWN_POSITION_REQ); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_MOVE_TO_POSITION_REQ& packet) { return MakeSendBuffer(packet, packet_id::eMovementPacketId::C2S_MOVE_TO_POSITION_REQ); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_CREATE_CHARACTER_REQ& packet) { return MakeSendBuffer(packet, packet_id::eMovementPacketId::C2S_CREATE_CHARACTER_REQ); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_JUMP_NOT& packet) { return MakeSendBuffer(packet, packet_id::eMovementPacketId::C2S_JUMP_NOT); }
 	
 
 private:

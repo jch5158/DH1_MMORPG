@@ -64,7 +64,7 @@ public:
 	static bool HANDLE_S2S_REALM_CHAT_SUBMIT_NOT(const Protocol::S2S_REALM_CHAT_SUBMIT_NOT& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_REALM_CHAT_DELIVER_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2S_REALM_CHAT_DELIVER_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_REALM_CHAT_DELIVER_NOT& packet) { return MakeSendBuffer(packet, packet_id::eChatPacketId::S2S_REALM_CHAT_DELIVER_NOT); }
 	
 
 private:

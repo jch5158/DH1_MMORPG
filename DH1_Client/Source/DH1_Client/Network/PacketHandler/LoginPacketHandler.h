@@ -69,8 +69,8 @@ public:
 	static bool HANDLE_S2C_KICK_NOT(const Protocol::S2C_KICK_NOT& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGIN_REQ); }
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGOUT_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGOUT_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::eLoginPacketId::C2S_LOGIN_REQ); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGOUT_NOT& packet) { return MakeSendBuffer(packet, packet_id::eLoginPacketId::C2S_LOGOUT_NOT); }
 	
 
 private:

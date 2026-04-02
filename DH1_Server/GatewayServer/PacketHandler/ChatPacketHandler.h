@@ -64,7 +64,7 @@ public:
 	static bool HANDLE_C2S_CHAT_REQ(const Protocol::C2S_CHAT_REQ& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_CHAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2C_CHAT_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_CHAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::eChatPacketId::S2C_CHAT_NOT); }
 	
 
 private:

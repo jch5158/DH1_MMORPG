@@ -64,7 +64,7 @@ public:
 	static bool HANDLE_S2S_HEARTBEAT_NOT(const Protocol::S2S_HEARTBEAT_NOT& packet, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_HEARTBEAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2S_HEARTBEAT_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2S_HEARTBEAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::eServerHeartbeatPacketId::S2S_HEARTBEAT_NOT); }
 	
 
 private:

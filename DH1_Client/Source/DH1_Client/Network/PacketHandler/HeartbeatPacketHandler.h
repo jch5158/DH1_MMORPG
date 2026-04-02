@@ -59,7 +59,7 @@ public:
 	static bool HANDLE_PACKET_ID_INVALID(const uint16 size, const uint16 packetId, const byte* pBuffer, const PacketSessionRef& pSession);
 	
 
-	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_HEARTBEAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_HEARTBEAT_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_HEARTBEAT_NOT& packet) { return MakeSendBuffer(packet, packet_id::eHeartbeatPacketId::C2S_HEARTBEAT_NOT); }
 	
 
 private:
