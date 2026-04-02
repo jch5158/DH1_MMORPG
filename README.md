@@ -4,6 +4,8 @@
 
 **CppNetEngine** — C++17 Windows IOCP 기반 Actor Model 네트워크 엔진을 직접 설계하고, 이를 **4개의 서버 프로세스**(Gateway · World · Realm · Login)와 **Unreal Engine 5.7 클라이언트**에 동일하게 적용했습니다. 서버 엔진을 static lib로 이식하여 **서버·클라이언트가 같은 네트워크 스택**을 공유합니다.
 
+<br>
+
 ---
 
 ### 기술 스택
@@ -18,6 +20,8 @@
 | 데이터 | MySQL · Redis (세션 · Pub/Sub) · AWS S3 (NavMesh) |
 | 인프라 | mimalloc · spdlog · Crashpad · vcpkg |
 | CI | GitHub Actions (PacketGenerator 빌드 + LoginServer 단위 테스트) |
+
+<br>
 
 ---
 
@@ -57,6 +61,10 @@
 | **WorldServer** | 게임 로직. NavMesh 경로탐색, AOI 엔티티 관리, GameTick (50ms), 채팅 라우팅 |
 | **RealmServer** | 서버 목록 관리. WorldServer 등록/상태, 렐름 선택 조율 |
 | **LoginServer** | 계정 인증 (이메일/비밀번호). HTTP REST API, 이메일 인증, 세션 티켓 발급 |
+
+<br>
+
+---
 
 ## 스레드 모델
 
@@ -106,6 +114,10 @@
   "actorScheduler":   { "runningThreadCount": 2, "dispatchThreadCount": 4 }
 }
 ```
+
+<br>
+
+---
 
 ## 패킷 흐름
 
@@ -163,6 +175,10 @@
     │◀── ENTER / LEAVE_NOT─│                       │
 ```
 
+<br>
+
+---
+
 ## CppNetEngine → UE5 클라이언트 이식
 
 서버와 클라이언트가 **동일한 네트워크 엔진**을 사용합니다.
@@ -187,6 +203,10 @@
 | **빌드 통합** | `DH1_Client.Build.cs`에서 vcpkg + CppNetEngine.lib 링크 |
 
 `UClientNetSubsystem`은 CppNetEngine의 `ClientService` + `NetworkScheduler`를 생성하고, UE `Tick()`에서 `Dispatch()`를 호출하여 수신 패킷을 게임 스레드로 전달합니다.
+
+<br>
+
+---
 
 ## PacketGenerator (패킷 코드 자동화)
 
@@ -259,6 +279,8 @@
 - 일반: `Shared\BuildScripts\PacketGenerator.bat` (vcpkg `protoc` 필요)
 - `BuildAll.bat`는 기본적으로 PacketGenerator를 포함한 전체 순서로 빌드합니다 (`--skip-proto` 시 proto 단계 생략).
 
+<br>
+
 ---
 
 ## 핵심 기능
@@ -274,6 +296,8 @@
 | **인게임 채팅** | LOCAL (AOI 범위) / WORLD (전체). Redis Pub/Sub 크로스 서버 라우팅 |
 | **캐릭터** | 캐릭터 생성 · 오버헤드 UI (이름·레벨·HP) · 스폰 위치 동기화 |
 | **크래시 리포팅** | Crashpad 미니덤프 수집 (`CrashReporter` + `crashpad_handler.exe`) |
+
+<br>
 
 ---
 
@@ -320,6 +344,8 @@ DH1_MMORPG/
 └── .github/workflows/ci.yml     # GitHub Actions CI
 ```
 
+<br>
+
 ---
 
 ## 빌드
@@ -362,6 +388,8 @@ Shared\BuildScripts\RunValidationTests.bat --full   # proto 컴파일 + Echo 엔
 
 > VS Code에서는 `Ctrl+Shift+B` → 빌드 태스크 선택으로도 실행 가능합니다.
 
+<br>
+
 ---
 
 ## 서버 실행
@@ -376,6 +404,8 @@ Shared\BuildScripts\StartGame.bat             # 서버 + 클라이언트 실행
 실행 순서: **RealmServer → WorldServer → GatewayServer → LoginServer** → (클라이언트)
 
 각 서버는 프로세스 존재·TCP 포트·HTTP 헬스체크를 순차 확인한 뒤 다음 단계로 진행합니다.
+
+<br>
 
 ---
 
