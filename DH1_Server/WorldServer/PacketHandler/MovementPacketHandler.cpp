@@ -241,17 +241,17 @@ bool MovementPacketHandler::HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_
 
 	if (charName.size() < 2)
 	{
-		sendResult(Protocol::CREATE_CHARACTER_FAIL_NAME_TOO_SHORT, u8"닉네임은 최소 2자 이상이어야 합니다.");
+		sendResult(Protocol::CREATE_CHARACTER_FAIL_NAME_TOO_SHORT, reinterpret_cast<const char*>(u8"닉네임은 최소 2자 이상이어야 합니다."));
 		return true;
 	}
 	if (charName.size() > 16)
 	{
-		sendResult(Protocol::CREATE_CHARACTER_FAIL_NAME_TOO_LONG, u8"닉네임은 16자 이하여야 합니다.");
+		sendResult(Protocol::CREATE_CHARACTER_FAIL_NAME_TOO_LONG, reinterpret_cast<const char*>(u8"닉네임은 16자 이하여야 합니다."));
 		return true;
 	}
 	if (!IsValidCharacterName(charName))
 	{
-		sendResult(Protocol::CREATE_CHARACTER_FAIL_NAME_INVALID, u8"닉네임에 사용할 수 없는 문자가 포함되어 있습니다.");
+		sendResult(Protocol::CREATE_CHARACTER_FAIL_NAME_INVALID, reinterpret_cast<const char*>(u8"닉네임에 사용할 수 없는 문자가 포함되어 있습니다."));
 		return true;
 	}
 
@@ -263,13 +263,13 @@ bool MovementPacketHandler::HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_
 
 	if (pMySqlService == nullptr || pGridManager == nullptr)
 	{
-		sendResult(Protocol::CREATE_CHARACTER_FAIL_INTERNAL, u8"서버 내부 오류가 발생했습니다.");
+		sendResult(Protocol::CREATE_CHARACTER_FAIL_INTERNAL, reinterpret_cast<const char*>(u8"서버 내부 오류가 발생했습니다."));
 		return true;
 	}
 
 	if (pGridManager->GetObjectByAccountId(accountId) != nullptr)
 	{
-		sendResult(Protocol::CREATE_CHARACTER_FAIL_ALREADY_EXISTS, u8"이미 캐릭터가 존재합니다.");
+		sendResult(Protocol::CREATE_CHARACTER_FAIL_ALREADY_EXISTS, reinterpret_cast<const char*>(u8"이미 캐릭터가 존재합니다."));
 		return true;
 	}
 
@@ -284,7 +284,7 @@ bool MovementPacketHandler::HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_
 			{
 				Protocol::S2C_CREATE_CHARACTER_RES res;
 				res.set_result(Protocol::CREATE_CHARACTER_FAIL_ALREADY_EXISTS);
-				res.set_message(u8"이미 캐릭터가 존재합니다.");
+				res.set_message(reinterpret_cast<const char*>(u8"이미 캐릭터가 존재합니다."));
 				auto innerBuf = MakeMovementSendBuffer(res, packet_id::S2C_CREATE_CHARACTER_RES);
 				Protocol::S2S_RELAY_TO_CLIENT_NOT relay;
 				relay.set_gatewaysessionid(gatewaySessionId);
@@ -299,7 +299,7 @@ bool MovementPacketHandler::HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_
 			{
 				Protocol::S2C_CREATE_CHARACTER_RES res;
 				res.set_result(Protocol::CREATE_CHARACTER_FAIL_NAME_DUPLICATE);
-				res.set_message(u8"이미 사용 중인 닉네임입니다.");
+				res.set_message(reinterpret_cast<const char*>(u8"이미 사용 중인 닉네임입니다."));
 				auto innerBuf = MakeMovementSendBuffer(res, packet_id::S2C_CREATE_CHARACTER_RES);
 				Protocol::S2S_RELAY_TO_CLIENT_NOT relay;
 				relay.set_gatewaysessionid(gatewaySessionId);

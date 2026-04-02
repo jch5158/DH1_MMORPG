@@ -1,5 +1,6 @@
 #include "ClientNetSubsystem.h"
 
+#include <chrono>
 #include "Async/Async.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Border.h"
@@ -32,6 +33,7 @@
 #include "Network/CppNetEngine/NetSession.h"
 #include "Network/Dh1StringConv.h"
 #include "Network/PacketHandler/ChatPacketHandler.h"
+#include "Network/PacketHandler/HeartbeatPacketHandler.h"
 #include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Network/PacketHandler/RealmPacketHandler.h"
@@ -357,10 +359,12 @@ void UClientNetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UClientNetSubsystem::Deinitialize()
 {
+	StopHeartbeatTimer();
 	UnregisterChatUi();
 	ClearNetworkSpawnedEntities();
 	RemoveEnterWorldLoadingFromViewport();
 	bClientWorldChatAllowed = false;
+	MarkSessionLocalDisconnect();
 	ServiceRef.reset();
 	EngineInit.Reset();
 	Super::Deinitialize();
@@ -565,12 +569,105 @@ bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 
 	ClearNetworkSpawnedEntities();
 	bClientWorldChatAllowed = false;
+
+	StartHeartbeatTimer();
+
 	return true;
 }
 
 void UClientNetSubsystem::Disconnect()
 {
+	StopHeartbeatTimer();
 	ClearNetworkSpawnedEntities();
+}
+
+void UClientNetSubsystem::StartHeartbeatTimer()
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
+		{
+			if (Ctx.WorldType == EWorldType::Game || Ctx.WorldType == EWorldType::PIE)
+			{
+				World = Ctx.World();
+				break;
+			}
+		}
+	}
+	if (World == nullptr) return;
+
+	World->GetTimerManager().SetTimer(
+		HeartbeatTimerHandle,
+		FTimerDelegate::CreateUObject(this, &UClientNetSubsystem::OnHeartbeatTick),
+		HeartbeatIntervalSec,
+		true);
+}
+
+void UClientNetSubsystem::StopHeartbeatTimer()
+{
+	if (!HeartbeatTimerHandle.IsValid()) return;
+
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		if (GEngine)
+		{
+			for (const FWorldContext& Ctx : GEngine->GetWorldContexts())
+			{
+				if (Ctx.WorldType == EWorldType::Game || Ctx.WorldType == EWorldType::PIE)
+				{
+					World = Ctx.World();
+					break;
+				}
+			}
+		}
+	}
+
+	if (World != nullptr)
+	{
+		World->GetTimerManager().ClearTimer(HeartbeatTimerHandle);
+	}
+	HeartbeatTimerHandle.Invalidate();
+}
+
+void UClientNetSubsystem::OnHeartbeatTick()
+{
+	if (!ServiceRef) return;
+
+	const SessionRef pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr) return;
+
+	auto pNetSession = std::static_pointer_cast<NetSession>(pSession);
+
+	const int64 LastRecv = pNetSession->GetLastRecvTimeMs();
+	if (LastRecv > 0)
+	{
+		const int64 NowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::steady_clock::now().time_since_epoch()).count();
+		if (NowMs - LastRecv > ServerTimeoutMs)
+		{
+			UE_LOG(LogNetEngine, Warning, TEXT("Server timeout detected (no packet for %lldms). Disconnecting."), NowMs - LastRecv);
+			pSession->Disconnect(eDisconnectReason::ServerTimeout);
+			StopHeartbeatTimer();
+			return;
+		}
+	}
+
+	Protocol::C2S_HEARTBEAT_NOT Packet;
+	const auto SendBuffer = HeartbeatPacketHandler::MakeSendBuffer(Packet);
+	pSession->Send(SendBuffer);
+}
+
+void UClientNetSubsystem::MarkSessionLocalDisconnect()
+{
+	if (!ServiceRef) return;
+
+	const SessionRef pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr) return;
+
+	auto pNetSession = std::static_pointer_cast<NetSession>(pSession);
+	pNetSession->MarkLocalDisconnect();
 }
 
 void UClientNetSubsystem::SendPacket(const uint8* PacketData, int32 Size)

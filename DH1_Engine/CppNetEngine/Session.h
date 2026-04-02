@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 enum class eSessionState : uint8
 {
@@ -20,6 +20,7 @@ enum class eDisconnectReason : uint8  // NOLINT(performance-enum-size)
 	SocketError,     // 네트워크 에러
 	StateError,
 	ServiceError,
+	ServerTimeout,   // 클라이언트 측 서버 응답 타임아웃
 };
 
 class Session : public SocketIocpObject

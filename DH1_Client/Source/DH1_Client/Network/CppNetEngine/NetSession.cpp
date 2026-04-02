@@ -14,6 +14,8 @@
 #include "Network/Subsystem/ClientNetSubsystem.h"
 #include "UI/AuthWidgetStyle.h"
 
+static std::atomic<bool> sDisconnectOverlayShown{false};
+
 NetSession::NetSession(const int32 receiveBufferSize, const int32 maxPacketSize, AuthData ArgAuthData)
 	:PacketSession(receiveBufferSize, maxPacketSize)
 	, mAuthData(ArgAuthData)
@@ -25,6 +27,10 @@ NetSession::~NetSession()
 
 void NetSession::OnConnected()
 {
+	mLastRecvTimeMs.store(SteadyNowMs(), std::memory_order_relaxed);
+	mLocalDisconnect.store(false, std::memory_order_relaxed);
+	sDisconnectOverlayShown.store(false, std::memory_order_relaxed);
+
 	Protocol::C2S_LOGIN_REQ packet;
 	packet.set_accountid(FCString::Atoi(*mAuthData.AccountId));
 	packet.set_ticket(TCHAR_TO_UTF8(*mAuthData.Ticket));
@@ -42,14 +48,29 @@ void NetSession::OnDisconnected()
 {
 	const eDisconnectReason reason = mbDisconnectReason;
 
-	if (reason == eDisconnectReason::Closed)
+	if (reason == eDisconnectReason::Closed && mLocalDisconnect.load(std::memory_order_relaxed))
 	{
 		return;
 	}
 
-	const FText Message = (reason == eDisconnectReason::DuplicateLogin)
-		? NSLOCTEXT("DH1", "DuplicateLoginKick", "다른 기기에서 로그인되어 연결이 종료되었습니다.")
-		: NSLOCTEXT("DH1", "DisconnectedGeneric", "서버와의 연결이 끊어졌습니다.");
+	if (sDisconnectOverlayShown.exchange(true))
+	{
+		return;
+	}
+
+	FText Message;
+	if (reason == eDisconnectReason::DuplicateLogin)
+	{
+		Message = NSLOCTEXT("DH1", "DuplicateLoginKick", "다른 기기에서 로그인되어 연결이 종료되었습니다.");
+	}
+	else if (reason == eDisconnectReason::ServerTimeout)
+	{
+		Message = NSLOCTEXT("DH1", "ServerTimeout", "서버가 응답하지 않습니다. 잠시 후 다시 시도해 주세요.");
+	}
+	else
+	{
+		Message = NSLOCTEXT("DH1", "DisconnectedGeneric", "서버와의 연결이 끊어졌습니다.");
+	}
 
 	AsyncTask(ENamedThreads::GameThread, [Message]()
 	{
@@ -60,7 +81,7 @@ void NetSession::OnDisconnected()
 
 		UClientNetSubsystem::ForEachPlayClientNetSubsystem([](UClientNetSubsystem* Net)
 		{
-			Net->ClearNetworkSpawnedEntities();
+			Net->Disconnect();
 		});
 
 		TSharedRef<SWidget> Overlay = SNew(SOverlay)
@@ -149,6 +170,8 @@ void NetSession::OnSend(const int32 len)
 
 void NetSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 {
+	mLastRecvTimeMs.store(SteadyNowMs(), std::memory_order_relaxed);
+
 	PacketSessionRef pSession = GetPacketSessionRef();
 
 	if (pBuffer == nullptr || len < static_cast<int32>(sizeof(PacketHeader)))
