@@ -26,39 +26,36 @@ Unreal Engine 5.7 C++ 클라이언트로 이루어져 있으며,
 
 ## 시스템 아키텍처
 
+**전체 흐름:** 클라이언트는 **게임은 Gateway**, **계정·티켓은 Login** 으로 나눠 접속합니다. Gateway는 World로 패킷을 넘기고, World와 Realm은 **TCP로 상시 연결**되어 월드 등록·하트비트 등을 주고받습니다. MySQL·Redis·S3·SMTP 등은 필요한 서버에서만 사용합니다.
+
 ```mermaid
-graph TB
-    subgraph Client ["DH1_Client (UE5 5.7)"]
-        UE[Unreal Engine C++<br/>+ CppNetEngine.lib]
+flowchart TB
+    subgraph ClientLayer [클라이언트]
+        C[UE5 + CppNetEngine]
     end
 
-    subgraph Servers ["DH1_Server"]
-        GW["GatewayServer<br/>TCP :9000<br/>(C++ IOCP)"]
-        WS["WorldServer<br/>TCP :9100<br/>(C++ IOCP)"]
-        RS["RealmServer<br/>TCP :9200<br/>(C++ IOCP)"]
-        LS["LoginServer<br/>HTTP :5000<br/>(C# ASP.NET Core)"]
+    subgraph Access [접속·인증]
+        G[Gateway<br/>게임 TCP]
+        L[Login<br/>HTTP API]
     end
 
-    subgraph Infra ["Infrastructure"]
-        MySQL[(MySQL<br/>account_db / game_db)]
-        Redis[(Redis<br/>세션 · Pub/Sub)]
-        S3[(AWS S3<br/>NavMesh)]
-        SMTP[SMTP<br/>이메일 인증]
+    subgraph GameServers [게임·메타 서버]
+        direction LR
+        W[World<br/>로직·AOI·NavMesh]
+        R[Realm<br/>서버 목록]
     end
 
-    UE -- "TCP (게임 패킷)" --> GW
-    UE -. "HTTP/S (로그인 API)" .-> LS
+    subgraph Backend [데이터·외부]
+        D[(MySQL · Redis · S3 · SMTP)]
+    end
 
-    GW -- "TCP (릴레이)" --> WS
-    WS -- "TCP (등록·하트비트)" --> RS
-
-    GW --- Redis
-    WS --- Redis
-    WS --- MySQL
-    GW --- MySQL
-    LS --- MySQL
-    LS --- SMTP
-    WS -. "S3 다운로드" .-> S3
+    C -->|게임| G
+    C -.->|로그인| L
+    G --> W
+    W --> R
+    G --> D
+    W --> D
+    L --> D
 ```
 
 | 서버 | 역할 |
@@ -70,29 +67,27 @@ graph TB
 
 ## 스레드 모델
 
-각 C++ 서버 프로세스는 **두 개의 IOCP 스케줄러**를 운용합니다.
+각 C++ 서버 프로세스는 **NetworkScheduler**와 **ActorScheduler** 두 축의 IOCP 스케줄러로 나눕니다. 아래는 **한 바퀴의 처리 흐름**입니다 (실선 = 주 경로).
+
+**흐름 요약:** 소켓 I/O 완료 → 네트워크 스레드에서 수신·역직렬화 → 메일박스에 메시지 적재 → 액터 스레드에서 게임 로직 → 송신 버퍼로 다시 IOCP 송신. 지연·타임아웃은 각 스케줄러의 **TimingWheel**이 담당합니다.
 
 ```mermaid
-graph LR
-    subgraph NetworkScheduler ["NetworkScheduler (IOCP)"]
-        direction TB
-        NT["I/O 워커 스레드 × N"]
-        TW1["TimingWheel<br/>(하트비트·타임아웃)"]
-    end
+flowchart TD
+    IOCP[IOCP 완료 이벤트]
+    NS[NetworkScheduler<br/>Recv·Send·소켓]
+    PS[PacketSession]
+    MB[ActorMailbox<br/>LockFreeQueue]
+    AS[ActorScheduler]
+    AC[Actor 로직<br/>DB·Redis·세션 등]
+    SB[SendBuffer]
 
-    subgraph ActorScheduler ["ActorScheduler (IOCP)"]
-        direction TB
-        AT["Actor 워커 스레드 × M"]
-        TW2["TimingWheel<br/>(지연 작업)"]
-    end
-
-    IOCP_RECV["IOCP I/O 완료<br/>(Recv/Send)"] --> NT
-    NT -- "패킷 역직렬화" --> Session["PacketSession"]
-    Session -- "Post(Message)" --> MB["Actor Mailbox<br/>(LockFreeQueue)"]
-    MB -- "IOCP Dispatch" --> AT
-    AT -- "게임 로직 처리" --> Actor["Actor<br/>(MySqlActor, RedisActor,<br/>ClientSession ...)"]
-    Actor -- "응답 패킷" --> SB["SendBuffer"]
-    SB -- "IOCP Send" --> IOCP_SEND["I/O 완료 포트"]
+    IOCP --> NS
+    NS --> PS
+    PS --> MB
+    MB --> AS
+    AS --> AC
+    AC --> SB
+    SB --> IOCP
 ```
 
 **핵심 구성 요소:**
