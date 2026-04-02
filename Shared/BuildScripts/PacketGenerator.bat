@@ -1,4 +1,6 @@
 @echo off
+chcp 65001 >nul 2>&1
+setlocal enabledelayedexpansion
 
 set "BASE_DIR=%~dp0"
 set "VCPKG_DIR=%BASE_DIR%..\vcpkg\vcpkg_installed"
@@ -11,7 +13,6 @@ set "CPP_OUT_DIR=%BASE_DIR%..\..\Shared\Protocol"
 if not exist "%PROTOC_PATH%" (
     echo [Error] protoc.exe not found: %PROTOC_PATH%
     echo Please ensure vcpkg protobuf is installed.
-    pause
     exit /b 1
 )
 
@@ -30,7 +31,6 @@ for %%f in ("%PROTO_DIR%\*.proto") do (
 
 if "%PROTOC_FAILED%"=="1" (
     echo [Error] One or more proto files failed to compile.
-    pause
     exit /b 1
 )
 
@@ -42,18 +42,10 @@ set "ARG_PROTO=%BASE_DIR%..\Protocol\Proto"
 set "ARG_BASE_PRJ=%BASE_DIR%..\.."
 
 if not exist "%GENERATOR_EXE%" (
-    echo [Error] PacketGenerator is not exist
+    echo [Error] PacketGenerator not found
     echo Path: %GENERATOR_EXE%
-    echo you changed the Enum.proto file, you must rebuild the PacketGenerator solution.
-    pause
+    echo If you changed Enum.proto, rebuild the PacketGenerator solution first.
     exit /b 1
 )
 
 "%GENERATOR_EXE%" "%ARG_CONFIG%" "%ARG_PROTO%" "%ARG_BASE_PRJ%"
-
-set "PACKET_ID_PATH=%BASE_DIR%..\Protocol\PacketId"
-set "DH1_CLIENT_PATH=%ARG_BASE_PRJ%\DH1_Client\Source\DH1_Client\Network\Protocol\PacketId"
-
-if not exist "%DH1_CLIENT_PATH%" mkdir "%DH1_CLIENT_PATH%"
-
-xcopy /S /Y "%PACKET_ID_PATH%\PacketId.h" "%DH1_CLIENT_PATH%\"

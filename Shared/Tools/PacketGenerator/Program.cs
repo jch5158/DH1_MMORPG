@@ -45,6 +45,11 @@ var handlers = Parser.ParseHandlersFromDesc(protoPath);
 
 EnumGenerator.GenerateSharedEnum(handlers, Path.Combine(prjBasePath, @"Shared\Protocol\PacketId\PacketId.h"));
 
+if (resultConfig.Projects.Count == 0)
+{
+    Console.WriteLine("[Warning] No projects configured in config file — nothing to generate.");
+}
+
 foreach (var prjConfig in resultConfig.Projects)
 {
     var outputPath = Path.Combine(prjBasePath, prjConfig.Name, "PacketHandler");

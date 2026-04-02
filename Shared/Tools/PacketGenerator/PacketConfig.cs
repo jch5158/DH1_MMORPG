@@ -16,35 +16,17 @@ namespace PacketGenerator
 
     internal class PacketConfig
     {
+        public static PacketProjectsConfig Load(string configFilePath)
+        {
+            var jsonString = File.ReadAllText(configFilePath);
+            var config = JsonSerializer.Deserialize<PacketProjectsConfig>(jsonString, s_jsonOptions);
+            return config ?? throw new InvalidOperationException(
+                $"JSON deserialization returned null for: {configFilePath}");
+        }
+
         private static readonly JsonSerializerOptions s_jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
-
-        public static PacketProjectsConfig Load(string configFilePath)
-        {
-            if (!File.Exists(configFilePath))
-            {
-                Console.WriteLine($"[Error] 설정 파일을 찾을 수 없습니다: {configFilePath}");
-                return new PacketProjectsConfig(); // 파일이 없으면 빈 객체 반환
-            }
-
-            try
-            {
-                var jsonString = File.ReadAllText(configFilePath);
-                var config = JsonSerializer.Deserialize<PacketProjectsConfig>(jsonString, s_jsonOptions);
-                return config ?? new PacketProjectsConfig();
-            }
-            catch (JsonException ex)
-            {
-                Console.WriteLine($"[Error] JSON 파싱 실패: {ex.Message}");
-                return new PacketProjectsConfig();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Error] 파일 읽기 실패: {ex.Message}");
-                return new PacketProjectsConfig();
-            }
-        }
     }
 }
