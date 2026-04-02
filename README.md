@@ -4,54 +4,52 @@
 
 ```mermaid
 flowchart TB
-    subgraph ENGINE ["🔧 CppNetEngine — C++17 Windows IOCP 네트워크 엔진"]
-        direction TB
+    subgraph ENGINE ["CppNetEngine — C++17 Windows IOCP 네트워크 엔진"]
+        direction LR
 
-        subgraph NET ["🌐 Network I/O"]
-            direction LR
-            IOCP["IOCP Core\nCreateIoCompletionPort\nGQCS · PQCS"]
-            SESSION["Session\nRecvBuffer · SendBuffer\n연결 생명주기"]
-            LISTENER["Listener\nAcceptEx 비동기 수락"]
-            CONNECTOR["Connector\nConnectEx 비동기 연결"]
+        subgraph NET ["Network I/O"]
+            direction TB
+            IOCP["IOCP Core\nGQCS · PQCS"]
+            SESSION["Session\nRecv/SendBuffer"]
+            LISTENER["Listener · Connector\nAcceptEx · ConnectEx"]
         end
 
-        subgraph SCHED ["⚡ Dual Scheduler"]
-            direction LR
-            NS["NetworkScheduler\n소켓 I/O 전담 IOCP\ndispatch 스레드 풀"]
-            AS["ActorScheduler\n게임 로직 전담 IOCP\nPQCS 기반 Actor 깨움"]
-            TWHL["TimingWheel\n하트비트 · 타임아웃\n지연 콜백 스케줄링"]
+        subgraph SCHED ["Scheduler"]
+            direction TB
+            NS["NetworkScheduler\n소켓 I/O 전담"]
+            AS["ActorScheduler\n게임 로직 전담"]
+            TWHL["TimingWheel"]
         end
 
-        subgraph ACTOR ["🎭 Actor Model"]
-            direction LR
-            ACT["Actor\natomic TryAcquire/Release\n단일 스레드 보장"]
-            SA["ScopedActor\n복수 Actor ID순 일괄 잠금\n재시도 · 백오프"]
-            MAILBOX["ActorMailbox\nLockFreeQueue 기반\nPQCS 자동 통지"]
+        subgraph ACTOR ["Actor Model"]
+            direction TB
+            ACT["Actor\natomic TryAcquire"]
+            SA["ScopedActor\n다중 잠금"]
+            MAILBOX["ActorMailbox\nPQCS 통지"]
         end
 
-        subgraph MEM ["💾 메모리 관리"]
-            direction LR
-            LF["Lock-free\nQueue · Stack\nNode16 wide CAS"]
-            POOL["ObjectPool · MemoryPool\nTLS Chunk 캐시\n체크섬 corruption 감지"]
-            SBA["SendBufferAllocator\n256B · 4096B 단위 정렬\n패킷 송신 최적화"]
-            MI["mimalloc\n풀 고갈 시 OS 할당\nmi_malloc · mi_free"]
+        subgraph MEM ["메모리 관리"]
+            direction TB
+            LF["LockFreeQueue\nLockFreeStack"]
+            POOL["ObjectPool\nMemoryPool"]
+            SBA["SendBufferAllocator"]
+            MI["mimalloc"]
         end
 
-        NET --> SCHED
-        SCHED --> ACTOR
+        NET --> SCHED --> ACTOR
         ACTOR -.-> MEM
     end
 
-    ENGINE -->|"static lib"| GW["🖥 GatewayServer\nC++ IOCP\n패킷 인증 · 라우팅 · 세션"]
-    ENGINE -->|"static lib"| WS["🖥 WorldServer\nC++ IOCP\nNavMesh · AOI · GameTick"]
-    ENGINE -->|"static lib"| RS["🖥 RealmServer\nC++ IOCP\n서버 목록 · 렐름 조율"]
-    ENGINE -->|"static lib → UE5 이식"| CL["🎮 DH1_Client\nUnreal Engine 5.7\nUClientNetSubsystem"]
+    ENGINE -->|"static lib"| GW["GatewayServer"]
+    ENGINE -->|"static lib"| WS["WorldServer"]
+    ENGINE -->|"static lib"| RS["RealmServer"]
+    ENGINE -->|"static lib → UE5 이식"| CL["DH1_Client\n(Unreal Engine 5.7)"]
 ```
 
 | 영역 | 기술 |
 |------|------|
 | **네트워크 엔진** | C++17 · Windows IOCP · Lock-free Queue/Stack · ObjectPool · MemoryPool · mimalloc |
-| **Actor Model** | Actor (atomic TryAcquire) · ScopedActor (다중 잠금) · ActorMailbox · NetworkScheduler · ActorScheduler |
+| **Actor Model** | Actor (atomic TryAcquire) · ScopedActor (다중 잠금) · ActorMailbox · ActorScheduler |
 | **서버** (GW / WS / RS) | C++17 · CppNetEngine (static lib) |
 | **서버** (Login) | C# · ASP.NET Core 10 · Entity Framework Core |
 | **클라이언트** | Unreal Engine 5.7 · C++ · CppNetEngine 이식 |
