@@ -87,7 +87,8 @@ flowchart TB
 | **NetworkScheduler** | 독립 IOCP. 소켓 핸들을 IOCP에 등록, Overlapped Recv/Send/Accept 완료 디스패치 |
 | **ActorScheduler** | 독립 IOCP. 소켓 없음. PQCS로 Actor 워크 아이템을 전달하는 수동 완료 큐 |
 | **ActorMailbox** | Actor별 `LockFreeQueue<MessageRef>`. 메시지 Post 시 PQCS로 ActorScheduler에 통지 |
-| **TryAcquire/Release** | Actor 단일 스레드 점유 보장. 한 번에 하나의 dispatch 스레드만 Actor를 처리 |
+| **Actor** | `IActor` 구현. 단일 `atomic<bool>` 플래그로 `TryAcquire/Release` — 한 번에 하나의 dispatch 스레드만 처리 |
+| **ScopedActor** | `IActor` 구현 (`Actor` 비상속). **복수 Actor를 ID 순 정렬 후 일괄 Acquire** → 자체 Mailbox 처리 → 역순 Release. 데드락 방지를 위한 고정 순서 잠금 + 재시도/백오프 내장 |
 | **TimingWheel** | 각 스케줄러에 독립 존재. Dispatch() 루프마다 Tick(), 하트비트·타임아웃 등 스케줄링 |
 
 스레드 수는 `*ServerConfig.json`에서 설정합니다 (`runningThreadCount: 0` → CPU 코어 자동 산정).
