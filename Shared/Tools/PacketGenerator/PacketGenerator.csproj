@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,9 +9,7 @@
     <InvariantGlobalization>true</InvariantGlobalization>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<PlatformTarget>x64</PlatformTarget>
-	<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <OutputPath>.\Binaries\</OutputPath>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
@@ -19,7 +17,6 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.33.5" />
     <PackageReference Include="Google.Protobuf.Tools" Version="3.33.5" />
-    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(SolutionDir)' != '' AND '$(SolutionDir)' != '*Undefined*'">

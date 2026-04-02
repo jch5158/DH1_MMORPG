@@ -240,8 +240,6 @@ private:
 	inline static HashMap<uint16, PacketHandle> sPacketHandleMap;
 }};";
 
-        public static readonly string PROTO_FILE_INCLUDE_FORMAT = "";
-
         public static readonly string RECEIVE_HANDLE_INIT_FORMAT =
             @"		sPacketHandleMap[packet_id::e{0}PacketId::{1}] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
 		{{

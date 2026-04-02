@@ -1,6 +1,5 @@
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
-using System.Data;
 using System.Text;
 
 namespace PacketGenerator
@@ -55,7 +54,7 @@ namespace PacketGenerator
             }
 
             var serviceTypeDescriptor = getEnumDescriptorProto("eServiceType", protocolDirPath);
-            var roleDescriptor = getEnumDescriptorProto("eRole", protocolDirPath); ;
+            var roleDescriptor = getEnumDescriptorProto("eRole", protocolDirPath);
             if (serviceTypeDescriptor == null || roleDescriptor == null)
             {
                 return handlers;
