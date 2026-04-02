@@ -1,25 +1,33 @@
 # DH1_MMORPG
 
-> C++ IOCP 커스텀 네트워크 엔진으로 서버와 클라이언트를 동시에 구동하는 MMORPG 프로젝트
+> C++ IOCP 커스텀 네트워크 엔진 기반 MMORPG — 서버와 클라이언트가 동일 네트워크 스택을 공유
 
-**CppNetEngine** — C++17 Windows IOCP 기반 Actor Model 네트워크 엔진을 직접 설계하고, 이를 **4개의 서버 프로세스**(Gateway · World · Realm · Login)와 **Unreal Engine 5.7 클라이언트**에 동일하게 적용했습니다. 서버 엔진을 static lib로 이식하여 **서버·클라이언트가 같은 네트워크 스택**을 공유합니다.
+```mermaid
+flowchart LR
+    subgraph ENGINE ["CppNetEngine (C++17 · IOCP · Actor Model)"]
+        direction TB
+        LF["Lock-free Queue/Stack"]
+        MP["ObjectPool · MemoryPool"]
+        TW["TimingWheel"]
+        SB["SendBufferAllocator"]
+    end
 
-<br>
-
----
-
-### 기술 스택
+    ENGINE -->|"static lib"| GW["GatewayServer"]
+    ENGINE -->|"static lib"| WS["WorldServer"]
+    ENGINE -->|"static lib"| RS["RealmServer"]
+    ENGINE -->|"static lib\n→ UE5 이식"| CL["DH1_Client\n(Unreal Engine 5.7)"]
+```
 
 | 영역 | 기술 |
 |------|------|
-| 네트워크 엔진 | C++17 · Windows IOCP · Actor Model · Lock-free Queue/Stack |
-| 서버 (GW / WS / RS) | C++17 · CppNetEngine (static lib) |
-| 서버 (Login) | C# · ASP.NET Core 10 · Entity Framework Core |
-| 클라이언트 | Unreal Engine 5.7 · C++ · CppNetEngine 이식 |
-| 프로토콜 | Protocol Buffers 3 + 커스텀 PacketGenerator (.NET) |
-| 데이터 | MySQL · Redis (세션 · Pub/Sub) · AWS S3 (NavMesh) |
-| 인프라 | mimalloc · spdlog · Crashpad · vcpkg |
-| CI | GitHub Actions (PacketGenerator 빌드 + LoginServer 단위 테스트) |
+| **네트워크 엔진** | C++17 · Windows IOCP · Actor Model · Lock-free Queue/Stack · ObjectPool · MemoryPool · mimalloc |
+| **서버** (GW / WS / RS) | C++17 · CppNetEngine (static lib) |
+| **서버** (Login) | C# · ASP.NET Core 10 · Entity Framework Core |
+| **클라이언트** | Unreal Engine 5.7 · C++ · CppNetEngine 이식 |
+| **프로토콜** | Protocol Buffers 3 + 커스텀 PacketGenerator (.NET) |
+| **데이터** | MySQL · Redis (세션 · Pub/Sub) · AWS S3 (NavMesh) |
+| **인프라** | spdlog · Crashpad · vcpkg |
+| **CI** | GitHub Actions (PacketGenerator 빌드 + LoginServer 단위 테스트) |
 
 <br>
 
@@ -52,6 +60,81 @@ flowchart TB
 | **WorldServer** | 게임 로직. NavMesh 경로탐색, AOI 엔티티 관리, GameTick (50ms), 채팅 라우팅 |
 | **RealmServer** | 서버 목록 관리. WorldServer 등록/상태, 렐름 선택 조율 |
 | **LoginServer** | 계정 인증 (이메일/비밀번호). HTTP REST API, 이메일 인증, 세션 티켓 발급 |
+
+<br>
+
+---
+
+## CppNetEngine 핵심 설계
+
+모든 C++ 서버와 클라이언트가 공유하는 네트워크 엔진의 내부 자료구조·메모리 관리 설계입니다.
+
+### Lock-free 자료구조
+
+멀티스레드 스케줄러 환경에서 **뮤텍스 없이** 안전한 데이터 전달을 위해 직접 구현한 자료구조입니다.
+
+```mermaid
+flowchart LR
+    LFQ["LockFreeQueue\nMPMC 큐"]
+    LFS["LockFreeStack\nTreiber 스택"]
+    MB["ActorMailbox\n(LockFreeQueue 기반)"]
+    SP["세션 풀\n(LockFreeStack 기반)"]
+
+    LFQ --> MB
+    LFS --> SP
+```
+
+| 자료구조 | 구현 | ABA 방지 | 용도 |
+|----------|------|----------|------|
+| **LockFreeQueue** | Dummy-head 연결 리스트 · `Node16` (포인터 + 64-bit 카운터) · `atomic_ref` CAS | 버전 카운터 (head/tail별) | ActorMailbox, SendBuffer 큐 |
+| **LockFreeStack** | Treiber 스택 · `Node16` wide CAS | 버전 카운터 (top) | 세션 풀, ConnectionPool 인덱스 |
+
+**공통 설계 원칙:**
+- `alignas(hardware_destructive_interference_size)` — head/tail/count를 **별도 캐시 라인**에 배치하여 false sharing 방지
+- 노드 할당은 `TlsObjectPool`을 통해 TLS 캐시에서 처리 — malloc/free 오버헤드 최소화
+- Capacity 제한 (`mMaxCount`) + `atomic<int32> mCount`로 bounded 큐/스택 지원
+
+<br>
+
+### 메모리 관리
+
+서버 엔진은 **3계층 메모리 할당 전략**을 사용합니다.
+
+```mermaid
+flowchart TB
+    subgraph "SendBufferAllocator"
+        SBA["MakeSendBuffer(size)"]
+        SBA -->|"256B 단위 정렬\n(≤4096)"| SMALL["Small 할당"]
+        SBA -->|"4096B 단위 정렬\n(≤65536)"| LARGE["Large 할당"]
+    end
+
+    subgraph "ObjectPool / MemoryPool"
+        OP["ObjectPool&lt;T&gt;\n글로벌 Lock-free 프리리스트"]
+        TLS["TlsObjectPool&lt;T&gt;\nTLS Chunk 할당"]
+        MP["MemoryPool&lt;ALLOC_SIZE&gt;\n고정 크기 메모리 블록"]
+        TLS --> OP
+        MP --> OP
+    end
+
+    subgraph "mimalloc"
+        MI["mi_malloc / mi_free"]
+    end
+
+    OP -->|"풀 고갈 시"| MI
+    MP -->|"MAX_SIZE 초과"| MI
+```
+
+| 계층 | 컴포넌트 | 설명 |
+|------|----------|------|
+| **L1 — TLS 캐시** | `TlsObjectPool<T>` | 스레드별 Chunk 배열 소유. 할당/해제 시 atomic 연산 불필요 — **가장 빠른 경로** |
+| **L2 — 글로벌 풀** | `ObjectPool<T>` | Lock-free 프리리스트. TLS Chunk 소진 시 새 Chunk 발급, 해제된 Chunk 재활용 |
+| **L3 — OS 할당** | `mimalloc` | 풀에 Chunk가 없거나 `MemoryAllocator`에서 MAX_SIZE 초과 시 `mi_malloc` 직접 호출 |
+
+| 컴포넌트 | 핵심 구현 |
+|----------|----------|
+| **ObjectPool\<T\>** | `mi_malloc` → placement new로 노드 생성. 체크섬 쿠키 `0xDEAD0001BEEF0001` — double-free·corruption 감지 |
+| **MemoryPool\<SIZE\>** | 고정 크기 `ChunkData` 배열. 각 블록에 체크섬 + Chunk 역참조 포인터 내장 — `Free()` 시 소속 Chunk를 O(1)로 찾아 반환 |
+| **SendBufferAllocator** | 요청 크기를 **256B / 4096B 단위**로 올림 정렬 → `SharedPtr<NetSendBuffer>` 발급. 빈번한 패킷 송신의 할당 편차 최소화 |
 
 <br>
 
@@ -281,7 +364,7 @@ flowchart LR
 
 | 기능 | 설명 |
 |------|------|
-| **커스텀 IOCP 엔진** | Actor Model · Lock-free Queue/Stack · ObjectPool · MemoryPool · TimingWheel · SendBuffer 할당기 |
+| **커스텀 IOCP 엔진** | Actor Model · Lock-free 자료구조 · 3계층 메모리 풀 · TimingWheel · SendBuffer 할당기 (상세: 상단 별도 섹션) |
 | **AOI** | `GridManager` 기반 셀 분할 (2000 유닛). 셀 경계 이동 시 Enter/Leave 자동 브로드캐스트 |
 | **서버 사이드 NavMesh** | UE5 Detour를 서버에서 직접 로드 → 서버 권위적 경로 탐색. S3에서 바이너리 다운로드 |
 | **PacketGenerator** | `.proto` 커스텀 옵션 → PacketId · Handler · UE 프로토콜 자동 생성 (상세: 하단 별도 섹션) |
