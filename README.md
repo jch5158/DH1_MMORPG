@@ -1,21 +1,17 @@
 # DH1_MMORPG
 
-> C++ IOCP 커스텀 네트워크 엔진 기반 MMORPG — 서버와 클라이언트가 동일 네트워크 스택을 공유
+> C++ IOCP 커스텀 네트워크 엔진 기반 MMORPG 서버와 클라이언트가 동일 네트워크 엔진을 공유
 
 | | |
 |---|---|
 | **개발자** | 정찬훈 |
 | **프로젝트 유형** | 개인 프로젝트 (1인 개발) |
-| **개발 기간** | 2025.01 ~ 현재 (진행 중) |
+| **개발 기간** | 2026.01 ~ 현재 (진행 중) |
 | **GitHub** | [https://github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
-
-<br>
 
 ### 프로젝트 목적
 
 고성능 MMORPG 서버의 핵심 기술을 직접 설계·구현하여, **네트워크 엔진부터 분산 서버 아키텍처, 클라이언트 통합까지** 게임 서버 개발의 전체 파이프라인을 경험하는 것을 목표로 합니다.
-
-<br>
 
 ### 사용 기술 및 언어
 
@@ -29,19 +25,15 @@
 | **Infra / DevOps** | AWS S3 · GitHub Actions · vcpkg · Crashpad · spdlog |
 | **Tools** | Visual Studio 2025 · Unreal Build Tool · MSBuild · .NET SDK 10 |
 
-<br>
-
 ### 프로젝트 소개
 
-C++17 Windows IOCP 기반 네트워크 엔진(**CppNetEngine**)을 직접 설계·구현하고, 이를 4개의 분산 서버(Gateway · World · Realm · Login)와 Unreal Engine 5.7 클라이언트에 동일하게 적용한 MMORPG 프로젝트입니다. Actor Model, Lock-free 자료구조, 3계층 메모리 풀 등 서버 엔진의 핵심 컴포넌트를 직접 구현하였으며, 서버 엔진을 static lib로 클라이언트에 이식하여 **서버·클라이언트가 같은 네트워크 스택**을 공유합니다.
-
-<br>
+C++17 Windows IOCP 기반 네트워크 엔진(**CppNetEngine**)을 직접 설계·구현하고, 이를 4개의 분산 서버(Gateway · World · Realm · Login)와 Unreal Engine 5.7 클라이언트에 동일하게 적용한 MMORPG 프로젝트입니다. Actor Model, Lock-free 자료구조, 3계층 메모리 풀 등 서버 엔진의 핵심 컴포넌트를 직접 구현하였으며, 서버 엔진을 static lib로 클라이언트에 이식하여 **서버·클라이언트가 같은 네트워크 엔진**을 공유합니다.
 
 ### 주요 기여 및 성과
 
 - **커스텀 네트워크 엔진 설계·구현** — IOCP 기반 비동기 I/O, Actor Model, Lock-free 자료구조, 3계층 메모리 풀을 포함하는 C++ 서버 엔진을 처음부터 직접 개발
 - **분산 서버 아키텍처 설계** — Gateway · World · Realm · Login 4개 서버로 역할을 분리하고, Relay 패턴과 Redis 세션을 활용한 멀티 서버 구조 구현
-- **서버 엔진 클라이언트 이식** — CppNetEngine을 static lib로 빌드하여 UE5 클라이언트에 통합, 서버·클라이언트 간 동일 네트워크 스택 공유
+- **서버 엔진 클라이언트 이식** — CppNetEngine을 static lib로 빌드하여 UE5 클라이언트에 통합, 서버·클라이언트 간 동일 네트워크 엔진 공유
 - **서버 사이드 NavMesh 경로탐색** — UE5 Detour 라이브러리를 서버에 이식하여 서버 권위적 경로 탐색 구현, S3 기반 NavMesh 바이너리 관리
 - **프로토콜 자동화 도구 개발** — .proto 커스텀 옵션 기반 PacketGenerator를 .NET으로 개발, 패킷 코드 자동 생성으로 서버·클라이언트 프로토콜 동기화
 - **CI 파이프라인 구축** — GitHub Actions로 PacketGenerator 빌드 및 LoginServer 단위 테스트 자동화
@@ -74,8 +66,6 @@ flowchart TB
 | **인프라** | spdlog · Crashpad · vcpkg |
 | **CI** | GitHub Actions (PacketGenerator 빌드 + LoginServer 단위 테스트) |
 
-<br>
-
 ---
 
 ## 시스템 아키텍처
@@ -102,11 +92,9 @@ flowchart TB
 | 서버 | 역할 |
 |------|------|
 | **GatewayServer** | 클라이언트 TCP 접속점. 패킷 인증·라우팅, 세션 관리, 하트비트 검사 |
-| **WorldServer** | 게임 로직. NavMesh 경로탐색, AOI 엔티티 관리, GameTick (50ms), 채팅 라우팅 |
+| **WorldServer** | 게임 로직. NavMesh 경로탐색, AOI 엔티티 관리, GameTick, 채팅 라우팅 |
 | **RealmServer** | 서버 목록 관리. WorldServer 등록/상태, 렐름 선택 조율 |
 | **LoginServer** | 계정 인증 (이메일/비밀번호). HTTP REST API, 이메일 인증, 세션 티켓 발급 |
-
-<br>
 
 ---
 
@@ -136,10 +124,8 @@ flowchart LR
 
 **공통 설계 원칙:**
 - `alignas(hardware_destructive_interference_size)` — head/tail/count를 **별도 캐시 라인**에 배치하여 false sharing 방지
-- 노드 할당은 `TlsObjectPool`을 통해 TLS 캐시에서 처리 — malloc/free 오버헤드 최소화
+- 노드 할당은 `TlsObjectPool`을 통해 TLS 캐시에서 처리 — mi_malloc/mi_free 오버헤드 최소화
 - Capacity 제한 (`mMaxCount`) + `atomic<int32> mCount`로 bounded 큐/스택 지원
-
-<br>
 
 ### 메모리 관리
 
@@ -181,8 +167,6 @@ flowchart TB
 | **MemoryPool\<SIZE\>** | 고정 크기 `ChunkData` 배열. 각 블록에 체크섬 + Chunk 역참조 포인터 내장 — `Free()` 시 소속 Chunk를 O(1)로 찾아 반환 |
 | **SendBufferAllocator** | 요청 크기를 **256B / 4096B 단위**로 올림 정렬 → `SharedPtr<NetSendBuffer>` 발급. 빈번한 패킷 송신의 할당 편차 최소화 |
 
-<br>
-
 ---
 
 ## 스레드 모델
@@ -207,8 +191,6 @@ flowchart TB
 | **IOCP** | `CreateIoCompletionPort`에 소켓 핸들을 직접 등록. Overlapped I/O 완료를 수신 |
 | **dispatch 스레드** | `Dispatch()` 루프. GQCS → `IocpObject::Dispatch` (Recv 역직렬화, Send 완료 처리, Accept) |
 | **TimingWheel** | Dispatch() 루프마다 `Tick()`. 하트비트·세션 타임아웃 등 스케줄링 |
-
-<br>
 
 ### ActorScheduler
 
@@ -241,8 +223,6 @@ flowchart TB
   "actorScheduler":   { "runningThreadCount": 2, "dispatchThreadCount": 4 }
 }
 ```
-
-<br>
 
 ---
 
@@ -299,7 +279,7 @@ sequenceDiagram
     W-->>G: S2C_MOVE_PATH_RES
     G-->>C: S2C_MOVE_PATH_RES
 
-    Note over W: GameTick (50ms) 경로 추종
+    Note over W: GameTick 경로 추종
 
     W-->>G: S2C_ENTITY_SNAPSHOT (AOI)
     G-->>C: S2C_ENTITY_SNAPSHOT
@@ -308,8 +288,6 @@ sequenceDiagram
     W-->>G: ENTER / LEAVE_NOT
     G-->>C: ENTER / LEAVE_NOT
 ```
-
-<br>
 
 ---
 
@@ -333,8 +311,6 @@ flowchart TB
 | **빌드 통합** | `DH1_Client.Build.cs`에서 vcpkg + CppNetEngine.lib 링크 |
 
 `UClientNetSubsystem`은 CppNetEngine의 `ClientService` + `NetworkScheduler`를 생성하고, UE `Tick()`에서 `Dispatch()`를 호출하여 수신 패킷을 게임 스레드로 전달합니다.
-
-<br>
 
 ---
 
@@ -401,8 +377,6 @@ flowchart LR
 - 일반: `Shared\BuildScripts\PacketGenerator.bat` (vcpkg `protoc` 필요)
 - `BuildAll.bat`는 기본적으로 PacketGenerator를 포함한 전체 순서로 빌드합니다 (`--skip-proto` 시 proto 단계 생략).
 
-<br>
-
 ---
 
 ## 핵심 기능
@@ -418,8 +392,6 @@ flowchart LR
 | **인게임 채팅** | LOCAL (AOI 범위) / WORLD (전체). Redis Pub/Sub 크로스 서버 라우팅 |
 | **캐릭터** | 캐릭터 생성 · 오버헤드 UI (이름·레벨·HP) · 스폰 위치 동기화 |
 | **크래시 리포팅** | Crashpad 미니덤프 수집 (`CrashReporter` + `crashpad_handler.exe`) |
-
-<br>
 
 ---
 
@@ -466,8 +438,6 @@ DH1_MMORPG/
 └── .github/workflows/ci.yml     # GitHub Actions CI
 ```
 
-<br>
-
 ---
 
 ## 빌드
@@ -510,8 +480,6 @@ Shared\BuildScripts\RunValidationTests.bat --full   # proto 컴파일 + Echo 엔
 
 > VS Code에서는 `Ctrl+Shift+B` → 빌드 태스크 선택으로도 실행 가능합니다.
 
-<br>
-
 ---
 
 ## 서버 실행
@@ -526,8 +494,6 @@ Shared\BuildScripts\StartGame.bat             # 서버 + 클라이언트 실행
 실행 순서: **RealmServer → WorldServer → GatewayServer → LoginServer** → (클라이언트)
 
 각 서버는 프로세스 존재·TCP 포트·HTTP 헬스체크를 순차 확인한 뒤 다음 단계로 진행합니다.
-
-<br>
 
 ---
 
