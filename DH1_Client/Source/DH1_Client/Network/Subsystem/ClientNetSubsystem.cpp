@@ -1,6 +1,5 @@
 #include "ClientNetSubsystem.h"
 
-#include <chrono>
 #include "Async/Async.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Border.h"
@@ -637,22 +636,6 @@ void UClientNetSubsystem::OnHeartbeatTick()
 
 	const SessionRef pSession = ServiceRef->GetFirstSessionRef();
 	if (pSession == nullptr) return;
-
-	auto pNetSession = std::static_pointer_cast<NetSession>(pSession);
-
-	const int64 LastRecv = pNetSession->GetLastRecvTimeMs();
-	if (LastRecv > 0)
-	{
-		const int64 NowMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-			std::chrono::steady_clock::now().time_since_epoch()).count();
-		if (NowMs - LastRecv > ServerTimeoutMs)
-		{
-			UE_LOG(LogNetEngine, Warning, TEXT("Server timeout detected (no packet for %lldms). Disconnecting."), NowMs - LastRecv);
-			pSession->Disconnect(eDisconnectReason::ServerTimeout);
-			StopHeartbeatTimer();
-			return;
-		}
-	}
 
 	Protocol::C2S_HEARTBEAT_NOT Packet;
 	const auto SendBuffer = HeartbeatPacketHandler::MakeSendBuffer(Packet);

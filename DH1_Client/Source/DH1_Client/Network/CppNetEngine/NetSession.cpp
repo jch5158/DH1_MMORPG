@@ -27,7 +27,6 @@ NetSession::~NetSession()
 
 void NetSession::OnConnected()
 {
-	mLastRecvTimeMs.store(SteadyNowMs(), std::memory_order_relaxed);
 	mLocalDisconnect.store(false, std::memory_order_relaxed);
 	sDisconnectOverlayShown.store(false, std::memory_order_relaxed);
 
@@ -62,10 +61,6 @@ void NetSession::OnDisconnected()
 	if (reason == eDisconnectReason::DuplicateLogin)
 	{
 		Message = NSLOCTEXT("DH1", "DuplicateLoginKick", "다른 기기에서 로그인되어 연결이 종료되었습니다.");
-	}
-	else if (reason == eDisconnectReason::ServerTimeout)
-	{
-		Message = NSLOCTEXT("DH1", "ServerTimeout", "서버가 응답하지 않습니다. 잠시 후 다시 시도해 주세요.");
 	}
 	else
 	{
@@ -170,8 +165,6 @@ void NetSession::OnSend(const int32 len)
 
 void NetSession::OnReceivePacket(const byte* pBuffer, const int32 len)
 {
-	mLastRecvTimeMs.store(SteadyNowMs(), std::memory_order_relaxed);
-
 	PacketSessionRef pSession = GetPacketSessionRef();
 
 	if (pBuffer == nullptr || len < static_cast<int32>(sizeof(PacketHeader)))

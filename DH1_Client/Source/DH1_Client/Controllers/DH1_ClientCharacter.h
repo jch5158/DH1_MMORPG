@@ -18,7 +18,7 @@ class UInputMappingContext;
 class UUserWidget;
 
 /**
- *  A controllable top-down perspective character
+ *  Quarter-view (쿼터뷰) MMORPG character with fixed camera angle and mouse-wheel zoom.
  */
 UCLASS()
 class ADH1_ClientCharacter : public ACharacter
@@ -68,11 +68,8 @@ public:
 private:
 
 	void CreateInputAssets();
-	void OnMoveInput(const FInputActionValue& Value);
-	void OnMoveInputCompleted();
 	void OnClickMove();
-	void OnRightMousePressed(const FInputActionValue& Value);
-	void OnRightMouseReleased(const FInputActionValue& Value);
+	void OnZoom(const FInputActionValue& Value);
 	void OnChatFocusPressed();
 	void OnChatChannelCycle();
 
@@ -112,13 +109,10 @@ private:
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY()
-	TObjectPtr<UInputAction> MoveAction;
-
-	UPROPERTY()
 	TObjectPtr<UInputAction> ClickMoveAction;
 
 	UPROPERTY()
-	TObjectPtr<UInputAction> RightMouseAction;
+	TObjectPtr<UInputAction> ZoomAction;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> ChatFocusAction;
@@ -126,18 +120,19 @@ private:
 	UPROPERTY()
 	TObjectPtr<UInputAction> ChatChannelCycleAction;
 
-	// 마우스 클릭 이동 (좌클릭)
+	// 좌클릭 이동
 	FVector ClickMoveTarget = FVector::ZeroVector;
 	bool bIsClickMoving = false;
 
-	// 키보드 이동
 	FVector CurrentMoveDirection = FVector::ZeroVector;
 	bool bIsKeyMoving = false;
 
-	// 카메라 회전 (우클릭 홀드)
-	bool bRightMouseHeld = false;
-	float CameraYaw = 0.0f;
-	float CameraPitch = -50.0f;
+	// 쿼터뷰 카메라 줌
+	float TargetArmLength = 1800.f;
+	static constexpr float MinArmLength = 800.f;
+	static constexpr float MaxArmLength = 3000.f;
+	static constexpr float ZoomStep = 150.f;
+	static constexpr float ZoomInterpSpeed = 8.f;
 
 	// 스폰 위치 수신 콜백
 	void OnSpawnPositionReceived(const FVector& Position, float Yaw);

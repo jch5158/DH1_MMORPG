@@ -3,7 +3,6 @@
 #include "Network/CppNetEngine/NetEngineWrapper.h"
 #include <PacketSession.h>
 #include <atomic>
-#include <chrono>
 
 struct AuthData
 {
@@ -23,20 +22,11 @@ public:
 
 	virtual void OnReceivePacket(const byte* pBuffer, const int32 len) override;
 
-	int64 GetLastRecvTimeMs() const { return mLastRecvTimeMs.load(std::memory_order_relaxed); }
-
 	void MarkLocalDisconnect() { mLocalDisconnect.store(true, std::memory_order_relaxed); }
 
 private:
-	static int64 SteadyNowMs()
-	{
-		return std::chrono::duration_cast<std::chrono::milliseconds>(
-			std::chrono::steady_clock::now().time_since_epoch()).count();
-	}
-
 	AuthData mAuthData;
 	eDisconnectReason mbDisconnectReason = eDisconnectReason::Closed;
-	std::atomic<int64> mLastRecvTimeMs{ 0 };
 	std::atomic<bool> mLocalDisconnect{ false };
 };
 

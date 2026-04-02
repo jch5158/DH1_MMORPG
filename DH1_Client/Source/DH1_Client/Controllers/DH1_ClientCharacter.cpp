@@ -73,15 +73,17 @@ ADH1_ClientCharacter::ADH1_ClientCharacter()
 		GetMesh()->SetAnimInstanceClass(AnimBP.Class);
 	}
 
-	// 카메라 붐
+	// 쿼터뷰 카메라 붐
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true);
-	CameraBoom->TargetArmLength = 1200.f;
-	CameraBoom->SetRelativeRotation(FRotator(-50.f, 0.f, 0.f));
+	CameraBoom->TargetArmLength = 1800.f;
+	CameraBoom->SetRelativeRotation(FRotator(-45.f, 45.f, 0.f));
 	CameraBoom->bDoCollisionTest = false;
+	CameraBoom->bEnableCameraLag = true;
+	CameraBoom->CameraLagSpeed = 10.f;
 
-	// 카메라
+	// 쿼터뷰 카메라
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false;
@@ -101,29 +103,22 @@ ADH1_ClientCharacter::ADH1_ClientCharacter()
 
 void ADH1_ClientCharacter::CreateInputAssets()
 {
-	// WASD/방향키 이동 (Vector2D: X=좌우, Y=전후)
-	MoveAction = NewObject<UInputAction>(this, TEXT("IA_Move"));
-	MoveAction->ValueType = EInputActionValueType::Axis2D;
-
-	// 마우스 왼쪽 클릭
 	ClickMoveAction = NewObject<UInputAction>(this, TEXT("IA_ClickMove"));
 	ClickMoveAction->ValueType = EInputActionValueType::Boolean;
 
-	// 매핑 컨텍스트
-	DefaultMappingContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Default"));
-
-	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
-
-	// 카메라 회전 액션 (미사용 - 우클릭은 클릭 이동으로 예약)
-	RightMouseAction = NewObject<UInputAction>(this, TEXT("IA_RightMouse"));
-	RightMouseAction->ValueType = EInputActionValueType::Boolean;
+	ZoomAction = NewObject<UInputAction>(this, TEXT("IA_Zoom"));
+	ZoomAction->ValueType = EInputActionValueType::Axis1D;
 
 	ChatFocusAction = NewObject<UInputAction>(this, TEXT("IA_ChatFocus"));
 	ChatFocusAction->ValueType = EInputActionValueType::Boolean;
-	DefaultMappingContext->MapKey(ChatFocusAction, EKeys::Enter);
 
 	ChatChannelCycleAction = NewObject<UInputAction>(this, TEXT("IA_ChatChannelCycle"));
 	ChatChannelCycleAction->ValueType = EInputActionValueType::Boolean;
+
+	DefaultMappingContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Default"));
+	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
+	DefaultMappingContext->MapKey(ZoomAction, EKeys::MouseWheelAxis);
+	DefaultMappingContext->MapKey(ChatFocusAction, EKeys::Enter);
 	DefaultMappingContext->MapKey(ChatChannelCycleAction, EKeys::Tab);
 }
 
@@ -190,33 +185,29 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// SetupPlayerInputComponent는 BeginPlay 전에 호출되므로 여기서 Input 에셋 생성
-	if (MoveAction == nullptr)
+	if (ClickMoveAction == nullptr)
 	{
 		CreateInputAssets();
 	}
 
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (ClickMoveAction != nullptr)
+		if (ClickMoveAction)
 		{
 			EnhancedInput->BindAction(ClickMoveAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnClickMove);
-			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - ClickMoveAction bound"));
 		}
 
-		if (RightMouseAction != nullptr)
+		if (ZoomAction)
 		{
-			EnhancedInput->BindAction(RightMouseAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnRightMousePressed);
-			EnhancedInput->BindAction(RightMouseAction, ETriggerEvent::Completed, this, &ADH1_ClientCharacter::OnRightMouseReleased);
-			UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - RightMouseAction bound"));
+			EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADH1_ClientCharacter::OnZoom);
 		}
 
-		if (ChatFocusAction != nullptr)
+		if (ChatFocusAction)
 		{
 			EnhancedInput->BindAction(ChatFocusAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatFocusPressed);
 		}
 
-		if (ChatChannelCycleAction != nullptr)
+		if (ChatChannelCycleAction)
 		{
 			EnhancedInput->BindAction(ChatChannelCycleAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatChannelCycle);
 		}
@@ -266,16 +257,13 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 		}
 	}
 
-	// 카메라 회전 (우클릭 홀드 + 마우스 드래그)
-	if (bRightMouseHeld)
+	// 쿼터뷰 줌 부드러운 보간
+	if (CameraBoom)
 	{
-		if (const APlayerController* PC = Cast<APlayerController>(Controller))
+		const float Current = CameraBoom->TargetArmLength;
+		if (!FMath::IsNearlyEqual(Current, TargetArmLength, 1.f))
 		{
-			float MouseDX, MouseDY;
-			PC->GetInputMouseDelta(MouseDX, MouseDY);
-			CameraYaw += MouseDX * 2.0f;
-			CameraPitch = FMath::Clamp(CameraPitch - MouseDY * 1.5f, -80.0f, -15.0f);
-			CameraBoom->SetRelativeRotation(FRotator(CameraPitch, CameraYaw, 0.0f));
+			CameraBoom->TargetArmLength = FMath::FInterpTo(Current, TargetArmLength, DeltaSeconds, ZoomInterpSpeed);
 		}
 	}
 
@@ -286,14 +274,10 @@ void ADH1_ClientCharacter::Tick(const float DeltaSeconds)
 	}
 }
 
-void ADH1_ClientCharacter::OnMoveInput(const FInputActionValue& Value)
+void ADH1_ClientCharacter::OnZoom(const FInputActionValue& Value)
 {
-	// WASD 이동 비활성화 — 클릭이동으로 통일
-}
-
-void ADH1_ClientCharacter::OnMoveInputCompleted()
-{
-	// WASD 이동 비활성화 — 클릭이동으로 통일
+	const float Axis = Value.Get<float>();
+	TargetArmLength = FMath::Clamp(TargetArmLength - Axis * ZoomStep, MinArmLength, MaxArmLength);
 }
 
 void ADH1_ClientCharacter::OnClickMove()
@@ -461,28 +445,6 @@ void ADH1_ClientCharacter::FollowServerPath(const float DeltaSeconds)
 	const FVector NextTarget = ServerPath[CurrentPathIndex];
 	CurrentMoveDirection = (NextTarget - CurrentLocation).GetSafeNormal2D();
 	AddMovementInput(CurrentMoveDirection, 1.0f);
-}
-
-void ADH1_ClientCharacter::OnRightMousePressed(const FInputActionValue& Value)
-{
-	bRightMouseHeld = true;
-
-	// 우클릭 홀드 중 커서 숨김
-	if (APlayerController* PC = Cast<APlayerController>(Controller))
-	{
-		PC->bShowMouseCursor = false;
-	}
-}
-
-void ADH1_ClientCharacter::OnRightMouseReleased(const FInputActionValue& Value)
-{
-	bRightMouseHeld = false;
-
-	// 우클릭 해제 시 커서 복원
-	if (APlayerController* PC = Cast<APlayerController>(Controller))
-	{
-		PC->bShowMouseCursor = true;
-	}
 }
 
 void ADH1_ClientCharacter::OnChatFocusPressed()

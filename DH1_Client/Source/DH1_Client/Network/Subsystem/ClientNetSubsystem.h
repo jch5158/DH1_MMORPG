@@ -198,7 +198,6 @@ private:
 
     FTimerHandle HeartbeatTimerHandle;
     static constexpr float HeartbeatIntervalSec = 5.0f;
-    static constexpr int64 ServerTimeoutMs = 15000;
 
     bool bCharacterCreatePending = false;
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
