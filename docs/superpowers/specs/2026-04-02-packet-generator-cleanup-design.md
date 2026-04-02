@@ -3,7 +3,7 @@
 ## 개요
 
 `Shared/Tools/PacketGenerator/` .NET 10 콘솔 앱의 코드 중복 제거, 유지보수성 개선, 데드 코드 정리를 수행한다.
-코드 리뷰에서 발견된 16개 이슈를 4단계 안전 리팩터링으로 해결한다.
+코드 리뷰에서 발견된 19개 이슈를 4단계 안전 리팩터링으로 해결한다.
 
 ## 배경
 
@@ -19,7 +19,7 @@ PacketGenerator는 protobuf descriptor 파일(.desc)을 읽어 C++ 패킷 핸들
 
 ## 결정사항
 
-- **범위:** 16개 이슈 전체 수정
+- **범위:** 19개 이슈 전체 수정
 - **파일 구조:** 플랫 구조 (하위 폴더 없음)
 - **에러 핸들링:** `PacketConfig.Load`는 예외를 throw, `Program.cs`가 유일한 catch 지점
 - **리팩터링 전략:** 4단계 안전 리팩터링, 각 단계마다 빌드 검증 후 커밋
@@ -35,7 +35,7 @@ PacketGenerator는 protobuf descriptor 파일(.desc)을 읽어 C++ 패킷 핸들
 | H3 | 337줄 모놀리스 파일에 5개 클래스 | `PacketHandlerGenerator.cs` |
 | H4 | csproj PreBuild에 존재하지 않는 `Protoc.bat` 참조 | `PacketGenerator.csproj` |
 
-### Medium (7건)
+### Medium (10건)
 
 | ID | 이슈 | 파일 |
 |---|---|---|
@@ -46,6 +46,9 @@ PacketGenerator는 protobuf descriptor 파일(.desc)을 읽어 C++ 패킷 핸들
 | M5 | 빈 상수 `PROTO_FILE_INCLUDE_FORMAT` | `PacketFormatter.cs` |
 | M6 | `GeneratePackageOnBuild` 불필요하게 활성화 | `PacketGenerator.csproj` |
 | M7 | `outputDirPath` 파라미터명이 실제로는 파일 경로 | `PacketHandlerGenerator.cs` |
+| M8 | `using JetBrains.Annotations;` 미사용 + NuGet 패키지 미사용 | `PacketConfig.cs`, `PacketGenerator.csproj` |
+| M9 | `ProduceReferenceAssembly` 불필요 (단독 콘솔 앱) | `PacketGenerator.csproj` |
+| M10 | `RECEIVE_HANDLE_DECLARE_FORMAT`, `SEND_MAKE_SEND_BUFFER_FORMAT` 줄바꿈 혼용 | `PacketFormatter.cs` |
 
 ### Low (5건)
 
@@ -61,28 +64,64 @@ PacketGenerator는 protobuf descriptor 파일(.desc)을 읽어 C++ 패킷 핸들
 
 ### 1단계: 데드 코드 정리 (위험도: 없음)
 
-**대상 이슈:** M3, M4, M5, M6, L2
+**대상 이슈:** M3, M4, M5, M6, M8, M9, L2
 
 | 파일 | 변경 |
 |---|---|
-| `PacketConfig.cs` | `using System;`, `System.Collections`, `System.Collections.Generic`, `System.Text` 제거 |
+| `PacketConfig.cs` | `using System;`, `System.Collections`, `System.Collections.Generic`, `System.Text`, `using JetBrains.Annotations;` 제거 |
 | `PacketHandlerGenerator.cs` | `using System.Data;` 제거 |
 | `PacketFormatter.cs` | `PROTO_FILE_INCLUDE_FORMAT` 상수 삭제 |
-| `PacketGenerator.csproj` | `<GeneratePackageOnBuild>true</GeneratePackageOnBuild>` 삭제 |
+| `PacketGenerator.csproj` | `<GeneratePackageOnBuild>true</GeneratePackageOnBuild>` 삭제, `<ProduceReferenceAssembly>true</ProduceReferenceAssembly>` 삭제, `<PackageReference Include="JetBrains.Annotations" .../>` 삭제 |
 | `PacketHandlerGenerator.cs` | line 58 `;;` → `;` |
 
 ### 2단계: 명명/스타일 통일 (위험도: 매우 낮음)
 
-**대상 이슈:** L1, M7, L3, L4
+**대상 이슈:** L1, M7, L3, L4, M10
 
 | 파일 | 변경 |
 |---|---|
 | `PacketHandlerGenerator.cs` | `getEnumDescriptorProto` → `GetEnumDescriptorProto` |
 | `PacketHandlerGenerator.cs` | `GenerateSharedEnum` 파라미터명 `outputDirPath` → `outputFilePath` |
 | `PacketConfig.cs` | `public static mOptions` → `private static readonly JsonSerializerOptions s_jsonOptions` |
-| `PacketFormatter.cs` | `RECEIVE_HANDLE_DECLARE_FORMAT`, `SEND_MAKE_SEND_BUFFER_FORMAT`의 `\r\n` → verbatim string 통일 |
-| `PacketFormatter.cs` | `SEND_MAKE_SEND_BUFFER_FORMAT`: `packet_id::{1}` → `packet_id::e{0}PacketId::{1}` |
-| `PacketHandlerGenerator.cs` | `Generator`에서 `SEND_MAKE_SEND_BUFFER_FORMAT` 호출 시 `handler.ProtoFileName` 전달 |
+| `PacketFormatter.cs` | `RECEIVE_HANDLE_DECLARE_FORMAT`, `SEND_MAKE_SEND_BUFFER_FORMAT`를 verbatim string(`@""`)으로 통일. 하드코딩 `\r\n` 제거, `NormalizeToCrlf`에 위임 |
+| `PacketFormatter.cs` | `SEND_MAKE_SEND_BUFFER_FORMAT`에 3번째 placeholder `{2}` 추가하여 enum 스코프 통일 |
+| `PacketHandlerGenerator.cs` | `Generator`에서 `SEND_MAKE_SEND_BUFFER_FORMAT` 호출 시 3개 인자 전달 |
+
+**L4 수정 상세 — `SEND_MAKE_SEND_BUFFER_FORMAT` 포맷 스트링 변경:**
+
+Before:
+```csharp
+public static readonly string SEND_MAKE_SEND_BUFFER_FORMAT =
+    "static NetSendBufferRef MakeSendBuffer(const Protocol::{0}& packet) {{ return MakeSendBuffer(packet, packet_id::{1}); }}\r\n\t";
+```
+
+After:
+```csharp
+public static readonly string SEND_MAKE_SEND_BUFFER_FORMAT =
+    @"static NetSendBufferRef MakeSendBuffer(const Protocol::{0}& packet) {{ return MakeSendBuffer(packet, packet_id::e{2}PacketId::{1}); }}
+	";
+```
+
+- `{0}` = `packet.MessageName` (Protocol 타입명, 기존과 동일)
+- `{1}` = `packet.MessageName` (enum 값 이름, 기존과 동일)
+- `{2}` = `handler.ProtoFileName` (enum 스코프명, 신규)
+
+호출부 변경:
+```csharp
+// Before:
+makeSendBufferBuilder.AppendFormat(PacketFormatter.SEND_MAKE_SEND_BUFFER_FORMAT,
+    packet.MessageName, packet.MessageName);
+
+// After:
+makeSendBufferBuilder.AppendFormat(PacketFormatter.SEND_MAKE_SEND_BUFFER_FORMAT,
+    packet.MessageName, packet.MessageName, handler.ProtoFileName);
+```
+
+생성 결과 예시 (EchoClient):
+```cpp
+// Before: packet_id::C2S_ECHO_REQ (비한정 — unscoped enum이므로 동작은 함)
+// After:  packet_id::eEchoPacketId::C2S_ECHO_REQ (receive 경로와 일관)
+```
 
 ### 3단계: 중복 제거 + 에러 핸들링 (위험도: 낮음)
 
@@ -91,9 +130,9 @@ PacketGenerator는 protobuf descriptor 파일(.desc)을 읽어 C++ 패킷 핸들
 | 파일 | 변경 |
 |---|---|
 | `PacketFormatter.cs` | 3개 템플릿(`ENUM_PACKET_ID_FORMAT`, `HANDLE_SERVICE_TYPE_FILE_FORMAT`, `HANDLE_FILE_FORMAT`)의 인라인 배너 → `AUTO_GENERATED_WARNING`를 합성하는 방식으로 교체 |
-| `PacketConfig.cs` | 내부 try-catch 전부 제거. `File.Exists` 체크 제거. 파싱 실패 시 예외 그대로 throw |
+| `PacketConfig.cs` | 내부 try-catch 전부 제거. `File.Exists` 체크 제거. 파싱 실패 시 예외 그대로 throw. 빈 경로/null 입력 시 `ArgumentException`이 자연 발생하며, `Program.cs`의 generic `Exception` catch에서 처리됨 |
 | `Program.cs` | 기존 catch 블록이 유일한 에러 처리 지점. `resultConfig.Projects.Count == 0` 경고 추가 |
-| `PacketGenerator.bat` | 마지막 3줄(PacketId.h xcopy) 제거 |
+| `PacketGenerator.bat` | line 53~58 (PacketId.h xcopy 관련 6줄) 제거 |
 
 ### 4단계: 구조 분리 (위험도: 중간)
 
@@ -132,9 +171,46 @@ Shared/Tools/PacketGenerator/
 
 ## 검증 방법
 
-각 단계마다:
+### 사전 준비 (1단계 시작 전)
+
+생성된 C++ 파일의 스냅샷을 저장하여 회귀 비교 기준으로 사용:
+
+```powershell
+# 생성 파일 스냅샷 저장
+$dirs = @(
+    "DH1_Engine\EchoClient\PacketHandler",
+    "DH1_Engine\EchoServer\PacketHandler",
+    "DH1_Client\Source\DH1_Client\Network\PacketHandler",
+    "DH1_Server\GatewayServer\PacketHandler",
+    "DH1_Server\WorldServer\PacketHandler",
+    "DH1_Server\RealmServer\PacketHandler",
+    "Shared\Protocol\PacketId"
+)
+New-Item -ItemType Directory -Force -Path ".snapshot"
+foreach ($d in $dirs) {
+    $dest = ".snapshot\$($d -replace '\\','_')"
+    Copy-Item -Path $d -Destination $dest -Recurse -Force
+}
+```
+
+### 각 단계마다
+
 1. `dotnet build Shared/Tools/PacketGenerator/PacketGenerator.csproj -c Release` 성공 확인
-2. 4단계 완료 후: `PacketGenerator.bat` 실행하여 생성된 C++ 파일을 이전 출력과 diff 비교 (2단계 L4 수정에 의한 `MakeSendBuffer` 스코프 변경 제외)
+
+### 4단계 완료 후
+
+2. `Shared\BuildScripts\PacketGenerator.bat` 실행
+3. 생성 결과를 스냅샷과 비교:
+
+```powershell
+# 2단계 L4 수정에 의한 MakeSendBuffer 스코프 변경만 diff에 나타나야 함
+foreach ($d in $dirs) {
+    $snap = ".snapshot\$($d -replace '\\','_')"
+    git diff --no-index -- $snap $d
+}
+```
+
+예상 diff: `MakeSendBuffer` 호출부에서 `packet_id::MessageName` → `packet_id::eXxxPacketId::MessageName` 변경만 나타남. 그 외 차이가 있으면 회귀.
 
 ## 비범위 (Out of Scope)
 
