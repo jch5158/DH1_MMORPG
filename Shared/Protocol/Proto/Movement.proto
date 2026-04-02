@@ -149,3 +149,20 @@ message S2C_CREATE_CHARACTER_RES
     eCreateCharacterResult result = 1;
     string message = 2;
 }
+
+// Client -> Gateway -> World: 점프 시작 알림
+message C2S_JUMP_NOT
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+}
+
+// Gateway -> Client: 다른 엔티티 점프 알림
+message S2C_JUMP_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    uint64 entityId = 1;
+}

@@ -48,6 +48,17 @@ struct S2C_LOGIN_RESDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S2C_LOGIN_RESDefaultTypeInternal _S2C_LOGIN_RES_default_instance_;
+PROTOBUF_CONSTEXPR C2S_LOGOUT_NOT::C2S_LOGOUT_NOT(
+    ::_pbi::ConstantInitialized) {}
+struct C2S_LOGOUT_NOTDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR C2S_LOGOUT_NOTDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~C2S_LOGOUT_NOTDefaultTypeInternal() {}
+  union {
+    C2S_LOGOUT_NOT _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 C2S_LOGOUT_NOTDefaultTypeInternal _C2S_LOGOUT_NOT_default_instance_;
 PROTOBUF_CONSTEXPR S2C_KICK_NOT::S2C_KICK_NOT(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.reason_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -62,7 +73,7 @@ struct S2C_KICK_NOTDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S2C_KICK_NOTDefaultTypeInternal _S2C_KICK_NOT_default_instance_;
 }  // namespace Protocol
-static ::_pb::Metadata file_level_metadata_Login_2eproto[3];
+static ::_pb::Metadata file_level_metadata_Login_2eproto[4];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_Login_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Login_2eproto = nullptr;
 
@@ -83,6 +94,12 @@ const uint32_t TableStruct_Login_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(pr
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2C_LOGIN_RES, _impl_.result_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C2S_LOGOUT_NOT, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2C_KICK_NOT, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -93,12 +110,14 @@ const uint32_t TableStruct_Login_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(pr
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::C2S_LOGIN_REQ)},
   { 8, -1, -1, sizeof(::Protocol::S2C_LOGIN_RES)},
-  { 15, -1, -1, sizeof(::Protocol::S2C_KICK_NOT)},
+  { 15, -1, -1, sizeof(::Protocol::C2S_LOGOUT_NOT)},
+  { 21, -1, -1, sizeof(::Protocol::S2C_KICK_NOT)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
   &::Protocol::_C2S_LOGIN_REQ_default_instance_._instance,
   &::Protocol::_S2C_LOGIN_RES_default_instance_._instance,
+  &::Protocol::_C2S_LOGOUT_NOT_default_instance_._instance,
   &::Protocol::_S2C_KICK_NOT_default_instance_._instance,
 };
 
@@ -107,9 +126,10 @@ const char descriptor_table_protodef_Login_2eproto[] PROTOBUF_SECTION_VARIABLE(p
   "ketOption.proto\"<\n\rC2S_LOGIN_REQ\022\021\n\tacco"
   "untId\030\001 \001(\004\022\016\n\006ticket\030\002 \001(\t:\010\240\265\030\001\250\265\030\004\"A\n"
   "\rS2C_LOGIN_RES\022&\n\006result\030\001 \001(\0162\026.Protoco"
-  "l.eLoginResult:\010\240\265\030\004\250\265\030\001\"(\n\014S2C_KICK_NOT"
-  "\022\016\n\006reason\030\001 \001(\t:\010\240\265\030\004\250\265\030\001B\032\210\265\030\002\222\265\030\022Logi"
-  "nPacketHandlerb\006proto3"
+  "l.eLoginResult:\010\240\265\030\004\250\265\030\001\"\032\n\016C2S_LOGOUT_N"
+  "OT:\010\240\265\030\001\250\265\030\004\"(\n\014S2C_KICK_NOT\022\016\n\006reason\030\001"
+  " \001(\t:\010\240\265\030\004\250\265\030\001B\032\210\265\030\002\222\265\030\022LoginPacketHandl"
+  "erb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -117,9 +137,9 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Login_2eproto_deps[
 };
 static ::_pbi::once_flag descriptor_table_Login_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Login_2eproto = {
-    false, false, 262, descriptor_table_protodef_Login_2eproto,
+    false, false, 290, descriptor_table_protodef_Login_2eproto,
     "Login.proto",
-    &descriptor_table_Login_2eproto_once, descriptor_table_Login_2eproto_deps, 2, 3,
+    &descriptor_table_Login_2eproto_once, descriptor_table_Login_2eproto_deps, 2, 4,
     schemas, file_default_instances, TableStruct_Login_2eproto::offsets,
     file_level_metadata_Login_2eproto, file_level_enum_descriptors_Login_2eproto,
     file_level_service_descriptors_Login_2eproto,
@@ -545,6 +565,46 @@ void S2C_LOGIN_RES::InternalSwap(S2C_LOGIN_RES* other) {
 
 // ===================================================================
 
+class C2S_LOGOUT_NOT::_Internal {
+ public:
+};
+
+C2S_LOGOUT_NOT::C2S_LOGOUT_NOT(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
+  // @@protoc_insertion_point(arena_constructor:Protocol.C2S_LOGOUT_NOT)
+}
+C2S_LOGOUT_NOT::C2S_LOGOUT_NOT(const C2S_LOGOUT_NOT& from)
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
+  C2S_LOGOUT_NOT* const _this = this; (void)_this;
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:Protocol.C2S_LOGOUT_NOT)
+}
+
+
+
+
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData C2S_LOGOUT_NOT::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl,
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl,
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*C2S_LOGOUT_NOT::GetClassData() const { return &_class_data_; }
+
+
+
+
+
+
+
+::PROTOBUF_NAMESPACE_ID::Metadata C2S_LOGOUT_NOT::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Login_2eproto_getter, &descriptor_table_Login_2eproto_once,
+      file_level_metadata_Login_2eproto[2]);
+}
+
+// ===================================================================
+
 class S2C_KICK_NOT::_Internal {
  public:
 };
@@ -743,7 +803,7 @@ void S2C_KICK_NOT::InternalSwap(S2C_KICK_NOT* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata S2C_KICK_NOT::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_Login_2eproto_getter, &descriptor_table_Login_2eproto_once,
-      file_level_metadata_Login_2eproto[2]);
+      file_level_metadata_Login_2eproto[3]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -756,6 +816,10 @@ Arena::CreateMaybeMessage< ::Protocol::C2S_LOGIN_REQ >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::Protocol::S2C_LOGIN_RES*
 Arena::CreateMaybeMessage< ::Protocol::S2C_LOGIN_RES >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Protocol::S2C_LOGIN_RES >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::C2S_LOGOUT_NOT*
+Arena::CreateMaybeMessage< ::Protocol::C2S_LOGOUT_NOT >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::C2S_LOGOUT_NOT >(arena);
 }
 template<> PROTOBUF_NOINLINE ::Protocol::S2C_KICK_NOT*
 Arena::CreateMaybeMessage< ::Protocol::S2C_KICK_NOT >(Arena* arena) {

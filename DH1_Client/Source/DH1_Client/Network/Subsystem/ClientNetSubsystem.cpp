@@ -33,6 +33,7 @@
 #include "Network/Dh1StringConv.h"
 #include "Network/PacketHandler/ChatPacketHandler.h"
 #include "Network/PacketHandler/HeartbeatPacketHandler.h"
+#include "Network/PacketHandler/LoginPacketHandler.h"
 #include "Network/PacketHandler/MovementPacketHandler.h"
 #include "Network/PacketHandler/PacketServiceTypeHandler.h"
 #include "Network/PacketHandler/RealmPacketHandler.h"
@@ -577,7 +578,26 @@ bool UClientNetSubsystem::ConnectToServer(const FString& IPAddress, int32 Port)
 void UClientNetSubsystem::Disconnect()
 {
 	StopHeartbeatTimer();
+
+	if (ServiceRef)
+	{
+		const auto pSession = ServiceRef->GetFirstSessionRef();
+		if (pSession != nullptr && pSession->IsConnected())
+		{
+			Protocol::C2S_LOGOUT_NOT LogoutPacket;
+			pSession->Send(LoginPacketHandler::MakeSendBuffer(LogoutPacket));
+		}
+	}
+
+	UnregisterChatUi();
 	ClearNetworkSpawnedEntities();
+	RemoveEnterWorldLoadingFromViewport();
+	bClientWorldChatAllowed = false;
+	bCharacterCreatePending = false;
+	MarkSessionLocalDisconnect();
+
+	ServiceRef.reset();
+	ServiceRef = cpp_net_engine::MakeShared<ClientService>(eServiceType::Client);
 }
 
 void UClientNetSubsystem::StartHeartbeatTimer()
@@ -1244,6 +1264,8 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 			Mv->SetMovementMode(EMovementMode::MOVE_Walking);
 			Mv->bOrientRotationToMovement = false;
 			Mv->MaxWalkSpeed = 600.f;
+			Mv->JumpZVelocity = 500.f;
+			Mv->AirControl = 0.3f;
 		}
 
 		{
@@ -1306,6 +1328,32 @@ void UClientNetSubsystem::ClearNetworkSpawnedEntities()
 	}
 	NetworkEntityActors.Empty();
 	NetworkEntityMoveStates.Empty();
+}
+
+void UClientNetSubsystem::SendJumpNotify()
+{
+	if (!ServiceRef) return;
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr) return;
+
+	Protocol::C2S_JUMP_NOT Packet;
+	pSession->Send(MovementPacketHandler::MakeSendBuffer(Packet));
+}
+
+void UClientNetSubsystem::ApplyRemoteJump(uint64 EntityId)
+{
+	const TWeakObjectPtr<AActor>* Found = NetworkEntityActors.Find(EntityId);
+	if (Found == nullptr || !Found->IsValid())
+	{
+		return;
+	}
+
+	ACharacter* ProxyChar = Cast<ACharacter>(Found->Get());
+	if (ProxyChar != nullptr)
+	{
+		ProxyChar->Jump();
+	}
 }
 
 void UClientNetSubsystem::HandleChatTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)

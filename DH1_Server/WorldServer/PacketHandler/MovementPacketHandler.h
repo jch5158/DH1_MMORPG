@@ -52,6 +52,10 @@ public:
 		{
 			return HandlePacket<Protocol::C2S_CREATE_CHARACTER_REQ>(size, pBuffer, pSession, HANDLE_C2S_CREATE_CHARACTER_REQ);
 		};
+		sPacketHandleMap[packet_id::eMovementPacketId::C2S_JUMP_NOT] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return HandlePacket<Protocol::C2S_JUMP_NOT>(size, pBuffer, pSession, HANDLE_C2S_JUMP_NOT);
+		};
 
 	}
 
@@ -77,6 +81,7 @@ public:
 	static bool HANDLE_C2S_SPAWN_POSITION_REQ(const Protocol::C2S_SPAWN_POSITION_REQ& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_MOVE_TO_POSITION_REQ(const Protocol::C2S_MOVE_TO_POSITION_REQ& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_CREATE_CHARACTER_REQ& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_C2S_JUMP_NOT(const Protocol::C2S_JUMP_NOT& packet, const PacketSessionRef& pSession);
 	
 
 	

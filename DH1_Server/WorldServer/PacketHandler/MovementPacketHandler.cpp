@@ -372,8 +372,65 @@ bool MovementPacketHandler::HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_
 			spawnRelay.set_payload(spawnInnerBuf->GetReadPtr(), spawnInnerBuf->GetUseSize());
 			pSession->Send(GameSessionPacketHandler::MakeSendBuffer(spawnRelay));
 
-			NET_ENGINE_LOG_INFO("MovementPacketHandler - Spawn position sent after character creation, accountId: {}", accountId);
-		});
+		NET_ENGINE_LOG_INFO("MovementPacketHandler - Spawn position sent after character creation, accountId: {}", accountId);
+	});
+
+	return true;
+}
+
+bool MovementPacketHandler::HANDLE_C2S_JUMP_NOT(const Protocol::C2S_JUMP_NOT& packet, const PacketSessionRef& pSession)
+{
+	const uint64 accountId = RelayContext::GetAccountId();
+	if (accountId == 0)
+	{
+		return false;
+	}
+
+	auto& worldService = ISingleton<WorldService>::GetInstance();
+	const auto pGridManager = worldService.GetGridManagerRef();
+	if (pGridManager == nullptr)
+	{
+		return false;
+	}
+
+	const auto pObject = pGridManager->GetObjectByAccountId(accountId);
+	if (pObject == nullptr)
+	{
+		return false;
+	}
+
+	const auto pPlayer = std::static_pointer_cast<PlayerObject>(pObject);
+
+	Protocol::S2C_JUMP_NOT jumpNot;
+	jumpNot.set_entityid(pPlayer->GetId());
+	auto innerBuf = MakeMovementSendBuffer(jumpNot, packet_id::S2C_JUMP_NOT);
+
+	const int32 cellX = pGridManager->ComputeCellX(pPlayer->GetPositionX());
+	const int32 cellY = pGridManager->ComputeCellY(pPlayer->GetPositionY());
+	const auto nearbyObjects = pGridManager->GetObjectsInRange(cellX, cellY);
+
+	const auto pGameTickProcessor = worldService.GetGameTickProcessorRef();
+	if (pGameTickProcessor == nullptr)
+	{
+		return false;
+	}
+
+	for (const auto& pNearby : nearbyObjects)
+	{
+		if (pNearby == nullptr || pNearby->GetObjectType() != eGameObjectType::Player)
+		{
+			continue;
+		}
+		const auto pNearbyPlayer = std::static_pointer_cast<PlayerObject>(pNearby);
+		if (pNearbyPlayer->GetAccountId() == accountId)
+		{
+			continue;
+		}
+		pGameTickProcessor->RelayChatToGatewayClient(
+			pNearbyPlayer->GetGatewaySessionId(),
+			pNearbyPlayer->GetGatewayServerId(),
+			innerBuf);
+	}
 
 	return true;
 }

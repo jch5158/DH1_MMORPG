@@ -312,3 +312,20 @@ bool MovementPacketHandler::HANDLE_S2C_CREATE_CHARACTER_RES(const Protocol::S2C_
 
 	return true;
 }
+
+bool MovementPacketHandler::HANDLE_S2C_JUMP_NOT(const Protocol::S2C_JUMP_NOT& packet, const PacketSessionRef& pSession)
+{
+	const uint64 EntityId = packet.entityid();
+
+	AsyncTask(ENamedThreads::GameThread, [EntityId]()
+		{
+			if (GEngine == nullptr) { return; }
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[EntityId](UClientNetSubsystem* Net)
+				{
+					Net->ApplyRemoteJump(EntityId);
+				});
+		});
+
+	return true;
+}

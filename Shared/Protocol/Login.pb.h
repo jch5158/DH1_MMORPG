@@ -23,6 +23,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
+#include <google/protobuf/generated_message_bases.h>
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata_lite.h>
 #include <google/protobuf/generated_message_reflection.h>
@@ -50,6 +51,9 @@ namespace Protocol {
 class C2S_LOGIN_REQ;
 struct C2S_LOGIN_REQDefaultTypeInternal;
 extern C2S_LOGIN_REQDefaultTypeInternal _C2S_LOGIN_REQ_default_instance_;
+class C2S_LOGOUT_NOT;
+struct C2S_LOGOUT_NOTDefaultTypeInternal;
+extern C2S_LOGOUT_NOTDefaultTypeInternal _C2S_LOGOUT_NOT_default_instance_;
 class S2C_KICK_NOT;
 struct S2C_KICK_NOTDefaultTypeInternal;
 extern S2C_KICK_NOTDefaultTypeInternal _S2C_KICK_NOT_default_instance_;
@@ -59,6 +63,7 @@ extern S2C_LOGIN_RESDefaultTypeInternal _S2C_LOGIN_RES_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
 template<> ::Protocol::C2S_LOGIN_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_LOGIN_REQ>(Arena*);
+template<> ::Protocol::C2S_LOGOUT_NOT* Arena::CreateMaybeMessage<::Protocol::C2S_LOGOUT_NOT>(Arena*);
 template<> ::Protocol::S2C_KICK_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_KICK_NOT>(Arena*);
 template<> ::Protocol::S2C_LOGIN_RES* Arena::CreateMaybeMessage<::Protocol::S2C_LOGIN_RES>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -378,6 +383,124 @@ class S2C_LOGIN_RES final :
 };
 // -------------------------------------------------------------------
 
+class C2S_LOGOUT_NOT final :
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:Protocol.C2S_LOGOUT_NOT) */ {
+ public:
+  inline C2S_LOGOUT_NOT() : C2S_LOGOUT_NOT(nullptr) {}
+  explicit PROTOBUF_CONSTEXPR C2S_LOGOUT_NOT(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C2S_LOGOUT_NOT(const C2S_LOGOUT_NOT& from);
+  C2S_LOGOUT_NOT(C2S_LOGOUT_NOT&& from) noexcept
+    : C2S_LOGOUT_NOT() {
+    *this = ::std::move(from);
+  }
+
+  inline C2S_LOGOUT_NOT& operator=(const C2S_LOGOUT_NOT& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C2S_LOGOUT_NOT& operator=(C2S_LOGOUT_NOT&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C2S_LOGOUT_NOT& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C2S_LOGOUT_NOT* internal_default_instance() {
+    return reinterpret_cast<const C2S_LOGOUT_NOT*>(
+               &_C2S_LOGOUT_NOT_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(C2S_LOGOUT_NOT& a, C2S_LOGOUT_NOT& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C2S_LOGOUT_NOT* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C2S_LOGOUT_NOT* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C2S_LOGOUT_NOT* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C2S_LOGOUT_NOT>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
+  inline void CopyFrom(const C2S_LOGOUT_NOT& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl(*this, from);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeFrom;
+  void MergeFrom(const C2S_LOGOUT_NOT& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(*this, from);
+  }
+  public:
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C2S_LOGOUT_NOT";
+  }
+  protected:
+  explicit C2S_LOGOUT_NOT(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:Protocol.C2S_LOGOUT_NOT)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+  };
+  friend struct ::TableStruct_Login_2eproto;
+};
+// -------------------------------------------------------------------
+
 class S2C_KICK_NOT final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S2C_KICK_NOT) */ {
  public:
@@ -426,7 +549,7 @@ class S2C_KICK_NOT final :
                &_S2C_KICK_NOT_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(S2C_KICK_NOT& a, S2C_KICK_NOT& b) {
     a.Swap(&b);
@@ -636,6 +759,10 @@ inline void S2C_LOGIN_RES::set_result(::Protocol::eLoginResult value) {
 
 // -------------------------------------------------------------------
 
+// C2S_LOGOUT_NOT
+
+// -------------------------------------------------------------------
+
 // S2C_KICK_NOT
 
 // string reason = 1;
@@ -691,6 +818,8 @@ inline void S2C_KICK_NOT::set_allocated_reason(std::string* reason) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

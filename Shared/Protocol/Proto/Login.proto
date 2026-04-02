@@ -24,6 +24,12 @@ message S2C_LOGIN_RES
     eLoginResult result = 1;
 }
 
+message C2S_LOGOUT_NOT
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+}
+
 message S2C_KICK_NOT
 {
     option (sender) = GATEWAY_SERVER;

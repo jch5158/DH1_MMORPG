@@ -36,9 +36,13 @@
 #include "UI/UMG/ChatPanelWidget.h"
 #include "UI/AuthWidgetStyle.h"
 #include "UI/SCharacterCreatePanel.h"
+#include "Kismet/GameplayStatics.h"
 #include "Widgets/Images/SImage.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SOverlay.h"
+#include "Widgets/Text/STextBlock.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacterMove, Log, All);
 
@@ -54,6 +58,8 @@ ADH1_ClientCharacter::ADH1_ClientCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = false;
 	GetCharacterMovement()->bSnapToPlaneAtStart = false;
+	GetCharacterMovement()->JumpZVelocity = 500.f;
+	GetCharacterMovement()->AirControl = 0.3f;
 
 	// 마네킹 스켈레탈 메쉬
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannequinMesh(
@@ -109,17 +115,25 @@ void ADH1_ClientCharacter::CreateInputAssets()
 	ZoomAction = NewObject<UInputAction>(this, TEXT("IA_Zoom"));
 	ZoomAction->ValueType = EInputActionValueType::Axis1D;
 
+	JumpAction = NewObject<UInputAction>(this, TEXT("IA_Jump"));
+	JumpAction->ValueType = EInputActionValueType::Boolean;
+
 	ChatFocusAction = NewObject<UInputAction>(this, TEXT("IA_ChatFocus"));
 	ChatFocusAction->ValueType = EInputActionValueType::Boolean;
 
 	ChatChannelCycleAction = NewObject<UInputAction>(this, TEXT("IA_ChatChannelCycle"));
 	ChatChannelCycleAction->ValueType = EInputActionValueType::Boolean;
 
+	EscapeAction = NewObject<UInputAction>(this, TEXT("IA_Escape"));
+	EscapeAction->ValueType = EInputActionValueType::Boolean;
+
 	DefaultMappingContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Default"));
 	DefaultMappingContext->MapKey(ClickMoveAction, EKeys::RightMouseButton);
 	DefaultMappingContext->MapKey(ZoomAction, EKeys::MouseWheelAxis);
+	DefaultMappingContext->MapKey(JumpAction, EKeys::SpaceBar);
 	DefaultMappingContext->MapKey(ChatFocusAction, EKeys::Enter);
 	DefaultMappingContext->MapKey(ChatChannelCycleAction, EKeys::Tab);
+	DefaultMappingContext->MapKey(EscapeAction, EKeys::Escape);
 }
 
 void ADH1_ClientCharacter::BeginPlay()
@@ -202,6 +216,12 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 			EnhancedInput->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADH1_ClientCharacter::OnZoom);
 		}
 
+		if (JumpAction)
+		{
+			EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnJumpStarted);
+			EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ADH1_ClientCharacter::OnJumpStopped);
+		}
+
 		if (ChatFocusAction)
 		{
 			EnhancedInput->BindAction(ChatFocusAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatFocusPressed);
@@ -210,6 +230,11 @@ void ADH1_ClientCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		if (ChatChannelCycleAction)
 		{
 			EnhancedInput->BindAction(ChatChannelCycleAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnChatChannelCycle);
+		}
+
+		if (EscapeAction)
+		{
+			EnhancedInput->BindAction(EscapeAction, ETriggerEvent::Started, this, &ADH1_ClientCharacter::OnEscapePressed);
 		}
 	}
 }
@@ -278,6 +303,24 @@ void ADH1_ClientCharacter::OnZoom(const FInputActionValue& Value)
 {
 	const float Axis = Value.Get<float>();
 	TargetArmLength = FMath::Clamp(TargetArmLength - Axis * ZoomStep, MinArmLength, MaxArmLength);
+}
+
+void ADH1_ClientCharacter::OnJumpStarted()
+{
+	Jump();
+
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UClientNetSubsystem* Net = GI->GetSubsystem<UClientNetSubsystem>())
+		{
+			Net->SendJumpNotify();
+		}
+	}
+}
+
+void ADH1_ClientCharacter::OnJumpStopped()
+{
+	StopJumping();
 }
 
 void ADH1_ClientCharacter::OnClickMove()
@@ -461,6 +504,155 @@ void ADH1_ClientCharacter::OnChatChannelCycle()
 	{
 		NetSub->CycleChatChannel();
 	}
+}
+
+void ADH1_ClientCharacter::OnEscapePressed()
+{
+	if (bEscapeMenuVisible)
+	{
+		HideEscapeMenu();
+	}
+	else
+	{
+		ShowEscapeMenu();
+	}
+}
+
+void ADH1_ClientCharacter::ShowEscapeMenu()
+{
+	if (bEscapeMenuVisible) return;
+	if (GEngine == nullptr || GEngine->GameViewport == nullptr) return;
+
+	bEscapeMenuVisible = true;
+
+	const FSlateFontInfo TitleFont = FCoreStyle::GetDefaultFontStyle("Bold", 20);
+	const FSlateFontInfo ButtonFont = FCoreStyle::GetDefaultFontStyle("Regular", 16);
+
+	TSharedRef<SWidget> ConfirmBtn = SNew(SBox)
+		.WidthOverride(200.f)
+		.HeightOverride(48.f)
+		[
+			SNew(SButton)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			.OnClicked_Lambda([this]() -> FReply
+			{
+				ConfirmReturnToLogin();
+				return FReply::Handled();
+			})
+			[
+				SNew(STextBlock)
+				.Text(NSLOCTEXT("DH1", "EscMenuConfirm", "확인"))
+				.Font(ButtonFont)
+				.ColorAndOpacity(FSlateColor(FLinearColor::White))
+				.Justification(ETextJustify::Center)
+			]
+		];
+
+	TSharedRef<SWidget> CancelBtn = SNew(SBox)
+		.WidthOverride(200.f)
+		.HeightOverride(48.f)
+		[
+			SNew(SButton)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			.OnClicked_Lambda([this]() -> FReply
+			{
+				HideEscapeMenu();
+				return FReply::Handled();
+			})
+			[
+				SNew(STextBlock)
+				.Text(NSLOCTEXT("DH1", "EscMenuCancel", "취소"))
+				.Font(ButtonFont)
+				.ColorAndOpacity(FSlateColor(FLinearColor::White))
+				.Justification(ETextJustify::Center)
+			]
+		];
+
+	TSharedRef<SWidget> ButtonRow = SNew(SHorizontalBox)
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(0.f, 0.f, 12.f, 0.f)
+		[
+			ConfirmBtn
+		]
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(12.f, 0.f, 0.f, 0.f)
+		[
+			CancelBtn
+		];
+
+	TSharedRef<SWidget> DialogBox = SNew(SBorder)
+		.Padding(FMargin(40.f, 30.f))
+		.BorderImage(AuthStyle::FlatBrush())
+		.BorderBackgroundColor(FLinearColor(0.05f, 0.06f, 0.08f, 0.92f))
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.HAlign(HAlign_Center)
+			.Padding(0.f, 0.f, 0.f, 24.f)
+			[
+				SNew(STextBlock)
+				.Text(NSLOCTEXT("DH1", "EscMenuTitle", "로그인 화면으로 돌아가시겠습니까?"))
+				.Font(TitleFont)
+				.ColorAndOpacity(FLinearColor(0.95f, 0.95f, 0.97f, 1.f))
+				.Justification(ETextJustify::Center)
+			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.HAlign(HAlign_Center)
+			[
+				ButtonRow
+			]
+		];
+
+	TSharedRef<SWidget> Overlay = SNew(SOverlay)
+		+ SOverlay::Slot()
+		[
+			SNew(SBorder)
+			.Padding(FMargin(0))
+			.BorderImage(AuthStyle::FlatBrush())
+			.BorderBackgroundColor(FLinearColor(0.01f, 0.02f, 0.04f, 0.75f))
+			[
+				SNew(SBox)
+			]
+		]
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		[
+			DialogBox
+		];
+
+	EscapeMenuOverlayRef = Overlay;
+	GEngine->GameViewport->AddViewportWidgetContent(Overlay, 100);
+}
+
+void ADH1_ClientCharacter::HideEscapeMenu()
+{
+	if (!bEscapeMenuVisible) return;
+	bEscapeMenuVisible = false;
+
+	if (EscapeMenuOverlayRef.IsValid() && GEngine != nullptr && GEngine->GameViewport != nullptr)
+	{
+		GEngine->GameViewport->RemoveViewportWidgetContent(EscapeMenuOverlayRef.ToSharedRef());
+	}
+	EscapeMenuOverlayRef.Reset();
+}
+
+void ADH1_ClientCharacter::ConfirmReturnToLogin()
+{
+	HideEscapeMenu();
+
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->Disconnect();
+	}
+
+	UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Levels/L_Login")));
 }
 
 UClientNetSubsystem* ADH1_ClientCharacter::GetNetSubsystem() const
@@ -673,6 +865,7 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 
 void ADH1_ClientCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	HideEscapeMenu();
 	HideCharacterCreatePanel();
 
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())

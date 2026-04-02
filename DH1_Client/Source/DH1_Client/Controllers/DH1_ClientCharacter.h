@@ -70,8 +70,15 @@ private:
 	void CreateInputAssets();
 	void OnClickMove();
 	void OnZoom(const FInputActionValue& Value);
+	void OnJumpStarted();
+	void OnJumpStopped();
 	void OnChatFocusPressed();
 	void OnChatChannelCycle();
+	void OnEscapePressed();
+
+	void ShowEscapeMenu();
+	void HideEscapeMenu();
+	void ConfirmReturnToLogin();
 
 	UClientNetSubsystem* GetNetSubsystem() const;
 
@@ -115,10 +122,19 @@ private:
 	TObjectPtr<UInputAction> ZoomAction;
 
 	UPROPERTY()
+	TObjectPtr<UInputAction> JumpAction;
+
+	UPROPERTY()
 	TObjectPtr<UInputAction> ChatFocusAction;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> ChatChannelCycleAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> EscapeAction;
+
+	TSharedPtr<SWidget> EscapeMenuOverlayRef;
+	bool bEscapeMenuVisible = false;
 
 	// 좌클릭 이동
 	FVector ClickMoveTarget = FVector::ZeroVector;

@@ -174,6 +174,9 @@ public:
     void ApplyNetworkEntitiesLeft(const TArray<uint64>& EntityIds);
     void ClearNetworkSpawnedEntities();
 
+    void SendJumpNotify();
+    void ApplyRemoteJump(uint64 EntityId);
+
     // 델리게이트
     FOnGatewayLoginResultDelegate OnGatewayLoginResult;
     FOnHttpLoginErrorDelegate OnHttpLoginError;

@@ -193,9 +193,72 @@ bool LoginPacketHandler::HANDLE_C2S_LOGIN_REQ(const Protocol::C2S_LOGIN_REQ& pac
 					});
 			}
 
-			NET_ENGINE_LOG_INFO("LoginPacketHandler - Login success, accountId: {}", argAccountId);
-			sendResponse(Protocol::eLoginResult::LOGIN_SUCCESS);
-		});
+	NET_ENGINE_LOG_INFO("LoginPacketHandler - Login success, accountId: {}", argAccountId);
+		sendResponse(Protocol::eLoginResult::LOGIN_SUCCESS);
+	});
+
+	return true;
+}
+
+bool LoginPacketHandler::HANDLE_C2S_LOGOUT_NOT(const Protocol::C2S_LOGOUT_NOT& packet, const PacketSessionRef& pSession)
+{
+	const auto pClientSession = std::static_pointer_cast<ClientSession>(pSession);
+	const uint64 accountId = pClientSession->GetAccountId();
+
+	NET_ENGINE_LOG_INFO("LoginPacketHandler::HANDLE_C2S_LOGOUT_NOT - accountId: {}", accountId);
+
+	if (accountId == 0)
+	{
+		return true;
+	}
+
+	if (pClientSession->IsInWorld())
+	{
+		const auto pWorldClientService = ISingleton<GatewayService>::GetInstance().GetWorldClientServiceRef();
+		if (pWorldClientService != nullptr)
+		{
+			const auto pWorldSession = pWorldClientService->GetFirstSessionRef();
+			if (pWorldSession != nullptr)
+			{
+				Protocol::S2S_GAME_SESSION_LEAVE_NOT leavePacket;
+				leavePacket.set_accountid(accountId);
+				leavePacket.set_gatewaysessionid(pClientSession->GetSessionId());
+
+				pWorldSession->Send(GameSessionPacketHandler::MakeSendBuffer(leavePacket));
+
+				NET_ENGINE_LOG_INFO("LoginPacketHandler::HANDLE_C2S_LOGOUT_NOT - LEAVE_NOT sent, accountId: {}", accountId);
+			}
+		}
+
+		pClientSession->SetWorldServerId(0);
+	}
+
+	const auto pManager = ISingleton<GatewayService>::GetInstance().GetClientSessionManagerRef();
+	if (pManager != nullptr)
+	{
+		(void)pManager->RemoveClientSession(accountId);
+	}
+
+	auto& gw = ISingleton<GatewayService>::GetInstance();
+	if (const auto pAccountMySql = gw.GetAccountMySqlServiceRef())
+	{
+		pAccountMySql->ReleaseRoutingKey(accountId);
+	}
+
+	const int32 gatewayId = gw.GetGatewayId();
+	if (const auto pRedisService = gw.GetRedisServiceRef())
+	{
+		pRedisService->CheckAndDeleteSessionAsync(accountId, gatewayId, [accountId](const bool isDeleted)
+			{
+				if (isDeleted)
+				{
+					NET_ENGINE_LOG_INFO("LoginPacketHandler::HANDLE_C2S_LOGOUT_NOT - Redis session cleared, accountId: {}", accountId);
+				}
+			});
+	}
+
+	pClientSession->SetDuplicateLoginHandled();
+	pClientSession->Disconnect(eDisconnectReason::Closed);
 
 	return true;
 }

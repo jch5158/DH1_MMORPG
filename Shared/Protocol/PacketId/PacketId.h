@@ -44,7 +44,8 @@ namespace packet_id
 	{
         C2S_LOGIN_REQ = 1,
         S2C_LOGIN_RES = 2,
-        S2C_KICK_NOT = 3,
+        C2S_LOGOUT_NOT = 3,
+        S2C_KICK_NOT = 4,
 	};
 
 
@@ -63,6 +64,8 @@ namespace packet_id
         S2C_CHARACTER_CREATE_NOT = 11,
         C2S_CREATE_CHARACTER_REQ = 12,
         S2C_CREATE_CHARACTER_RES = 13,
+        C2S_JUMP_NOT = 14,
+        S2C_JUMP_NOT = 15,
 	};
 
 

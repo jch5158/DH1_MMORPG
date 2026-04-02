@@ -70,6 +70,7 @@ public:
 	
 
 	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGIN_REQ& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGIN_REQ); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::C2S_LOGOUT_NOT& packet) { return MakeSendBuffer(packet, packet_id::C2S_LOGOUT_NOT); }
 	
 
 private:
