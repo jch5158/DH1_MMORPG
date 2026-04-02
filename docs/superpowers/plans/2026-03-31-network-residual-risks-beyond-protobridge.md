@@ -1,10 +1,8 @@
-# Network / Spawn Crash — Residual Risks (Beyond ProtoBridge) Implementation Plan
-
-> **Note (2026-03):** The separate `ProtoBridge` MSBuild target was removed; the UE client compiles `Shared/Protocol` outputs under `DH1_Client/.../Network/Protocol`. Tasks below that mention `ProtoBridge.vcxproj` are obsolete.
+# Network / Spawn Crash — Residual Risks Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** After ruling out ProtoBridge header/`.pb` skew, systematically eliminate or instrument the **remaining** failure modes for `S2C_SPAWN_POSITION_RES` AV and related net-stack instability (relay, framing, UE threading, diagnostics).
+**Goal:** Systematically eliminate or instrument the **remaining** failure modes for `S2C_SPAWN_POSITION_RES` AV and related net-stack instability (relay, framing, UE threading, diagnostics).
 
 **Architecture:** Treat the client as **IOCP receive → sync protobuf parse → handler**. Failures split into **(A) bad bytes on the wire**, **(B) server/gateway bugs**, **(C) UObject/game-thread misuse on net thread**, **(D) unrelated heap corruption**. This plan sequences cheap code checks before heavy tooling (Page Heap).
 
@@ -23,8 +21,7 @@
 | `DH1_Client/.../Network/CppNetEngine/NetSession.cpp` | `header.size` vs `len`; disconnect on handler failure |
 | `DH1_Client/.../Network/PacketHandler/MovementPacketHandler.cpp` | Spawn handler; `HANDLE_S2C_MOVE_PATH_RES` and others using `GEngine` |
 | `DH1_Client/.../Network/PacketHandler/PacketServiceTypeHandler.h` | Service-type demux; `packetSize` consistency |
-| `DH1_Client/ProtoBridge/ProtoBridge.vcxproj` | Optional: add `Echo.pb.cc` to match `ProtocolWrapper.h` (hygiene only) |
-| `DH1_Client/Source/DH1_Client/Network/ProtocolHeader/ProtocolWrapper.h` | Includes `Echo.pb.h` — align with ProtoBridge or remove include |
+| `DH1_Client/Source/DH1_Client/Network/Protocol/` | UE client compiles `Shared/Protocol` outputs directly (ProtoBridge 제거됨) |
 
 ---
 
@@ -103,23 +100,6 @@
 - [ ] **Step 2:** Reproduce; if fault moves earlier → fix **first** AV site (buffer overrun in CppNetEngine, memcpy, etc.).
 
 - [ ] **Step 3:** Document finding in `docs/` only if team wants runbooks (YAGNI: skip doc unless requested).
-
----
-
-### Task 6: ProtoBridge / Echo hygiene (optional, low priority)
-
-**Files:**
-- Modify: `DH1_Client/ProtoBridge/ProtoBridge.vcxproj`
-- Modify: `DH1_Client/ProtoBridge/ProtoBridge.vcxproj.filters`
-- Regenerate or hand-add: `Echo.pb.cc` / `Echo.pb.h` entries mirroring other protos
-
-- [ ] **Step 1:** Add `..\..\Shared\Protocol\Echo.pb.cc` + `.pb.h` to ProtoBridge (same `PrecompiledHeader` = NotUsing pattern as `Enum.pb.cc`).
-
-- [ ] **Step 2:** Run `BuildAll.bat`; confirm no duplicate symbol errors (Echo must not also compile in another static lib linked to client).
-
-**Expected:** `ProtocolWrapper.h` include of `Echo.pb.h` backed by one `.obj` source of truth.
-
-- [ ] **Step 3:** Commit: `chore(protobridge): compile Echo.pb for wrapper consistency`
 
 ---
 

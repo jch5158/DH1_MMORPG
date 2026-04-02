@@ -1,5 +1,7 @@
 # TF_REUSE_SOCKET 기반 세션 재사용 설계
 
+> **Status (2026-04):** 설계 완료, 구현 미착수. 매칭 Plan 없음 — 구현 시 Plan 문서 작성 필요.
+
 ## Overview
 
 DisconnectEx(TF_REUSE_SOCKET) 완료 후 세션 객체+소켓을 파괴하지 않고, 내부 상태만 리셋하여 재사용 풀에 넣는다. CreateSession() 호출 시 풀에서 먼저 꺼내고, 없으면 새로 생성한다.
