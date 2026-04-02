@@ -82,8 +82,8 @@ if not exist "%UPROJECT%" (
     exit /b 1
 )
 
-set "RESX=1280"
-set "RESY=720"
+set "RESX=1920"
+set "RESY=1080"
 if not "%DH1_CLIENT_RESX%"=="" set "RESX=%DH1_CLIENT_RESX%"
 if not "%DH1_CLIENT_RESY%"=="" set "RESY=%DH1_CLIENT_RESY%"
 
