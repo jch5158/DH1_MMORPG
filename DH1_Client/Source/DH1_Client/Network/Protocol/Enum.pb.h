@@ -218,6 +218,36 @@ inline bool eSessionLeaveReason_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eSessionLeaveReason>(
     eSessionLeaveReason_descriptor(), name, value);
 }
+enum eCreateCharacterResult : int {
+  CREATE_CHARACTER_SUCCESS = 0,
+  CREATE_CHARACTER_FAIL_NAME_TOO_SHORT = 1,
+  CREATE_CHARACTER_FAIL_NAME_TOO_LONG = 2,
+  CREATE_CHARACTER_FAIL_NAME_INVALID = 3,
+  CREATE_CHARACTER_FAIL_NAME_DUPLICATE = 4,
+  CREATE_CHARACTER_FAIL_ALREADY_EXISTS = 5,
+  CREATE_CHARACTER_FAIL_INTERNAL = 6,
+  eCreateCharacterResult_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  eCreateCharacterResult_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool eCreateCharacterResult_IsValid(int value);
+constexpr eCreateCharacterResult eCreateCharacterResult_MIN = CREATE_CHARACTER_SUCCESS;
+constexpr eCreateCharacterResult eCreateCharacterResult_MAX = CREATE_CHARACTER_FAIL_INTERNAL;
+constexpr int eCreateCharacterResult_ARRAYSIZE = eCreateCharacterResult_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eCreateCharacterResult_descriptor();
+template<typename T>
+inline const std::string& eCreateCharacterResult_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, eCreateCharacterResult>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function eCreateCharacterResult_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    eCreateCharacterResult_descriptor(), enum_t_value);
+}
+inline bool eCreateCharacterResult_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, eCreateCharacterResult* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<eCreateCharacterResult>(
+    eCreateCharacterResult_descriptor(), name, value);
+}
 enum eChatChannel : int {
   CHAT_CHANNEL_LOCAL = 0,
   CHAT_CHANNEL_WORLD = 1,
@@ -295,6 +325,11 @@ template <> struct is_proto_enum< ::Protocol::eSessionLeaveReason> : ::std::true
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eSessionLeaveReason>() {
   return ::Protocol::eSessionLeaveReason_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::eCreateCharacterResult> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::eCreateCharacterResult>() {
+  return ::Protocol::eCreateCharacterResult_descriptor();
 }
 template <> struct is_proto_enum< ::Protocol::eChatChannel> : ::std::true_type {};
 template <>

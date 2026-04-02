@@ -60,6 +60,9 @@ namespace packet_id
         C2S_MOVE_TO_POSITION_REQ = 8,
         S2C_MOVE_PATH_RES = 9,
         S2C_POSITION_CORRECTION_NOT = 10,
+        S2C_CHARACTER_CREATE_NOT = 11,
+        C2S_CREATE_CHARACTER_REQ = 12,
+        S2C_CREATE_CHARACTER_RES = 13,
 	};
 
 

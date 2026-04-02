@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UClientNetSubsystem;
 class UWidgetComponent;
 class UCharacterOverheadWidget;
+class SCharacterCreatePanel;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
@@ -82,6 +83,15 @@ private:
 	void OnCharacterOverheadDataFromNet(const FString& Name, int32 Level, float CurrentHP, float MaxHP);
 
 	void CreateAndRegisterChatWidget();
+
+	void OnCharacterCreateRequired();
+	void OnCharacterCreateResult(int32 Result, const FString& Message);
+	void HandleCreateCharacterRequested(const FString& CharacterName);
+	void ShowCharacterCreatePanel();
+	void HideCharacterCreatePanel();
+
+	TSharedPtr<SCharacterCreatePanel> CharacterCreatePanel;
+	TSharedPtr<SWidget> CharacterCreateOverlayRef;
 
 	UPROPERTY()
 	TObjectPtr<UUserWidget> ChatWidgetInstance;

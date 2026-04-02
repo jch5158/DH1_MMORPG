@@ -678,6 +678,48 @@ void UClientNetSubsystem::RequestRealmSelect(const int32 RealmId)
 	pSession->Send(RealmPacketHandler::MakeSendBuffer(packet));
 }
 
+void UClientNetSubsystem::NotifyCharacterCreateRequired()
+{
+	bCharacterCreatePending = true;
+
+	AsyncTask(ENamedThreads::GameThread, [this]()
+		{
+			RemoveEnterWorldLoadingFromViewport();
+
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Character creation required (pending=%s)"),
+				bCharacterCreatePending ? TEXT("true") : TEXT("false"));
+			OnCharacterCreateRequired.Broadcast();
+		});
+}
+
+void UClientNetSubsystem::NotifyCharacterCreateResult(const int32 Result, const FString& Message)
+{
+	AsyncTask(ENamedThreads::GameThread, [this, Result, Message]()
+		{
+			UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] Character create result: %d, msg: %s"), Result, *Message);
+			OnCharacterCreateResult.Broadcast(Result, Message);
+		});
+}
+
+void UClientNetSubsystem::SendCreateCharacterRequest(const FString& CharacterName)
+{
+	if (ServiceRef == nullptr)
+	{
+		return;
+	}
+
+	const auto pSession = ServiceRef->GetFirstSessionRef();
+	if (pSession == nullptr)
+	{
+		return;
+	}
+
+	Protocol::C2S_CREATE_CHARACTER_REQ packet;
+	packet.set_charactername(TCHAR_TO_UTF8(*CharacterName));
+	pSession->Send(MovementPacketHandler::MakeSendBuffer(packet));
+
+	UE_LOG(LogNetEngine, Log, TEXT("[ClientNetSubsystem] SendCreateCharacterRequest: %s"), *CharacterName);
+}
 
 void UClientNetSubsystem::NotifySpawnPosition(const FVector& Position, const float Yaw)
 {

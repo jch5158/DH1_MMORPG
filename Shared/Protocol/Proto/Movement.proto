@@ -122,3 +122,30 @@ message S2C_POSITION_CORRECTION_NOT
     Vector3 correctedPosition = 1;
     int64 serverTimestamp = 2;
 }
+
+// Gateway -> Client: 캐릭터가 없으므로 생성 필요
+message S2C_CHARACTER_CREATE_NOT
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+}
+
+// Client -> Gateway -> World: 캐릭터 생성 요청
+message C2S_CREATE_CHARACTER_REQ
+{
+    option (sender) = CLIENT;
+    option (receiver) = GATEWAY_SERVER;
+    option (receiver) = WORLD_SERVER;
+
+    string characterName = 1;
+}
+
+// Gateway -> Client: 캐릭터 생성 결과
+message S2C_CREATE_CHARACTER_RES
+{
+    option (sender) = GATEWAY_SERVER;
+    option (receiver) = CLIENT;
+
+    eCreateCharacterResult result = 1;
+    string message = 2;
+}

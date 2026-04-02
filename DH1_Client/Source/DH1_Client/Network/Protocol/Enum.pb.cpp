@@ -22,7 +22,7 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[7];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[8];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
@@ -53,13 +53,20 @@ const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "TE\020\002\022\036\n\032GAME_SESSION_FAIL_INTERNAL\020\003*R\n\023"
   "eSessionLeaveReason\022\030\n\024SESSION_LEAVE_NOR"
   "MAL\020\000\022!\n\035SESSION_LEAVE_DUPLICATE_LOGIN\020\001"
-  "*V\n\014eChatChannel\022\026\n\022CHAT_CHANNEL_LOCAL\020\000"
-  "\022\026\n\022CHAT_CHANNEL_WORLD\020\001\022\026\n\022CHAT_CHANNEL"
-  "_REALM\020\002b\006proto3"
+  "*\251\002\n\026eCreateCharacterResult\022\034\n\030CREATE_CH"
+  "ARACTER_SUCCESS\020\000\022(\n$CREATE_CHARACTER_FA"
+  "IL_NAME_TOO_SHORT\020\001\022\'\n#CREATE_CHARACTER_"
+  "FAIL_NAME_TOO_LONG\020\002\022&\n\"CREATE_CHARACTER"
+  "_FAIL_NAME_INVALID\020\003\022(\n$CREATE_CHARACTER"
+  "_FAIL_NAME_DUPLICATE\020\004\022(\n$CREATE_CHARACT"
+  "ER_FAIL_ALREADY_EXISTS\020\005\022\"\n\036CREATE_CHARA"
+  "CTER_FAIL_INTERNAL\020\006*V\n\014eChatChannel\022\026\n\022"
+  "CHAT_CHANNEL_LOCAL\020\000\022\026\n\022CHAT_CHANNEL_WOR"
+  "LD\020\001\022\026\n\022CHAT_CHANNEL_REALM\020\002b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 1056, descriptor_table_protodef_Enum_2eproto,
+    false, false, 1356, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -178,9 +185,28 @@ bool eSessionLeaveReason_IsValid(int value) {
   }
 }
 
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eChatChannel_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eCreateCharacterResult_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
   return file_level_enum_descriptors_Enum_2eproto[6];
+}
+bool eCreateCharacterResult_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* eChatChannel_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[7];
 }
 bool eChatChannel_IsValid(int value) {
   switch (value) {

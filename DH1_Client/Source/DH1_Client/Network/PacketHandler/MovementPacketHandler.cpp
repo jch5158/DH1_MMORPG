@@ -275,3 +275,40 @@ bool MovementPacketHandler::HANDLE_S2C_POSITION_CORRECTION_NOT(const Protocol::S
 
 	return true;
 }
+
+bool MovementPacketHandler::HANDLE_S2C_CHARACTER_CREATE_NOT(const Protocol::S2C_CHARACTER_CREATE_NOT& packet, const PacketSessionRef& pSession)
+{
+	UE_LOG(LogMovement, Log, TEXT("CHARACTER_CREATE_NOT - character creation required"));
+
+	AsyncTask(ENamedThreads::GameThread, []()
+		{
+			if (GEngine == nullptr) { return; }
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[](UClientNetSubsystem* Net)
+				{
+					Net->NotifyCharacterCreateRequired();
+				});
+		});
+
+	return true;
+}
+
+bool MovementPacketHandler::HANDLE_S2C_CREATE_CHARACTER_RES(const Protocol::S2C_CREATE_CHARACTER_RES& packet, const PacketSessionRef& pSession)
+{
+	const int32 Result = static_cast<int32>(packet.result());
+	const FString Message = UTF8_TO_TCHAR(packet.message().c_str());
+
+	UE_LOG(LogMovement, Log, TEXT("CREATE_CHARACTER_RES - result: %d, msg: %s"), Result, *Message);
+
+	AsyncTask(ENamedThreads::GameThread, [Result, Message]()
+		{
+			if (GEngine == nullptr) { return; }
+			UClientNetSubsystem::ForEachPlayClientNetSubsystem(
+				[Result, Message](UClientNetSubsystem* Net)
+				{
+					Net->NotifyCharacterCreateResult(Result, Message);
+				});
+		});
+
+	return true;
+}

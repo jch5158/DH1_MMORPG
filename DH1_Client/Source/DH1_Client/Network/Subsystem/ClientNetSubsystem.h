@@ -19,6 +19,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSpawnPositionReceivedDelegate, const FVe
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnMovePathReceivedDelegate, uint32 /*SeqId*/, const TArray<FVector>& /*Waypoints*/, float /*MoveSpeed*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPositionCorrectionDelegate, const FVector& /*CorrectedPosition*/);
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnCharacterOverheadDataDelegate, const FString& /*DisplayName*/, int32 /*Level*/, float /*CurrentHP*/, float /*MaxHP*/);
+DECLARE_MULTICAST_DELEGATE(FOnCharacterCreateRequiredDelegate);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCharacterCreateResultDelegate, int32 /*eCreateCharacterResult*/, const FString& /*Message*/);
 
 USTRUCT(BlueprintType)
 struct FRealmServerInfo
@@ -128,6 +130,10 @@ public:
     void RequestRealmList();
     void RequestRealmSelect(int32 RealmId);
 
+    void NotifyCharacterCreateRequired();
+    void NotifyCharacterCreateResult(int32 Result, const FString& Message);
+    void SendCreateCharacterRequest(const FString& CharacterName);
+
     /** 렐름 진입 직후·스폰 요청 시 월드 로딩 오버레이 (뷰포트 전역, GameMode와 무관) */
     void ShowEnterWorldLoadingOverlay();
     void HideEnterWorldLoadingOverlay();
@@ -178,8 +184,14 @@ public:
     FOnMovePathReceivedDelegate OnMovePathReceived;
     FOnPositionCorrectionDelegate OnPositionCorrection;
     FOnCharacterOverheadDataDelegate OnCharacterOverheadData;
+    FOnCharacterCreateRequiredDelegate OnCharacterCreateRequired;
+    FOnCharacterCreateResultDelegate OnCharacterCreateResult;
+
+    bool IsCharacterCreatePending() const { return bCharacterCreatePending; }
+    void ClearCharacterCreatePending() { bCharacterCreatePending = false; }
 
 private:
+    bool bCharacterCreatePending = false;
     void OnLoginResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
     UFUNCTION()

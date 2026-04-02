@@ -49,6 +49,9 @@ struct TableStruct_Movement_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Movement_2eproto;
 namespace Protocol {
+class C2S_CREATE_CHARACTER_REQ;
+struct C2S_CREATE_CHARACTER_REQDefaultTypeInternal;
+extern C2S_CREATE_CHARACTER_REQDefaultTypeInternal _C2S_CREATE_CHARACTER_REQ_default_instance_;
 class C2S_MOVE_INPUT_NOT;
 struct C2S_MOVE_INPUT_NOTDefaultTypeInternal;
 extern C2S_MOVE_INPUT_NOTDefaultTypeInternal _C2S_MOVE_INPUT_NOT_default_instance_;
@@ -58,6 +61,12 @@ extern C2S_MOVE_TO_POSITION_REQDefaultTypeInternal _C2S_MOVE_TO_POSITION_REQ_def
 class C2S_SPAWN_POSITION_REQ;
 struct C2S_SPAWN_POSITION_REQDefaultTypeInternal;
 extern C2S_SPAWN_POSITION_REQDefaultTypeInternal _C2S_SPAWN_POSITION_REQ_default_instance_;
+class S2C_CHARACTER_CREATE_NOT;
+struct S2C_CHARACTER_CREATE_NOTDefaultTypeInternal;
+extern S2C_CHARACTER_CREATE_NOTDefaultTypeInternal _S2C_CHARACTER_CREATE_NOT_default_instance_;
+class S2C_CREATE_CHARACTER_RES;
+struct S2C_CREATE_CHARACTER_RESDefaultTypeInternal;
+extern S2C_CREATE_CHARACTER_RESDefaultTypeInternal _S2C_CREATE_CHARACTER_RES_default_instance_;
 class S2C_ENTITY_ENTER_NOT;
 struct S2C_ENTITY_ENTER_NOTDefaultTypeInternal;
 extern S2C_ENTITY_ENTER_NOTDefaultTypeInternal _S2C_ENTITY_ENTER_NOT_default_instance_;
@@ -81,9 +90,12 @@ struct S2C_SPAWN_POSITION_RESDefaultTypeInternal;
 extern S2C_SPAWN_POSITION_RESDefaultTypeInternal _S2C_SPAWN_POSITION_RES_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
+template<> ::Protocol::C2S_CREATE_CHARACTER_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_CREATE_CHARACTER_REQ>(Arena*);
 template<> ::Protocol::C2S_MOVE_INPUT_NOT* Arena::CreateMaybeMessage<::Protocol::C2S_MOVE_INPUT_NOT>(Arena*);
 template<> ::Protocol::C2S_MOVE_TO_POSITION_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_MOVE_TO_POSITION_REQ>(Arena*);
 template<> ::Protocol::C2S_SPAWN_POSITION_REQ* Arena::CreateMaybeMessage<::Protocol::C2S_SPAWN_POSITION_REQ>(Arena*);
+template<> ::Protocol::S2C_CHARACTER_CREATE_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_CHARACTER_CREATE_NOT>(Arena*);
+template<> ::Protocol::S2C_CREATE_CHARACTER_RES* Arena::CreateMaybeMessage<::Protocol::S2C_CREATE_CHARACTER_RES>(Arena*);
 template<> ::Protocol::S2C_ENTITY_ENTER_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_ENTITY_ENTER_NOT>(Arena*);
 template<> ::Protocol::S2C_ENTITY_LEAVE_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_ENTITY_LEAVE_NOT>(Arena*);
 template<> ::Protocol::S2C_ENTITY_SNAPSHOT_NOT* Arena::CreateMaybeMessage<::Protocol::S2C_ENTITY_SNAPSHOT_NOT>(Arena*);
@@ -1906,6 +1918,441 @@ class S2C_POSITION_CORRECTION_NOT final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Movement_2eproto;
 };
+// -------------------------------------------------------------------
+
+class S2C_CHARACTER_CREATE_NOT final :
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:Protocol.S2C_CHARACTER_CREATE_NOT) */ {
+ public:
+  inline S2C_CHARACTER_CREATE_NOT() : S2C_CHARACTER_CREATE_NOT(nullptr) {}
+  explicit PROTOBUF_CONSTEXPR S2C_CHARACTER_CREATE_NOT(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S2C_CHARACTER_CREATE_NOT(const S2C_CHARACTER_CREATE_NOT& from);
+  S2C_CHARACTER_CREATE_NOT(S2C_CHARACTER_CREATE_NOT&& from) noexcept
+    : S2C_CHARACTER_CREATE_NOT() {
+    *this = ::std::move(from);
+  }
+
+  inline S2C_CHARACTER_CREATE_NOT& operator=(const S2C_CHARACTER_CREATE_NOT& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S2C_CHARACTER_CREATE_NOT& operator=(S2C_CHARACTER_CREATE_NOT&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S2C_CHARACTER_CREATE_NOT& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S2C_CHARACTER_CREATE_NOT* internal_default_instance() {
+    return reinterpret_cast<const S2C_CHARACTER_CREATE_NOT*>(
+               &_S2C_CHARACTER_CREATE_NOT_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(S2C_CHARACTER_CREATE_NOT& a, S2C_CHARACTER_CREATE_NOT& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S2C_CHARACTER_CREATE_NOT* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S2C_CHARACTER_CREATE_NOT* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S2C_CHARACTER_CREATE_NOT* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S2C_CHARACTER_CREATE_NOT>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
+  inline void CopyFrom(const S2C_CHARACTER_CREATE_NOT& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl(*this, from);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeFrom;
+  void MergeFrom(const S2C_CHARACTER_CREATE_NOT& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(*this, from);
+  }
+  public:
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S2C_CHARACTER_CREATE_NOT";
+  }
+  protected:
+  explicit S2C_CHARACTER_CREATE_NOT(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:Protocol.S2C_CHARACTER_CREATE_NOT)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+  };
+  friend struct ::TableStruct_Movement_2eproto;
+};
+// -------------------------------------------------------------------
+
+class C2S_CREATE_CHARACTER_REQ final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C2S_CREATE_CHARACTER_REQ) */ {
+ public:
+  inline C2S_CREATE_CHARACTER_REQ() : C2S_CREATE_CHARACTER_REQ(nullptr) {}
+  ~C2S_CREATE_CHARACTER_REQ() override;
+  explicit PROTOBUF_CONSTEXPR C2S_CREATE_CHARACTER_REQ(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C2S_CREATE_CHARACTER_REQ(const C2S_CREATE_CHARACTER_REQ& from);
+  C2S_CREATE_CHARACTER_REQ(C2S_CREATE_CHARACTER_REQ&& from) noexcept
+    : C2S_CREATE_CHARACTER_REQ() {
+    *this = ::std::move(from);
+  }
+
+  inline C2S_CREATE_CHARACTER_REQ& operator=(const C2S_CREATE_CHARACTER_REQ& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C2S_CREATE_CHARACTER_REQ& operator=(C2S_CREATE_CHARACTER_REQ&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C2S_CREATE_CHARACTER_REQ& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C2S_CREATE_CHARACTER_REQ* internal_default_instance() {
+    return reinterpret_cast<const C2S_CREATE_CHARACTER_REQ*>(
+               &_C2S_CREATE_CHARACTER_REQ_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  friend void swap(C2S_CREATE_CHARACTER_REQ& a, C2S_CREATE_CHARACTER_REQ& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C2S_CREATE_CHARACTER_REQ* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C2S_CREATE_CHARACTER_REQ* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C2S_CREATE_CHARACTER_REQ* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C2S_CREATE_CHARACTER_REQ>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const C2S_CREATE_CHARACTER_REQ& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const C2S_CREATE_CHARACTER_REQ& from) {
+    C2S_CREATE_CHARACTER_REQ::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(C2S_CREATE_CHARACTER_REQ* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C2S_CREATE_CHARACTER_REQ";
+  }
+  protected:
+  explicit C2S_CREATE_CHARACTER_REQ(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kCharacterNameFieldNumber = 1,
+  };
+  // string characterName = 1;
+  void clear_charactername();
+  const std::string& charactername() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_charactername(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_charactername();
+  PROTOBUF_NODISCARD std::string* release_charactername();
+  void set_allocated_charactername(std::string* charactername);
+  private:
+  const std::string& _internal_charactername() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_charactername(const std::string& value);
+  std::string* _internal_mutable_charactername();
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.C2S_CREATE_CHARACTER_REQ)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr charactername_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Movement_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S2C_CREATE_CHARACTER_RES final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S2C_CREATE_CHARACTER_RES) */ {
+ public:
+  inline S2C_CREATE_CHARACTER_RES() : S2C_CREATE_CHARACTER_RES(nullptr) {}
+  ~S2C_CREATE_CHARACTER_RES() override;
+  explicit PROTOBUF_CONSTEXPR S2C_CREATE_CHARACTER_RES(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S2C_CREATE_CHARACTER_RES(const S2C_CREATE_CHARACTER_RES& from);
+  S2C_CREATE_CHARACTER_RES(S2C_CREATE_CHARACTER_RES&& from) noexcept
+    : S2C_CREATE_CHARACTER_RES() {
+    *this = ::std::move(from);
+  }
+
+  inline S2C_CREATE_CHARACTER_RES& operator=(const S2C_CREATE_CHARACTER_RES& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S2C_CREATE_CHARACTER_RES& operator=(S2C_CREATE_CHARACTER_RES&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S2C_CREATE_CHARACTER_RES& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S2C_CREATE_CHARACTER_RES* internal_default_instance() {
+    return reinterpret_cast<const S2C_CREATE_CHARACTER_RES*>(
+               &_S2C_CREATE_CHARACTER_RES_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    12;
+
+  friend void swap(S2C_CREATE_CHARACTER_RES& a, S2C_CREATE_CHARACTER_RES& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S2C_CREATE_CHARACTER_RES* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S2C_CREATE_CHARACTER_RES* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S2C_CREATE_CHARACTER_RES* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S2C_CREATE_CHARACTER_RES>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S2C_CREATE_CHARACTER_RES& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S2C_CREATE_CHARACTER_RES& from) {
+    S2C_CREATE_CHARACTER_RES::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S2C_CREATE_CHARACTER_RES* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S2C_CREATE_CHARACTER_RES";
+  }
+  protected:
+  explicit S2C_CREATE_CHARACTER_RES(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMessageFieldNumber = 2,
+    kResultFieldNumber = 1,
+  };
+  // string message = 2;
+  void clear_message();
+  const std::string& message() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_message(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_message();
+  PROTOBUF_NODISCARD std::string* release_message();
+  void set_allocated_message(std::string* message);
+  private:
+  const std::string& _internal_message() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_message(const std::string& value);
+  std::string* _internal_mutable_message();
+  public:
+
+  // .Protocol.eCreateCharacterResult result = 1;
+  void clear_result();
+  ::Protocol::eCreateCharacterResult result() const;
+  void set_result(::Protocol::eCreateCharacterResult value);
+  private:
+  ::Protocol::eCreateCharacterResult _internal_result() const;
+  void _internal_set_result(::Protocol::eCreateCharacterResult value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.S2C_CREATE_CHARACTER_RES)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr message_;
+    int result_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Movement_2eproto;
+};
 // ===================================================================
 
 
@@ -3156,9 +3603,147 @@ inline void S2C_POSITION_CORRECTION_NOT::set_servertimestamp(int64_t value) {
   // @@protoc_insertion_point(field_set:Protocol.S2C_POSITION_CORRECTION_NOT.serverTimestamp)
 }
 
+// -------------------------------------------------------------------
+
+// S2C_CHARACTER_CREATE_NOT
+
+// -------------------------------------------------------------------
+
+// C2S_CREATE_CHARACTER_REQ
+
+// string characterName = 1;
+inline void C2S_CREATE_CHARACTER_REQ::clear_charactername() {
+  _impl_.charactername_.ClearToEmpty();
+}
+inline const std::string& C2S_CREATE_CHARACTER_REQ::charactername() const {
+  // @@protoc_insertion_point(field_get:Protocol.C2S_CREATE_CHARACTER_REQ.characterName)
+  return _internal_charactername();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void C2S_CREATE_CHARACTER_REQ::set_charactername(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.charactername_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.C2S_CREATE_CHARACTER_REQ.characterName)
+}
+inline std::string* C2S_CREATE_CHARACTER_REQ::mutable_charactername() {
+  std::string* _s = _internal_mutable_charactername();
+  // @@protoc_insertion_point(field_mutable:Protocol.C2S_CREATE_CHARACTER_REQ.characterName)
+  return _s;
+}
+inline const std::string& C2S_CREATE_CHARACTER_REQ::_internal_charactername() const {
+  return _impl_.charactername_.Get();
+}
+inline void C2S_CREATE_CHARACTER_REQ::_internal_set_charactername(const std::string& value) {
+  
+  _impl_.charactername_.Set(value, GetArenaForAllocation());
+}
+inline std::string* C2S_CREATE_CHARACTER_REQ::_internal_mutable_charactername() {
+  
+  return _impl_.charactername_.Mutable(GetArenaForAllocation());
+}
+inline std::string* C2S_CREATE_CHARACTER_REQ::release_charactername() {
+  // @@protoc_insertion_point(field_release:Protocol.C2S_CREATE_CHARACTER_REQ.characterName)
+  return _impl_.charactername_.Release();
+}
+inline void C2S_CREATE_CHARACTER_REQ::set_allocated_charactername(std::string* charactername) {
+  if (charactername != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.charactername_.SetAllocated(charactername, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.charactername_.IsDefault()) {
+    _impl_.charactername_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C2S_CREATE_CHARACTER_REQ.characterName)
+}
+
+// -------------------------------------------------------------------
+
+// S2C_CREATE_CHARACTER_RES
+
+// .Protocol.eCreateCharacterResult result = 1;
+inline void S2C_CREATE_CHARACTER_RES::clear_result() {
+  _impl_.result_ = 0;
+}
+inline ::Protocol::eCreateCharacterResult S2C_CREATE_CHARACTER_RES::_internal_result() const {
+  return static_cast< ::Protocol::eCreateCharacterResult >(_impl_.result_);
+}
+inline ::Protocol::eCreateCharacterResult S2C_CREATE_CHARACTER_RES::result() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_CREATE_CHARACTER_RES.result)
+  return _internal_result();
+}
+inline void S2C_CREATE_CHARACTER_RES::_internal_set_result(::Protocol::eCreateCharacterResult value) {
+  
+  _impl_.result_ = value;
+}
+inline void S2C_CREATE_CHARACTER_RES::set_result(::Protocol::eCreateCharacterResult value) {
+  _internal_set_result(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_CREATE_CHARACTER_RES.result)
+}
+
+// string message = 2;
+inline void S2C_CREATE_CHARACTER_RES::clear_message() {
+  _impl_.message_.ClearToEmpty();
+}
+inline const std::string& S2C_CREATE_CHARACTER_RES::message() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_CREATE_CHARACTER_RES.message)
+  return _internal_message();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S2C_CREATE_CHARACTER_RES::set_message(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.message_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S2C_CREATE_CHARACTER_RES.message)
+}
+inline std::string* S2C_CREATE_CHARACTER_RES::mutable_message() {
+  std::string* _s = _internal_mutable_message();
+  // @@protoc_insertion_point(field_mutable:Protocol.S2C_CREATE_CHARACTER_RES.message)
+  return _s;
+}
+inline const std::string& S2C_CREATE_CHARACTER_RES::_internal_message() const {
+  return _impl_.message_.Get();
+}
+inline void S2C_CREATE_CHARACTER_RES::_internal_set_message(const std::string& value) {
+  
+  _impl_.message_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S2C_CREATE_CHARACTER_RES::_internal_mutable_message() {
+  
+  return _impl_.message_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S2C_CREATE_CHARACTER_RES::release_message() {
+  // @@protoc_insertion_point(field_release:Protocol.S2C_CREATE_CHARACTER_RES.message)
+  return _impl_.message_.Release();
+}
+inline void S2C_CREATE_CHARACTER_RES::set_allocated_message(std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.message_.SetAllocated(message, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.message_.IsDefault()) {
+    _impl_.message_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S2C_CREATE_CHARACTER_RES.message)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

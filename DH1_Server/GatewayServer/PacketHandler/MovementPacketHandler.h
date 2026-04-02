@@ -48,6 +48,10 @@ public:
 		{
 			return HandlePacket<Protocol::C2S_MOVE_TO_POSITION_REQ>(size, pBuffer, pSession, HANDLE_C2S_MOVE_TO_POSITION_REQ);
 		};
+		sPacketHandleMap[packet_id::eMovementPacketId::C2S_CREATE_CHARACTER_REQ] = [](const uint16 size, const byte* pBuffer, const PacketSessionRef& pSession) -> bool
+		{
+			return HandlePacket<Protocol::C2S_CREATE_CHARACTER_REQ>(size, pBuffer, pSession, HANDLE_C2S_CREATE_CHARACTER_REQ);
+		};
 
 	}
 
@@ -72,6 +76,7 @@ public:
 	static bool HANDLE_C2S_MOVE_INPUT_NOT(const Protocol::C2S_MOVE_INPUT_NOT& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_SPAWN_POSITION_REQ(const Protocol::C2S_SPAWN_POSITION_REQ& packet, const PacketSessionRef& pSession);
 	static bool HANDLE_C2S_MOVE_TO_POSITION_REQ(const Protocol::C2S_MOVE_TO_POSITION_REQ& packet, const PacketSessionRef& pSession);
+	static bool HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_CREATE_CHARACTER_REQ& packet, const PacketSessionRef& pSession);
 	
 
 	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_MOVE_RESULT_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2C_MOVE_RESULT_NOT); }
@@ -81,6 +86,8 @@ public:
 	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_SPAWN_POSITION_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_SPAWN_POSITION_RES); }
 	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_MOVE_PATH_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_MOVE_PATH_RES); }
 	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_POSITION_CORRECTION_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2C_POSITION_CORRECTION_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_CHARACTER_CREATE_NOT& packet) { return MakeSendBuffer(packet, packet_id::S2C_CHARACTER_CREATE_NOT); }
+	static NetSendBufferRef MakeSendBuffer(const Protocol::S2C_CREATE_CHARACTER_RES& packet) { return MakeSendBuffer(packet, packet_id::S2C_CREATE_CHARACTER_RES); }
 	
 
 private:

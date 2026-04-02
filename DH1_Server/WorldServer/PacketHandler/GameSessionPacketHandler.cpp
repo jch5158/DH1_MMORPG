@@ -252,38 +252,35 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - Character loaded from DB, accountId: {}, pos: ({}, {}, {}), level: {}, hp: {}/{}",
 							accountId, posX, posY, posZ, level, currentHp, maxHp);
 					}
-					else
+				else
+				{
+					// 캐릭터가 없음 → 클라이언트에 캐릭터 생성 화면을 표시하도록 알림
+					Protocol::S2C_CHARACTER_CREATE_NOT createNot;
+					auto createNotInnerBuffer = MakeMovementSendBuffer(createNot, packet_id::S2C_CHARACTER_CREATE_NOT);
+					Protocol::S2S_RELAY_TO_CLIENT_NOT createNotRelay;
+					createNotRelay.set_gatewaysessionid(gatewaySessionId);
+					createNotRelay.set_payload(createNotInnerBuffer->GetReadPtr(), createNotInnerBuffer->GetUseSize());
+					pSession->Send(GameSessionPacketHandler::MakeSendBuffer(createNotRelay));
+
+					NET_ENGINE_LOG_INFO("GameSessionPacketHandler - No character found, sent CHARACTER_CREATE_NOT, accountId: {}", accountId);
+
+					// RealmServer에 동기화 (세션은 유지)
+					if (pRealmClientService != nullptr)
 					{
-						// 새 캐릭터 생성
-						charDisplayName = "Player_" + std::to_string(accountId);
-
-						constexpr double defaultSpawnZ = 148.0;
-						maxHp = ComputeDefaultMaxHp(1);
-						currentHp = maxHp;
-						const double maxHpDb = static_cast<double>(maxHp);
-						const double currentHpDb = static_cast<double>(currentHp);
-
-						db(sqlpp::insert_into(table).set(
-							table.accountId = static_cast<int64>(accountId),
-							table.characterName = charDisplayName,
-							table.level = 1,
-							table.currentHp = currentHpDb,
-							table.maxHp = maxHpDb,
-							table.experience = static_cast<int64>(0),
-							table.positionX = 0.0,
-							table.positionY = 0.0,
-							table.positionZ = defaultSpawnZ,
-							table.rotationYaw = 0.0,
-							table.worldId = worldServerId
-						));
-
-						posZ = static_cast<float>(defaultSpawnZ);
-
-						NET_ENGINE_LOG_INFO("GameSessionPacketHandler - New character created in DB, accountId: {}, name: {}",
-							accountId, charDisplayName);
+						const auto pRealmSession = std::static_pointer_cast<RealmSession>(pRealmClientService->GetFirstSessionRef());
+						if (pRealmSession != nullptr)
+						{
+							Protocol::S2S_GAME_SESSION_SYNC_ENTER_NOT syncPacket;
+							syncPacket.set_accountid(accountId);
+							syncPacket.set_worldserverid(worldServerId);
+							syncPacket.set_gatewayserverid(gatewayServerId);
+							pRealmSession->Send(GameSessionPacketHandler::MakeSendBuffer(syncPacket));
+						}
 					}
+					return;
+				}
 
-					// PlayerObject 생성 (DB 위치 반영)
+				// PlayerObject 생성 (DB 위치 반영)
 					auto pPlayerObject = cpp_net_engine::MakeShared<PlayerObject>(accountId, gatewaySessionId, gatewayServerId);
 					pPlayerObject->SetMoveSpeed(defaultMoveSpeed);
 					pPlayerObject->SetPosition(posX, posY, posZ);

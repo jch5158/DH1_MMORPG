@@ -34,6 +34,11 @@
 #include "Network/Subsystem/ClientNetSubsystem.h"
 #include "UI/UMG/CharacterOverheadWidget.h"
 #include "UI/UMG/ChatPanelWidget.h"
+#include "UI/AuthWidgetStyle.h"
+#include "UI/SCharacterCreatePanel.h"
+#include "Widgets/Images/SImage.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/SOverlay.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacterMove, Log, All);
 
@@ -161,7 +166,18 @@ void ADH1_ClientCharacter::BeginPlay()
 			NetSub->OnSpawnPositionReceived.AddUObject(this, &ADH1_ClientCharacter::OnSpawnPositionReceived);
 			NetSub->OnMovePathReceived.AddUObject(this, &ADH1_ClientCharacter::OnMovePathReceived);
 			NetSub->OnPositionCorrection.AddUObject(this, &ADH1_ClientCharacter::OnPositionCorrected);
-			NetSub->RequestSpawnPosition();
+			NetSub->OnCharacterCreateRequired.AddUObject(this, &ADH1_ClientCharacter::OnCharacterCreateRequired);
+			NetSub->OnCharacterCreateResult.AddUObject(this, &ADH1_ClientCharacter::OnCharacterCreateResult);
+
+			if (NetSub->IsCharacterCreatePending())
+			{
+				UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter::BeginPlay - CharacterCreatePending detected, showing create panel"));
+				ShowCharacterCreatePanel();
+			}
+			else
+			{
+				NetSub->RequestSpawnPosition();
+			}
 		}
 	}
 	else
@@ -695,11 +711,15 @@ void ADH1_ClientCharacter::CreateAndRegisterChatWidget()
 
 void ADH1_ClientCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	HideCharacterCreatePanel();
+
 	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
 	{
 		NetSub->UnregisterChatUi();
 		NetSub->OnCharacterOverheadData.RemoveAll(this);
 		NetSub->OnSpawnPositionReceived.RemoveAll(this);
+		NetSub->OnCharacterCreateRequired.RemoveAll(this);
+		NetSub->OnCharacterCreateResult.RemoveAll(this);
 	}
 
 	if (ChatWidgetInstance != nullptr)
@@ -709,4 +729,114 @@ void ADH1_ClientCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 
 	Super::EndPlay(EndPlayReason);
+}
+
+void ADH1_ClientCharacter::OnCharacterCreateRequired()
+{
+	UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Character creation required"));
+	ShowCharacterCreatePanel();
+}
+
+void ADH1_ClientCharacter::OnCharacterCreateResult(const int32 Result, const FString& Message)
+{
+	UE_LOG(LogCharacterMove, Warning, TEXT("DH1_ClientCharacter - Character create result: %d, msg: %s"), Result, *Message);
+
+	if (Result == 0)
+	{
+		if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+		{
+			NetSub->ClearCharacterCreatePending();
+		}
+
+		if (CharacterCreatePanel.IsValid())
+		{
+			CharacterCreatePanel->SetStatusMessage(TEXT("캐릭터가 생성되었습니다!"), false);
+		}
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			HideCharacterCreatePanel();
+		}), 0.8f, false);
+	}
+	else
+	{
+		if (CharacterCreatePanel.IsValid())
+		{
+			FString ErrorMsg = Message;
+			if (ErrorMsg.IsEmpty())
+			{
+				switch (Result)
+				{
+				case 1: ErrorMsg = TEXT("닉네임이 너무 짧습니다."); break;
+				case 2: ErrorMsg = TEXT("닉네임이 너무 깁니다."); break;
+				case 3: ErrorMsg = TEXT("닉네임에 사용할 수 없는 문자가 포함되어 있습니다."); break;
+				case 4: ErrorMsg = TEXT("이미 사용 중인 닉네임입니다."); break;
+				case 5: ErrorMsg = TEXT("이미 캐릭터가 존재합니다."); break;
+				default: ErrorMsg = TEXT("캐릭터 생성에 실패했습니다."); break;
+				}
+			}
+			CharacterCreatePanel->SetStatusMessage(ErrorMsg, true);
+			CharacterCreatePanel->SetCreateEnabled(true);
+		}
+	}
+}
+
+void ADH1_ClientCharacter::HandleCreateCharacterRequested(const FString& CharacterName)
+{
+	if (UClientNetSubsystem* NetSub = GetNetSubsystem())
+	{
+		NetSub->SendCreateCharacterRequest(CharacterName);
+	}
+}
+
+void ADH1_ClientCharacter::ShowCharacterCreatePanel()
+{
+	if (CharacterCreateOverlayRef.IsValid())
+	{
+		return;
+	}
+
+	if (!GEngine || !GEngine->GameViewport)
+	{
+		return;
+	}
+
+	static FSlateBrush OverlayBg;
+	static bool bOverlayInit = false;
+	if (!bOverlayInit)
+	{
+		bOverlayInit = true;
+		OverlayBg.DrawAs = ESlateBrushDrawType::Image;
+		OverlayBg.TintColor = FSlateColor(FLinearColor(0.01f, 0.01f, 0.01f, 0.88f));
+	}
+
+	CharacterCreateOverlayRef =
+		SNew(SOverlay)
+
+		+ SOverlay::Slot()
+		[
+			SNew(SImage)
+			.Image(&OverlayBg)
+		]
+
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		[
+			SAssignNew(CharacterCreatePanel, SCharacterCreatePanel)
+			.OnCreateRequested(FOnCreateCharacterRequested::CreateUObject(this, &ADH1_ClientCharacter::HandleCreateCharacterRequested))
+		];
+
+	GEngine->GameViewport->AddViewportWidgetContent(CharacterCreateOverlayRef.ToSharedRef(), 100);
+}
+
+void ADH1_ClientCharacter::HideCharacterCreatePanel()
+{
+	if (CharacterCreateOverlayRef.IsValid() && GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->RemoveViewportWidgetContent(CharacterCreateOverlayRef.ToSharedRef());
+	}
+	CharacterCreateOverlayRef.Reset();
+	CharacterCreatePanel.Reset();
 }
