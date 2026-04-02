@@ -27,32 +27,17 @@
 
 ## 시스템 아키텍처
 
-```
-                          ┌──────────────────────────────────────────────┐
-                          │               DH1_Client (UE5)              │
-                          │          UE5 C++ + CppNetEngine.lib         │
-                          └──────┬──────────────────────────┬───────────┘
-                           TCP   │                          │  HTTP/S
-                     (게임 패킷) │                          │ (로그인 API)
-                ┌────────────────▼───────┐    ┌─────────────▼──────────┐
-                │    GatewayServer       │    │     LoginServer        │
-                │  패킷 인증·라우팅·세션 │    │  REST API · 이메일 인증 │
-                │       (C++ IOCP)       │    │  (C# ASP.NET Core 10)  │
-                └────────────┬───────────┘    └────────────────────────┘
-                       TCP   │  (릴레이)
-                ┌────────────▼───────────┐
-                │     WorldServer        │
-                │  게임 로직 · AOI · 경로 │
-                │       (C++ IOCP)       │
-                └────────────┬───────────┘
-                       TCP   │  (등록·하트비트)
-                ┌────────────▼───────────┐
-                │     RealmServer        │
-                │  서버 목록 · 월드 관리  │
-                │       (C++ IOCP)       │
-                └────────────────────────┘
+```mermaid
+flowchart TB
+    C["DH1_Client (UE5)\nCppNetEngine.lib"]
 
-   외부 의존: MySQL (계정·게임 DB)  ·  Redis (세션·Pub/Sub)  ·  AWS S3 (NavMesh)
+    C -->|"TCP · 게임 패킷"| G["GatewayServer\nC++ IOCP"]
+    C -.->|"HTTP · 로그인 API"| L["LoginServer\nASP.NET Core"]
+
+    G -->|"TCP · 릴레이"| W["WorldServer\nC++ IOCP"]
+    W -->|"TCP · 등록 · 하트비트"| R["RealmServer\nC++ IOCP"]
+
+    G & W & L -.-> D[(MySQL · Redis · S3)]
 ```
 
 | 서버 | 역할 |
@@ -70,32 +55,23 @@
 
 각 C++ 서버 프로세스는 **두 개의 독립 IOCP 스케줄러**로 나뉩니다.
 
-```
-  ┌───────────────────────────────────────────────────────────────────┐
-  │                     서버 프로세스 (예: WorldServer)                │
-  │                                                                   │
-  │   ┌─ NetworkScheduler (IOCP) ──┐   ┌─ ActorScheduler (IOCP) ──┐  │
-  │   │                            │   │                           │  │
-  │   │  running × R               │   │  running × R              │  │
-  │   │  ┌────┐ ┌────┐             │   │  ┌────┐ ┌────┐           │  │
-  │   │  │ IO │ │ IO │  GQCS 대기  │   │  │ IO │ │ IO │ GQCS 대기│  │
-  │   │  └────┘ └────┘             │   │  └────┘ └────┘           │  │
-  │   │                            │   │                           │  │
-  │   │  dispatch × N              │   │  dispatch × M             │  │
-  │   │  ┌────┐┌────┐┌────┐┌────┐ │   │  ┌────┐┌────┐┌────┐     │  │
-  │   │  │ W1 ││ W2 ││ W3 ││ W4 │ │   │  │ W1 ││ W2 ││ W3 │     │  │
-  │   │  └────┘└────┘└────┘└────┘ │   │  └────┘└────┘└────┘     │  │
-  │   │  Recv·Send·PacketSession  │   │  Actor 로직 실행          │  │
-  │   │  역직렬화                  │   │  DB·Redis·세션            │  │
-  │   │            │               │   │        │                  │  │
-  │   │   TimingWheel              │   │   TimingWheel             │  │
-  │   └────────────┼───────────────┘   └────────┼──────────────────┘  │
-  │                │                             ▲                    │
-  │                ▼     ActorMailbox             │                    │
-  │            ┌──────── (LockFreeQueue) ────────┘                    │
-  │            │                                                      │
-  │            ▼         SendBuffer → IOCP 송신                       │
-  └───────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    IOCP(["IOCP"])
+
+    subgraph NET["NetworkScheduler"]
+        NW["워커 × N\nRecv · Send · 역직렬화\nTimingWheel"]
+    end
+
+    MB[["ActorMailbox\n(LockFreeQueue)"]]
+
+    subgraph ACT["ActorScheduler"]
+        AW["워커 × M\nActor 로직 · DB · Redis\nTimingWheel"]
+    end
+
+    SB["SendBuffer"]
+
+    IOCP --> NW --> MB --> AW --> SB --> IOCP
 ```
 
 | 컴포넌트 | 설명 |
@@ -123,56 +99,57 @@
 
 ### 로그인 → 월드 진입
 
-```
- Client (UE5)          LoginServer         GatewayServer          WorldServer
-      │                     │                     │                     │
-      │  POST /auth/login   │                     │                     │
-      │────────────────────▶│                     │                     │
-      │◀─── 200 {ticket} ──│                     │                     │
-      │                                           │                     │
-      │  TCP Connect + C2S_LOGIN_REQ (ticket)     │                     │
-      │──────────────────────────────────────────▶│                     │
-      │                                    Redis 티켓 검증              │
-      │◀──────────────── S2C_LOGIN_RES ──────────│                     │
-      │                                           │                     │
-      │  C2S_REALM_LIST_REQ ────────────────────▶│                     │
-      │◀──────────── S2C_REALM_LIST_RES ─────────│                     │
-      │                                           │                     │
-      │  C2S_REALM_SELECT_REQ ──────────────────▶│                     │
-      │                                           │  S2S_GAME_SESSION   │
-      │                                           │────────────────────▶│
-      │                                           │◀── RES ────────────│
-      │◀──────────── S2C_REALM_SELECT_RES ───────│                     │
-      │                                           │                     │
-      │  C2S_SPAWN_POSITION_REQ ────────────────▶│  RELAY_TO_WORLD     │
-      │                                           │────────────────────▶│
-      │                                           │                  DB 캐릭터 조회
-      │                                           │◀── RELAY_TO_CLIENT─│
-      │◀──────── S2C_SPAWN_POSITION_RES ─────────│                     │
-      │                                           │               AOI 범위 내
-      │                                           │            S2C_ENTITY_ENTER_NOT
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant L as LoginServer
+    participant G as GatewayServer
+    participant W as WorldServer
+
+    C->>L: POST /auth/login
+    L-->>C: 200 OK (ticket)
+
+    C->>G: TCP + C2S_LOGIN_REQ (ticket)
+    G->>G: Redis 티켓 검증
+    G-->>C: S2C_LOGIN_RES
+
+    C->>G: C2S_REALM_LIST_REQ
+    G-->>C: S2C_REALM_LIST_RES
+
+    C->>G: C2S_REALM_SELECT_REQ
+    G->>W: S2S_GAME_SESSION_ENTER
+    W-->>G: RES
+    G-->>C: S2C_REALM_SELECT_RES
+
+    C->>G: C2S_SPAWN_POSITION_REQ
+    G->>W: RELAY_TO_WORLD
+    W->>W: DB 캐릭터 조회 + AOI
+    W-->>G: RELAY_TO_CLIENT
+    G-->>C: S2C_SPAWN_POSITION_RES
 ```
 
 ### 이동 (서버 사이드 NavMesh 경로탐색)
 
-```
- Client                GatewayServer          WorldServer
-    │                       │                       │
-    │  C2S_MOVE_TO_POS_REQ  │                       │
-    │──────────────────────▶│  RELAY_TO_WORLD       │
-    │                       │──────────────────────▶│
-    │                       │                    NavMesh FindPath (Detour)
-    │                       │                    GameTick 경로 추종 (50ms)
-    │                       │◀── S2C_MOVE_PATH_RES─│
-    │◀── S2C_MOVE_PATH_RES─│                       │
-    │                       │                       │
-    │                       │        AOI 범위 브로드캐스트
-    │                       │◀─ S2C_ENTITY_SNAPSHOT │
-    │◀─ S2C_ENTITY_SNAPSHOT│                       │
-    │                       │                       │
-    │                       │           셀 경계 이동 시
-    │                       │◀── ENTER / LEAVE_NOT─│
-    │◀── ENTER / LEAVE_NOT─│                       │
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant G as GatewayServer
+    participant W as WorldServer
+
+    C->>G: C2S_MOVE_TO_POSITION_REQ
+    G->>W: RELAY_TO_WORLD
+    W->>W: NavMesh FindPath (Detour)
+    W-->>G: S2C_MOVE_PATH_RES
+    G-->>C: S2C_MOVE_PATH_RES
+
+    Note over W: GameTick (50ms) 경로 추종
+
+    W-->>G: S2C_ENTITY_SNAPSHOT (AOI)
+    G-->>C: S2C_ENTITY_SNAPSHOT
+
+    Note over W: 셀 경계 이동 시
+    W-->>G: ENTER / LEAVE_NOT
+    G-->>C: ENTER / LEAVE_NOT
 ```
 
 <br>
@@ -183,15 +160,11 @@
 
 서버와 클라이언트가 **동일한 네트워크 엔진**을 사용합니다.
 
-```
-   CppNetEngine (C++17 · IOCP)
-   ─────────────────────────────
-          │ static lib (.lib)
-          ├────────────────────────────────────┐
-          ▼                                    ▼
-   DH1_Server                          DH1_Client (UE5)
-   GW · WS · RS                        Shared/Libraries/ 경유
-   직접 링크 + 헤더 참조               UClientNetSubsystem 래핑
+```mermaid
+flowchart TB
+    E["CppNetEngine\nC++17 · IOCP · Actor Model"]
+    E -->|"static lib"| S["DH1_Server\nGW · WS · RS\n직접 링크"]
+    E -->|"static lib → Shared/Libraries"| U["DH1_Client (UE5)\nUClientNetSubsystem 래핑"]
 ```
 
 | 항목 | 구현 |
@@ -215,23 +188,15 @@
 
 ### 처리 파이프라인
 
-```
-  *.proto  +  PacketOption.proto
-       │
-       ▼
-  ┌─ PacketGenerator.bat ─────────────────────────────────────────┐
-  │                                                                │
-  │  1) protoc  --cpp_out   → Shared/Protocol/*.pb.h / .pb.cc     │
-  │             --desc_out  → Proto/*.desc                         │
-  │                                                                │
-  │  2) PacketGenerator.exe (.NET)                                 │
-  │     .desc 파싱 → Role별 코드 생성                              │
-  └────────────────────────────────────────────────────────────────┘
-       │
-       ├──→  Shared/Protocol/PacketId/PacketId.h
-       ├──→  각 프로젝트/PacketHandler/*.h
-       ├──→  PacketServiceTypeHandler.h
-       └──→  UE Network/Protocol/*.pb.cpp  (클라이언트 전용 복사)
+```mermaid
+flowchart LR
+    P[".proto 파일"] --> PC["protoc"]
+    PC --> PB[".pb.h / .pb.cc"]
+    PC --> DESC[".desc"]
+    DESC --> GEN["PacketGenerator.exe\n(.NET)"]
+    GEN --> ID["PacketId.h"]
+    GEN --> HND["PacketHandler/*.h"]
+    GEN --> UE["UE Protocol/*.pb.cpp\n(클라이언트 복사)"]
 ```
 
 1. **protoc** — `Shared/vcpkg`의 `protoc.exe`로 `.proto` → `Shared/Protocol/*.pb.h`, `*.pb.cc` 및 `Proto/*.desc` (descriptor set).
