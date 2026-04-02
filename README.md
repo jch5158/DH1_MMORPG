@@ -2,48 +2,64 @@
 
 > C++ IOCP 커스텀 네트워크 엔진 기반 MMORPG — 서버와 클라이언트가 동일 네트워크 스택을 공유
 
+| | |
+|---|---|
+| **개발자** | 정찬훈 |
+| **프로젝트 유형** | 개인 프로젝트 (1인 개발) |
+| **개발 기간** | 2025.01 ~ 현재 (진행 중) |
+| **GitHub** | [https://github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
+
+<br>
+
+### 프로젝트 목적
+
+고성능 MMORPG 서버의 핵심 기술을 직접 설계·구현하여, **네트워크 엔진부터 분산 서버 아키텍처, 클라이언트 통합까지** 게임 서버 개발의 전체 파이프라인을 경험하는 것을 목표로 합니다.
+
+<br>
+
+### 사용 기술 및 언어
+
+| 분류 | 기술 |
+|------|------|
+| **Language** | C++17 · C# · SQL · Protobuf |
+| **Server Engine** | Windows IOCP · Actor Model · Lock-free Queue/Stack · ObjectPool · MemoryPool · mimalloc · TimingWheel |
+| **Framework** | ASP.NET Core 10 · Entity Framework Core · Unreal Engine 5.7 |
+| **Protocol** | Protocol Buffers 3 · TCP · HTTPS · 커스텀 PacketGenerator (.NET) |
+| **Database** | MySQL · Redis (세션 · Pub/Sub) |
+| **Infra / DevOps** | AWS S3 · GitHub Actions · vcpkg · Crashpad · spdlog |
+| **Tools** | Visual Studio 2025 · Unreal Build Tool · MSBuild · .NET SDK 10 |
+
+<br>
+
+### 프로젝트 소개
+
+C++17 Windows IOCP 기반 네트워크 엔진(**CppNetEngine**)을 직접 설계·구현하고, 이를 4개의 분산 서버(Gateway · World · Realm · Login)와 Unreal Engine 5.7 클라이언트에 동일하게 적용한 MMORPG 프로젝트입니다. Actor Model, Lock-free 자료구조, 3계층 메모리 풀 등 서버 엔진의 핵심 컴포넌트를 직접 구현하였으며, 서버 엔진을 static lib로 클라이언트에 이식하여 **서버·클라이언트가 같은 네트워크 스택**을 공유합니다.
+
+<br>
+
+### 주요 기여 및 성과
+
+- **커스텀 네트워크 엔진 설계·구현** — IOCP 기반 비동기 I/O, Actor Model, Lock-free 자료구조, 3계층 메모리 풀을 포함하는 C++ 서버 엔진을 처음부터 직접 개발
+- **분산 서버 아키텍처 설계** — Gateway · World · Realm · Login 4개 서버로 역할을 분리하고, Relay 패턴과 Redis 세션을 활용한 멀티 서버 구조 구현
+- **서버 엔진 클라이언트 이식** — CppNetEngine을 static lib로 빌드하여 UE5 클라이언트에 통합, 서버·클라이언트 간 동일 네트워크 스택 공유
+- **서버 사이드 NavMesh 경로탐색** — UE5 Detour 라이브러리를 서버에 이식하여 서버 권위적 경로 탐색 구현, S3 기반 NavMesh 바이너리 관리
+- **프로토콜 자동화 도구 개발** — .proto 커스텀 옵션 기반 PacketGenerator를 .NET으로 개발, 패킷 코드 자동 생성으로 서버·클라이언트 프로토콜 동기화
+- **CI 파이프라인 구축** — GitHub Actions로 PacketGenerator 빌드 및 LoginServer 단위 테스트 자동화
+
 ```mermaid
 flowchart TB
-    subgraph ENGINE ["CppNetEngine — C++17 Windows IOCP 네트워크 엔진"]
+    subgraph ENGINE ["CppNetEngine"]
         direction LR
-
-        subgraph NET ["Network I/O"]
-            direction TB
-            IOCP["IOCP Core\nGQCS · PQCS"]
-            SESSION["Session\nRecv/SendBuffer"]
-            LISTENER["Listener · Connector\nAcceptEx · ConnectEx"]
-        end
-
-        subgraph SCHED ["Scheduler"]
-            direction TB
-            NS["NetworkScheduler\n소켓 I/O 전담"]
-            AS["ActorScheduler\n게임 로직 전담"]
-            TWHL["TimingWheel"]
-        end
-
-        subgraph ACTOR ["Actor Model"]
-            direction TB
-            ACT["Actor\natomic TryAcquire"]
-            SA["ScopedActor\n다중 잠금"]
-            MAILBOX["ActorMailbox\nPQCS 통지"]
-        end
-
-        subgraph MEM ["메모리 관리"]
-            direction TB
-            LF["LockFreeQueue\nLockFreeStack"]
-            POOL["ObjectPool\nMemoryPool"]
-            SBA["SendBufferAllocator"]
-            MI["mimalloc"]
-        end
-
-        NET --> SCHED --> ACTOR
-        ACTOR -.-> MEM
+        A["IOCP\nNetwork I/O"]
+        B["Actor Model\nScheduler"]
+        C["Lock-free\n메모리 관리"]
+        A --> B --> C
     end
 
     ENGINE -->|"static lib"| GW["GatewayServer"]
     ENGINE -->|"static lib"| WS["WorldServer"]
     ENGINE -->|"static lib"| RS["RealmServer"]
-    ENGINE -->|"static lib → UE5 이식"| CL["DH1_Client\n(Unreal Engine 5.7)"]
+    ENGINE -->|"static lib"| CL["DH1_Client (UE5)"]
 ```
 
 | 영역 | 기술 |
