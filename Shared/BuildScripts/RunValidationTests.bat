@@ -17,15 +17,8 @@ if /i "%~1"=="--full" set "FULL=1"
 
 pushd "%ROOT_DIR%" || exit /b 1
 
-for /f "usebackq delims=" %%v in (`dotnet --version 2^>nul`) do set "DOTNET_VER=%%v"
-if not defined DOTNET_VER (
-    echo [Error] dotnet not found
-    popd & exit /b 1
-)
-if not "!DOTNET_VER!"=="10.0.201" (
-    echo [Error] .NET SDK must be 10.0.201 ^(global.json^). Current: !DOTNET_VER!
-    popd & exit /b 1
-)
+call "%BASE_DIR%_common.bat" :check_dotnet_sdk
+if errorlevel 1 ( popd & exit /b 1 )
 
 echo [1/2] Building PacketGenerator ^(Release^)...
 dotnet build "%ROOT_DIR%\Shared\Tools\PacketGenerator\PacketGenerator.csproj" -c Release --verbosity quiet
@@ -55,16 +48,8 @@ if !errorlevel! neq 0 (
     popd & exit /b 1
 )
 
-set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
-if not exist "%VSWHERE%" (
-    echo [Error] vswhere not found
-    popd & exit /b 1
-)
-for /f "usebackq delims=" %%i in (`"%VSWHERE%" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\amd64\MSBuild.exe`) do set "MSBUILD=%%i"
-if not defined MSBUILD (
-    echo [Error] MSBuild not found
-    popd & exit /b 1
-)
+call "%BASE_DIR%_common.bat" :detect_msbuild
+if errorlevel 1 ( popd & exit /b 1 )
 
 echo [--full] Building DH1_Engine ^(Debug x64^)...
 "%MSBUILD%" "%ROOT_DIR%\DH1_Engine\DH1_Engine.slnx" -p:Configuration=Debug -p:Platform=x64 -m -nologo -v:minimal

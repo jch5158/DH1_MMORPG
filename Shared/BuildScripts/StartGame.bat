@@ -24,61 +24,21 @@ echo ============================================
 echo  DH1 MMORPG Game Launcher (worker^) [%CONFIG%]
 echo ============================================
 
-REM 환경 변수 로드 (local, env, default 순)
-call :load_env_file "%BASE_DIR%\.env" ".env"
-call :load_env_file "%BASE_DIR%\.env.local" ".env.local"
+call "%~dp0_common.bat" :load_env_file "%BASE_DIR%\.env" ".env"
+call "%~dp0_common.bat" :load_env_file "%BASE_DIR%\.env.local" ".env.local"
 
 set "SERVER_DIR=%BASE_DIR%\Binaries\Server\%CONFIG%"
-set "UE5_EDITOR="
-if not "%DH1_UE5_EDITOR%"=="" (
-    set "UE5_EDITOR=%DH1_UE5_EDITOR%"
-) else (
-    for /f "tokens=2,*" %%A in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Engine\5.7" /v InstalledDirectory 2^>nul') do set "UE5_EDITOR=%%B\Engine\Binaries\Win64\UnrealEditor.exe"
-)
-if "!UE5_EDITOR!"=="" set "UE5_EDITOR=C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\Win64\UnrealEditor.exe"
+
+call "%~dp0_common.bat" :detect_ue5
 set "UPROJECT=%BASE_DIR%\DH1_Client\DH1_Client.uproject"
 set "CLIENT_ARGS=-game -windowed"
 set "LOGIN_HTTP_HOST=127.0.0.1"
 set "LOGIN_HTTP_PORT=5000"
 set "LOGIN_HEALTH_PATH=/health"
 set "WORLD_STABLE_SECONDS=15"
-set "AWS_CMD=aws"
 
-:: AWS CLI 경로 보정 (WorldServer의 `aws s3 cp` 실행 보장)
-if not "%DH1_AWS_CLI_PATH%"=="" (
-    if exist "%DH1_AWS_CLI_PATH%" (
-        for %%D in ("%DH1_AWS_CLI_PATH%") do set "PATH=%%~dpD;%PATH%"
-        set "AWS_CMD=%DH1_AWS_CLI_PATH%"
-        echo [Info] Using AWS CLI from DH1_AWS_CLI_PATH
-    ) else (
-        echo [Warning] DH1_AWS_CLI_PATH does not exist: %DH1_AWS_CLI_PATH%
-    )
-)
-
-if "%AWS_CMD%"=="aws" if exist "C:\Program Files\Amazon\AWSCLIV2\aws.exe" (
-    set "PATH=C:\Program Files\Amazon\AWSCLIV2;%PATH%"
-    set "DH1_AWS_CLI_PATH=C:\Program Files\Amazon\AWSCLIV2\aws.exe"
-    set "AWS_CMD=!DH1_AWS_CLI_PATH!"
-    echo [Info] AWS CLI path added for server processes
-    echo [Info] DH1_AWS_CLI_PATH configured
-)
-
-if not "%DH1_AWS_PROFILE%"=="" (
-    set "AWS_PROFILE=%DH1_AWS_PROFILE%"
-    echo [Info] AWS profile override from .env: !AWS_PROFILE!
-)
-
-if "%AWS_PROFILE%"=="" (
-    if exist "%USERPROFILE%\.aws\credentials" (
-        findstr /B /C:"[dh1]" "%USERPROFILE%\.aws\credentials" >nul 2>&1
-        if not errorlevel 1 (
-            set "AWS_PROFILE=dh1"
-            echo [Info] AWS profile auto-selected: dh1
-        )
-    )
-)
-
-call :check_aws_credentials
+call "%~dp0_common.bat" :detect_aws_cli
+call "%~dp0_common.bat" :check_aws_credentials
 if errorlevel 1 goto :launch_error
 
 :: 선택 해상도: .env에서 DH1_CLIENT_RESX / DH1_CLIENT_RESY 둘 다 설정된 경우에만 적용
@@ -199,7 +159,7 @@ if %WAIT_REMAIN% LEQ 0 (
     exit /b 1
 )
 set /a "WAIT_REMAIN-=1" >nul 2>&1
-call :sleep_seconds 1
+call "%~dp0_common.bat" :sleep_seconds 1
 goto :wait_process_loop
 
 :wait_tcp_port
@@ -222,7 +182,7 @@ if %TCP_REMAIN% LEQ 0 (
     exit /b 1
 )
 set /a "TCP_REMAIN-=1" >nul 2>&1
-call :sleep_seconds 1
+call "%~dp0_common.bat" :sleep_seconds 1
 goto :wait_tcp_port_loop
 
 :wait_http_ok
@@ -247,7 +207,7 @@ if %HTTP_REMAIN% LEQ 0 (
     exit /b 1
 )
 set /a "HTTP_REMAIN-=1" >nul 2>&1
-call :sleep_seconds 1
+call "%~dp0_common.bat" :sleep_seconds 1
 goto :wait_http_ok_loop
 
 :wait_process_stable_ps
@@ -261,61 +221,4 @@ if errorlevel 1 (
     exit /b 1
 )
 echo [Info] %STABLE_PROC_NAME%.exe remained alive for %STABLE_SECONDS%s.
-exit /b 0
-
-:sleep_seconds
-set "SLEEP_SECONDS=%~1"
-if "%SLEEP_SECONDS%"=="" set "SLEEP_SECONDS=1"
-timeout /t %SLEEP_SECONDS% /nobreak >nul 2>&1
-if not errorlevel 1 exit /b 0
-powershell -NoProfile -Command "Start-Sleep -Seconds %SLEEP_SECONDS%" >nul 2>&1
-if not errorlevel 1 exit /b 0
-set /a "PING_COUNT=SLEEP_SECONDS+1" >nul 2>&1
-ping 127.0.0.1 -n %PING_COUNT% >nul 2>&1
-exit /b 0
-
-:load_env_file
-set "ENV_FILE=%~1"
-set "ENV_LABEL=%~2"
-if exist "%ENV_FILE%" (
-    for /f "usebackq tokens=1,* delims==" %%A in ("%ENV_FILE%") do (
-        set "LINE=%%A"
-        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
-            set "%%A=%%B"
-        )
-    )
-    echo [Info] Loaded %ENV_LABEL%
-) else (
-    echo [Info] %ENV_LABEL% not found, skipping
-)
-exit /b 0
-
-:check_aws_credentials
-if "%AWS_CMD%"=="aws" (
-    where aws >nul 2>&1
-    if errorlevel 1 (
-        echo [Error] AWS CLI not found in PATH.
-        echo [Error] Install AWS CLI v2 or set DH1_AWS_CLI_PATH in .env
-        exit /b 1
-    )
-) else (
-    if not exist "%AWS_CMD%" (
-        echo [Error] AWS CLI path is invalid: %AWS_CMD%
-        echo [Error] Update DH1_AWS_CLI_PATH in .env
-        exit /b 1
-    )
-)
-
-if "%AWS_PROFILE%"=="" (
-    "%AWS_CMD%" sts get-caller-identity --output json >nul 2>&1
-) else (
-    "%AWS_CMD%" sts get-caller-identity --output json --profile "%AWS_PROFILE%" >nul 2>&1
-)
-if errorlevel 1 (
-    echo [Error] AWS credentials are not available for this terminal/session.
-    echo [Error] Fix AWS login/profile first, then run StartGame.bat again.
-    if not "%AWS_PROFILE%"=="" echo [Error] Current AWS_PROFILE: %AWS_PROFILE%
-    exit /b 1
-)
-echo [Info] AWS credentials check passed.
 exit /b 0

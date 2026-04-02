@@ -5,8 +5,8 @@ setlocal enabledelayedexpansion
 :: StartClient.bat — DH1_Client 증분 빌드 후 UnrealEditor -game 으로 N개 실행
 ::
 :: Usage:
-::   StartClient.bat              → 빌드 + 1개 실행 (기본 해상도 1280x720)
-::   StartClient.bat 3            → 빌드 + 3개 (기본 해상도 960x540, 창 위치 살짝 어긋남)
+::   StartClient.bat              → 빌드 + 1개 실행 (기본 해상도 1920x1080)
+::   StartClient.bat 3            → 빌드 + 3개 (기본 해상도, 창 위치 살짝 어긋남)
 ::   StartClient.bat 3 4          → 빌드 + 3개, 인스턴스 간 대기 4초 (기본 2초)
 ::   StartClient.bat --skip-build → 빌드 생략, 바로 실행
 ::
@@ -33,8 +33,8 @@ for %%A in (%*) do (
     )
 )
 
-call :load_env_file "%BASE_DIR%\.env" ".env"
-call :load_env_file "%BASE_DIR%\.env.local" ".env.local"
+call "%~dp0_common.bat" :load_env_file "%BASE_DIR%\.env" ".env"
+call "%~dp0_common.bat" :load_env_file "%BASE_DIR%\.env.local" ".env.local"
 
 if not "%DH1_CLIENT_SKIP_BUILD%"=="" if "%DH1_CLIENT_SKIP_BUILD%"=="1" set "SKIP_BUILD=1"
 
@@ -57,18 +57,7 @@ if %IC% GTR 12 (
 set "INSTANCE_COUNT=%IC%"
 
 REM UE5 엔진 경로 감지
-set "UE5_ROOT="
-if not "%DH1_UE5_EDITOR%"=="" (
-    set "UE5_EDITOR=%DH1_UE5_EDITOR%"
-) else (
-    for /f "tokens=2,*" %%A in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Engine\5.7" /v InstalledDirectory 2^>nul') do (
-        set "UE5_ROOT=%%B"
-        set "UE5_EDITOR=%%B\Engine\Binaries\Win64\UnrealEditor.exe"
-    )
-)
-if "!UE5_ROOT!"=="" set "UE5_ROOT=C:\Program Files\Epic Games\UE_5.7"
-if "!UE5_EDITOR!"=="" set "UE5_EDITOR=!UE5_ROOT!\Engine\Binaries\Win64\UnrealEditor.exe"
-set "UPROJECT=%BASE_DIR%\DH1_Client\DH1_Client.uproject"
+call "%~dp0_common.bat" :detect_ue5
 
 if not exist "!UE5_EDITOR!" (
     echo [Error] UnrealEditor.exe not found:
@@ -76,6 +65,7 @@ if not exist "!UE5_EDITOR!" (
     echo         Set DH1_UE5_EDITOR in .env or install UE 5.7.
     exit /b 1
 )
+set "UPROJECT=%BASE_DIR%\DH1_Client\DH1_Client.uproject"
 if not exist "%UPROJECT%" (
     echo [Error] .uproject not found:
     echo         %UPROJECT%
@@ -127,33 +117,9 @@ for /L %%i in (1,1,%INSTANCE_COUNT%) do (
     set "ABSLOG=%CLIENT_LOG_DIR%\DH1_Client_%%i.log"
     echo [Start] #%%i / %INSTANCE_COUNT%   -WinX=!OFFX! -WinY=!OFFY!   log: !ABSLOG!
     start "DH1_Client #%%i" "!UE5_EDITOR!" "%UPROJECT%" -game -windowed -ResX=%RESX% -ResY=%RESY% -WinX=!OFFX! -WinY=!OFFY! -ABSLOG="!ABSLOG!" -CrashForceLogFlush
-    if %%i LSS %INSTANCE_COUNT% call :sleep_seconds %STAGGER_SEC%
+    if %%i LSS %INSTANCE_COUNT% call "%~dp0_common.bat" :sleep_seconds %STAGGER_SEC%
 )
 
 echo.
 echo [Done] Per-instance log: %CLIENT_LOG_DIR%\DH1_Client_1.log … #%INSTANCE_COUNT%
-exit /b 0
-
-:sleep_seconds
-set "SLEEP_SECONDS=%~1"
-if "%SLEEP_SECONDS%"=="" set "SLEEP_SECONDS=2"
-timeout /t %SLEEP_SECONDS% /nobreak >nul 2>&1
-if not errorlevel 1 exit /b 0
-powershell -NoProfile -Command "Start-Sleep -Seconds %SLEEP_SECONDS%" >nul 2>&1
-exit /b 0
-
-:load_env_file
-set "ENV_FILE=%~1"
-set "ENV_LABEL=%~2"
-if exist "%ENV_FILE%" (
-    for /f "usebackq tokens=1,* delims==" %%A in ("%ENV_FILE%") do (
-        set "LINE=%%A"
-        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
-            set "%%A=%%B"
-        )
-    )
-    echo [Info] Loaded %ENV_LABEL%
-) else (
-    echo [Info] %ENV_LABEL% not found, skipping
-)
 exit /b 0

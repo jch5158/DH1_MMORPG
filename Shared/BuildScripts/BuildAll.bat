@@ -32,23 +32,12 @@ echo.
 
 :: ── 환경 검증 ─────────────────────────────────────────────────
 
-:: .NET SDK 버전 확인 (global.json 기준: 10.0.201)
-for /f "usebackq delims=" %%v in (`dotnet --version 2^>nul`) do set "DOTNET_VER=%%v"
-if not defined DOTNET_VER (
-    echo [Error] .NET SDK not found. Install .NET 10.0.201.
-    exit /b 1
-)
-if not "!DOTNET_VER!"=="10.0.201" (
-    echo [Error] .NET SDK version mismatch.
-    echo         Required : 10.0.201
-    echo         Installed: !DOTNET_VER!
-    echo         Download : https://dotnet.microsoft.com/download/dotnet/10.0
-    exit /b 1
-)
+call "%BASE_DIR%_common.bat" :check_dotnet_sdk
+if errorlevel 1 exit /b 1
 
 :: Visual Studio 버전 확인 (최소 18.0 = VS 2025)
-set "VSWHERE_EXE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
-for /f "usebackq delims=" %%v in (`"!VSWHERE_EXE!" -latest -property installationVersion 2^>nul`) do set "VS_VER=%%v"
+set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+for /f "usebackq delims=" %%v in (`"!VSWHERE!" -latest -property installationVersion 2^>nul`) do set "VS_VER=%%v"
 for /f "tokens=1 delims=." %%m in ("!VS_VER!") do set "VS_MAJOR=%%m"
 if !VS_MAJOR! lss 18 (
     echo [Error] Visual Studio 2025 ^(v18+^) required.
@@ -57,10 +46,8 @@ if !VS_MAJOR! lss 18 (
     exit /b 1
 )
 
-:: UE5 버전 확인 (레지스트리에서 설치 경로 자동 감지, 폴백: 기본 경로)
-set "UE5_ROOT="
-for /f "tokens=2,*" %%A in ('reg query "HKLM\SOFTWARE\EpicGames\Unreal Engine\5.7" /v InstalledDirectory 2^>nul') do set "UE5_ROOT=%%B"
-if "!UE5_ROOT!"=="" set "UE5_ROOT=C:\Program Files\Epic Games\UE_5.7"
+:: UE5 경로 감지
+call "%BASE_DIR%_common.bat" :detect_ue5
 if not exist "!UE5_ROOT!\Engine\Build\BatchFiles\Build.bat" (
     echo [Error] Unreal Engine 5.7 not found at: !UE5_ROOT!
     echo         Install UE 5.7 via Epic Games Launcher.
@@ -74,27 +61,13 @@ echo.
 
 :: ──────────────────────────────────────────────────────────────
 
-REM 환경 변수 로드 (local, env, default 순)
-call :load_env_file "%ROOT_DIR%\.env" ".env"
-call :load_env_file "%ROOT_DIR%\.env.local" ".env.local"
+call "%BASE_DIR%_common.bat" :load_env_file "%ROOT_DIR%\.env" ".env"
+call "%BASE_DIR%_common.bat" :load_env_file "%ROOT_DIR%\.env.local" ".env.local"
 echo.
 
-:: Find MSBuild via vswhere
-set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
-if not exist "%VSWHERE%" (
-    echo [Error] vswhere.exe not found
-    exit /b 1
-)
-
-for /f "usebackq delims=" %%i in (`"%VSWHERE%" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\amd64\MSBuild.exe`) do (
-    set "MSBUILD=%%i"
-)
-
-if not defined MSBUILD (
-    echo [Error] MSBuild.exe not found. Install Visual Studio.
-    exit /b 1
-)
-
+:: Find MSBuild
+call "%BASE_DIR%_common.bat" :detect_msbuild
+if errorlevel 1 exit /b 1
 echo [Info] MSBuild: %MSBUILD%
 echo.
 
@@ -173,20 +146,4 @@ echo ============================================================
 echo.
 echo [Info] Run StartServers.bat to launch servers + client.
 echo.
-exit /b 0
-
-:load_env_file
-set "ENV_FILE=%~1"
-set "ENV_LABEL=%~2"
-if exist "%ENV_FILE%" (
-    for /f "usebackq tokens=1,* delims==" %%A in ("%ENV_FILE%") do (
-        set "LINE=%%A"
-        if not "!LINE:~0,1!"=="#" if not "%%A"=="" (
-            set "%%A=%%B"
-        )
-    )
-    echo [Info] Loaded %ENV_LABEL%
-) else (
-    echo [Info] %ENV_LABEL% not found, skipping
-)
 exit /b 0
