@@ -1,106 +1,104 @@
 # DH1_MMORPG
 
-C++ IOCP 기반 커스텀 네트워크 엔진(**CppNetEngine**)으로 구축한 MMORPG 프로젝트입니다.
-4개의 서버 프로세스(Gateway · World · Realm · Login)로 구성된 분산 아키텍처와
-Unreal Engine 5.7 C++ 클라이언트로 이루어져 있으며,
-서버 엔진을 클라이언트에 static lib로 이식하여 동일한 네트워크 스택을 공유합니다.
+> C++ IOCP 커스텀 네트워크 엔진으로 서버와 클라이언트를 동시에 구동하는 MMORPG 프로젝트
 
-## 기술 스택
+**CppNetEngine** — C++17 Windows IOCP 기반 Actor Model 네트워크 엔진을 직접 설계하고, 이를 **4개의 서버 프로세스**(Gateway · World · Realm · Login)와 **Unreal Engine 5.7 클라이언트**에 동일하게 적용했습니다. 서버 엔진을 static lib로 이식하여 **서버·클라이언트가 같은 네트워크 스택**을 공유합니다.
+
+---
+
+### 기술 스택
 
 | 영역 | 기술 |
 |------|------|
-| 네트워크 엔진 | C++17, Windows IOCP, Actor Model, Lock-free Queue/Stack |
-| 서버 (Gateway / World / Realm) | C++17, CppNetEngine (static lib) |
-| 서버 (Login) | C# ASP.NET Core 10, Entity Framework Core |
-| 클라이언트 | Unreal Engine 5.7, C++, CppNetEngine 이식 |
+| 네트워크 엔진 | C++17 · Windows IOCP · Actor Model · Lock-free Queue/Stack |
+| 서버 (GW / WS / RS) | C++17 · CppNetEngine (static lib) |
+| 서버 (Login) | C# · ASP.NET Core 10 · Entity Framework Core |
+| 클라이언트 | Unreal Engine 5.7 · C++ · CppNetEngine 이식 |
 | 프로토콜 | Protocol Buffers 3 + 커스텀 PacketGenerator (.NET) |
-| 데이터베이스 | MySQL (계정 DB + 게임 DB) |
-| 캐시 / Pub-Sub | Redis (세션 TTL, 서버 등록, 채팅 릴레이) |
-| 스토리지 | AWS S3 (서버용 NavMesh 바이너리) |
-| 메모리 할당 | mimalloc (전역 교체) |
-| 로깅 | spdlog + fmt |
-| 크래시 덤프 | Crashpad (crashpad_handler) |
-| 빌드 | MSBuild (C++), .NET SDK 10.0.201, Unreal Build Tool |
+| 데이터 | MySQL · Redis (세션 · Pub/Sub) · AWS S3 (NavMesh) |
+| 인프라 | mimalloc · spdlog · Crashpad · vcpkg |
 | CI | GitHub Actions (PacketGenerator 빌드 + LoginServer 단위 테스트) |
-| 패키지 관리 | vcpkg (spdlog, protobuf, redis-plus-plus, mimalloc, crashpad 등) |
+
+---
 
 ## 시스템 아키텍처
 
-**전체 흐름:** 클라이언트는 **게임은 Gateway**, **계정·티켓은 Login** 으로 나눠 접속합니다. Gateway는 World로 패킷을 넘기고, World와 Realm은 **TCP로 상시 연결**되어 월드 등록·하트비트 등을 주고받습니다. MySQL·Redis·S3·SMTP 등은 필요한 서버에서만 사용합니다.
+```
+                          ┌──────────────────────────────────────────────┐
+                          │               DH1_Client (UE5)              │
+                          │          UE5 C++ + CppNetEngine.lib         │
+                          └──────┬──────────────────────────┬───────────┘
+                           TCP   │                          │  HTTP/S
+                     (게임 패킷) │                          │ (로그인 API)
+                ┌────────────────▼───────┐    ┌─────────────▼──────────┐
+                │    GatewayServer       │    │     LoginServer        │
+                │  패킷 인증·라우팅·세션 │    │  REST API · 이메일 인증 │
+                │       (C++ IOCP)       │    │  (C# ASP.NET Core 10)  │
+                └────────────┬───────────┘    └────────────────────────┘
+                       TCP   │  (릴레이)
+                ┌────────────▼───────────┐
+                │     WorldServer        │
+                │  게임 로직 · AOI · 경로 │
+                │       (C++ IOCP)       │
+                └────────────┬───────────┘
+                       TCP   │  (등록·하트비트)
+                ┌────────────▼───────────┐
+                │     RealmServer        │
+                │  서버 목록 · 월드 관리  │
+                │       (C++ IOCP)       │
+                └────────────────────────┘
 
-```mermaid
-flowchart TB
-    subgraph ClientLayer [클라이언트]
-        C[UE5 + CppNetEngine]
-    end
-
-    subgraph Access [접속·인증]
-        G[Gateway<br/>게임 TCP]
-        L[Login<br/>HTTP API]
-    end
-
-    subgraph GameServers [게임·메타 서버]
-        direction LR
-        W[World<br/>로직·AOI·NavMesh]
-        R[Realm<br/>서버 목록]
-    end
-
-    subgraph Backend [데이터·외부]
-        D[(MySQL · Redis · S3 · SMTP)]
-    end
-
-    C -->|게임| G
-    C -.->|로그인| L
-    G --> W
-    W --> R
-    G --> D
-    W --> D
-    L --> D
+   외부 의존: MySQL (계정·게임 DB)  ·  Redis (세션·Pub/Sub)  ·  AWS S3 (NavMesh)
 ```
 
 | 서버 | 역할 |
 |------|------|
-| **GatewayServer** | 클라이언트 TCP 접속점. 패킷 인증·라우팅, 세션 관리, 클라이언트 하트비트 검사 |
-| **WorldServer** | 게임 로직 처리. NavMesh 경로탐색, AOI 엔티티 관리, GameTick (50ms), 채팅 라우팅 |
+| **GatewayServer** | 클라이언트 TCP 접속점. 패킷 인증·라우팅, 세션 관리, 하트비트 검사 |
+| **WorldServer** | 게임 로직. NavMesh 경로탐색, AOI 엔티티 관리, GameTick (50ms), 채팅 라우팅 |
 | **RealmServer** | 서버 목록 관리. WorldServer 등록/상태, 렐름 선택 조율 |
 | **LoginServer** | 계정 인증 (이메일/비밀번호). HTTP REST API, 이메일 인증, 세션 티켓 발급 |
 
 ## 스레드 모델
 
-각 C++ 서버 프로세스는 **NetworkScheduler**와 **ActorScheduler** 두 축의 IOCP 스케줄러로 나눕니다. 아래는 **한 바퀴의 처리 흐름**입니다 (실선 = 주 경로).
+각 C++ 서버 프로세스는 **두 개의 독립 IOCP 스케줄러**로 나뉩니다.
 
-**흐름 요약:** 소켓 I/O 완료 → 네트워크 스레드에서 수신·역직렬화 → 메일박스에 메시지 적재 → 액터 스레드에서 게임 로직 → 송신 버퍼로 다시 IOCP 송신. 지연·타임아웃은 각 스케줄러의 **TimingWheel**이 담당합니다.
-
-```mermaid
-flowchart TD
-    IOCP[IOCP 완료 이벤트]
-    NS[NetworkScheduler<br/>Recv·Send·소켓]
-    PS[PacketSession]
-    MB[ActorMailbox<br/>LockFreeQueue]
-    AS[ActorScheduler]
-    AC[Actor 로직<br/>DB·Redis·세션 등]
-    SB[SendBuffer]
-
-    IOCP --> NS
-    NS --> PS
-    PS --> MB
-    MB --> AS
-    AS --> AC
-    AC --> SB
-    SB --> IOCP
 ```
-
-**핵심 구성 요소:**
+  ┌───────────────────────────────────────────────────────────────────┐
+  │                     서버 프로세스 (예: WorldServer)                │
+  │                                                                   │
+  │   ┌─ NetworkScheduler (IOCP) ──┐   ┌─ ActorScheduler (IOCP) ──┐  │
+  │   │                            │   │                           │  │
+  │   │  running × R               │   │  running × R              │  │
+  │   │  ┌────┐ ┌────┐             │   │  ┌────┐ ┌────┐           │  │
+  │   │  │ IO │ │ IO │  GQCS 대기  │   │  │ IO │ │ IO │ GQCS 대기│  │
+  │   │  └────┘ └────┘             │   │  └────┘ └────┘           │  │
+  │   │                            │   │                           │  │
+  │   │  dispatch × N              │   │  dispatch × M             │  │
+  │   │  ┌────┐┌────┐┌────┐┌────┐ │   │  ┌────┐┌────┐┌────┐     │  │
+  │   │  │ W1 ││ W2 ││ W3 ││ W4 │ │   │  │ W1 ││ W2 ││ W3 │     │  │
+  │   │  └────┘└────┘└────┘└────┘ │   │  └────┘└────┘└────┘     │  │
+  │   │  Recv·Send·PacketSession  │   │  Actor 로직 실행          │  │
+  │   │  역직렬화                  │   │  DB·Redis·세션            │  │
+  │   │            │               │   │        │                  │  │
+  │   │   TimingWheel              │   │   TimingWheel             │  │
+  │   └────────────┼───────────────┘   └────────┼──────────────────┘  │
+  │                │                             ▲                    │
+  │                ▼     ActorMailbox             │                    │
+  │            ┌──────── (LockFreeQueue) ────────┘                    │
+  │            │                                                      │
+  │            ▼         SendBuffer → IOCP 송신                       │
+  └───────────────────────────────────────────────────────────────────┘
+```
 
 | 컴포넌트 | 설명 |
 |----------|------|
-| `NetworkScheduler` | IOCP 기반. Recv/Send 완료 처리, 소켓 I/O 디스패치 |
-| `ActorScheduler` | IOCP 기반. Actor 메일박스 메시지를 워커 스레드에서 처리 |
-| `Actor` / `ActorMailbox` | Actor 모델 구현. `LockFreeQueue` 기반 메일박스, `TryAcquire/Release`로 단일 스레드 점유 보장 |
-| `TimingWheel` | 계층형 타이밍 휠. 하트비트·세션 타임아웃·재연결 지연 등 스케줄링 |
-| `SessionReaper` | 비활성 세션 주기적 정리 (서버측 타임아웃 감지) |
+| **NetworkScheduler** | IOCP 기반. Recv/Send 완료 처리, 소켓 I/O 디스패치 |
+| **ActorScheduler** | IOCP 기반. Actor 메일박스 메시지를 워커 스레드에서 처리 |
+| **ActorMailbox** | `LockFreeQueue` 기반 메일박스. `TryAcquire/Release`로 단일 스레드 점유 보장 |
+| **TimingWheel** | 계층형 타이밍 휠. 하트비트·세션 타임아웃·재연결 지연 등 스케줄링 |
+| **SessionReaper** | 비활성 세션 주기적 정리 (서버측 타임아웃 감지) |
 
-**스레드 수 설정** (`*ServerConfig.json`):
+스레드 수는 `*ServerConfig.json`에서 설정합니다 (`runningThreadCount: 0` → CPU 코어 자동 산정).
 
 ```json
 {
@@ -109,69 +107,60 @@ flowchart TD
 }
 ```
 
-`runningThreadCount`가 0이면 `std::thread::hardware_concurrency()` 기반 자동 산정합니다.
-
 ## 패킷 흐름
 
 ### 로그인 → 월드 진입
 
-```mermaid
-sequenceDiagram
-    participant C as Client (UE5)
-    participant L as LoginServer
-    participant G as GatewayServer
-    participant R as RealmServer
-    participant W as WorldServer
-
-    C->>L: POST /api/auth/login (email, password)
-    L-->>C: 200 OK {ticket, gatewayIp, gatewayPort}
-
-    C->>G: TCP Connect
-    C->>G: C2S_LOGIN_REQ (ticket, accountId)
-    G->>G: Redis 티켓 검증
-    G-->>C: S2C_LOGIN_RES (성공)
-
-    C->>G: C2S_REALM_LIST_REQ
-    G-->>C: S2C_REALM_LIST_RES (서버 목록)
-
-    C->>G: C2S_REALM_SELECT_REQ (realmId)
-    G->>W: S2S_GAME_SESSION_ENTER_NOT
-    W->>W: 게임 세션 생성
-    W-->>G: S2S_GAME_SESSION_ENTER_RES
-    G-->>C: S2C_REALM_SELECT_RES
-
-    C->>G: C2S_SPAWN_POSITION_REQ
-    G->>W: S2S_RELAY_TO_WORLD_NOT
-    W->>W: DB 캐릭터 조회 (없으면 S2C_CHARACTER_CREATE_NOT)
-    W-->>G: S2S_RELAY_TO_CLIENT_NOT
-    G-->>C: S2C_SPAWN_POSITION_RES (위치, 캐릭터 데이터)
-    W->>W: AOI 주변 플레이어에게 S2C_ENTITY_ENTER_NOT
+```
+ Client (UE5)          LoginServer         GatewayServer          WorldServer
+      │                     │                     │                     │
+      │  POST /auth/login   │                     │                     │
+      │────────────────────▶│                     │                     │
+      │◀─── 200 {ticket} ──│                     │                     │
+      │                                           │                     │
+      │  TCP Connect + C2S_LOGIN_REQ (ticket)     │                     │
+      │──────────────────────────────────────────▶│                     │
+      │                                    Redis 티켓 검증              │
+      │◀──────────────── S2C_LOGIN_RES ──────────│                     │
+      │                                           │                     │
+      │  C2S_REALM_LIST_REQ ────────────────────▶│                     │
+      │◀──────────── S2C_REALM_LIST_RES ─────────│                     │
+      │                                           │                     │
+      │  C2S_REALM_SELECT_REQ ──────────────────▶│                     │
+      │                                           │  S2S_GAME_SESSION   │
+      │                                           │────────────────────▶│
+      │                                           │◀── RES ────────────│
+      │◀──────────── S2C_REALM_SELECT_RES ───────│                     │
+      │                                           │                     │
+      │  C2S_SPAWN_POSITION_REQ ────────────────▶│  RELAY_TO_WORLD     │
+      │                                           │────────────────────▶│
+      │                                           │                  DB 캐릭터 조회
+      │                                           │◀── RELAY_TO_CLIENT─│
+      │◀──────── S2C_SPAWN_POSITION_RES ─────────│                     │
+      │                                           │               AOI 범위 내
+      │                                           │            S2C_ENTITY_ENTER_NOT
 ```
 
 ### 이동 (서버 사이드 NavMesh 경로탐색)
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant G as GatewayServer
-    participant W as WorldServer
-
-    C->>G: C2S_MOVE_TO_POSITION_REQ (현재 위치, 목적지)
-    G->>W: S2S_RELAY_TO_WORLD_NOT
-
-    W->>W: NavMesh FindPath (Detour)
-    W->>W: GameTick 경로 추종 (50ms 간격)
-
-    W-->>G: S2C_MOVE_PATH_RES (웨이포인트[], 속도)
-    G-->>C: S2C_MOVE_PATH_RES
-
-    Note over W: AOI 범위 내 다른 플레이어에게 브로드캐스트
-    W-->>G: S2C_ENTITY_SNAPSHOT_NOT (주변 엔티티 위치)
-    G-->>C: S2C_ENTITY_SNAPSHOT_NOT
-
-    W->>W: 셀 경계 이동 시 AOI Enter/Leave 처리
-    W-->>G: S2C_ENTITY_ENTER_NOT / S2C_ENTITY_LEAVE_NOT
-    G-->>C: S2C_ENTITY_ENTER_NOT / S2C_ENTITY_LEAVE_NOT
+```
+ Client                GatewayServer          WorldServer
+    │                       │                       │
+    │  C2S_MOVE_TO_POS_REQ  │                       │
+    │──────────────────────▶│  RELAY_TO_WORLD       │
+    │                       │──────────────────────▶│
+    │                       │                    NavMesh FindPath (Detour)
+    │                       │                    GameTick 경로 추종 (50ms)
+    │                       │◀── S2C_MOVE_PATH_RES─│
+    │◀── S2C_MOVE_PATH_RES─│                       │
+    │                       │                       │
+    │                       │        AOI 범위 브로드캐스트
+    │                       │◀─ S2C_ENTITY_SNAPSHOT │
+    │◀─ S2C_ENTITY_SNAPSHOT│                       │
+    │                       │                       │
+    │                       │           셀 경계 이동 시
+    │                       │◀── ENTER / LEAVE_NOT─│
+    │◀── ENTER / LEAVE_NOT─│                       │
 ```
 
 ## CppNetEngine → UE5 클라이언트 이식
@@ -179,26 +168,25 @@ sequenceDiagram
 서버와 클라이언트가 **동일한 네트워크 엔진**을 사용합니다.
 
 ```
-DH1_Engine/CppNetEngine/    →  CppNetEngine.lib (static library)
-                                    │
-                ┌───────────────────┼───────────────────┐
-                ▼                                       ▼
-    DH1_Server (GW/WS/RS)                    DH1_Client (UE5)
-    직접 링크 + 헤더 참조                     Shared/Libraries/ 경유 링크
+   CppNetEngine (C++17 · IOCP)
+   ─────────────────────────────
+          │ static lib (.lib)
+          ├────────────────────────────────────┐
+          ▼                                    ▼
+   DH1_Server                          DH1_Client (UE5)
+   GW · WS · RS                        Shared/Libraries/ 경유
+   직접 링크 + 헤더 참조               UClientNetSubsystem 래핑
 ```
-
-**이식 핵심:**
 
 | 항목 | 구현 |
 |------|------|
-| 라이브러리 배포 | `CppNetEngine.lib` → `Shared/Libraries/CppNetEngine/{Debug,Release}/` |
-| UE5 매크로 충돌 해결 | `NetEngineWrapper.h` — `check`, `verify`, `cast` 매크로 push/pop 후 엔진 헤더 포함 |
-| UE5 생명주기 통합 | `UClientNetSubsystem` (`UGameInstanceSubsystem` + `FTickableGameObject`) |
-| 프로토콜 코드 공유 | 서버·Echo는 `Shared/Protocol` 직접 컴파일, UE 클라이언트는 PacketGenerator가 역할에 맞게 `Network/Protocol`로 복사 |
-| 빌드 통합 | `DH1_Client.Build.cs`에서 vcpkg 라이브러리 + CppNetEngine.lib 링크 |
+| **라이브러리 배포** | `CppNetEngine.lib` → `Shared/Libraries/CppNetEngine/{Debug,Release}/` |
+| **UE5 매크로 충돌** | `NetEngineWrapper.h` — `check`, `verify`, `cast` 매크로 push/pop 후 엔진 헤더 포함 |
+| **UE5 생명주기 통합** | `UClientNetSubsystem` (`UGameInstanceSubsystem` + `FTickableGameObject`) |
+| **프로토콜 코드 공유** | 서버·Echo는 `Shared/Protocol` 직접 컴파일, UE는 PacketGenerator가 `Network/Protocol`로 복사 |
+| **빌드 통합** | `DH1_Client.Build.cs`에서 vcpkg + CppNetEngine.lib 링크 |
 
-클라이언트 `UClientNetSubsystem`은 CppNetEngine의 `ClientService`와 `NetworkScheduler`를 내부적으로 생성하고,
-UE5의 `Tick()` 에서 `Dispatch()`를 호출하여 수신 패킷을 게임 스레드로 전달합니다.
+`UClientNetSubsystem`은 CppNetEngine의 `ClientService` + `NetworkScheduler`를 생성하고, UE `Tick()`에서 `Dispatch()`를 호출하여 수신 패킷을 게임 스레드로 전달합니다.
 
 ## PacketGenerator (패킷 코드 자동화)
 
@@ -207,31 +195,23 @@ UE5의 `Tick()` 에서 `Dispatch()`를 호출하여 수신 패킷을 게임 스�
 
 ### 처리 파이프라인
 
-```mermaid
-flowchart LR
-    subgraph Input
-        P["Shared/Protocol/Proto/*.proto"]
-        PO["PacketOption.proto<br/>(File/Message 옵션)"]
-    end
-
-    subgraph Batch["PacketGenerator.bat"]
-        PC["protoc<br/>--cpp_out → Shared/Protocol<br/>--descriptor_set_out → *.desc"]
-        EXE["PacketGenerator.exe<br/>(.NET)"]
-    end
-
-    subgraph Output
-        PID["Shared/Protocol/PacketId/PacketId.h"]
-        PH["각 프로젝트/PacketHandler/*.h"]
-        DIS["PacketServiceTypeHandler.h"]
-        UE["UE 모듈<br/>Network/Protocol/*.pb.cpp"]
-    end
-
-    P --> PC
-    PC --> EXE
-    EXE --> PID
-    EXE --> PH
-    EXE --> DIS
-    EXE --> UE
+```
+  *.proto  +  PacketOption.proto
+       │
+       ▼
+  ┌─ PacketGenerator.bat ─────────────────────────────────────────┐
+  │                                                                │
+  │  1) protoc  --cpp_out   → Shared/Protocol/*.pb.h / .pb.cc     │
+  │             --desc_out  → Proto/*.desc                         │
+  │                                                                │
+  │  2) PacketGenerator.exe (.NET)                                 │
+  │     .desc 파싱 → Role별 코드 생성                              │
+  └────────────────────────────────────────────────────────────────┘
+       │
+       ├──→  Shared/Protocol/PacketId/PacketId.h
+       ├──→  각 프로젝트/PacketHandler/*.h
+       ├──→  PacketServiceTypeHandler.h
+       └──→  UE Network/Protocol/*.pb.cpp  (클라이언트 전용 복사)
 ```
 
 1. **protoc** — `Shared/vcpkg`의 `protoc.exe`로 `.proto` → `Shared/Protocol/*.pb.h`, `*.pb.cc` 및 `Proto/*.desc` (descriptor set).
@@ -279,20 +259,23 @@ flowchart LR
 - 일반: `Shared\BuildScripts\PacketGenerator.bat` (vcpkg `protoc` 필요)
 - `BuildAll.bat`는 기본적으로 PacketGenerator를 포함한 전체 순서로 빌드합니다 (`--skip-proto` 시 proto 단계 생략).
 
+---
+
 ## 핵심 기능
 
 | 기능 | 설명 |
 |------|------|
-| **커스텀 IOCP 엔진** | Actor 모델, Lock-free Queue/Stack, ObjectPool/MemoryPool, TimingWheel, SendBuffer 할당기 |
-| **AOI (Area of Interest)** | `GridManager` 기반 셀 분할 (기본 2000 유닛). 셀 경계 이동 시 Enter/Leave 자동 브로드캐스트 |
-| **서버 사이드 NavMesh** | UE5 Detour 라이브러리를 서버에서 직접 로드. S3에서 바이너리 다운로드, 서버 권위적 경로 탐색 |
-| **PacketGenerator** | 위 **PacketGenerator (패킷 코드 자동화)** 절 참고 — 옵션 기반 ID·핸들러·UE 프로토콜 동기화 |
-| **Relay 패턴** | Gateway ↔ World 간 `S2S_RELAY_TO_CLIENT_NOT` / `S2S_RELAY_TO_WORLD_NOT`으로 클라이언트 패킷 투명 중계 |
-| **하트비트 체계** | 클라이언트→Gateway, Gateway↔World, World↔Realm 양방향 하트비트 + 타임아웃 검출 |
-| **세션 관리** | Redis 기반 세션 TTL, 중복 로그인 Kick (`S2C_KICK_NOT`), SessionReaper 자동 정리 |
-| **인게임 채팅** | LOCAL (AOI 범위) / WORLD (전체) 채널. Redis Pub/Sub로 크로스 서버 라우팅 |
-| **캐릭터 시스템** | 캐릭터 생성, 오버헤드 UI (이름·레벨·HP), 스폰 위치 동기화 |
-| **크래시 리포팅** | Crashpad 기반 미니덤프 수집 (`CrashReporter` + `crashpad_handler.exe`) |
+| **커스텀 IOCP 엔진** | Actor Model · Lock-free Queue/Stack · ObjectPool · MemoryPool · TimingWheel · SendBuffer 할당기 |
+| **AOI** | `GridManager` 기반 셀 분할 (2000 유닛). 셀 경계 이동 시 Enter/Leave 자동 브로드캐스트 |
+| **서버 사이드 NavMesh** | UE5 Detour를 서버에서 직접 로드 → 서버 권위적 경로 탐색. S3에서 바이너리 다운로드 |
+| **PacketGenerator** | `.proto` 커스텀 옵션 → PacketId · Handler · UE 프로토콜 자동 생성 (상세: 하단 별도 섹션) |
+| **Relay 패턴** | Gateway ↔ World 간 `RELAY_TO_CLIENT` / `RELAY_TO_WORLD`로 패킷 투명 중계 |
+| **하트비트 · 세션** | 양방향 하트비트 + Redis 세션 TTL + 중복 로그인 Kick + SessionReaper 자동 정리 |
+| **인게임 채팅** | LOCAL (AOI 범위) / WORLD (전체). Redis Pub/Sub 크로스 서버 라우팅 |
+| **캐릭터** | 캐릭터 생성 · 오버헤드 UI (이름·레벨·HP) · 스폰 위치 동기화 |
+| **크래시 리포팅** | Crashpad 미니덤프 수집 (`CrashReporter` + `crashpad_handler.exe`) |
+
+---
 
 ## 프로젝트 구조
 
@@ -337,6 +320,8 @@ DH1_MMORPG/
 └── .github/workflows/ci.yml     # GitHub Actions CI
 ```
 
+---
+
 ## 빌드
 
 ### 사전 요구사항
@@ -377,6 +362,8 @@ Shared\BuildScripts\RunValidationTests.bat --full   # proto 컴파일 + Echo 엔
 
 > VS Code에서는 `Ctrl+Shift+B` → 빌드 태스크 선택으로도 실행 가능합니다.
 
+---
+
 ## 서버 실행
 
 ```batch
@@ -389,6 +376,8 @@ Shared\BuildScripts\StartGame.bat             # 서버 + 클라이언트 실행
 실행 순서: **RealmServer → WorldServer → GatewayServer → LoginServer** → (클라이언트)
 
 각 서버는 프로세스 존재·TCP 포트·HTTP 헬스체크를 순차 확인한 뒤 다음 단계로 진행합니다.
+
+---
 
 ## 환경 설정
 
