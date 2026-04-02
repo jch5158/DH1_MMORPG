@@ -16,6 +16,11 @@ namespace PacketGenerator
 
     internal class PacketConfig
     {
+        private static readonly JsonSerializerOptions s_jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         public static PacketProjectsConfig Load(string configFilePath)
         {
             if (!File.Exists(configFilePath))
@@ -27,7 +32,7 @@ namespace PacketGenerator
             try
             {
                 var jsonString = File.ReadAllText(configFilePath);
-                var config = JsonSerializer.Deserialize<PacketProjectsConfig>(jsonString, mOptions);
+                var config = JsonSerializer.Deserialize<PacketProjectsConfig>(jsonString, s_jsonOptions);
                 return config ?? new PacketProjectsConfig();
             }
             catch (JsonException ex)
@@ -41,10 +46,5 @@ namespace PacketGenerator
                 return new PacketProjectsConfig();
             }
         }
-
-        public static JsonSerializerOptions mOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
     }
 }

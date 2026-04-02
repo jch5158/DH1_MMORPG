@@ -53,8 +53,8 @@ namespace PacketGenerator
                 return handlers;
             }
 
-            var serviceTypeDescriptor = getEnumDescriptorProto("eServiceType", protocolDirPath);
-            var roleDescriptor = getEnumDescriptorProto("eRole", protocolDirPath);
+            var serviceTypeDescriptor = GetEnumDescriptorProto("eServiceType", protocolDirPath);
+            var roleDescriptor = GetEnumDescriptorProto("eRole", protocolDirPath);
             if (serviceTypeDescriptor == null || roleDescriptor == null)
             {
                 return handlers;
@@ -191,7 +191,7 @@ namespace PacketGenerator
             return handlers;
         }
 
-        private static EnumDescriptorProto? getEnumDescriptorProto(string enumName, string protocolDirPath)
+        private static EnumDescriptorProto? GetEnumDescriptorProto(string enumName, string protocolDirPath)
         {
             var enumDescPath = Path.Combine(protocolDirPath, "Enum.desc");
             if (!File.Exists(enumDescPath))
@@ -208,7 +208,7 @@ namespace PacketGenerator
 
     public static class EnumGenerator
     {
-        public static void GenerateSharedEnum(List<HandlerInfo> handlers, string outputDirPath)
+        public static void GenerateSharedEnum(List<HandlerInfo> handlers, string outputFilePath)
         {
             var enumsBuilder = new StringBuilder();
 
@@ -245,13 +245,13 @@ namespace PacketGenerator
             var fileContent = string.Format(PacketFormatter.ENUM_PACKET_ID_FORMAT, enumsBuilder.ToString());
             var normalizedContent = PacketFormatter.NormalizeToCrlf(fileContent);
 
-            var directoryPath = Path.GetDirectoryName(outputDirPath);
+            var directoryPath = Path.GetDirectoryName(outputFilePath);
             if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
             {
                 Directory.CreateDirectory(directoryPath);
             }
 
-            File.WriteAllText(outputDirPath, normalizedContent, new UTF8Encoding(true));
+            File.WriteAllText(outputFilePath, normalizedContent, new UTF8Encoding(true));
         }
     }
 
@@ -290,7 +290,8 @@ namespace PacketGenerator
                     {
                         makeSendBufferBuilder.AppendFormat(PacketFormatter.SEND_MAKE_SEND_BUFFER_FORMAT,
                             packet.MessageName, // {0}
-                            packet.MessageName); // {1} (상수/Enum 이름으로 가정)
+                            packet.MessageName, // {1}
+                            handler.ProtoFileName); // {2}
                     }
                 }
 
