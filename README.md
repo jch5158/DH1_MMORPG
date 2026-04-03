@@ -8,6 +8,7 @@
 | **프로젝트 유형** | 개인 프로젝트 (1인 개발) |
 | **개발 기간** | 2026.01 ~ 현재 (진행 중) |
 | **GitHub** | [https://github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
+| **시연 영상** | [YouTube](https://www.youtube.com/watch?v=_RJqDSDwSnE) |
 
 ### 프로젝트 목적
 
