@@ -465,31 +465,29 @@ void GameTickProcessor::updatePathFollowing(const float deltaSec)
 		const Vector3f& waypoint = pPlayer->GetCurrentWaypoint();
 		const float dx = waypoint.mX - pPlayer->GetPositionX();
 		const float dy = waypoint.mY - pPlayer->GetPositionY();
-		// Z는 클라이언트 동기화 값 사용 — 수평 거리만으로 웨이포인트 도달 판정
+		const float dz = waypoint.mZ - pPlayer->GetPositionZ();
 		const float dist = std::sqrt(dx * dx + dy * dy);
 
 		if (dist < 30.0f)
 		{
-			// 웨이포인트 도달 — Z는 클라이언트 동기화 값 유지
-			pPlayer->SetPosition(waypoint.mX, waypoint.mY, pPlayer->GetPositionZ());
+			pPlayer->SetPosition(waypoint.mX, waypoint.mY, waypoint.mZ);
 
 			if (!pPlayer->AdvanceToNextWaypoint())
 			{
-				// 경로 완료
 				pPlayer->ClearPath();
 			}
 
 			continue;
 		}
 
-		// 웨이포인트를 향해 이동 — Z는 클라이언트 동기화 값 유지
 		const float moveDistance = pPlayer->GetMoveSpeed() * deltaSec;
 		const float ratio = std::min(moveDistance / dist, 1.0f);
 
 		const float newX = pPlayer->GetPositionX() + dx * ratio;
 		const float newY = pPlayer->GetPositionY() + dy * ratio;
+		const float newZ = pPlayer->GetPositionZ() + dz * ratio;
 
-		pPlayer->SetPosition(newX, newY, pPlayer->GetPositionZ());
+		pPlayer->SetPosition(newX, newY, newZ);
 		pPlayer->SetVelocity(dx / dist * pPlayer->GetMoveSpeed(), dy / dist * pPlayer->GetMoveSpeed(), 0.0f);
 		pPlayer->SetRotationYaw(std::atan2(dy, dx) * 180.0f / 3.14159265f);
 	}

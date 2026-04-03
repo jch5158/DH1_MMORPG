@@ -685,7 +685,10 @@ void ALoginPlayerController::BeginPlay()
 		SlateAuthWidget = SNew(SAuthMasterWidget);
 		GEngine->GameViewport->AddViewportWidgetContent(SlateAuthWidget.ToSharedRef(), 10);
 
+		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::SetDirectly);
+
 		FInputModeUIOnly InputModeData;
+		InputModeData.SetWidgetToFocus(SlateAuthWidget);
 		SetInputMode(InputModeData);
 		bShowMouseCursor = true;
 		UE_LOG(LogTemp, Log, TEXT("LoginPlayerController: Using Slate auth master widget"));

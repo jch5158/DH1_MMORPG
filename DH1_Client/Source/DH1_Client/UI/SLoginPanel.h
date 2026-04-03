@@ -27,7 +27,7 @@ public:
 	void ResetPanel(const FString& StatusText, const FString& Email);
 
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
-	virtual bool SupportsKeyboardFocus() const override { return true; }
+	virtual bool SupportsKeyboardFocus() const override { return false; }
 
 	// SAuthMasterWidget에서 delegate 바인딩으로 호출
 	void HandleGatewayLoginResult(int32 Result);

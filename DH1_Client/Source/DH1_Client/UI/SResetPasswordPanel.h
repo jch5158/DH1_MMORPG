@@ -25,7 +25,7 @@ public:
 	void ResetPanel(const FString& InStatusText, const FString& Email);
 
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
-	virtual bool SupportsKeyboardFocus() const override { return true; }
+	virtual bool SupportsKeyboardFocus() const override { return false; }
 
 private:
 
