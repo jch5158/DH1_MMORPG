@@ -36,22 +36,28 @@ C++17 Windows IOCP 기반 네트워크 엔진(**CppNetEngine**)을 직접 설계
 - **서버 엔진 클라이언트 이식** — CppNetEngine을 static lib로 빌드하여 UE5 클라이언트에 통합, 서버·클라이언트 간 동일 네트워크 엔진 공유
 - **서버 사이드 NavMesh 경로탐색** — UE5 Detour 라이브러리를 서버에 이식하여 서버 권위적 경로 탐색 구현, S3 기반 NavMesh 바이너리 관리
 - **프로토콜 자동화 도구 개발** — .proto 커스텀 옵션 기반 PacketGenerator를 .NET으로 개발, 패킷 코드 자동 생성으로 서버·클라이언트 프로토콜 동기화
-- **CI 파이프라인 구축** — GitHub Actions로 PacketGenerator 빌드 및 LoginServer 단위 테스트 자동화
+- **CI 파이프라인 구축** — GitHub Actions로 .NET 전체 빌드·단위 테스트·코드 포맷 검사·NuGet 취약점 감사·Proto 구문 검증을 자동화, Dependabot으로 의존성 자동 업데이트
 
 ```mermaid
 flowchart TB
     subgraph ENGINE ["CppNetEngine"]
-        direction LR
-        A["IOCP\nNetwork I/O"]
-        B["Actor Model\nScheduler"]
-        C["Lock-free\n메모리 관리"]
-        A --> B --> C
+        direction TB
+        subgraph CORE ["IocpCore  (Completion Port · TimingWheel)"]
+            direction LR
+            NS["NetworkScheduler\nSession · Listener\nSender · Receiver"]
+            AS["ActorScheduler\nActor · ScopedActor\nActorMailbox"]
+        end
+        subgraph INFRA ["Lock-free · Memory"]
+            direction LR
+            LF["LockFreeQueue\nLockFreeStack"]
+            MEM["ObjectPool · MemoryPool\nmimalloc"]
+        end
     end
 
     ENGINE -->|"static lib"| GW["GatewayServer"]
     ENGINE -->|"static lib"| WS["WorldServer"]
     ENGINE -->|"static lib"| RS["RealmServer"]
-    ENGINE -->|"static lib"| CL["DH1_Client (UE5)"]
+    ENGINE -->|"static lib"| CL["DH1_Client\n(UE5)"]
 ```
 
 | 영역 | 기술 |
@@ -64,7 +70,7 @@ flowchart TB
 | **프로토콜** | Protocol Buffers 3 + 커스텀 PacketGenerator (.NET) |
 | **데이터** | MySQL · Redis (세션 · Pub/Sub) · AWS S3 (NavMesh) |
 | **인프라** | spdlog · Crashpad · vcpkg |
-| **CI** | GitHub Actions (PacketGenerator 빌드 + LoginServer 단위 테스트) |
+| **CI** | GitHub Actions (.NET 빌드 · 테스트 · format · 취약점 감사 · Proto 검증 · Dependabot) |
 
 ---
 
