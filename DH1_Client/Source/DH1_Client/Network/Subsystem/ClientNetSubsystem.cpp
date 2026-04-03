@@ -401,23 +401,20 @@ void UClientNetSubsystem::Tick(float DeltaTime)
 
 		UCharacterMovementComponent* const Mv = Ch->GetCharacterMovement();
 
+		const float ServerYaw = It.Value().TargetYaw;
+		const float NewYaw = FMath::FInterpTo(Ch->GetActorRotation().Yaw, ServerYaw, DeltaTime, 10.f);
+		Ch->SetActorRotation(FRotator(0.f, NewYaw, 0.f));
+
 		if (Dist2D > 5.f && Mv != nullptr)
 		{
 			const FVector Dir = Delta.GetSafeNormal2D();
 			Ch->AddMovementInput(Dir, 1.f);
 
-			const float DesiredYaw = FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X));
-			const float NewYaw = FMath::FInterpTo(Ch->GetActorRotation().Yaw, DesiredYaw, DeltaTime, 10.f);
-			Ch->SetActorRotation(FRotator(0.f, NewYaw, 0.f));
-
 			if (Dist2D > 300.f)
 			{
-				Ch->SetActorLocation(FMath::VInterpTo(Current, Target, DeltaTime, 4.f));
+				const FVector Interp = FMath::VInterpTo(Current, Target, DeltaTime, 4.f);
+				Ch->SetActorLocation(Interp, true);
 			}
-		}
-		else if (Mv != nullptr)
-		{
-			Mv->StopMovementImmediately();
 		}
 	}
 }
@@ -1211,9 +1208,15 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 		AnimBPClass = LoadObject<UClass>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.ABP_Unarmed_C"));
 	}
 
+	const double Now = FPlatformTime::Seconds();
+	for (auto It = RecentlyLeftEntities.CreateIterator(); It; ++It)
+	{
+		if (Now - It.Value() > 5.0) { It.RemoveCurrent(); }
+	}
+
 	for (const FNetworkEntitySpawnData& E : Entities)
 	{
-		if (E.EntityId == 0)
+		if (E.EntityId == 0 || RecentlyLeftEntities.Contains(E.EntityId))
 		{
 			continue;
 		}
@@ -1303,6 +1306,7 @@ void UClientNetSubsystem::ApplyNetworkEntitiesEntered(const TArray<FNetworkEntit
 
 void UClientNetSubsystem::ApplyNetworkEntitiesLeft(const TArray<uint64>& EntityIds)
 {
+	const double Now = FPlatformTime::Seconds();
 	for (const uint64 Id : EntityIds)
 	{
 		if (TWeakObjectPtr<AActor>* const Found = NetworkEntityActors.Find(Id))
@@ -1314,6 +1318,7 @@ void UClientNetSubsystem::ApplyNetworkEntitiesLeft(const TArray<uint64>& EntityI
 			NetworkEntityActors.Remove(Id);
 		}
 		NetworkEntityMoveStates.Remove(Id);
+		RecentlyLeftEntities.Add(Id, Now);
 	}
 }
 
@@ -1328,6 +1333,7 @@ void UClientNetSubsystem::ClearNetworkSpawnedEntities()
 	}
 	NetworkEntityActors.Empty();
 	NetworkEntityMoveStates.Empty();
+	RecentlyLeftEntities.Empty();
 }
 
 void UClientNetSubsystem::SendJumpNotify()

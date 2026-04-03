@@ -237,10 +237,9 @@ bool GameSessionPacketHandler::HANDLE_S2S_GAME_SESSION_ENTER_NOT(const Protocol:
 							: maxHp;
 						currentHp = std::clamp(currentHp, 0.f, maxHp);
 
-						// Z=0이면 기본 스폰 높이로 보정
 						if (posZ < 1.0f)
 						{
-							posZ = 148.0f;
+							posZ = 96.0f;
 						}
 
 						// last_played_at 갱신

@@ -372,17 +372,7 @@ void ADH1_ClientCharacter::OnSpawnPositionReceived(const FVector& Position, cons
 		}
 	}
 
-	FVector Loc = Position;
-	if (UCapsuleComponent* Cap = GetCapsuleComponent())
-	{
-		const float HalfH = Cap->GetScaledCapsuleHalfHeight();
-		if (Position.Z < HalfH + 10.f)
-		{
-			Loc.Z = Position.Z + HalfH;
-		}
-	}
-
-	SetActorLocation(Loc);
+	SetActorLocation(Position);
 	SetActorRotation(FRotator(0.0f, Yaw, 0.0f));
 
 	SetActorHiddenInGame(false);

@@ -12,6 +12,8 @@
 
 namespace
 {
+	constexpr float CAPSULE_HALF_HEIGHT = 96.0f;
+
 	constexpr uint32 MAKE_MOVEMENT_HEADER_ID(const uint16 packetId)
 	{
 		return (static_cast<uint32>(Protocol::eServiceType::SERVICE_TYPE_MOVEMENT) << 16) | static_cast<uint32>(packetId);
@@ -411,6 +413,7 @@ void GameTickProcessor::processMoveToPositionRequests()
 			Vector3f snapped;
 			if (mpNavMeshManager->GetNearestValidPosition(start.mX, start.mY, start.mZ, 100000.0f, snapped))
 			{
+				snapped.mZ += CAPSULE_HALF_HEIGHT;
 				pPlayer->SetPosition(snapped.mX, snapped.mY, snapped.mZ);
 				start = snapped;
 				NET_ENGINE_LOG_WARN("processMoveToPosition - start off NavMesh, snapped to ({:.1f}, {:.1f}, {:.1f}), accountId: {}",
@@ -430,13 +433,17 @@ void GameTickProcessor::processMoveToPositionRequests()
 		result.mMoveSpeed = pPlayer->GetMoveSpeed();
 
 		const bool bPathFound = mpNavMeshManager->FindPath(start, end, result.mWaypoints);
+		if (bPathFound)
+		{
+			for (auto& wp : result.mWaypoints)
+			{
+				wp.mZ += CAPSULE_HALF_HEIGHT;
+			}
+			pPlayer->SetPath(Vector<Vector3f>(result.mWaypoints));
+		}
 		NET_ENGINE_LOG_INFO("processMoveToPosition - accountId: {}, start: ({:.1f},{:.1f},{:.1f}), end: ({:.1f},{:.1f},{:.1f}), pathFound: {}, waypoints: {}",
 			input.mAccountId, start.mX, start.mY, start.mZ, end.mX, end.mY, end.mZ,
 			bPathFound, result.mWaypoints.size());
-		if (bPathFound)
-		{
-			pPlayer->SetPath(Vector<Vector3f>(result.mWaypoints));
-		}
 
 		mPendingPathResults.push_back(std::move(result));
 	}

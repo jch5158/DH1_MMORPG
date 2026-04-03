@@ -267,4 +267,5 @@ private:
 
     TMap<uint64, TWeakObjectPtr<AActor>> NetworkEntityActors;
 	TMap<uint64, FNetworkEntityMoveState> NetworkEntityMoveStates;
+	TMap<uint64, double> RecentlyLeftEntities;
 };

@@ -308,7 +308,7 @@ bool MovementPacketHandler::HANDLE_C2S_CREATE_CHARACTER_REQ(const Protocol::C2S_
 				return;
 			}
 
-			constexpr double defaultSpawnZ = 148.0;
+			constexpr double defaultSpawnZ = 96.0;
 			const float maxHp = ComputeDefaultMaxHp(1);
 			const float currentHp = maxHp;
 
