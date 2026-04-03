@@ -1,4 +1,4 @@
-# Minimal CI: .NET tools + LoginServer unit tests (matches RunValidationTests.bat core path).
+# CI: .NET build/test/format/audit + Proto validation.
 # UE / vcpkg / full native build: run locally with BuildAll.bat or RunValidationTests.bat --full.
 
 name: CI
@@ -6,12 +6,39 @@ name: CI
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
   pull_request:
     branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
 jobs:
-  validate-dotnet:
+  # ---------------------------------------------------------------------------
+  # .NET: build every project, run tests, enforce formatting, audit packages
+  # ---------------------------------------------------------------------------
+  dotnet:
+    name: .NET Build & Test
     runs-on: windows-latest
+    timeout-minutes: 15
+    permissions:
+      checks: write
+      contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,8 +48,100 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Build PacketGenerator
-        run: dotnet build Shared/Tools/PacketGenerator/PacketGenerator.csproj -c Release
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/Directory.Build.props', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
 
-      - name: Test LoginServer.Tests
-        run: dotnet test DH1_Server/LoginServer.Tests/LoginServer.Tests.csproj -c Release --verbosity minimal
+      - name: Restore packages
+        run: |
+          dotnet restore Shared/Tools/PacketGenerator/PacketGenerator.csproj
+          dotnet restore DH1_Server/DH1_Server.slnx
+
+      - name: Build PacketGenerator
+        run: dotnet build Shared/Tools/PacketGenerator/PacketGenerator.csproj -c Release --no-restore
+
+      - name: Build DH1_Server (LoginServer + DbMigration)
+        run: dotnet build DH1_Server/DH1_Server.slnx -c Release --no-restore
+
+      - name: Run LoginServer.Tests
+        run: >
+          dotnet test DH1_Server/LoginServer.Tests/LoginServer.Tests.csproj
+          -c Release --no-restore
+          --logger "trx;LogFileName=results.trx"
+          --results-directory TestResults
+          --verbosity minimal
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: LoginServer Tests
+          path: TestResults/results.trx
+          reporter: dotnet-trx
+
+      - name: Check code formatting
+        if: success() || failure()
+        run: |
+          dotnet format Shared/Tools/PacketGenerator/PacketGenerator.csproj --verify-no-changes --verbosity diagnostic
+          dotnet format DH1_Server/DH1_Server.slnx --verify-no-changes --verbosity diagnostic
+
+      - name: Audit NuGet vulnerabilities
+        if: success() || failure()
+        run: |
+          $failed = $false
+          foreach ($proj in @(
+            "Shared/Tools/PacketGenerator/PacketGenerator.csproj",
+            "DH1_Server/LoginServer/LoginServer.csproj",
+            "DH1_Server/DbMigration/DbMigration.csproj"
+          )) {
+            $output = dotnet list $proj package --vulnerable --include-transitive 2>&1 | Out-String
+            Write-Output $output
+            if ($output -match "has the following vulnerable packages") {
+              Write-Output "::warning::Vulnerable packages found in $proj"
+              $failed = $true
+            }
+          }
+          if ($failed) { exit 1 }
+
+  # ---------------------------------------------------------------------------
+  # Proto: validate .proto syntax without vcpkg (lightweight, runs on Linux)
+  # ---------------------------------------------------------------------------
+  proto:
+    name: Proto Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: Validate .proto syntax
+        run: >
+          protoc
+          --proto_path=Shared/Protocol/Proto
+          --descriptor_set_out=/dev/null
+          Shared/Protocol/Proto/*.proto
+
+  # ---------------------------------------------------------------------------
+  # Gate: single required status check for branch protection
+  # ---------------------------------------------------------------------------
+  ci-pass:
+    name: CI Pass
+    if: always()
+    needs: [dotnet, proto]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.dotnet.result }}" != "success" || "${{ needs.proto.result }}" != "success" ]]; then
+            echo "::error::One or more CI jobs failed"
+            exit 1
+          fi
+          echo "All CI jobs passed"
