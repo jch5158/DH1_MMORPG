@@ -1,4 +1,4 @@
-﻿using LoginServer.Data.Table;
+using LoginServer.Data.Table;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoginServer.Data

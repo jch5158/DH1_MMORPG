@@ -326,26 +326,34 @@ namespace LoginServer.Services
             {
                 EAccountState.Suspended => new LoginResult
                 {
-                    Success = false, StatusCode = 403,
-                    ErrorCode = "ACCOUNT_SUSPENDED", Email = account.Email,
+                    Success = false,
+                    StatusCode = 403,
+                    ErrorCode = "ACCOUNT_SUSPENDED",
+                    Email = account.Email,
                     ErrorMessage = "일시 정지된 계정입니다."
                 },
                 EAccountState.Banned => new LoginResult
                 {
-                    Success = false, StatusCode = 403,
-                    ErrorCode = "ACCOUNT_BANNED", Email = account.Email,
+                    Success = false,
+                    StatusCode = 403,
+                    ErrorCode = "ACCOUNT_BANNED",
+                    Email = account.Email,
                     ErrorMessage = "영구 정지된 계정입니다."
                 },
                 EAccountState.EmailUnverified => new LoginResult
                 {
-                    Success = false, StatusCode = 403,
-                    ErrorCode = "EMAIL_UNVERIFIED", Email = account.Email,
+                    Success = false,
+                    StatusCode = 403,
+                    ErrorCode = "EMAIL_UNVERIFIED",
+                    Email = account.Email,
                     ErrorMessage = "이메일 인증이 완료되지 않은 계정입니다. 인증 페이지로 이동합니다."
                 },
                 EAccountState.PendingUnregister => new LoginResult
                 {
-                    Success = false, StatusCode = 403,
-                    ErrorCode = "ACCOUNT_PENDING_UNREGISTER", Email = account.Email,
+                    Success = false,
+                    StatusCode = 403,
+                    ErrorCode = "ACCOUNT_PENDING_UNREGISTER",
+                    Email = account.Email,
                     ErrorMessage = "탈퇴한 회원입니다."
                 },
                 _ => null

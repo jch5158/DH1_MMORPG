@@ -74,7 +74,9 @@ public class PasswordTests : AuthControllerTestBase
         var controller = CreateController();
         var result = await controller.ResetPassword(new ResetPasswordRequest
         {
-            Email = TestEmail, VerifyCode = ResetCode, ResetPassword = "NewPassword1!"
+            Email = TestEmail,
+            VerifyCode = ResetCode,
+            ResetPassword = "NewPassword1!"
         });
 
         Assert.Equal(200, GetStatusCode(result));
@@ -92,7 +94,9 @@ public class PasswordTests : AuthControllerTestBase
         var controller = CreateController();
         var result = await controller.ResetPassword(new ResetPasswordRequest
         {
-            Email = TestEmail, VerifyCode = ResetCode, ResetPassword = "NewPassword1!"
+            Email = TestEmail,
+            VerifyCode = ResetCode,
+            ResetPassword = "NewPassword1!"
         });
 
         Assert.Equal(400, GetStatusCode(result));
@@ -106,7 +110,9 @@ public class PasswordTests : AuthControllerTestBase
         var controller = CreateController();
         var result = await controller.ResetPassword(new ResetPasswordRequest
         {
-            Email = "nobody@example.com", VerifyCode = ResetCode, ResetPassword = "NewPassword1!"
+            Email = "nobody@example.com",
+            VerifyCode = ResetCode,
+            ResetPassword = "NewPassword1!"
         });
 
         Assert.Equal(404, GetStatusCode(result));
@@ -121,7 +127,9 @@ public class PasswordTests : AuthControllerTestBase
         var controller = CreateController();
         await controller.ResetPassword(new ResetPasswordRequest
         {
-            Email = TestEmail, VerifyCode = ResetCode, ResetPassword = "NewPassword1!"
+            Email = TestEmail,
+            VerifyCode = ResetCode,
+            ResetPassword = "NewPassword1!"
         });
 
         MockRedisDb.Verify(d => d.KeyDeleteAsync(new RedisKey($"ResetCode_{TestEmail}"), It.IsAny<CommandFlags>()), Times.Once);
