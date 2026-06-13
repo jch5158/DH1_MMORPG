@@ -1,572 +1,274 @@
-# DH1_MMORPG
+# DH1_MMORPG — Game Server Engineer Portfolio 2026
 
-> C++ IOCP 커스텀 네트워크 엔진 기반 MMORPG 서버와 클라이언트가 동일 네트워크 엔진을 공유
+[![GitHub](https://img.shields.io/badge/GitHub-jch5158%2FDH1__MMORPG-181717?logo=github)](https://github.com/jch5158/DH1_MMORPG)
+[![YouTube](https://img.shields.io/badge/YouTube-%EC%8B%9C%EC%97%B0%20%EC%98%81%EC%83%81-FF0000?logo=youtube)](https://www.youtube.com/watch?v=_RJqDSDwSnE)
 
-| | |
-|---|---|
-| **개발자** | 정찬훈 |
-| **프로젝트 유형** | 개인 프로젝트 (1인 개발) |
-| **개발 기간** | 2026.01 ~ 현재 (진행 중) |
-| **GitHub** | [https://github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
-| **시연 영상** | [https://www.youtube.com/watch?v=_RJqDSDwSnE](https://www.youtube.com/watch?v=_RJqDSDwSnE) |
+> **정찬훈** · MMORPG / 온라인 게임 서버 개발  
+> C++ IOCP 기반 비동기 네트워크 엔진을 처음부터 직접 설계·구현한 게임 서버 프로그래머입니다.  
+> 조이시티에서 라이브 서비스·신작 콘텐츠를 개발하며 실무 감각을 길렀고, 개인 프로젝트 DH1_MMORPG에서  
+> 네트워크 엔진·분산 서버·서버 사이드 NavMesh·AOI까지 MMORPG 서버의 핵심 파이프라인을 구현했습니다.  
+> "동작하는 코드"를 넘어 **왜 그렇게 동작하는지**를 파고드는 깊이를 강점으로 삼습니다.
 
-### 프로젝트 목적
+| 1Y 10M | 2종 | 1인 |
+|:---:|:---:|:---:|
+| 현업 경력 · 조이시티 | 라이브·신작 프로젝트 | MMORPG 서버 풀스택 구현 |
 
-고성능 MMORPG 서버의 핵심 기술을 직접 설계·구현하여, **네트워크 엔진부터 분산 서버 아키텍처, 클라이언트 통합까지** 게임 서버 개발의 전체 파이프라인을 경험하는 것을 목표로 합니다.
+---
 
-### 사용 기술 및 언어
+## 목차 (Table of Contents)
+
+이 포트폴리오는 **저(개발자)에 대한 소개 → 프로젝트 심화 → 배경**의 순서로 구성되어 있습니다.
+
+| # | 챕터 | 내용 |
+|:---:|------|------|
+| **01** | [Profile & Positioning](#01-profile--positioning) | 핵심 역량 요약 · 기술 스택 |
+| **02** | [Joycity Live Service Experience](#02-joycity-live-service-experience) | 조이시티 라이브 서비스·신작 개발 경력 |
+| **03** | [DH1_MMORPG — Distributed MMORPG Server](#03-dh1_mmorpg--distributed-mmorpg-server) | 대표 프로젝트 개요 · 분산 아키텍처 |
+| **04** | [CppNetEngine — IOCP Network Engine](#04-cppnetengine--iocp-network-engine) | 이중 IOCP · Actor 모델 · Lock-free · TimingWheel |
+| **05** | [Memory Pool & Multi-Server Architecture](#05-memory-pool--multi-server-architecture) | 3계층 메모리 풀 · 멀티 서버 수평 확장 |
+| **06** | [Server Authority — NavMesh · AOI · Codegen](#06-server-authority--navmesh--aoi--codegen) | 서버 권위 경로탐색 · 시야 동기화 · 코드 자동화 |
+| **07** | [Background — Education · Training · Certificate](#07-background--education--training--certificate) | 학력 · 교육 · 자격 |
+
+---
+
+## 01 Profile & Positioning
+
+저는 "동작하는 코드"에 멈추지 않고 **왜 그렇게 동작하는지**를 끝까지 파고드는 게임 서버 프로그래머입니다. 라이브러리를 가져다 쓰는 대신 IOCP 비동기 네트워크 엔진·Lock-free 자료구조·메모리 할당기·타이머 스케줄러를 직접 구현하며 OS·네트워크·동시성의 근본을 체득했고, 그 위에 서버 사이드 NavMesh 경로탐색·AOI·GameTick·인게임 채팅 등 실제 MMORPG 서버의 핵심 시스템을 올렸습니다.
+
+### 게임 서버 개발자로서의 강점
+
+| 엔진을 만드는 깊이 | 서버 권위 게임 로직 | 라이브 서비스 실무 |
+|------|------|------|
+| IOCP Overlapped I/O · Lock-free 큐 · 3계층 메모리 풀 · 계층형 TimingWheel을 **외부 프레임워크 없이** 구현. 서버가 멈추거나 느려지는 근본 원인을 엔진 레벨에서 진단·튜닝합니다. | 서버 사이드 NavMesh 경로탐색, AOI 기반 시야 동기화, GameTick 경로 추종, 범위별 채팅 릴레이 등 **서버가 게임 상태를 관리하는 권위적 구조**를 설계·구현했습니다. | 프리스타일2·리부트에서 미션·레드닷 시스템과 미니게임 이벤트를 개발하고, 라이브 버그 대응·레거시 리팩토링을 수행하며 **유저에게 닿는 코드의 안정성**을 최우선으로 다뤘습니다. |
+| 동접 부하·렉·메모리 누수의 근본 대응 | 서버 이동 검증·시야 동기화 | 게임 콘텐츠·시스템 개발, 라이브 이슈 경험 |
+
+### Technical Stack
 
 | 분류 | 기술 |
 |------|------|
-| **Language** | C++17 · C# · SQL · Protobuf |
-| **Server Engine** | Windows IOCP · Actor Model · Lock-free Queue/Stack · ObjectPool · MemoryPool · mimalloc · TimingWheel |
-| **Framework** | ASP.NET Core 10 · Entity Framework Core · Unreal Engine 5.7 |
-| **Protocol** | Protocol Buffers 3 · TCP · HTTPS · 커스텀 PacketGenerator (.NET) |
-| **Database** | MySQL · Redis (세션 · Pub/Sub) |
-| **Infra / DevOps** | AWS S3 · GitHub Actions · vcpkg · Crashpad · spdlog |
-| **Tools** | Visual Studio 2025 · Unreal Build Tool · MSBuild · .NET SDK 10 |
+| **Languages** | C++17 (주력) · C# · SQL · Assembly (분석) |
+| **Game Server** | 서버 권위 로직 · 인게임 채팅 · 에이전트 서버 기반 패킷 Relay · 서버 사이드 NavMesh · AOI / GridManager |
+| **Networking** | Windows IOCP · SendBufferAllocator · HTTPS / REST · Custom Network Engine |
+| **Concurrency** | Actor Model · ScopedActor · Lock-free Queue/Stack · atomic / CAS · 3-Tier Memory Pool · TimingWheel |
+| **Multi-Server** | Redis (Session / Pub/Sub) · Gateway 로드밸런싱 · 크로스 서버 채팅 |
+| **Backend** | ASP.NET Core 10 · EF Core (Migrations) · REST API · Background Service |
+| **Client** | Unreal Engine 5.7 (C++) · Custom Network Engine 이식 |
+| **Build / Tooling** | PacketGenerator (.NET) · protoc · MSBuild / UBT · vcpkg · BuildScripts (.bat) |
 
-### 프로젝트 소개
+> 표기된 기술은 모두 실제 코드로 구현·운영해 본 항목이며, 학습 수준에 그친 항목은 포함하지 않았습니다.
 
-C++17 Windows IOCP 기반 네트워크 엔진(**CppNetEngine**)을 직접 설계·구현하고, 이를 4개의 분산 서버(Gateway · World · Realm · Login)와 Unreal Engine 5.7 클라이언트에 동일하게 적용한 MMORPG 프로젝트입니다. Actor Model, Lock-free 자료구조, 3계층 메모리 풀 등 서버 엔진의 핵심 컴포넌트를 직접 구현하였으며, 서버 엔진을 static lib로 클라이언트에 이식하여 **서버·클라이언트가 같은 네트워크 엔진**을 공유합니다.
+---
 
-### 주요 기여 및 성과
+## 02 Joycity Live Service Experience
 
-- **커스텀 네트워크 엔진 설계·구현** — IOCP 기반 비동기 I/O, Actor Model, Lock-free 자료구조, 3계층 메모리 풀을 포함하는 C++ 서버 엔진을 처음부터 직접 개발
-- **분산 서버 아키텍처 설계** — Gateway · World · Realm · Login 4개 서버로 역할을 분리하고, Relay 패턴과 Redis 세션을 활용한 멀티 서버 구조 구현
-- **서버 엔진 클라이언트 이식** — CppNetEngine을 static lib로 빌드하여 UE5 클라이언트에 통합, 서버·클라이언트 간 동일 네트워크 엔진 공유
-- **서버 사이드 NavMesh 경로탐색** — UE5 Detour 라이브러리를 서버에 이식하여 서버 권위적 경로 탐색 구현, S3 기반 NavMesh 바이너리 관리
-- **프로토콜 자동화 도구 개발** — .proto 커스텀 옵션 기반 PacketGenerator를 .NET으로 개발, 패킷 코드 자동 생성으로 서버·클라이언트 프로토콜 동기화
-- **CI 파이프라인 구축** — GitHub Actions로 .NET 전체 빌드·단위 테스트·코드 포맷 검사·NuGet 취약점 감사·Proto 구문 검증을 자동화, Dependabot으로 의존성 자동 업데이트
+**서버 프로그래머 (사원) · 조이시티 · 프리스타일 4팀**  
+2023.05 – 2025.02 (1년 10개월)  
+프리스타일2(라이브 서비스)·프리스타일 리부트(신작 개발) 서버 개발 — C++17 / C++11 · MS SQL Server · AWS
 
-```mermaid
-flowchart TB
-    subgraph ENGINE ["CppNetEngine"]
-        direction TB
-        subgraph CORE ["IocpCore  (Completion Port · TimingWheel)"]
-            direction LR
-            NS["NetworkScheduler\nSession · Listener\nSender · Receiver"]
-            AS["ActorScheduler\nActor · ScopedActor\nActorMailbox"]
-        end
-        subgraph INFRA ["Lock-free · Memory"]
-            direction LR
-            LF["LockFreeQueue\nLockFreeStack"]
-            MEM["ObjectPool · MemoryPool\nmimalloc"]
-        end
-    end
-
-    ENGINE -->|"static lib"| GW["GatewayServer"]
-    ENGINE -->|"static lib"| WS["WorldServer"]
-    ENGINE -->|"static lib"| RS["RealmServer"]
-    ENGINE -->|"static lib"| CL["DH1_Client\n(UE5)"]
-```
-
-| 영역 | 기술 |
+| 구분 | 내용 |
 |------|------|
-| **네트워크 엔진** | C++17 · Windows IOCP · Lock-free Queue/Stack · ObjectPool · MemoryPool · mimalloc |
-| **Actor Model** | Actor (atomic TryAcquire) · ScopedActor (다중 잠금) · ActorMailbox · ActorScheduler |
-| **서버** (GW / WS / RS) | C++17 · CppNetEngine (static lib) |
-| **서버** (Login) | C# · ASP.NET Core 10 · Entity Framework Core |
-| **클라이언트** | Unreal Engine 5.7 · C++ · CppNetEngine 이식 |
-| **프로토콜** | Protocol Buffers 3 + 커스텀 PacketGenerator (.NET) |
-| **데이터** | MySQL · Redis (세션 · Pub/Sub) · AWS S3 (NavMesh) |
-| **인프라** | spdlog · Crashpad · vcpkg |
-| **CI** | GitHub Actions (.NET 빌드 · 테스트 · format · 취약점 감사 · Proto 검증 · Dependabot) |
+| **시스템 개발** | 레드닷 시스템, 일일·주간 미션 시스템, 장비 추가 능력치 부여, 2차 비밀번호 등 설계·구현 |
+| **콘텐츠 개발** | 주사위·가위바위보·계단오르기 미니게임 이벤트, 주간 미션 상점, 12주년 SLG 미니게임 이벤트 |
+| **라이브 운영** | 실시간 버그 이슈 대응, 레거시 코드 리팩토링, DB 테이블 명세서 작성, 가챠 확률 검증 치트 |
+
+> 라이브 서비스에서 버그 하나가 다수 유저에 미치는 영향을 체감하며 **코드 안정성·가독성을 최우선으로 두는 습관**을 확립했습니다.
 
 ---
 
-## 시스템 아키텍처
+## 03 DH1_MMORPG — Distributed MMORPG Server
 
-```mermaid
-flowchart TB
-    C["DH1_Client (UE5)\nCppNetEngine.lib"]
+C++17 IOCP 커스텀 네트워크 엔진(**CppNetEngine**)을 설계·구현하고, 이를 4개의 분산 서버와 Unreal Engine 5.7 클라이언트가 동일하게 공유하도록 만든 MMORPG 서버 프로젝트입니다. 네트워크 엔진의 내부 컴포넌트(I/O 모델·동시성·메모리·타이머)부터 분산 아키텍처, 클라이언트 통합까지 **서버 개발의 전 과정을 1인이 구현**했습니다.
 
-    C -->|"TCP"| G["GatewayServer\nC++ IOCP"]
-    C -.->|"HTTPS"| L["LoginServer\nASP.NET Core"]
+| | |
+|---|---|
+| **유형 / 기간** | 개인 프로젝트 (1인 개발) · 2026.01 ~ 진행 중 |
+| **구성** | C++17 네트워크 엔진 · C# 인증 서버 · Protobuf 프로토콜 · UE5 클라이언트 |
+| **저장소** | [github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
+| **시연 영상** | [youtube.com/watch?v=_RJqDSDwSnE](https://www.youtube.com/watch?v=_RJqDSDwSnE) |
 
-    G -->|"TCP"| W["WorldServer\nC++ IOCP"]
-    W -->|"TCP"| R["RealmServer\nC++ IOCP"]
+**핵심 수치**
 
-    DB[(MySQL)]
-    RD[(Redis)]
-    S3[(AWS S3)]
+| 2 | 3계층 | 3레벨 | 4 |
+|:---:|:---:|:---:|:---:|
+| 독립 IOCP 스케줄러<br>(Network / Actor) | 메모리 풀<br>TLS → 글로벌 → OS | 계층형 TimingWheel<br>256·256·128 슬롯 | 분산 서버 역할 분리<br>+ UE5 클라이언트 |
 
-    L -.-> DB
-    G -.-> RD
-    W -.-> DB & RD & S3
+### 시스템 아키텍처 (Distributed Topology)
+
+```
+DH1_Client (UE5)
+CppNetEngine.lib 이식 · 서버와 동일 엔진 공유
+    │
+    ├─ TCP ───────────────────────────────┐
+    │                                     ▼
+    └─ HTTPS ───────────────►  LoginServer (C# ASP.NET Core 10)
+                                계정 인증 · 세션 티켓 발급
+                                    GatewayServer (C++ IOCP)
+                                접속 관문 · 인증·라우팅·하트비트
+                                          │ Relay (TCP)
+                                          ▼
+                                    WorldServer (C++ IOCP)
+                          게임 로직 · NavMesh 경로탐색 · AOI · GameTick · 채팅 라우팅
+                                          │
+                                          ▼
+                                    RealmServer (C++ IOCP)
+                                서버 목록 / 월드 등록 · 상태 조율
+                                          │
+               ┌──────────────────────────┼─────────────────────┐
+               ▼                          ▼                     ▼
+           MySQL                        Redis                AWS S3
+       계정·캐릭터 영속            세션·Pub/Sub·서버 레지스트리    NavMesh 바이너리
 ```
 
-| 서버 | 역할 |
+각 C++ 서버는 CppNetEngine을 static lib로 링크하며, 클라이언트(UE5)도 동일 엔진을 이식하여 **서버·클라이언트가 단일 네트워크 스택을 공유**합니다.
+
+### 주요 기여 & 성과
+
+| 항목 | 내용 |
 |------|------|
-| **GatewayServer** | 클라이언트 TCP 접속점. 패킷 인증·라우팅, 세션 관리, 하트비트 검사 |
-| **WorldServer** | 게임 로직. NavMesh 경로탐색, AOI 엔티티 관리, GameTick, 채팅 라우팅 |
-| **RealmServer** | 서버 목록 관리. WorldServer 등록/상태, 렐름 선택 조율 |
-| **LoginServer** | 계정 인증 (이메일/비밀번호). HTTP REST API, 이메일 인증, 세션 티켓 발급 |
+| **커스텀 네트워크 엔진** | IOCP 비동기 I/O · Actor 모델 · Lock-free 자료구조 · 3계층 메모리 풀 · TimingWheel을 포함한 C++ 서버 엔진을 외부 프레임워크 없이 처음부터 구현 |
+| **분산 서버 아키텍처** | 역할별 4개 서버 분리 + Relay 패턴 + Redis 세션으로 멀티 서버 구조 구현. LoginServer는 Gateway별 세션 수(Redis 조회)를 비교해 최소 연결 노드로 분배 |
+| **엔진 클라이언트 이식** | CppNetEngine을 static lib로 빌드해 UE5에 통합. 매크로 충돌 격리·생명주기 통합(Subsystem)으로 서버·클라 동일 엔진 공유 |
+| **프로토콜 자동화 도구** | .proto 커스텀 옵션 기반 PacketGenerator(.NET)를 직접 개발해 역할별 패킷 코드·디스패처를 자동 생성, 서버·클라 프로토콜을 동기화 |
 
 ---
 
-## CppNetEngine 핵심 설계
+## 04 CppNetEngine — IOCP Network Engine
 
-모든 C++ 서버와 클라이언트가 공유하는 네트워크 엔진의 내부 자료구조·메모리 관리 설계입니다.
+엔진의 핵심은 소켓 I/O와 게임 로직을 **물리적으로 분리한 이중 IOCP 스케줄러**입니다. 각 스케줄러는 독립된 IOCP 핸들과 스레드 풀을 가져 서로 간섭하지 않으며, 메시지는 Lock-free 큐로만 전달됩니다.
 
-### Lock-free 자료구조
+```
+NetworkScheduler (소켓 I/O 전담)
+  Overlapped I/O 완료 → GetQueuedCompletionStatus 수신 → 패킷 역직렬화·송신 완료 처리
+  디스패치 루프마다 TimingWheel.Tick() → 하트비트·세션 타임아웃 함께 스케줄링
 
-멀티스레드 스케줄러 환경에서 **뮤텍스 없이** 안전한 데이터 전달을 위해 직접 구현한 자료구조입니다.
-
-```mermaid
-flowchart LR
-    LFQ["LockFreeQueue"]
-    LFS["LockFreeStack"]
-    MB["ActorMailbox\n(LockFreeQueue 기반)"]
-    SP["세션 풀\n(LockFreeStack 기반)"]
-
-    LFQ --> MB
-    LFS --> SP
+ActorScheduler (게임 로직 전담)
+  소켓 없이 PostQueuedCompletionStatus로 Actor를 깨우는 수동 완료 큐
+  워크 아이템을 IOCP 동시성 제어에 그대로 위임 → 별도 락 없이 스레드 부하 분산
 ```
 
-| 자료구조 | 구현 | ABA 방지 | 용도 |
-|----------|------|----------|------|
-| **LockFreeQueue** | Dummy-head 연결 리스트 · `Node16` (포인터 + 64-bit 카운터) · `atomic_ref` CAS | 버전 카운터 (head/tail별) | ActorMailbox, SendBuffer 큐 |
-| **LockFreeStack** | Treiber 스택 · `Node16` wide CAS | 버전 카운터 (top) | 세션 풀, ConnectionPool 인덱스 |
+### Actor 모델 — 락 없는 단일 소유 동시성
 
-**공통 설계 원칙:**
-- `alignas(hardware_destructive_interference_size)` — head/tail/count를 **별도 캐시 라인**에 배치하여 false sharing 방지
-- 노드 할당은 `TlsObjectPool`을 통해 TLS 캐시에서 처리 — mi_malloc/mi_free 오버헤드 최소화
-- Capacity 제한 (`mMaxCount`) + `atomic<int32> mCount`로 bounded 큐/스택 지원
+각 Actor는 단일 `atomic<bool>` 플래그의 `TryAcquire / Release`로 보호되어, **한 번에 하나의 디스패치 스레드**만 진입합니다. 멀티 객체를 동시에 다뤄야 하는 경우 `ScopedActor`가 ID 순으로 정렬해 일괄 잠금하여 데드락을 원천 차단합니다.
 
-### 메모리 관리
-
-서버 엔진은 **3계층 메모리 할당 전략**을 사용합니다.
-
-```mermaid
-flowchart TB
-    subgraph "SendBufferAllocator"
-        SBA["MakeSendBuffer(size)"]
-        SBA -->|"256B 단위 정렬\n(≤4096)"| SMALL["Small 할당"]
-        SBA -->|"4096B 단위 정렬\n(≤65536)"| LARGE["Large 할당"]
-    end
-
-    subgraph "ObjectPool / MemoryPool"
-        OP["ObjectPool&lt;T&gt;\n글로벌 Lock-free 프리리스트"]
-        TLS["TlsObjectPool&lt;T&gt;\nTLS Chunk 할당"]
-        MP["MemoryPool&lt;ALLOC_SIZE&gt;\n고정 크기 메모리 블록"]
-        TLS --> OP
-        MP --> OP
-    end
-
-    subgraph "mimalloc"
-        MI["mi_malloc / mi_free"]
-    end
-
-    OP -->|"풀 고갈 시"| MI
-    MP -->|"MAX_SIZE 초과"| MI
-```
-
-| 계층 | 컴포넌트 | 설명 |
-|------|----------|------|
-| **L1 — TLS 캐시** | `TlsObjectPool<T>` | 스레드별 Chunk 배열 소유. 할당/해제 시 atomic 연산 불필요 — **가장 빠른 경로** |
-| **L2 — 글로벌 풀** | `ObjectPool<T>` | Lock-free 프리리스트. TLS Chunk 소진 시 새 Chunk 발급, 해제된 Chunk 재활용 |
-| **L3 — OS 할당** | `mimalloc` | 풀에 Chunk가 없거나 `MemoryAllocator`에서 MAX_SIZE 초과 시 `mi_malloc` 직접 호출 |
-
-| 컴포넌트 | 핵심 구현 |
-|----------|----------|
-| **ObjectPool\<T\>** | `mi_malloc` → placement new로 노드 생성. 체크섬 쿠키 `0xDEAD0001BEEF0001` — double-free·corruption 감지 |
-| **MemoryPool\<SIZE\>** | 고정 크기 `ChunkData` 배열. 각 블록에 체크섬 + Chunk 역참조 포인터 내장 — `Free()` 시 소속 Chunk를 O(1)로 찾아 반환 |
-| **SendBufferAllocator** | 요청 크기를 **256B / 4096B 단위**로 올림 정렬 → `SharedPtr<NetSendBuffer>` 발급. 빈번한 패킷 송신의 할당 편차 최소화 |
-
----
-
-## 스레드 모델
-
-각 C++ 서버 프로세스는 **두 개의 완전 독립 IOCP 스케줄러**를 사용합니다. 각 스케줄러는 자체 IOCP 핸들과 스레드 풀을 가지며, 서로 직접 연결되지 않습니다.
-
-### NetworkScheduler
-
-소켓 I/O 전담. Overlapped I/O 완료를 GQCS로 수신하여 처리합니다.
-
-```mermaid
-flowchart TB
-    S["소켓 I/O\nRecv · Send · Accept"]
-    S -->|"Overlapped 완료"| IOCP["IOCP\n(runningThreadCount 동시성)"]
-    IOCP -->|"GQCS"| D["dispatch 스레드 × N"]
-    D --> P["IocpObject::Dispatch\n패킷 역직렬화 · Send 완료 처리"]
-    D --> TW["TimingWheel.Tick()"]
-```
-
-| 컴포넌트 | 설명 |
-|----------|------|
-| **IOCP** | `CreateIoCompletionPort`에 소켓 핸들을 직접 등록. Overlapped I/O 완료를 수신 |
-| **dispatch 스레드** | `Dispatch()` 루프. GQCS → `IocpObject::Dispatch` (Recv 역직렬화, Send 완료 처리, Accept) |
-| **TimingWheel** | Dispatch() 루프마다 `Tick()`. 하트비트·세션 타임아웃 등 스케줄링 |
-
-### ActorScheduler
-
-게임 로직 전담. 소켓을 사용하지 않고, `PostQueuedCompletionStatus`로 Actor를 깨웁니다.
-
-```mermaid
-flowchart TB
-    Post["IActor::Post(message)"]
-    Post --> MB["ActorMailbox\n(LockFreeQueue · Actor별 개별 소유)"]
-    MB -->|"PQCS"| IOCP["IOCP\n(runningThreadCount 동시성)"]
-    IOCP -->|"GQCS"| D["dispatch 스레드 × M"]
-    D --> A["Actor::Dispatch\nTryAcquire → Mailbox.Process → Release"]
-    D --> TW["TimingWheel.Tick()"]
-```
-
-| 컴포넌트 | 설명 |
-|----------|------|
-| **IOCP** | 소켓 없음. `PostQueuedCompletionStatus`로 Actor 워크 아이템을 전달하는 수동 완료 큐 |
-| **dispatch 스레드** | `Dispatch()` 루프. GQCS → `Actor::Dispatch` (TryAcquire → Mailbox.Process → Release) |
-| **ActorMailbox** | Actor별 `LockFreeQueue<MessageRef>`. 메시지 Post 시 PQCS로 IOCP에 통지 |
-| **Actor** | `IActor` 구현. 단일 `atomic<bool>` 플래그로 `TryAcquire/Release` — 한 번에 하나의 dispatch 스레드만 처리 |
-| **ScopedActor** | `IActor` 구현 (`Actor` 비상속). 복수 Actor를 ID 순 정렬 후 일괄 Acquire → 자체 Mailbox 처리 → 역순 Release. 데드락 방지를 위한 고정 순서 잠금 + 재시도/백오프 |
-| **TimingWheel** | Dispatch() 루프마다 `Tick()`. 지연 콜백 스케줄링 |
-
-스레드 수는 `*ServerConfig.json`에서 설정합니다 (`runningThreadCount: 0` → CPU 코어 자동 산정).
-
-```json
-{
-  "networkScheduler": { "runningThreadCount": 2, "dispatchThreadCount": 8 },
-  "actorScheduler":   { "runningThreadCount": 2, "dispatchThreadCount": 4 }
+```cpp
+// ScopedActor — 고정 순서 잠금 + 단계적 백오프로 데드락/라이브락 방지
+bool ScopedActor::TryAcquire() {
+    for (int32 retry = 0; retry < retryLimit; ++retry) {
+        if (tryAcquireAll())  return true;   // ID 순 정렬 후 일괄 Acquire
+        Release();                            // 실패 시 역순 전체 해제
+        if      (retry < 10) _mm_pause();                // 스핀
+        else if (retry < 50) std::this_thread::yield();   // 양보
+        else              std::this_thread::sleep_for(1ms); // 백오프
+    }
 }
 ```
 
----
+### Lock-free 자료구조 — ABA 방지 설계
 
-## 패킷 흐름
+| 자료구조 | 구현 | ABA 방지 | 용도 |
+|----------|------|----------|------|
+| **LockFreeQueue** | Dummy-head 연결 리스트 + `atomic_ref` CAS + `Node16`(포인터 + 64-bit 버전 카운터) | 버전 카운터 (head/tail별) | ActorMailbox, SendBuffer 큐 |
+| **LockFreeStack** | Treiber 스택 + `Node16` wide-CAS | 버전 카운터 (top) | 세션 풀, ConnectionPool 인덱스 |
 
-### 로그인 → 월드 진입
+> **설계 원칙** · `alignas(hardware_destructive_interference_size)`로 head/tail/count를 별도 캐시 라인에 배치해 **false sharing을 제거**하고, 노드 할당은 TLS 캐시(`TlsObjectPool`)에서 처리하여 atomic 연산 오버헤드를 최소화했습니다.
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant L as LoginServer
-    participant G as GatewayServer
-    participant R as RealmServer
-    participant W as WorldServer
+### 계층형 TimingWheel — O(1) 타이머 스케줄링
 
-    Note over R: 기동 시 Redis에 Realm 정보 등록
-
-    C->>L: POST /auth/login
-    L-->>C: 200 OK (ticket)
-
-    C->>G: TCP + C2S_LOGIN_REQ (ticket)
-    G->>G: Redis 티켓 검증
-    G-->>C: S2C_LOGIN_RES
-
-    C->>G: C2S_REALM_LIST_REQ
-    G->>G: Redis Realm:* 조회
-    G-->>C: S2C_REALM_LIST_RES
-
-    C->>G: C2S_REALM_SELECT_REQ
-    G->>G: Redis Realm:{id} 검증
-    G->>W: S2S_GAME_SESSION_ENTER_NOT
-    W-->>G: S2S_GAME_SESSION_ENTER_RES
-    G-->>C: S2C_REALM_SELECT_RES
-    W->>R: S2S_GAME_SESSION_SYNC_ENTER_NOT
-
-    C->>G: C2S_SPAWN_POSITION_REQ
-    G->>W: RELAY_TO_WORLD
-    W->>W: DB 캐릭터 조회 + AOI
-    W-->>G: RELAY_TO_CLIENT
-    G-->>C: S2C_SPAWN_POSITION_RES
-```
-
-### 이동 (서버 사이드 NavMesh 경로탐색)
-
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant G as GatewayServer
-    participant W as WorldServer
-
-    C->>G: C2S_MOVE_TO_POSITION_REQ
-    G->>W: RELAY_TO_WORLD
-    W->>W: NavMesh FindPath (Detour)
-    W-->>G: S2C_MOVE_PATH_RES
-    G-->>C: S2C_MOVE_PATH_RES
-
-    Note over W: GameTick 경로 추종
-
-    W-->>G: S2C_ENTITY_SNAPSHOT (AOI)
-    G-->>C: S2C_ENTITY_SNAPSHOT
-
-    Note over W: 셀 경계 이동 시
-    W-->>G: ENTER / LEAVE_NOT
-    G-->>C: ENTER / LEAVE_NOT
-```
+하트비트·세션 타임아웃·지연 콜백을 위한 타이머를 **3레벨 계층 구조(256 / 256 / 128 슬롯)**로 구현했습니다. 표준 우선순위 큐 대비 삽입·만료가 상수 시간에 처리되며, 디스패치 루프에 통합되어 **별도 타이머 스레드가 없습니다**.
 
 ---
 
-## CppNetEngine → UE5 클라이언트 이식
+## 05 Memory Pool & Multi-Server Architecture
 
-서버와 클라이언트가 **동일한 네트워크 엔진**을 사용합니다.
+### 3계층 메모리 할당 전략
 
-```mermaid
-flowchart TB
-    E["CppNetEngine\nC++17 · IOCP · Actor Model"]
-    E -->|"static lib"| S["DH1_Server\nGW · WS · RS\n직접 링크"]
-    E -->|"static lib → Shared/Libraries"| U["DH1_Client (UE5)\nUClientNetSubsystem 래핑"]
+빈번한 패킷 송수신에서 할당 비용과 경합을 줄이기 위해, **스레드 로컬 캐시 → 글로벌 Lock-free 풀 → mimalloc(OS)**로 이어지는 3계층 전략을 설계했습니다.
+
+```
+L1 · TLS 캐시       TlsObjectPool<T>      스레드별 Chunk · atomic 불필요 (최단 경로)
+        ↓
+L2 · 글로벌 풀      ObjectPool<T>         Lock-free 프리리스트 · Chunk 재활용
+        ↓
+L3 · OS 할당        mimalloc              풀 고갈/초과 시 호출
 ```
 
-| 항목 | 구현 |
+| 항목 | 내용 |
 |------|------|
-| **라이브러리 배포** | `CppNetEngine.lib` → `Shared/Libraries/CppNetEngine/{Debug,Release}/` |
-| **UE5 매크로 충돌** | `NetEngineWrapper.h` — `check`, `verify`, `cast` 매크로 push/pop 후 엔진 헤더 포함 |
-| **UE5 생명주기 통합** | `UClientNetSubsystem` (`UGameInstanceSubsystem` + `FTickableGameObject`) |
-| **프로토콜 코드 공유** | 서버·Echo는 `Shared/Protocol` 직접 컴파일, UE는 PacketGenerator가 `Network/Protocol`로 복사 |
-| **빌드 통합** | `DH1_Client.Build.cs`에서 vcpkg + CppNetEngine.lib 링크 |
+| **안전성 · 무결성** | 각 노드에 체크섬 쿠키(`0xDEAD...BEEF`)를 심어 double-free·메모리 손상을 런타임에 감지. `MemoryPool`은 블록마다 소속 Chunk 역참조 포인터를 내장해 `Free()`를 O(1)로 처리 |
+| **SendBufferAllocator** | 요청 크기가 4096B 이하면 256B, 초과 시 4096B 단위로 올림 정렬(최대 65536B)해 `SharedPtr<NetSendBuffer>` 발급. 패킷 크기 편차로 인한 할당 단편화 억제 |
 
-`UClientNetSubsystem`은 CppNetEngine의 `ClientService` + `NetworkScheduler`를 생성하고, UE `Tick()`에서 `Dispatch()`를 호출하여 수신 패킷을 게임 스레드로 전달합니다.
+> **게임 서버 관점** · 초당 수많은 패킷이 오가는 MMORPG에서 할당 비용·단편화·메모리 손상은 곧 렉과 크래시로 직결됩니다. 이를 엔진 레벨에서 통제하는 구조입니다.
 
----
+### 멀티 서버 · 수평 확장 설계
 
-## PacketGenerator (패킷 코드 자동화)
-
-`.proto`에 **커스텀 옵션**으로 패킷 메타데이터를 선언하면, C++ 쪽 **수신 등록·송신 헬퍼·통합 디스패처**와 **PacketId enum**이 자동 생성됩니다.  
-실행은 `Shared/BuildScripts/PacketGenerator.bat` 한 번으로 **protoc 컴파일 + 생성기 실행**까지 묶여 있습니다.
-
-### 처리 파이프라인
-
-```mermaid
-flowchart LR
-    P[".proto 파일"] --> PC["protoc"]
-    PC --> PB[".pb.h / .pb.cc"]
-    PC --> DESC[".desc"]
-    DESC --> GEN["PacketGenerator.exe\n(.NET)"]
-    GEN --> ID["PacketId.h"]
-    GEN --> HND["PacketHandler/*.h"]
-    GEN --> UE["UE Protocol/*.pb.cpp\n(클라이언트 복사)"]
-```
-
-1. **protoc** — `Shared/vcpkg`의 `protoc.exe`로 `.proto` → `Shared/Protocol/*.pb.h`, `*.pb.cc` 및 `Proto/*.desc` (descriptor set).
-2. **PacketGenerator** — `.desc`를 읽어 패킷 목록을 파싱한 뒤, 역할(Role)별로 C++ 헤더를 씁니다.
-3. **클라이언트 동기화** — `CLIENT` 역할에 필요한 `.pb.h` / `.pb.cc`(→`.pb.cpp`로 복사)와 `PacketId.h`를 UE 모듈 경로로 복사합니다.
-
-### Protobuf 커스텀 옵션 (`PacketOption.proto`)
-
-| 확장 대상 | 필드 | 의미 |
-|-----------|------|------|
-| `FileOptions` | `service_type` (50001) | 이 파일이 속한 서비스 타입 enum (`eServiceType`) — 디스패처 그룹핑 |
-| `FileOptions` | `handler_name` (50002) | 생성될 핸들러 클래스 접두어 (예: `LoginPacketHandler`) |
-| `MessageOptions` | `packet_id` (50003) | 패킷 ID (enum 값) |
-| `MessageOptions` | `sender` (50004) | 송신 주체 `eRole` |
-| `MessageOptions` | `receiver` (50005) | 수신 주체 `eRole` (복수 가능) |
-
-역할(`eRole`)과 서비스 타입(`eServiceType`)은 `Enum.proto`에 정의되어 있으며, 생성기는 **수신자에 현재 프로젝트 역할이 포함된 메시지**에만 `HandleRecv` 등록 코드를 넣고, **송신자가 현재 역할인 메시지**에만 `MakeSendBuffer` 헬퍼를 생성합니다.
-
-### 프로젝트 설정 (`Shared/Config/Tools/PacketGeneratorConfig.json`)
-
-`projects` 배열에 **출력 루트 경로**와 **역할 문자열**을 지정합니다. 예:
-
-| `name` (프로젝트 내 상대 경로) | `role` |
-|-------------------------------|--------|
-| `DH1_Server/GatewayServer` | `GATEWAY_SERVER` |
-| `DH1_Server/WorldServer` | `WORLD_SERVER` |
-| `DH1_Server/RealmServer` | `REALM_SERVER` |
-| `DH1_Client/Source/DH1_Client/Network` | `CLIENT` |
-| `DH1_Engine/EchoServer`, `EchoClient` | `ECHO_SERVER`, `ECHO_CLIENT` |
-
-`clientProtocolPath`가 설정되어 있으면, 클라이언트가 송수신에 실제로 쓰는 proto 집합만 골라 `DH1_Client/.../Network/Protocol` 아래로 복사합니다. 기본으로 **Enum / Struct / PacketOption**은 항상 포함되고, 나머지는 패킷 메타데이터에 따라 필터링됩니다. `.pb.cc`는 UBT가 스캔하는 `.pb.cpp` 이름으로 복사해 **클라이언트 모듈 단일 컴파일 단위**로 맞춥니다.
-
-### 자동 생성 산출물
-
-| 산출물 | 위치 | 내용 |
-|--------|------|------|
-| `PacketId.h` | `Shared/Protocol/PacketId/` (및 UE `Network/Protocol/PacketId/`) | proto 파일별 `eXxxPacketId` enum |
-| `{HandlerName}.h` | 각 타깃의 `PacketHandler/` | `HandleRecv` 등록, 수신 처리 함수 선언, `MakeSendBuffer` 정적 메서드 |
-| `PacketServiceTypeHandler.h` | 각 타깃의 `PacketHandler/` | 서비스 타입별 핸들러 include·초기화·`InitPacketHandlers` 한곳 모음 |
-
-생성된 `.h`는 **수정 금지(재생성 시 덮어씀)** 로 두고, 실제 게임 로직은 동일 이름의 `.cpp` 구현부에서 연결하는 패턴을 사용합니다.
-
-### 실행 방법
-
-- 일반: `Shared\BuildScripts\PacketGenerator.bat` (vcpkg `protoc` 필요)
-- `BuildAll.bat`는 기본적으로 PacketGenerator를 포함한 전체 순서로 빌드합니다 (`--skip-proto` 시 proto 단계 생략).
+| 설계 | 내용 | 게임 적용 |
+|------|------|-----------|
+| **최소 연결 로드밸런싱** | 각 Gateway가 자신의 세션 수·상태를 Redis에 등록(`Gateway:*`). LoginServer의 `GatewaySelector`가 온라인 게이트웨이 중 현재 연결이 가장 적은 노드를 선택해 접속 분배 | 접속 폭주 시 서버 간 부하 분산·증설 |
+| **Relay 패턴 · 투명 중계** | `Gateway ↔ World` 간 `RELAY_TO_CLIENT / RELAY_TO_WORLD`로 패킷을 투명 중계. 클라이언트는 단일 접속점만 알면 되고, 내부 서버는 역할에만 집중 | 접속 관문 분리·내부 토폴로지 은닉 |
+| **범위 기반 채팅 라우팅** | 채팅을 LOCAL(AOI 범위)·WORLD(월드 전체)·REALM으로 구분해 패킷 릴레이. REALM 채팅은 RealmServer를 통해 여러 World로 S2S 전파 | 근거리·월드·렐름 범위별 채팅 전파 |
+| **세션 신뢰성 · 자동 정리** | 양방향 하트비트 + Redis 세션 TTL + 중복 로그인 Kick(Redis Pub/Sub) + `SessionReaper` 자동 정리로 좀비 세션·자원 누수 차단 | 끊긴 접속 정리·중복 로그인·계정 보안 |
 
 ---
 
-## 핵심 기능
+## 06 Server Authority — NavMesh · AOI · Codegen
 
-| 기능 | 설명 |
-|------|------|
-| **커스텀 IOCP 엔진** | Actor Model · Lock-free 자료구조 · 3계층 메모리 풀 · TimingWheel · SendBuffer 할당기 (상세: 상단 별도 섹션) |
-| **AOI** | `GridManager` 기반 셀 분할 (2000 유닛). 셀 경계 이동 시 Enter/Leave 자동 브로드캐스트 |
-| **서버 사이드 NavMesh** | UE5 Detour를 서버에서 직접 로드 → 서버 권위적 경로 탐색. S3에서 바이너리 다운로드 |
-| **PacketGenerator** | `.proto` 커스텀 옵션 → PacketId · Handler · UE 프로토콜 자동 생성 (상세: 하단 별도 섹션) |
-| **Relay 패턴** | Gateway ↔ World 간 `RELAY_TO_CLIENT` / `RELAY_TO_WORLD`로 패킷 투명 중계 |
-| **하트비트 · 세션** | 양방향 하트비트 + Redis 세션 TTL + 중복 로그인 Kick + SessionReaper 자동 정리 |
-| **인게임 채팅** | LOCAL (AOI 범위) / WORLD (전체). Redis Pub/Sub 크로스 서버 라우팅 |
-| **캐릭터** | 캐릭터 생성 · 오버헤드 UI (이름·레벨·HP) · 스폰 위치 동기화 |
-| **크래시 리포팅** | Crashpad 미니덤프 수집 (`CrashReporter` + `crashpad_handler.exe`) |
+### 서버 사이드 NavMesh — 서버 권위적 경로 탐색
 
----
+이동 검증을 클라이언트가 아닌 서버에서 수행하기 위해, **UE5 Detour 라이브러리를 서버에 이식**하여 서버가 권위적으로 경로를 계산합니다. NavMesh 바이너리는 AWS S3에서 로드하며, DB(`world_navmesh_source`)로 버전·맵별 경로를 관리하고, 로딩 실패 시 **fail-fast**로 기동을 중단해 잘못된 상태로의 서비스 진입을 막습니다.
 
-## 프로젝트 구조
+| 컴포넌트 | 내용 |
+|----------|------|
+| **FindPath** | `dtNavMeshQuery` 기반 start→end 경로 탐색, GameTick에서 경로 추종 |
+| **AOI · GridManager** | 맵을 격자 셀로 분할(셀 크기 설정값). 셀 경계 이동 시 Enter/Leave 자동 브로드캐스트로 관심 영역만 동기화 |
+| **S3 + IAM** | 최소 권한(`s3:GetObject`) IAM Role로 NavMesh 다운로드. 운영 보안을 고려한 권한 설계 |
+
+> **AOI(Area of Interest)**는 "플레이어의 시야 안에 들어온 대상만 추려 전송"하는 구조로, 대규모 동접 환경에서 위치·상태 동기화 트래픽을 크게 줄이는 MMORPG의 핵심 기법입니다.
+
+### PacketGenerator — 프로토콜 코드 자동 생성
+
+`.proto`에 커스텀 옵션(`packet_id · sender · receiver`)으로 메타데이터를 선언하면, **역할(Role)별 수신 등록 코드·송신 헬퍼·통합 디스패처·PacketId enum**이 자동 생성됩니다. 현재 프로젝트 역할에 해당하는 메시지만 골라 코드를 만들고, 클라이언트가 실제로 쓰는 proto만 UE 모듈로 복사하여 서버·클라 프로토콜을 항상 동기화합니다.
 
 ```
-DH1_MMORPG/
-├── DH1_Engine/                  # CppNetEngine (C++ IOCP 네트워크 엔진, static lib)
-│   ├── CppNetEngine/            #   IOCP, Actor, Session, Scheduler, LockFree, MemoryPool ...
-│   ├── EchoServer/              #   엔진 테스트용 Echo 서버
-│   └── EchoClient/              #   엔진 테스트용 Echo 클라이언트
-│
-├── DH1_Server/
-│   ├── GatewayServer/           # 클라이언트 TCP 접속 관문 (C++ IOCP)
-│   ├── WorldServer/             # 게임 로직, NavMesh, AOI, GameTick (C++ IOCP)
-│   ├── RealmServer/             # 서버 목록 · 월드 등록 관리 (C++ IOCP)
-│   ├── LoginServer/             # 계정 인증 REST API (C# ASP.NET Core 10)
-│   ├── LoginServer.Tests/       # LoginServer 단위 테스트
-│   └── DbMigration/             # EF Core 데이터베이스 마이그레이션
-│
-├── DH1_Client/                  # Unreal Engine 5.7 클라이언트
-│   ├── Source/DH1_Client/
-│   │   ├── Network/             #   CppNetEngine 래퍼, 패킷 핸들러, NetSubsystem
-│   │   ├── Controllers/         #   플레이어 컨트롤러
-│   │   ├── Core/                #   GameMode, NavMesh Exporter
-│   │   ├── UI/                  #   위젯 (로그인, 채팅, 오버헤드 등)
-│   │   └── Misc/                #   유틸리티
-│   └── Plugins/                 #   FlopAI, UnrealMCP 등 에디터 플러그인
-│
-├── Shared/
-│   ├── BuildScripts/            # 빌드 · 실행 · 검증 스크립트 (bat)
-│   ├── Config/                  # 서버/클라이언트/도구 JSON 설정
-│   ├── Protocol/                # Protobuf 정의 (.proto) 및 생성 코드
-│   ├── NavMesh/                 # 서버용 NavMesh 바이너리
-│   ├── NavmeshUE5/              # UE5 Detour 소스 (서버 컴파일용)
-│   ├── Libraries/CppNetEngine/  # 클라이언트용 엔진 lib (Debug/Release)
-│   ├── Tools/
-│   │   ├── PacketGenerator/     #   .proto → PacketId·핸들러 코드 생성기 (.NET)
-│   │   └── CrashHandler/        #   crashpad_handler.exe
-│   └── vcpkg/                   # 패키지 의존성 (spdlog, protobuf, redis++ 등)
-│
-├── Binaries/                    # 빌드 산출물 (Server/{Debug,Release}/...)
-├── Logs/                        # 서버·클라이언트 로그
-└── .github/workflows/ci.yml     # GitHub Actions CI
+.proto  →  protoc  →  .pb.h / .desc  →  PacketGenerator.exe (.NET)
+                                                ↓
+         PacketId.h  ·  {Role}PacketHandler.h  ·  UE Protocol/*.pb.cpp (클라 복사)
 ```
 
 ---
 
-## 빌드
+## 07 Background — Education · Training · Certificate
 
-### 사전 요구사항
+> 잠시 현업을 떠나 진로를 깊이 고민한 시기를 거치며, 코딩이 한순간도 머릿속을 떠나지 않는다는 사실을 확인하고 분명한 확신을 갖고 돌아왔습니다. 그 확신은 "도구를 잘 쓰는 개발자"를 넘어 **서버 시스템의 근본을 만들 수 있는 개발자**가 되겠다는 방향으로 이어졌고, 그 결과물이 네트워크 엔진부터 분산 서버·서버 사이드 NavMesh·AOI까지 구현한 DH1_MMORPG입니다.
 
-| 항목 | 버전 |
-|------|------|
-| Visual Studio | 2025 (v18.x) — `.vsconfig`로 필요 컴포넌트 설치 |
-| .NET SDK | 10.0.201 (`global.json`으로 고정) |
-| Unreal Engine | 5.7 |
-| vcpkg | `Shared/vcpkg/vcpkg.json` 참조 (spdlog, protobuf, redis-plus-plus, mimalloc 등) |
+### 학력
 
-### 전체 빌드
+| | |
+|---|---|
+| **한국공학대학교** | 지식서비스공학 · 2015.03 – 2019.02 졸업 |
+| **유한공업고등학교** | 2012 – 2015 졸업 |
 
-PacketGenerator → Engine → Server → UE 클라이언트 순서로 빌드합니다.
+### 자격 · 교육
 
-```batch
-Shared\BuildScripts\BuildAll.bat           # Debug
-Shared\BuildScripts\BuildAll.bat Release   # Release
-Shared\BuildScripts\BuildAll.bat --skip-proto   # proto 생성 건너뛰기
-```
+| | |
+|---|---|
+| **정보처리기사** | 한국산업인력공단 · 2019.08 취득 |
+| **프로카데미 16기** | 서버 프로그래머 과정 졸업 — 어셈블리 분석·C/C++·네트워크·OS·멀티스레드·IOCP·MMORPG 서버 구현 |
 
-### 패킷 코드 생성
+### 게임 서버 개발자 적합성 요약
 
-`.proto` 파일 수정 후 실행합니다.
+| 엔진 깊이 | 게임 시스템 | 라이브 실무 |
+|------|------|------|
+| IOCP·Lock-free·메모리 풀을 구현해 렉·크래시·동접 부하를 근본부터 다루는 역량 | NavMesh 서버 권위 이동·AOI·GameTick·채팅을 구현한 실제 MMORPG 서버 설계 경험 | 라이브 서비스와 신작 프로젝트 양쪽에서 콘텐츠·시스템 개발과 운영 이슈 대응·리팩토링을 수행한 실무 감각 |
 
-```batch
-Shared\BuildScripts\PacketGenerator.bat
-```
-
-### 검증 테스트
-
-CI와 동일한 최소 점검을 로컬에서 수행합니다 (.NET SDK 10.0.201 필요).
-
-```batch
-Shared\BuildScripts\RunValidationTests.bat
-Shared\BuildScripts\RunValidationTests.bat --full   # proto 컴파일 + Echo 엔진 빌드 포함
-```
-
-> VS Code에서는 `Ctrl+Shift+B` → 빌드 태스크 선택으로도 실행 가능합니다.
+> 주어진 일을 잘 해내는 것을 넘어, **더 나은 구조와 더 깊은 이해**를 향해 꾸준히 성장하는 엔지니어가 되겠습니다.
 
 ---
 
-## 서버 실행
+## 연락처
 
-```batch
-Shared\BuildScripts\StartServers.bat          # 서버만 실행 (Debug)
-Shared\BuildScripts\StartServers.bat Release  # 서버만 실행 (Release)
-
-Shared\BuildScripts\StartGame.bat             # 서버 + 클라이언트 실행
-```
-
-실행 순서: **RealmServer → WorldServer → GatewayServer → LoginServer** → (클라이언트)
-
-각 서버는 프로세스 존재·TCP 포트·HTTP 헬스체크를 순차 확인한 뒤 다음 단계로 진행합니다.
-
----
-
-## 환경 설정
-
-```bash
-# .env.example을 복사해 값을 채워주세요
-cp .env.example .env
-```
-
-환경 설정은 `.env` 단일 파일 기준으로 운영합니다.
-
-- `.env`: 로컬 실행용 환경 변수 (커밋 금지, `.gitignore` 적용)
-- `.env.example`: 템플릿 (커밋 대상)
-
-| 변수 | 설명 |
-|------|------|
-| `DH1_MYSQL_HOST` | MySQL 호스트 (기본: 127.0.0.1) |
-| `DH1_MYSQL_PORT` | MySQL 포트 (기본: 3306) |
-| `DH1_MYSQL_USER` | MySQL 사용자 |
-| `DH1_MYSQL_PASSWORD` | MySQL 비밀번호 |
-| `DH1_REDIS_HOST` | Redis 호스트 (기본: 127.0.0.1) |
-| `DH1_REDIS_PORT` | Redis 포트 (기본: 6379) |
-| `DH1_S3_REGION` | `s3://` 사용 시 AWS 리전 (`ap-northeast-2` 등) |
-| `DH1_NAVMESH_CACHE_PATH` | S3에서 내려받은 NavMesh 로컬 캐시 경로 |
-| `DH1_SMTP_HOST` | SMTP 서버 주소 (예: smtp.gmail.com) |
-| `DH1_SMTP_SENDER_EMAIL` | 발신자 이메일 주소 |
-| `DH1_SMTP_APP_PASSWORD` | SMTP 앱 비밀번호 (Gmail 기준: 앱 비밀번호) |
-| `DH1_LOG_DIR` | CppNetEngine 파일 로그 경로 (미설정 시 콘솔만 출력) |
-| `DH1_CRASH_DIR` | 크래시 덤프 저장 경로 |
-| `DH1_CRASH_HANDLER_PATH` | crashpad_handler.exe 절대 경로 |
-
-`Shared/Config/Server/WorldServerConfig.json`의 `gameTick.navMeshRequireSuccess`가 `true`이면(기본값)
-NavMesh 다운로드/로딩 실패 시 WorldServer는 fail-fast로 기동을 중단합니다.
-
-### NavMesh 소스 DB (필수)
-
-WorldServer는 `world_navmesh_source` 테이블이 있으면 `world_server_id + map_code` 기준으로 NavMesh 경로를 먼저 조회합니다.
-NavMesh 소스는 `s3://bucket/key`만 지원합니다.
-
-```sql
-CREATE TABLE world_navmesh_source (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  world_server_id INT NOT NULL,
-  map_code VARCHAR(64) NOT NULL,
-  navmesh_path VARCHAR(1024) NOT NULL,  -- s3://bucket/key
-  navmesh_version INT NULL,
-  is_active TINYINT(1) NOT NULL DEFAULT 1,
-  UNIQUE KEY uq_world_map (world_server_id, map_code, is_active)
-);
-```
-
-### 권장 운영 방식 (IAM)
-
-- EC2(또는 서버)에 IAM Role 부여 (`s3:GetObject`)
-- 서버에 AWS CLI 설치
-- `world_navmesh_source.navmesh_path`를 `s3://...`로 관리
-- WorldServer 시작 시 `aws s3 cp`로 캐시에 내려받아 로드
-
-#### 최소 권한 정책 예시
-
-- 파일: `Shared/Config/Server/IamPolicy.NavMeshReadOnly.example.json`
-- 버킷명/접두어를 실제 운영 값으로 바꿔서 IAM Role에 연결
-
-```bash
-# 권한 연결 후 테스트 (서버 머신)
-aws s3 ls s3://dh1-navmesh-prod/navmesh/ --region ap-northeast-2
-aws s3 cp s3://dh1-navmesh-prod/navmesh/L_GameWorld.bin C:/Temp/L_GameWorld.bin --region ap-northeast-2
-```
+| | |
+|---|---|
+| **Email** | devhun001@gmail.com |
+| **Phone** | 010-5158-2378 |
+| **GitHub** | [github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
+| **시연 영상** | [youtube.com/watch?v=_RJqDSDwSnE](https://www.youtube.com/watch?v=_RJqDSDwSnE) |
