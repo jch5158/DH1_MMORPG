@@ -11,7 +11,7 @@
 
 **MMORPG / 온라인 게임 서버 개발 · 고성능 네트워크 엔진 구현 · 라이브 서비스 운영·콘텐츠 개발**
 
-C++ IOCP 기반 비동기 네트워크 엔진을 처음부터 직접 설계·구현한 게임 서버 프로그래머입니다. 조이시티에서 프리스타일2 라이브 서비스와 신작 프리스타일 리부트의 시스템·콘텐츠를 개발하며 운영 안정성과 실무 감각을 길렀고, 개인 프로젝트 DH1_MMORPG에서는 네트워크 엔진·분산 서버·서버 사이드 NavMesh·AOI까지 MMORPG 서버의 핵심 파이프라인을 구현했습니다. "동작하는 코드"를 넘어 **왜 그렇게 동작하는지**를 파고드는 깊이를 강점으로 삼습니다.
+C++ IOCP 기반 비동기 네트워크 엔진을 직접 설계·구현한 게임 서버 프로그래머입니다. 조이시티에서 프리스타일2 라이브 서비스와 신작 프리스타일 리부트의 시스템·콘텐츠를 개발하며 운영 안정성과 실무 감각을 쌓았습니다. 개인 프로젝트 DH1_MMORPG에서는 네트워크 엔진·분산 서버 구조·서버 권위 기반 이동 검증·AOI·UE5 클라이언트까지 MMORPG 핵심 파이프라인을 1인 개발로 구현했습니다. CS 지식을 바탕으로 동작 원리를 코드 수준에서 이해하고 검증하는 개발자를 지향합니다.
 
 | 1Y 10M | 2종 | 1인 |
 |:---:|:---:|:---:|
@@ -74,14 +74,14 @@ C++ IOCP 기반 비동기 네트워크 엔진을 처음부터 직접 설계·구
 
 ### 핵심 역량 요약
 
-저는 "동작하는 코드"에 멈추지 않고 왜 그렇게 동작하는지를 끝까지 파고드는 게임 서버 프로그래머입니다. 라이브러리를 가져다 쓰는 대신 IOCP 비동기 네트워크 엔진·Lock-free 자료구조·메모리 할당기·타이머 스케줄러를 구현하며 OS·네트워크·동시성의 근본을 체득했고, 그 위에 서버 사이드 NavMesh 경로탐색·AOI·GameTick·인게임 채팅 등 실제 MMORPG 서버의 핵심 시스템을 올렸습니다. 조이시티 라이브 서비스에서 다진 운영 안정성과 콘텐츠·시스템 개발 경험이 이 깊이를 실무로 뒷받침합니다.
+IOCP 비동기 네트워크 엔진·Lock-free 자료구조·메모리 할당기·타이머 스케줄러를 구현하며 OS·네트워크·동시성의 핵심 원리를 코드로 검증했고, 그 위에 서버 사이드 NavMesh 경로탐색·AOI·GameTick·인게임 채팅 등 MMORPG 서버에 필요한 핵심 시스템을 구현했습니다. 이러한 기술적 기반은 조이시티에서 쌓은 라이브 서비스 운영 경험과 안정성 중심의 개발 경험으로 뒷받침됩니다.
 
 ### 게임 서버 개발자로서의 강점 (Why this profile fits)
 
-| 엔진을 만드는 깊이 | 서버 권위 게임 로직 | 라이브 서비스 실무 |
+| 엔진 레벨 구현 역량 | 게이트웨이 중심 구조 | 라이브 서비스 실무 |
 |------|------|------|
-| IOCP Overlapped I/O · Lock-free 큐 · 3계층 메모리 풀 · 계층형 TimingWheel을 **외부 프레임워크 없이** 구현. 서버가 멈추거나 느려지는 근본 원인을 엔진 레벨에서 진단·튜닝합니다. | 서버 사이드 NavMesh 경로탐색, AOI 기반 시야 동기화, GameTick 경로 추종, 범위별 채팅 릴레이 등 **서버가 게임 상태를 관리하는 권위적 구조**를 설계·구현했습니다. | 프리스타일2·리부트에서 미션·레드닷 시스템과 미니게임 이벤트를 개발하고, 라이브 버그 대응·레거시 리팩토링을 수행하며 **유저에게 닿는 코드의 안정성**을 최우선으로 다뤘습니다. |
-| 게임 적용 · 동접 부하·렉·메모리 누수의 근본 대응 | 게임 적용 · 서버 이동 검증·시야 동기화 | 게임 적용 · 게임 콘텐츠·시스템 개발, 라이브 이슈 경험 |
+| IOCP Overlapped I/O · Lock-free 큐 · 3계층 메모리 풀 · 계층형 TimingWheel을 외부 프레임워크 없이 구현. 서버가 멈추거나 느려지는 원인을 엔진 레벨에서 진단·튜닝합니다. | 클라이언트는 GatewayServer 한 곳에만 접속(단일 커넥션)하고, Gateway가 내부 World·Realm으로 패킷을 릴레이하는 구조를 설계·구현했습니다. | 프리스타일2·리부트에서 미션·레드닷 시스템과 미니게임 이벤트를 개발하고, 라이브 버그 대응·레거시 리팩토링을 수행하며 실제 유저에게 영향을 주는 코드의 안정성을 최우선으로 다뤘습니다. |
+| 게임 적용 · 동접 부하·응답 지연·메모리 누수 대응 | 게임 적용 · 단일 접속점·내부 토폴로지 은닉 | 게임 적용 · 게임 콘텐츠·시스템 개발, 라이브 이슈 경험 |
 
 ---
 
@@ -91,8 +91,8 @@ C++ IOCP 기반 비동기 네트워크 엔진을 처음부터 직접 설계·구
 
 | 분류 | 기술 |
 |------|------|
-| **Languages** (주력 / 보조) | C++17 · C# · SQL · Assembly (분석) |
-| **Game Server** (게임 서버 시스템) | 서버 권위 로직 · 인게임 채팅 · 에이전트 서버 기반 패킷 Relay · 서버 사이드 NavMesh · AOI / GridManager |
+| **Languages** (주력 / 보조) | C++20 / C++17 / C++11 · C# · SQL · Assembly (분석) |
+| **Game Server** (게임 서버 시스템) | 서버 권위 기반 로직 · 인게임 채팅 · Gateway 기반 패킷 릴레이 · 서버 사이드 NavMesh · AOI / GridManager |
 | **Networking** (저수준 I/O) | Windows IOCP · SendBufferAllocator · HTTPS / REST · Custom Network Engine |
 | **Concurrency** (동시성·자료구조) | Actor Model · ScopedActor · Lock-free Queue/Stack · atomic / CAS · 3-Tier Memory Pool · TimingWheel |
 | **Multi-Server** (분산·상태 동기화) | Redis (Session / Pub/Sub) · Gateway 로드밸런싱 · 크로스 서버 채팅 |
@@ -100,7 +100,7 @@ C++ IOCP 기반 비동기 네트워크 엔진을 처음부터 직접 설계·구
 | **Client** (클라이언트 통합) | Unreal Engine 5.7 (C++) · Custom Network Engine 이식 |
 | **Build / Tooling** (빌드·자동화) | PacketGenerator (.NET) · protoc · MSBuild / UBT · vcpkg · BuildScripts (.bat) |
 
-> 표기된 기술은 모두 실제 코드로 구현·운영해 본 항목이며, 학습 수준에 그친 항목은 포함하지 않았습니다.
+> 표기된 기술은 실제 코드로 구현했거나 실무에서 사용한 항목 위주로 정리했습니다.
 
 ---
 
@@ -108,12 +108,12 @@ C++ IOCP 기반 비동기 네트워크 엔진을 처음부터 직접 설계·구
 
 ### 대표 프로젝트
 
-C++17 IOCP 커스텀 네트워크 엔진(CppNetEngine)을 설계·구현하고, 이를 4개의 분산 서버와 Unreal Engine 5.7 클라이언트가 동일하게 공유하도록 만든 MMORPG 서버 프로젝트입니다. 네트워크 엔진의 내부 컴포넌트(I/O 모델·동시성·메모리·타이머)부터 분산 아키텍처, 클라이언트 통합까지 **서버 개발의 전 과정을 1인이 구현**했습니다.
+C++20 기반 IOCP 커스텀 네트워크 엔진(CppNetEngine)을 설계·구현하고, 이를 GatewayServer·WorldServer·RealmServer와 UE5 클라이언트가 공유하도록 구성하고, 인증 기능은 C# 기반 LoginServer로 분리한 MMORPG 프로젝트입니다. I/O 모델·동시성·메모리 풀·타이머 스케줄러부터 분산 서버 아키텍처, 프로토콜 자동화, UE5 클라이언트 통합까지 전 영역을 직접 구현했습니다.
 
 | | |
 |---|---|
 | **유형 / 기간** | 개인 프로젝트 (1인 개발) · 2026.01 ~ 진행 중 |
-| **구성** | C++17 네트워크 엔진 · C# 인증 서버 · Protobuf 프로토콜 · UE5 클라이언트 — 1인 전 영역 구현 |
+| **구성** | C++20 네트워크 엔진 · C# ASP.NET Core 인증 서버 · Protobuf 프로토콜 · UE5 클라이언트까지 1인 구현 |
 | **저장소** | [github.com/jch5158/DH1_MMORPG](https://github.com/jch5158/DH1_MMORPG) |
 | **시연 영상** | [youtube.com/watch?v=_RJqDSDwSnE](https://www.youtube.com/watch?v=_RJqDSDwSnE) |
 
@@ -154,9 +154,9 @@ CppNetEngine.lib 이식 · 서버와 동일 엔진 공유
 
 | 항목 | 내용 |
 |------|------|
-| **커스텀 네트워크 엔진** | IOCP 비동기 I/O · Actor 모델 · Lock-free 자료구조 · 3계층 메모리 풀 · TimingWheel을 포함한 C++ 서버 엔진을 외부 프레임워크 없이 처음부터 구현 |
+| **커스텀 네트워크 엔진** | IOCP 비동기 I/O · Actor 모델 · Lock-free 자료구조 · 3계층 메모리 풀 · TimingWheel을 포함한 C++ 서버 엔진을 외부 프레임워크 없이 구현 |
 | **분산 서버 아키텍처** | 역할별 4개 서버 분리 + Relay 패턴 + Redis 세션으로 멀티 서버 구조 구현. LoginServer는 Gateway별 세션 수(Redis 조회)를 비교해 최소 연결 노드로 분배 |
-| **엔진 클라이언트 이식** | CppNetEngine을 static lib로 빌드해 UE5에 통합. 매크로 충돌 격리·생명주기 통합(Subsystem)으로 서버·클라 동일 엔진 공유 |
+| **UE5 클라이언트 구현** | CppNetEngine을 UE5에 이식해 서버·클라이언트가 동일 네트워크 스택을 공유. 로그인·캐릭터 생성 UI, 접속·인증 흐름, 패킷 송수신, 캐릭터 이동·서버 동기화, 인게임 채팅까지 직접 구현 |
 | **프로토콜 자동화 도구** | .proto 커스텀 옵션 기반 PacketGenerator(.NET)를 직접 개발해 역할별 패킷 코드·디스패처를 자동 생성, 서버·클라 프로토콜을 동기화 |
 
 ---
@@ -165,12 +165,12 @@ CppNetEngine.lib 이식 · 서버와 동일 엔진 공유
 
 ### 고성능 네트워크 엔진
 
-엔진의 핵심은 소켓 I/O와 게임 로직을 **물리적으로 분리한 이중 IOCP 스케줄러**입니다. 각 스케줄러는 독립된 IOCP 핸들과 스레드 풀을 가져 서로 간섭하지 않으며, 메시지는 Lock-free 큐로만 전달됩니다.
+엔진의 핵심은 소켓 I/O와 게임 로직을 **역할별로 컴포넌트화한 이중 IOCP 스케줄러**입니다. 각 스케줄러는 독립된 IOCP 핸들과 스레드 풀을 가져 서로 간섭하지 않으며, 메시지는 Lock-free 큐로만 전달됩니다.
 
 | 스케줄러 | 역할 | 설명 |
 |----------|------|------|
 | **NetworkScheduler** | 소켓 I/O 전담 | Overlapped I/O 완료를 GetQueuedCompletionStatus로 수신 → 패킷 역직렬화·송신 완료 처리. 디스패치 루프마다 TimingWheel을 Tick하여 하트비트·세션 타임아웃을 함께 스케줄링 |
-| **ActorScheduler** | 게임 로직 전담 | 소켓 없이 PostQueuedCompletionStatus로 Actor를 깨우는 수동 완료 큐. 워크 아이템을 IOCP 동시성 제어에 그대로 위임하여 별도 락 없이 스레드 부하를 분산 |
+| **ActorScheduler** | 게임 로직 · DB 비동기 | 소켓 없이 PostQueuedCompletionStatus로 Actor를 깨우는 수동 완료 큐. 게임 로직뿐 아니라 DB 쿼리도 전용 Actor에 Post해 비동기 처리하며, 라운드 로빈 / 라우팅 키(유저별 순서 보장)로 분배합니다 |
 
 ### Actor 모델 — 락 없는 단일 소유 동시성
 
@@ -193,7 +193,7 @@ bool ScopedActor::TryAcquire() {
 
 | 자료구조 | 구현 방식 | ABA 방지 | 용도 |
 |----------|-----------|----------|------|
-| **LockFreeQueue** | Dummy-head 연결 리스트 + `atomic_ref` CAS + `Node16`(포인터 + 64-bit 버전 카운터) | 버전 카운터 (head/tail 별) | ActorMailbox · SendBuffer 큐의 기반 |
+| **LockFreeQueue** | Dummy-head 연결 리스트 + CAS 기반 원자적 갱신, `Node16`(포인터 + 64-bit 버전 카운터)로 ABA 문제 차단 | 버전 카운터 (head/tail 별) | ActorMailbox · SendBuffer 큐의 기반 |
 | **LockFreeStack** | Treiber 스택 + `Node16` wide-CAS | top 버전 카운터 | 세션 풀 · ConnectionPool 인덱스 관리 |
 
 > **설계 원칙** · `alignas(hardware_destructive_interference_size)`로 head/tail/count를 별도 캐시 라인에 배치해 **false sharing을 제거**하고, 노드 할당은 TLS 캐시(`TlsObjectPool`)에서 처리하여 atomic 연산 오버헤드를 최소화했습니다.
@@ -223,7 +223,7 @@ L3 · OS 할당     mimalloc            풀 고갈/초과 시 호출
 | **안전성 · 무결성** | 각 노드에 체크섬 쿠키(`0xDEAD…BEEF`)를 심어 double-free·메모리 손상을 **런타임에 감지**. `MemoryPool`은 블록마다 소속 Chunk 역참조 포인터를 내장해 `Free()`를 O(1)로 처리 |
 | **SendBufferAllocator** | 요청 크기가 4096B 이하면 256B, 초과 시 4096B 단위로 올림 정렬(최대 65536B)해 `SharedPtr<NetSendBuffer>` 발급. 패킷 크기 편차로 인한 할당 단편화를 억제 |
 
-> **게임 서버 관점** · 초당 수많은 패킷이 오가는 MMORPG에서 할당 비용·단편화·메모리 손상은 곧 렉과 크래시로 직결됩니다. 이를 엔진 레벨에서 통제하는 구조입니다.
+> **게임 서버 관점** · 초당 수많은 패킷이 오가는 MMORPG에서 할당 비용·단편화·메모리 손상은 응답 지연과 크래시로 직결됩니다. 이를 엔진 레벨에서 통제하는 구조입니다.
 
 ### 멀티 서버 · 수평 확장 설계
 
